@@ -1,0 +1,12 @@
+<Scenario name="Default test scenario">
+	<Party>
+		<Unit Template="Dummy"/>
+	</Party>
+	<Fights>
+		<Fight name="First fight">		
+			<Wave>
+				<Unit Template="Dummy"/>
+			</Wave>		
+		</Fight>
+	</Fights>
+</Scenario>
