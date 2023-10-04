@@ -1,0 +1,14 @@
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\bin\Debug\HSR_SIM_GUI.exe.config
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\bin\Debug\HSR_SIM_GUI.exe
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\bin\Debug\HSR_SIM_GUI.pdb
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\bin\Debug\HSR_SIM_LIB.dll
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\bin\Debug\HSR_SIM_LIB.pdb
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\obj\Debug\HSR_SIM_GUI.csproj.AssemblyReference.cache
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\obj\Debug\HSR_SIM_GUI.csproj.SuggestedBindingRedirects.cache
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\obj\Debug\HSR_SIM_GUI.Main.resources
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\obj\Debug\HSR_SIM_GUI.Properties.Resources.resources
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\obj\Debug\HSR_SIM_GUI.csproj.GenerateResource.cache
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\obj\Debug\HSR_SIM_GUI.csproj.CoreCompileInputs.cache
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\obj\Debug\HSR_SIM_GUI.csproj.CopyComplete
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\obj\Debug\HSR_SIM_GUI.exe
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\obj\Debug\HSR_SIM_GUI.pdb

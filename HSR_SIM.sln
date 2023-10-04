@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33723.286
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSR_SIM_GUI", "HSR_SIM_GUI\HSR_SIM_GUI.csproj", "{38D76C59-75EE-4E01-A69B-F3175CDF9900}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSR_SIM_LIB", "HSR_SIM_LIB\HSR_SIM_LIB.csproj", "{E00A8B28-2FD6-4A6C-B761-630F8ED66421}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{38D76C59-75EE-4E01-A69B-F3175CDF9900}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38D76C59-75EE-4E01-A69B-F3175CDF9900}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38D76C59-75EE-4E01-A69B-F3175CDF9900}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38D76C59-75EE-4E01-A69B-F3175CDF9900}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E00A8B28-2FD6-4A6C-B761-630F8ED66421}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E00A8B28-2FD6-4A6C-B761-630F8ED66421}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E00A8B28-2FD6-4A6C-B761-630F8ED66421}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E00A8B28-2FD6-4A6C-B761-630F8ED66421}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B272ABB3-F590-44EA-8022-D00E8AB674D2}
+	EndGlobalSection
+EndGlobal

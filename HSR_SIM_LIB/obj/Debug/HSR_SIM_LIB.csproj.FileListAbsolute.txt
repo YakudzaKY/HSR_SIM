@@ -1,0 +1,6 @@
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_LIB\bin\Debug\HSR_SIM_LIB.dll
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_LIB\bin\Debug\HSR_SIM_LIB.pdb
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_LIB\obj\Debug\HSR_SIM_LIB.csproj.AssemblyReference.cache
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_LIB\obj\Debug\HSR_SIM_LIB.csproj.CoreCompileInputs.cache
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_LIB\obj\Debug\HSR_SIM_LIB.dll
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_LIB\obj\Debug\HSR_SIM_LIB.pdb

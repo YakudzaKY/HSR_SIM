@@ -1,0 +1,6 @@
+<Unit name="Default Dummy">	
+	<Stats>
+		<MaxHP>10000</MaxHP>
+		<Attack>10</Attack>
+	</Stats>
+</Unit>
