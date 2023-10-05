@@ -46,10 +46,24 @@ namespace HSR_SIM_LIB
         {
             short i = 0;
             int spaceXSize = (int)Math.Round ((double)((CombatImgSize.Width - (5 * TotalUnitSize.Width) )/5)) ;
-            foreach (Unit unit in units)
+            foreach (CombatUnit unit in units)
             {
-              
-                gfx.DrawImage(unit.Portrait, new Point(point.X + (i * (spaceXSize+ TotalUnitSize.Width)) , point.Y ));   
+                Point portraitPoint = new Point(point.X + (i * (spaceXSize + TotalUnitSize.Width)), point.Y);
+                //portrait
+                gfx.DrawImage(unit.Portrait, portraitPoint);
+                //name
+                DrawText(portraitPoint.X+3, portraitPoint.Y+3, gfx, unit.Name,null, new Font("Tahoma", 12, FontStyle.Bold));
+                //healthbar
+                using (SolidBrush brush = new SolidBrush(Color.FromArgb(170, 000, 000)))
+                {
+                    gfx.FillRectangle(brush, portraitPoint.X, portraitPoint.Y+ PortraitSize.Height, HealthBarSize.Width, HealthBarSize.Height);
+                }
+                using (SolidBrush brush = new SolidBrush(Color.FromArgb(000, 170, 000)))
+                {
+                    int greenWidth =(int)Math.Floor((double)HealthBarSize.Width *(unit.Stats.CurrentHp) / unit.Stats.MaxHp);
+                    gfx.FillRectangle(brush, portraitPoint.X, portraitPoint.Y + PortraitSize.Height, greenWidth, HealthBarSize.Height);
+                }
+                DrawText(portraitPoint.X , portraitPoint.Y + PortraitSize.Height, gfx, String.Format("HP: {0:d}/{1:d}",unit.Stats.CurrentHp, unit.Stats.MaxHp), null, new Font("Tahoma", 8));
                 i++;
             }  
         }
@@ -99,7 +113,7 @@ namespace HSR_SIM_LIB
                     //party draw
                     DrawUnits(gfx, Combat.Party, unitHostility.Friendly, new Point(10, CombatImgSize.Height - TotalUnitSize.Height-10));
                     //TP draw
-                    DrawText(CombatImgSize.Width - 100, CombatImgSize.Height / 2, gfx, "TP:");
+                    DrawText(CombatImgSize.Width - 100, CombatImgSize.Height / 2, gfx, String.Format("TP: {0:d}/{1:d}",Combat.Tp , Constant.MaxTp) );
                     //enemy draw
                     if (Combat.CurrentFight != null)
                     {
@@ -185,7 +199,7 @@ namespace HSR_SIM_LIB
                 XmlElement xRoot = unitDoc.DocumentElement;
                 if (xRoot != null)
                 {
-                    unit.Name = xRoot.Attributes.GetNamedItem("name").Value.Trim();
+                    unit.Name = unitCode;
                     //parse all items
                     foreach (XmlElement xnode in xRoot)
                     {
