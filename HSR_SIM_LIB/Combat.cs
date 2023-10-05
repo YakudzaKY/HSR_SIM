@@ -20,7 +20,7 @@ namespace HSR_SIM_LIB
 
         public int CurrentStep { get => currentStep; set => currentStep = value; }
         internal Scenario CurrentScenario { get => currentScenario; set => currentScenario = value; }
-        public List<CombatUnit> Party { get => party; set => party = value; }
+        public List<Unit> Party { get => party; set => party = value; }
         internal CombatFight CurrentFight { get => currentFight; set => currentFight = value; }
         public int Tp { get => tp; set => tp = value; }
         public int Sp { get => sp; set => sp = value; }
@@ -42,7 +42,7 @@ namespace HSR_SIM_LIB
 
         public int CurrentFightStep { get => currentFightStep; set => currentFightStep = value; }
 
-        List<CombatUnit> party;
+        List<Unit> party;
 
         CombatFight currentFight=null;
         
@@ -70,12 +70,12 @@ namespace HSR_SIM_LIB
         /// </summary>
         /// <param name="units"></param>
         /// <returns></returns>
-        public List<CombatUnit> getCombatUnits(List<Unit> units)
+        public List<Unit> getCombatUnits(List<Unit> units)
         {
-            List<CombatUnit> res= new List<CombatUnit> ();
-            foreach (Unit unit in units)
-            {   
-                res.Add(new CombatUnit(unit));
+            List<Unit> res = new List<Unit>(units);
+            foreach (Unit unit in res)
+            {
+                unit.InitToCombat();               
             }
             return res;
         }

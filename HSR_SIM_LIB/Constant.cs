@@ -20,10 +20,11 @@ namespace HSR_SIM_LIB
         }
         public static readonly Size PortraitSize = new Size(100, 100);        
         public static readonly Size HealthBarSize = new Size(100, 15);
+        public static readonly Size EnergyBarSize = new Size(100, 10);
         public static readonly Size CombatImgSize = new Size(800, 400);        
         /// <summary>
         /// total
         /// </summary>
-        public static readonly Size TotalUnitSize = new Size(PortraitSize.Width, PortraitSize.Height+ HealthBarSize.Height);
+        public static readonly Size TotalUnitSize = new Size(PortraitSize.Width, PortraitSize.Height+ HealthBarSize.Height+ EnergyBarSize.Height);
     }
 }

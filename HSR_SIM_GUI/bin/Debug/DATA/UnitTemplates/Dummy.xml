@@ -1,3 +1,3 @@
 <Unit>	
-	<Stats maxHp="10000" attack="10"/>
+	<Stats maxHp="500000" attack="10" />
 </Unit>

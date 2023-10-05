@@ -53,7 +53,6 @@
     <Compile Include="CallBacks.cs" />
     <Compile Include="Combat.cs" />
     <Compile Include="CombatFight.cs" />
-    <Compile Include="CombatUnit.cs" />
     <Compile Include="Constant.cs" />
     <Compile Include="Fight.cs" />
     <Compile Include="Scenario.cs" />

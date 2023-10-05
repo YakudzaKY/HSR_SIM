@@ -8,13 +8,13 @@ namespace HSR_SIM_LIB
 {
     internal class CombatFight : Fight
     {
-        List<CombatUnit> units;
+        List<Unit> units;
 
         public CombatFight()
         {
 
         }
 
-        internal List<CombatUnit> Units { get => units; set => units = value; }
+        internal List<Unit> Units { get => units; set => units = value; }
     }
 }

@@ -42,11 +42,11 @@ namespace HSR_SIM_LIB
         /// <param name="units"> Unit list</param>
         /// <param name="hstl">hostile type</param>
         /// <param name="point"> start point</param>
-        public void DrawUnits(Graphics gfx,List<CombatUnit> units, unitHostility hstl, Point point)
+        public void DrawUnits(Graphics gfx,List<Unit> units, unitHostility hstl, Point point)
         {
             short i = 0;
             int spaceXSize = (int)Math.Round ((double)((CombatImgSize.Width - (5 * TotalUnitSize.Width) )/5)) ;
-            foreach (CombatUnit unit in units)
+            foreach (Unit unit in units)
             {
                 Point portraitPoint = new Point(point.X + (i * (spaceXSize + TotalUnitSize.Width)), point.Y);
                 //portrait
@@ -63,7 +63,24 @@ namespace HSR_SIM_LIB
                     int greenWidth =(int)Math.Floor((double)HealthBarSize.Width *(unit.Stats.CurrentHp) / unit.Stats.MaxHp);
                     gfx.FillRectangle(brush, portraitPoint.X, portraitPoint.Y + PortraitSize.Height, greenWidth, HealthBarSize.Height);
                 }
-                DrawText(portraitPoint.X , portraitPoint.Y + PortraitSize.Height, gfx, String.Format("HP: {0:d}/{1:d}",unit.Stats.CurrentHp, unit.Stats.MaxHp), null, new Font("Tahoma", 8));
+                DrawText(portraitPoint.X + 5, portraitPoint.Y + PortraitSize.Height, gfx, String.Format("{0:d}/{1:d}", unit.Stats.CurrentHp, unit.Stats.MaxHp), null, new Font("Tahoma", 7));
+                //Energy bar
+                if (unit.Stats.BaseMaxEnergy > 0)
+                {
+                    
+                    using (SolidBrush brush = new SolidBrush(Color.FromArgb(252, 217, 167)))
+                    {
+                        gfx.FillRectangle(brush, portraitPoint.X, portraitPoint.Y + PortraitSize.Height + HealthBarSize.Height, EnergyBarSize.Width, EnergyBarSize.Height);
+                    }
+                    using (SolidBrush brush = new SolidBrush(Color.FromArgb(4, 232, 255)))
+                    {
+                        int blueWidth = (int)Math.Floor((double)EnergyBarSize.Width * (unit.Stats.CurrentEnergy) / unit.Stats.BaseMaxEnergy);
+                        gfx.FillRectangle(brush, portraitPoint.X, portraitPoint.Y + PortraitSize.Height+ HealthBarSize.Height, blueWidth, EnergyBarSize.Height);
+                    }
+                    DrawText(portraitPoint.X + 5, portraitPoint.Y + PortraitSize.Height + HealthBarSize.Height, gfx, String.Format("{0:d}/{1:d}", unit.Stats.CurrentEnergy, unit.Stats.BaseMaxEnergy), null, new Font("Tahoma", 7));
+                }
+
+               
                 i++;
             }  
         }
@@ -207,11 +224,9 @@ namespace HSR_SIM_LIB
                         {
                             unit.Stats.BaseMaxHp = int.Parse(xnode.Attributes.GetNamedItem("maxHp").Value.Trim());
                             unit.Stats.BaseAttack = int.Parse(xnode.Attributes.GetNamedItem("attack").Value.Trim());
-                            FileInfo fi = new FileInfo(Utils.getAvalableImageFile(unitCode));
-                            //load portrait
-                            unit.Portrait = Utils.NewBitmap(fi);
-                            //resize
-                            unit.Portrait =  new Bitmap(unit.Portrait, PortraitSize);
+                            if (xnode.Attributes.GetNamedItem("energy") != null)
+                                unit.Stats.BaseMaxEnergy = int.Parse(xnode.Attributes.GetNamedItem("energy").Value.Trim());
+                            
                         }
                       
                     }
