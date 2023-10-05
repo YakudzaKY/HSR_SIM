@@ -1,12 +1,24 @@
 <Scenario name="Default test scenario">
 	<Party>
-		<Unit Template="Dummy"/>
+		<Unit template="Blade"/>
+		<Unit template="Bronya"/>		
 	</Party>
 	<Fights>
 		<Fight name="First fight">		
 			<Wave>
-				<Unit Template="Dummy"/>
+				<Unit template="Dummy"/>
 			</Wave>		
+		</Fight>
+		<Fight name="Second fight">		
+			<Wave>
+				<Unit template="Dummy"/>
+				<Unit template="Dummy"/>
+			</Wave>
+			<Wave>
+				<Unit template="Dummy"/>
+				<Unit template="Dummy"/>
+				<Unit template="Dummy"/>
+			</Wave>	
 		</Fight>
 	</Fights>
 </Scenario>

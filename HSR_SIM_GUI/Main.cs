@@ -17,6 +17,10 @@ namespace HSR_SIM_GUI
     {
         Worker wrk;        
 
+        /// <summary>
+        /// For text callback
+        /// </summary>
+        /// <param name="kv"></param>
         public  void WorkerCallBackString(KeyValuePair<String, String> kv)
         {
             if (String.Equals(kv.Key, Constant.MsgLog))
@@ -25,13 +29,26 @@ namespace HSR_SIM_GUI
                 LogWindow.ScrollToCaret();
             }
         }
+        /// <summary>
+        /// For imagesCallback
+        /// </summary>
+        /// <param name="kv"></param>
+        public void WorkerCallBackImages(Bitmap combatImg)
+        {
+            if (combatImg!=null)
+            {
+                combatOut.BackgroundImage  = combatImg;
+            }
+        }
 
         public Main()
         {
             CallBackStr callBackStr = new CallBackStr(WorkerCallBackString);
+            CallBackRender callBackRender = new CallBackRender(WorkerCallBackImages);
             InitializeComponent();
             wrk = new Worker();
             wrk.CbLog += callBackStr;
+            wrk.CbRend += callBackRender;
             wrk.Init();
 
         }

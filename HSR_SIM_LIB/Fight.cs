@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HSR_SIM_LIB
 {
-    internal class Fight
+    public class Fight
     {
         List<Wave> waves;
 

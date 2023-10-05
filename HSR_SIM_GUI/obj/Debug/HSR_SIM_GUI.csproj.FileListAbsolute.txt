@@ -12,3 +12,10 @@ C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\obj\Debug\HSR_SIM_GUI.csproj.Cor
 C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\obj\Debug\HSR_SIM_GUI.csproj.CopyComplete
 C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\obj\Debug\HSR_SIM_GUI.exe
 C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\obj\Debug\HSR_SIM_GUI.pdb
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\bin\Debug\Magick.Native-Q16-arm64.dll
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\bin\Debug\Magick.Native-Q16-x64.dll
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\bin\Debug\Magick.Native-Q16-x86.dll
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\bin\Debug\Magick.NET-Q16-AnyCPU.dll
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\bin\Debug\Magick.NET.Core.dll
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\bin\Debug\Magick.NET-Q16-AnyCPU.xml
+C:\Users\tehni\source\repos\HSR_SIM\HSR_SIM_GUI\bin\Debug\Magick.NET.Core.xml

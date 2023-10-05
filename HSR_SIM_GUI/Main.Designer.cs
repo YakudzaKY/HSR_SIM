@@ -30,21 +30,23 @@
         {
             this.LogWindow = new System.Windows.Forms.RichTextBox();
             this.button1 = new System.Windows.Forms.Button();
+            this.combatOut = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.combatOut)).BeginInit();
             this.SuspendLayout();
             // 
             // LogWindow
             // 
             this.LogWindow.Cursor = System.Windows.Forms.Cursors.Default;
             this.LogWindow.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.LogWindow.Location = new System.Drawing.Point(12, 273);
+            this.LogWindow.Location = new System.Drawing.Point(12, 418);
             this.LogWindow.Name = "LogWindow";
-            this.LogWindow.Size = new System.Drawing.Size(1114, 323);
+            this.LogWindow.Size = new System.Drawing.Size(795, 218);
             this.LogWindow.TabIndex = 0;
             this.LogWindow.Text = "";
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(12, 602);
+            this.button1.Location = new System.Drawing.Point(12, 642);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(103, 30);
             this.button1.TabIndex = 1;
@@ -52,16 +54,26 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // combatOut
+            // 
+            this.combatOut.Location = new System.Drawing.Point(7, 12);
+            this.combatOut.Name = "combatOut";
+            this.combatOut.Size = new System.Drawing.Size(800, 400);
+            this.combatOut.TabIndex = 2;
+            this.combatOut.TabStop = false;
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1138, 644);
+            this.ClientSize = new System.Drawing.Size(820, 690);
+            this.Controls.Add(this.combatOut);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.LogWindow);
             this.Name = "Main";
             this.Text = "SIM GUI";
             this.Load += new System.EventHandler(this.Main_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.combatOut)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -70,6 +82,7 @@
 
         private System.Windows.Forms.RichTextBox LogWindow;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.PictureBox combatOut;
     }
 }
 
