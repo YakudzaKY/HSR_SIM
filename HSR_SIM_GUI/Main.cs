@@ -15,17 +15,17 @@ namespace HSR_SIM_GUI
 {
     public partial class Main : Form
     {
-        Worker wrk;        
+        Worker wrk;
 
         /// <summary>
         /// For text callback
         /// </summary>
         /// <param name="kv"></param>
-        public  void WorkerCallBackString(KeyValuePair<String, String> kv)
+        public void WorkerCallBackString(KeyValuePair<String, String> kv)
         {
             if (String.Equals(kv.Key, Constant.MsgLog))
             {
-                LogWindow.AppendText(kv.Value+ "\r\n"  );
+                LogWindow.AppendText(kv.Value + "\r\n");
                 LogWindow.ScrollToCaret();
             }
         }
@@ -35,9 +35,9 @@ namespace HSR_SIM_GUI
         /// <param name="kv"></param>
         public void WorkerCallBackImages(Bitmap combatImg)
         {
-            if (combatImg!=null)
+            if (combatImg != null)
             {
-                combatOut.BackgroundImage  = combatImg;
+                combatOut.BackgroundImage = combatImg;
             }
         }
 
@@ -65,7 +65,7 @@ namespace HSR_SIM_GUI
         private void button1_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
-            openFileDialog1.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory+ "DATA\\Scenario\\";
+            openFileDialog1.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\";
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 wrk.LoadScenarioFromXml(openFileDialog1.FileName);

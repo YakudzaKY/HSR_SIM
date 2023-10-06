@@ -25,5 +25,6 @@ namespace HSR_SIM_LIB
         public int BaseMaxEnergy { get => baseMaxEnergy; set => baseMaxEnergy = value; }
 
         public UnitStats() { }
+
     }
 }

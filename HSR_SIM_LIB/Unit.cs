@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using static HSR_SIM_LIB.Constant;
 
 namespace HSR_SIM_LIB
@@ -20,9 +21,17 @@ namespace HSR_SIM_LIB
         List<Ability> abilities = null;
         public Bitmap Portrait { get => portrait; set => portrait = value; }
         public List<Ability> Abilities { get => abilities; set => abilities = value; }
+        public ElementEnm Element { get => element; set => element = value; }
+
+        private ElementEnm element;
+
+
         public Unit() {
-            Abilities=new List<Ability>(); 
+            Element = ElementEnm.NPC;//first NPC- default value on class init
+            Abilities =new List<Ability>(); 
         }
+
+        public bool IsAlive = true;
         /// <summary>
         /// Prepare to combat
         /// </summary>
@@ -49,6 +58,20 @@ namespace HSR_SIM_LIB
             } 
             set => stats = value; }
 
-  
+     
+        public enum ElementEnm
+        {
+            NPC,
+            Wind,
+            Physical,
+            Fire,
+            Ice,
+            Lightning,
+            Quantum,
+            Imaginary
+
+        }
+
     }
+
 }

@@ -28,77 +28,80 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.LogWindow = new System.Windows.Forms.RichTextBox();
-            this.button1 = new System.Windows.Forms.Button();
-            this.combatOut = new System.Windows.Forms.PictureBox();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.combatOut)).BeginInit();
-            this.SuspendLayout();
+            LogWindow = new System.Windows.Forms.RichTextBox();
+            button1 = new System.Windows.Forms.Button();
+            combatOut = new System.Windows.Forms.PictureBox();
+            button2 = new System.Windows.Forms.Button();
+            button3 = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)combatOut).BeginInit();
+            SuspendLayout();
             // 
             // LogWindow
             // 
-            this.LogWindow.Cursor = System.Windows.Forms.Cursors.Default;
-            this.LogWindow.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.LogWindow.Location = new System.Drawing.Point(12, 418);
-            this.LogWindow.Name = "LogWindow";
-            this.LogWindow.Size = new System.Drawing.Size(795, 218);
-            this.LogWindow.TabIndex = 0;
-            this.LogWindow.Text = "";
+            LogWindow.ForeColor = System.Drawing.SystemColors.WindowText;
+            LogWindow.Location = new System.Drawing.Point(8, 430);
+            LogWindow.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            LogWindow.Name = "LogWindow";
+            LogWindow.Size = new System.Drawing.Size(800, 305);
+            LogWindow.TabIndex = 0;
+            LogWindow.Text = "";
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(12, 642);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(103, 30);
-            this.button1.TabIndex = 1;
-            this.button1.Text = "Open Scenario";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            button1.Location = new System.Drawing.Point(14, 741);
+            button1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            button1.Name = "button1";
+            button1.Size = new System.Drawing.Size(120, 35);
+            button1.TabIndex = 1;
+            button1.Text = "Open Scenario";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
             // 
             // combatOut
             // 
-            this.combatOut.Location = new System.Drawing.Point(7, 12);
-            this.combatOut.Name = "combatOut";
-            this.combatOut.Size = new System.Drawing.Size(800, 400);
-            this.combatOut.TabIndex = 2;
-            this.combatOut.TabStop = false;
+            combatOut.Location = new System.Drawing.Point(8, 14);
+            combatOut.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            combatOut.Name = "combatOut";
+            combatOut.Size = new System.Drawing.Size(800, 400);
+            combatOut.TabIndex = 2;
+            combatOut.TabStop = false;
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(217, 642);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(103, 30);
-            this.button2.TabIndex = 3;
-            this.button2.Text = "Prev Step";
-            this.button2.UseVisualStyleBackColor = true;
+            button2.Location = new System.Drawing.Point(253, 741);
+            button2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            button2.Name = "button2";
+            button2.Size = new System.Drawing.Size(120, 35);
+            button2.TabIndex = 3;
+            button2.Text = "Prev Step";
+            button2.UseVisualStyleBackColor = true;
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(326, 642);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(103, 30);
-            this.button3.TabIndex = 4;
-            this.button3.Text = "Next step";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            button3.Location = new System.Drawing.Point(380, 741);
+            button3.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            button3.Name = "button3";
+            button3.Size = new System.Drawing.Size(120, 35);
+            button3.TabIndex = 4;
+            button3.Text = "Next step";
+            button3.UseVisualStyleBackColor = true;
+            button3.Click += button3_Click;
             // 
             // Main
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(820, 690);
-            this.Controls.Add(this.button3);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.combatOut);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.LogWindow);
-            this.Name = "Main";
-            this.Text = "SIM GUI";
-            this.Load += new System.EventHandler(this.Main_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.combatOut)).EndInit();
-            this.ResumeLayout(false);
-
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            ClientSize = new System.Drawing.Size(826, 796);
+            Controls.Add(button3);
+            Controls.Add(button2);
+            Controls.Add(combatOut);
+            Controls.Add(button1);
+            Controls.Add(LogWindow);
+            Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            Name = "Main";
+            Text = "SIM GUI";
+            Load += Main_Load;
+            ((System.ComponentModel.ISupportInitialize)combatOut).EndInit();
+            ResumeLayout(false);
         }
 
         #endregion

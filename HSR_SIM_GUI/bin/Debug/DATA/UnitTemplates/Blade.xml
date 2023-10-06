@@ -1,8 +1,0 @@
-<Unit>	
-	<Stats maxHp="10000" attack="10" energy="90"/>
-	<Ability name="Banner of Command">
-		<Type>Technique</Type>
-		<EnterCombat>true</EnterCombat>
-	</Ability>
-
-</Unit>

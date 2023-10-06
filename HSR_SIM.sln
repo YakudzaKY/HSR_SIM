@@ -1,11 +1,11 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSR_SIM_GUI", "HSR_SIM_GUI\HSR_SIM_GUI.csproj", "{38D76C59-75EE-4E01-A69B-F3175CDF9900}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HSR_SIM_GUI", "HSR_SIM_GUI\HSR_SIM_GUI.csproj", "{38D76C59-75EE-4E01-A69B-F3175CDF9900}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSR_SIM_LIB", "HSR_SIM_LIB\HSR_SIM_LIB.csproj", "{E00A8B28-2FD6-4A6C-B761-630F8ED66421}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HSR_SIM_LIB", "HSR_SIM_LIB\HSR_SIM_LIB.csproj", "{E00A8B28-2FD6-4A6C-B761-630F8ED66421}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

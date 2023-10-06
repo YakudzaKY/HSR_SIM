@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace HSR_SIM_LIB
 {
-    internal class CombatFight : Fight
+    internal class SimFight : Fight
     {
         List<Unit> units;
 
-        public CombatFight()
+        public SimFight()
         {
 
         }

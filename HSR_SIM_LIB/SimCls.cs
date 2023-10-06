@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -10,7 +9,7 @@ namespace HSR_SIM_LIB
 {/// <summary>
 /// Combat simulation class
 /// </summary>
-    public class CombatCls
+    public class SimCls
     {
         Scenario currentScenario;
 
@@ -24,9 +23,10 @@ namespace HSR_SIM_LIB
         public List<Step> steps= new List<Step>();
         public List<Step> Steps { get => steps; set => steps = value; }
         public List<Unit> Party { get => party; set => party = value; }
-        internal CombatFight CurrentFight { get => currentFight; set => currentFight = value; }
+        internal SimFight CurrentFight { get => currentFight; set => currentFight = value; }
         public int Tp { get => tp; set => tp = value; }
         public int Sp { get => sp; set => sp = value; }
+        public List<Ability> BeforeStartQueue = new List<Ability>();
 
         private Fight nextFight;
         public Fight NextFight { 
@@ -47,12 +47,12 @@ namespace HSR_SIM_LIB
 
         List<Unit> party;
 
-        CombatFight currentFight=null;
+        SimFight currentFight=null;
 
         /// <summary>
         /// construcotor
         /// </summary>
-        public CombatCls()
+        public SimCls()
         {
            
         }

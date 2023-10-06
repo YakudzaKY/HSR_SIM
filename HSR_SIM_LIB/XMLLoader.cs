@@ -11,10 +11,10 @@ namespace HSR_SIM_LIB
 {
     public static class XMLLoader
     {
-        public static CombatCls LoadCombatFromXml(string ScenarioPath)
+        public static SimCls LoadCombatFromXml(string ScenarioPath)
         {
 
-            CombatCls Combat = new CombatCls();
+            SimCls Combat = new SimCls();
             Combat.CurrentStep = null;
             Combat.CurrentScenario = new Scenario();
 
@@ -91,31 +91,27 @@ namespace HSR_SIM_LIB
 
 
         /// <summary>
-        /// exctract one ability
-        /// </summary>
-        /// <param name="xmlAbility"></param>
-        /// <returns></returns>
-        private static Ability ExctractAbility(XmlElement xmlAbility)
-        {
-            Ability ability = new Ability();
-            ability.AbilityParams.Name = xmlAbility.Attributes.GetNamedItem("name").Value.Trim();
-            ability.AbilityParams.AbilityType  = (Ability.AbilityTypeEnm)System.Enum.Parse(typeof(Ability.AbilityTypeEnm), getXmlTagValue(xmlAbility, "Type") );
-            ability.AbilityParams.EnterCombat = Convert.ToBoolean(getXmlTagValue(xmlAbility, "EnterCombat")) ;
-            ability.AbilityParams.IgnoreWeaknes = Convert.ToBoolean(getXmlTagValue(xmlAbility, "IgnoreWeaknes"))  ;
-            return ability;
-        }
-        /// <summary>
         /// Exctract abilities(is not mandatory in xml)
         /// </summary>
         /// <param name="xmlItems"></param>
         /// <returns></returns>
-        private static List<Ability> ExctractAbilities(XmlElement xmlItems)
+        private static List<Ability> ExctractAbilities(XmlElement xmlItems,Unit parent)
         {
             List<Ability> abilities = new List<Ability>();
             foreach (XmlElement abilitiyXml in xmlItems.SelectNodes("Ability"))
             {
-               
-                abilities.Add(ExctractAbility(abilitiyXml));
+
+                Ability ability = new Ability(parent);
+                ability.AbilityType = (Ability.AbilityTypeEnm)System.Enum.Parse(typeof(Ability.AbilityTypeEnm), abilitiyXml.Attributes.GetNamedItem("type").Value.Trim());
+                ability.Name = abilitiyXml.Attributes.GetNamedItem("name").Value.Trim();
+                //events
+                foreach (XmlElement xmlevent in abilitiyXml.SelectNodes("Event") ) 
+                {
+                    Event ent = new Event() { Type = (Event.EventType)System.Enum.Parse(typeof(Event.EventType), xmlevent.Attributes.GetNamedItem("name").Value.Trim()) };
+                    ability.Events.Add(ent);
+
+                }
+                abilities.Add(ability);
               
                  
             }
@@ -143,8 +139,11 @@ namespace HSR_SIM_LIB
                 if (xRoot != null)
                 {
                     unit.Name = unitCode;
+                    string elementVal = xRoot.Attributes.GetNamedItem("element")?.Value.Trim();
+                    if (elementVal != null)
+                        unit.Element = (Unit.ElementEnm)System.Enum.Parse(typeof(Unit.ElementEnm), elementVal);
                     unit.Stats = ExctractStats(xRoot);
-                    unit.Abilities = ExctractAbilities(xRoot);
+                    unit.Abilities = ExctractAbilities(xRoot,unit);
                     units.Add(unit);
                 }
 
@@ -157,7 +156,7 @@ namespace HSR_SIM_LIB
         /// Parsing XML part of Fights
         /// </summary>
         /// <param name="xnode">xml segment</param>
-        private static void FillFights(XmlElement xnode,CombatCls Combat)
+        private static void FillFights(XmlElement xnode,SimCls Combat)
         {
 
 

@@ -12,12 +12,21 @@ namespace HSR_SIM_LIB
     {
 
         private AbilityTypeEnm abilityType;
+        private Unit parent;
 
         public AbilityTypeEnm AbilityType { get => abilityType; set => abilityType = value; }
-        public AbilityParameters AbilityParams { get => abilityParams; set => abilityParams = value; }
+        public Unit Parent { get => parent; set => parent = value; }
 
-        private AbilityParameters abilityParams;
+        // public AbilityParameters AbilityParams { get => abilityParams; set => abilityParams = value; }
+        public string Name { get; internal set; }
+        public List<Event> Events { get => events; set => events = value; }
 
+        private List<Event> events = new List<Event>();
+
+        public Ability(Unit parent) 
+        { 
+            Parent= parent; 
+        }
       
 
         public enum AbilityTypeEnm

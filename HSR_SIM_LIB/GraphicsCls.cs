@@ -17,7 +17,7 @@ namespace HSR_SIM_LIB
         /// <summary>
         /// Render current situation in combat
         /// </summary>
-        public static Bitmap RenderCombat(CombatCls Combat)
+        public static Bitmap RenderCombat(SimCls Combat)
         {
 
             Bitmap res = new Bitmap(CombatImgSize.Width, CombatImgSize.Height);

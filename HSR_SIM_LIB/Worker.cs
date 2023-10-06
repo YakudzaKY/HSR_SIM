@@ -9,7 +9,6 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
 using static HSR_SIM_LIB.CallBacks;
-using System.Runtime.Remoting.Contexts;
 using System.Xml;
 using System.Xml.Linq;
 using System.Runtime.CompilerServices;
@@ -33,25 +32,60 @@ namespace HSR_SIM_LIB
         public CallBackStr CbLog { get => cbLog; set => cbLog = value; }
 
         CallBackRender cbRend;
-        private CombatCls combat = null;
+        private SimCls sim = null;
 
         public CallBackRender CbRend { get => cbRend; set => cbRend = value; }
 
-        public CombatCls Combat { get => combat; set => combat = value; }
+        public SimCls Sim { get => sim; set => sim = value; }
         /// <summary>
         /// Load and parse xml file with scenario
         /// </summary>
         /// <param name="selectedPath">file path to file</param>
         public void LoadScenarioFromXml(string SelectedPath)
         {
-            Combat = XMLLoader.LoadCombatFromXml(SelectedPath);
-            LogText("Scenario name: " + Combat.CurrentScenario.Name + " loaded");
+            Sim = XMLLoader.LoadCombatFromXml(SelectedPath);
+            LogText("Scenario  " + Sim.CurrentScenario.Name + " was loaded");
             DoSomething();
         }
 
-        public void BuffTeam(Step step)
+        /// <summary>
+        /// Execute the technique
+        /// </summary>
+        public void ExecuteTechnique(Step step, Ability ability)
         {
+            step.Events.AddRange(ability.Events);
+            step.Actor = ability.Parent;
+            step.ActorAbility= ability;
+            step.StepType = StepTypeEnm.TechniqueUse;
+        }
 
+        /// <summary>
+        /// Proc all events in step
+        /// </summary>
+        public void ProcEvents(bool rewind = false)
+        {
+            //Combat.BeforeStartQueue.Add(ability);
+        }
+
+        //Cast all techniques before fights starts
+        public void TechniqueWork(Step step)
+        {
+            List<Ability> abilities = new List<Ability>();
+            //gather all abilities from party alive members
+            foreach (Unit unit in sim.Party.Where(partyMember => partyMember.IsAlive))
+            {
+                abilities.AddRange(unit.Abilities.Where(ability => ability.AbilityType==Ability.AbilityTypeEnm.Technique));
+            }
+            //Use techniques starts from non combat
+            foreach (Ability ability in abilities)//TODO: order by non combat
+            {
+                
+                //TODO: choose technique by conditions
+                ExecuteTechnique(step,ability);
+            }
+
+            return;
+         
         }
 
         /// <summary>
@@ -61,26 +95,41 @@ namespace HSR_SIM_LIB
         {
             Step newStep= new Step();
             //TODO rewind, scheck existed step when next 
-            if (Combat.CurrentStep==null)
+            if (Sim.CurrentStep==null)
             {
-                Combat.Prepare();
-                newStep.StepType = StepTypeEnm.CombatInit;
+                Sim.Prepare();
+                newStep.StepType = StepTypeEnm.SimInit;
             }
             //buff before fight
-            if (newStep.StepType != StepTypeEnm.Iddle)  BuffTeam(newStep);
+            if (newStep.StepType == StepTypeEnm.Iddle)  TechniqueWork(newStep);
 
 
             if (newStep.StepType != StepTypeEnm.Iddle)
             {
-                Combat.CurrentStep = newStep;
-                Combat.Steps.Add(Combat.CurrentStep);
-                LogText(" Step# " + Combat.Steps.IndexOf(Combat.CurrentStep).ToString() + " executed");
+                Sim.CurrentStep = newStep;
+                Sim.Steps.Add(Sim.CurrentStep);
+                //TODO: proc the event steps
+                LogStepDescription(newStep);
                 
             }            
+            else 
                 LogText(" nothing to do...");
 
             DrawCombat();
 
+        }
+
+        private void LogStepDescription(Step step)
+        {
+            string OutText = " Step# " + Sim.Steps.IndexOf(Sim.CurrentStep).ToString() +" ["+ step.StepType.ToString()+ "] ";
+            if (step.StepType == StepTypeEnm.SimInit)
+                OutText = OutText + "summulation was initialized";
+            else if (step.StepType == StepTypeEnm.TechniqueUse)
+                OutText = OutText + step.Actor.Name+" used "+step.ActorAbility.Name;
+            else
+                throw new NotImplementedException();
+            LogText(OutText);
+            
         }
 
 
@@ -90,7 +139,7 @@ namespace HSR_SIM_LIB
         private void DrawCombat()
         {
             if (CbRend != null)
-                CbRend(GraphicsCls.RenderCombat(Combat));
+                CbRend(GraphicsCls.RenderCombat(Sim));
         }        
              
 
