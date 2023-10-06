@@ -4,22 +4,25 @@ using System.Linq;
 using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace HSR_SIM_LIB
 {/// <summary>
 /// Combat simulation class
 /// </summary>
-    public class Combat
+    public class CombatCls
     {
         Scenario currentScenario;
 
-        int currentStep=0;
+        Step currentStep =null;
         int currentFightStep = 0;
         int sp = 0;//Skill points
         int tp = 0;// tehcnique pounts
 
-        public int CurrentStep { get => currentStep; set => currentStep = value; }
+        public Step CurrentStep { get => currentStep; set => currentStep = value; }
         internal Scenario CurrentScenario { get => currentScenario; set => currentScenario = value; }
+        public List<Step> steps= new List<Step>();
+        public List<Step> Steps { get => steps; set => steps = value; }
         public List<Unit> Party { get => party; set => party = value; }
         internal CombatFight CurrentFight { get => currentFight; set => currentFight = value; }
         public int Tp { get => tp; set => tp = value; }
@@ -45,24 +48,16 @@ namespace HSR_SIM_LIB
         List<Unit> party;
 
         CombatFight currentFight=null;
-        
+
         /// <summary>
         /// construcotor
         /// </summary>
-        public Combat()
+        public CombatCls()
         {
-            init();
+           
         }
 
-        /// <summary>
-        /// initialization
-        /// </summary>
-        private void init()
-        {
-            CurrentStep = 0;
-            CurrentFight = null;
 
-        }
 
 
         /// <summary>
@@ -85,7 +80,7 @@ namespace HSR_SIM_LIB
         /// </summary>
         public void Prepare()
         {
-            init();
+  
             Party = getCombatUnits(CurrentScenario.Party);
             Tp= Constant.MaxTp;
 

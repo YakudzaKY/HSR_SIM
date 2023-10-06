@@ -50,18 +50,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Ability.cs" />
+    <Compile Include="AbilityParameters.cs" />
     <Compile Include="CallBacks.cs" />
-    <Compile Include="Combat.cs" />
+    <Compile Include="CombatCls.cs" />
     <Compile Include="CombatFight.cs" />
     <Compile Include="Constant.cs" />
     <Compile Include="Fight.cs" />
+    <Compile Include="GraphicsCls.cs" />
     <Compile Include="Scenario.cs" />
+    <Compile Include="Step.cs" />
     <Compile Include="Unit.cs" />
     <Compile Include="UnitStats.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Wave.cs" />
     <Compile Include="Worker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="XMLLoader.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -8,16 +8,20 @@ using System.Threading.Tasks;
 using static HSR_SIM_LIB.Constant;
 
 namespace HSR_SIM_LIB
-{
+{/// <summary>
+/// Unit class. Stats skills etc
+/// </summary>
     public class Unit
     {
         
         string name = string.Empty;
         Bitmap portrait = null;
         UnitStats stats = null;
+        List<Ability> abilities = null;
         public Bitmap Portrait { get => portrait; set => portrait = value; }
-        public Unit() {        
-
+        public List<Ability> Abilities { get => abilities; set => abilities = value; }
+        public Unit() {
+            Abilities=new List<Ability>(); 
         }
         /// <summary>
         /// Prepare to combat
@@ -45,6 +49,6 @@ namespace HSR_SIM_LIB
             } 
             set => stats = value; }
 
-       
+  
     }
 }
