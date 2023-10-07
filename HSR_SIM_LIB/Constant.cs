@@ -16,7 +16,7 @@ namespace HSR_SIM_LIB
 
         public static readonly Size CombatImgSize = new Size(1200, 600);
         public static readonly Size PortraitSize = new Size((CombatImgSize.Width/10), (CombatImgSize.Height / 5));
-        public static readonly Size HealthBarSize = new Size((CombatImgSize.Width / 10), (sbyte)(Math.Round((double)(CombatImgSize.Height / 26.66))) );
+        public static readonly Size HealthBarSize = new Size((CombatImgSize.Width / 10), (sbyte)(Math.Round((double)(CombatImgSize.Height / 30))) );
         public static readonly Size EnergyBarSize = new Size((CombatImgSize.Width / 10), (sbyte)(Math.Round((double)(CombatImgSize.Height / 40))));
         /// <summary>
         /// total portrait size
@@ -24,7 +24,7 @@ namespace HSR_SIM_LIB
         public static readonly Size TotalUnitSize = new Size(PortraitSize.Width, PortraitSize.Height+ HealthBarSize.Height+ EnergyBarSize.Height);
 
         //Some of sizes or coords
-        public static readonly sbyte BarFontSize = (sbyte) (Math.Round((double)(CombatImgSize.Height / 57.14)));
+        public static readonly sbyte BarFontSize = (sbyte) (Math.Round((double)(CombatImgSize.Height / 65)));
         public static readonly sbyte DefaultFontSize = (sbyte)(Math.Round((double)(CombatImgSize.Height / 40)));
         public static readonly sbyte DefaultFontSizeSpace = (sbyte)(Math.Round((double)(DefaultFontSize * 0.4)));
         public static readonly short CenterTextY = (short)Math.Round((double)(CombatImgSize.Height * 0.4));

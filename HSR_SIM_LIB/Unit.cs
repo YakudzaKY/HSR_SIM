@@ -19,7 +19,21 @@ namespace HSR_SIM_LIB
         Bitmap portrait = null;
         UnitStats stats = null;
         List<Ability> abilities = null;
-        public Bitmap Portrait { get => portrait; set => portrait = value; }
+        public Bitmap Portrait { 
+            get
+            {
+                if (portrait == null)
+                {
+                    FileInfo fi = new FileInfo(Utils.getAvalableImageFile(Name));
+                    //load portrait
+                    portrait = Utils.NewBitmap(fi);
+                    //resize
+                    portrait = new Bitmap(Portrait, PortraitSize);
+
+                }
+                return portrait;
+            }
+            set => portrait = value; }
         public List<Ability> Abilities { get => abilities; set => abilities = value; }
         public ElementEnm Element { get => element; set => element = value; }
 
@@ -42,11 +56,8 @@ namespace HSR_SIM_LIB
         {
             Stats.MaxHp = Stats.BaseMaxHp;
             Stats.CurrentHp = Stats.MaxHp;
-            FileInfo fi = new FileInfo(Utils.getAvalableImageFile(Name));
-            //load portrait
-            Portrait = Utils.NewBitmap(fi);
-            //resize
-            Portrait = new Bitmap(Portrait,PortraitSize);
+            
+           
         }
 
         

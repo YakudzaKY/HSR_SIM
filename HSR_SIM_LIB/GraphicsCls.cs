@@ -39,7 +39,7 @@ namespace HSR_SIM_LIB
                     //enemy draw
                     if (sim.CurrentFight != null)
                     {
-                        DrawUnits(gfx, sim.CurrentFight.Units, unitHostility.Hostile, new Point(LeftSideWithSpace, TopSideWithSpace), sim.CurrentStep);
+                        DrawUnits(gfx, sim.HostileParty, unitHostility.Hostile, new Point(LeftSideWithSpace, TopSideWithSpace), sim.CurrentStep);
                         DrawText(PartyResourceX, PartyResourceY- DefaultFontSize, gfx, String.Format("Fight: {0:d}/{1:d}",
                             sim.CurrentScenario.Fights.IndexOf(sim.CurrentFight), sim.CurrentScenario.Fights.Count));
                     }
@@ -47,6 +47,7 @@ namespace HSR_SIM_LIB
 
                     if (sim.CurrentFight is null && sim.NextFight != null)
                     {
+                        DrawNextHostile(gfx, sim.HostileParty, unitHostility.Hostile, new Point(LeftSideWithSpace, TopSideWithSpace), sim.CurrentStep);
                         DrawStartQueue(gfx, new Point(LeftSideWithSpace, TopSideForQueue), sim.BeforeStartQueue);
                     }
 
@@ -56,6 +57,28 @@ namespace HSR_SIM_LIB
             }
             return res;
         }
+
+        private static void DrawNextHostile(Graphics gfx, List<Unit> hostileParty, unitHostility hostile, Point point, Step currentStep)
+        {
+            short i = 0;
+            //todo : переделать чтоб норм было
+            foreach (Unit unit in hostileParty)
+            {
+                
+                Point portraitPoint = new Point(point.X + (i * (UnitSpaceSize + TotalUnitSize.Width)), point.Y);
+                //portrait
+                gfx.DrawImage(unit.Portrait, portraitPoint);
+                i++;
+                if (i > 5)
+                {
+
+                    break;
+                }
+
+            }
+              
+        }
+
         /// <summary>
         /// Draw start skills queue(technique etc)
         /// </summary>
