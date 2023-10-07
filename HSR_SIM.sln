@@ -7,9 +7,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HSR_SIM_LIB", "HSR_SIM_LIB\HSR_SIM_LIB.csproj", "{E00A8B28-2FD6-4A6C-B761-630F8ED66421}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E2546477-046A-4A37-9DFF-9704ECA334E7}"
-	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

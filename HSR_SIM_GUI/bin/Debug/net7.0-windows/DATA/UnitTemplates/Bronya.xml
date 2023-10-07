@@ -1,13 +1,13 @@
 <Unit element="Wind">
 	<Stats maxHp="10000" attack="10" energy="90"/>
-	<Ability name="Banner of Command" type="Technique">
+	<Ability name="Banner of Command" type="Technique" costtype="TP" cost="1">
 		<Event name="CombatStartSkillQueue"/>
 		<ExecuteWhen>
 			<Condition orgroup="TP_SPENDING">
-				<ResourceCheck name="TP" quantity ="2" equal=">="/>
+				<ResourceCheck resCheck="party" resType="TP" quantity ="2" equal=">="/>
 			</Condition>			
 			<Condition orgroup="TP_SPENDING">
-				<ResourceCheck name="TP" quantity ="1" equal=">="/>
+				<ResourceCheck resCheck="party" resType="TP" quantity ="1" equal=">="/>
 				<partyMemeberExists alive="true" haveSkill="Technique_EnterCombat" clause="false"/>
 			</Condition>
 		</ExecuteWhen>

@@ -56,7 +56,8 @@ namespace HSR_SIM_LIB
         public void ExecuteTechnique(Step step, Ability ability)
         {
             step.Events.AddRange(ability.Events);//copy events from ability reference
-            step.Events.Add(new Event() { Type = EventType.PartyResourceDrain, ResType= ResourceType.TP, ResourceValue=1 }) ;//add default energy drain
+            if (ability.CostType != ResourceType.nil)
+                step.Events.Add(new Event() { Type = EventType.PartyResourceDrain, ResType= ability.CostType, ResourceValue= ability.Cost }) ;//energy drain
             step.Actor = ability.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
             step.ActorAbility= ability;//WAT ABILITY is casting
             step.StepType = StepTypeEnm.TechniqueUse;
@@ -83,6 +84,21 @@ namespace HSR_SIM_LIB
             }
         }
 
+        /// <summary>
+        /// Party have res to cast abilitiy
+        /// if res not found then false
+        /// </summary>
+        /// <returns></returns>
+        private bool PartyHaveRes(Ability ability)
+        {
+            foreach (Resource res in sim.Resources)
+            {
+                if (res.ResType==ability.CostType)                
+                    return res.ResVal>=ability.Cost;                
+            }
+            return false;
+        }
+
         //Cast all techniques before fights starts
         public void TechniqueWork(Step step)
         {
@@ -92,8 +108,17 @@ namespace HSR_SIM_LIB
             {
                 abilities.AddRange(unit.Abilities.Where(ability => ability.AbilityType==Ability.AbilityTypeEnm.Technique));
             }
+            
+            var orderedAbilities = from ability in abilities
+                                  where PartyHaveRes(ability)
+                                  orderby ability.Events.Exists(ent=> ent.Type== EventType.EnterCombat) ascending//non combat first
+                                        //TODO add element order
+                                        //TODO priority order
+                                      , ability.Cost descending//start from Hight cost abilities
+                                 select ability;
+            
             //Use techniques starts from non combat
-            foreach (Ability ability in abilities)//TODO: order by non combat
+            foreach (Ability ability in orderedAbilities)
             {
                 
                 //TODO: choose technique by conditions
@@ -145,6 +170,7 @@ namespace HSR_SIM_LIB
             DrawCombat();
 
         }
+
         /// <summary>
         /// output text description of completed step
         /// </summary>
@@ -152,13 +178,7 @@ namespace HSR_SIM_LIB
         /// <exception cref="NotImplementedException"></exception>
         private void LogStepDescription(Step step)
         {
-            string OutText = " Step# " + Sim.Steps.IndexOf(Sim.CurrentStep).ToString() +" ["+ step.StepType.ToString()+ "] ";
-            if (step.StepType == StepTypeEnm.SimInit)
-                OutText = OutText + "summulation was initialized";
-            else if (step.StepType == StepTypeEnm.TechniqueUse)
-                OutText = OutText + step.Actor.Name+" used "+step.ActorAbility.Name;
-            else
-                throw new NotImplementedException();
+            string OutText = " Step# " + Sim.Steps.IndexOf(Sim.CurrentStep).ToString() +" ["+ step.StepType.ToString()+ "] " + step.GetStepDescription();          
             LogText(OutText);
             
         }

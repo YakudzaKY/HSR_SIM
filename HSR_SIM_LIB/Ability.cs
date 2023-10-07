@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static HSR_SIM_LIB.Resource;
 
 namespace HSR_SIM_LIB
 {/// <summary>
@@ -13,6 +14,8 @@ namespace HSR_SIM_LIB
 
         private AbilityTypeEnm abilityType;
         private Unit parent;
+        private short cost=0;
+        private ResourceType costType= ResourceType.nil;
 
         public AbilityTypeEnm AbilityType { get => abilityType; set => abilityType = value; }
         public Unit Parent { get => parent; set => parent = value; }
@@ -20,6 +23,8 @@ namespace HSR_SIM_LIB
         // public AbilityParameters AbilityParams { get => abilityParams; set => abilityParams = value; }
         public string Name { get; internal set; }
         public List<Event> Events { get => events; set => events = value; }
+        public short Cost { get => cost; set => cost = value; }
+        public ResourceType CostType { get => costType; set => costType = value; }
 
         private List<Event> events = new List<Event>();
 

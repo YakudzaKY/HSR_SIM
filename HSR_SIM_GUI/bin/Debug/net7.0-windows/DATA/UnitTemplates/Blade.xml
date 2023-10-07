@@ -1,6 +1,6 @@
 <Unit element="Wind">	
 	<Stats maxHp="10000" attack="10" energy="90"/>
-	<Ability name="Karma Wind" type="Technique">
+	<Ability name="Karma Wind" type="Technique" costtype="TP" cost="1">
 		<Event name="CombatStartSkillQueue"/>
 		<Event name="EnterCombat"/>
 	</Ability>

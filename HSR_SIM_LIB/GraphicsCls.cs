@@ -33,13 +33,13 @@ namespace HSR_SIM_LIB
                         gfx.FillRectangle(brush, 0, 0, res.Width, res.Height);
                     }
                     //party draw
-                    DrawUnits(gfx, sim.Party, unitHostility.Friendly, new Point(LeftSideWithSpace, BottomSideWithSpace));
+                    DrawUnits(gfx, sim.Party, unitHostility.Friendly, new Point(LeftSideWithSpace, BottomSideWithSpace), sim.CurrentStep);
                     //TP draw
                     DrawText(PartyResourceX, PartyResourceY, gfx, String.Format("TP: {0:d}/{1:d}", sim.GetRes(ResourceType.TP).ResVal, Constant.MaxTp));
                     //enemy draw
                     if (sim.CurrentFight != null)
                     {
-                        DrawUnits(gfx, sim.CurrentFight.Units, unitHostility.Hostile, new Point(LeftSideWithSpace, TopSideWithSpace));
+                        DrawUnits(gfx, sim.CurrentFight.Units, unitHostility.Hostile, new Point(LeftSideWithSpace, TopSideWithSpace), sim.CurrentStep);
                         DrawText(PartyResourceX, PartyResourceY- DefaultFontSize, gfx, String.Format("Fight: {0:d}/{1:d}",
                             sim.CurrentScenario.Fights.IndexOf(sim.CurrentFight), sim.CurrentScenario.Fights.Count));
                     }
@@ -47,13 +47,11 @@ namespace HSR_SIM_LIB
 
                     if (sim.CurrentFight is null && sim.NextFight != null)
                     {
-                        DrawCenterText(gfx, "waiting for combat");
                         DrawStartQueue(gfx, new Point(LeftSideWithSpace, TopSideForQueue), sim.BeforeStartQueue);
                     }
-                    else if (sim.CurrentFight is null && sim.NextFight == null)
-                    {
-                        DrawCenterText(gfx, "scenario completed");
-                    }
+
+                    //TODO: draw next fight units 
+                    DrawCenterText(gfx, sim.CurrentStep.GetStepDescription());
                 }
             }
             return res;
@@ -90,7 +88,7 @@ namespace HSR_SIM_LIB
         /// <param name="units"> Unit list</param>
         /// <param name="hstl">hostile type</param>
         /// <param name="point"> start point</param>
-        private static void DrawUnits(Graphics gfx, List<Unit> units, unitHostility hstl, Point point)
+        private static void DrawUnits(Graphics gfx, List<Unit> units, unitHostility hstl, Point point, Step step)
     {
         short i = 0;
        
@@ -133,6 +131,12 @@ namespace HSR_SIM_LIB
                     , new Font("Tahoma", BarFontSize));
             }
 
+            //If unit is actor
+            if (step.Actor == unit)
+            {                    
+                    gfx.DrawRectangle(new Pen(Color.YellowGreen, 3), portraitPoint.X, portraitPoint.Y, PortraitSize.Width, PortraitSize.Height);
+            }
+
 
             i++;
         }
@@ -142,7 +146,7 @@ namespace HSR_SIM_LIB
     /// </summary>
     private static void DrawCenterText(Graphics gfx, string text, Brush brush = null)
     {
-        DrawText(CenterTextX, CenterTextY, gfx, text, brush);
+        DrawText(CombatImgSize.Width-(text.Length* DefaultFontSizeSpace), CenterTextY, gfx, text, brush);
     }
 
     /// <summary>

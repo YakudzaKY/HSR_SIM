@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using HSR_SIM_LIB;
+using static HSR_SIM_LIB.Ability;
+using static HSR_SIM_LIB.Resource;
 
 namespace HSR_SIM_LIB
 {
@@ -102,8 +104,10 @@ namespace HSR_SIM_LIB
             {
 
                 Ability ability = new Ability(parent);
-                ability.AbilityType = (Ability.AbilityTypeEnm)System.Enum.Parse(typeof(Ability.AbilityTypeEnm), abilitiyXml.Attributes.GetNamedItem("type").Value.Trim());
+                ability.AbilityType = (AbilityTypeEnm)System.Enum.Parse(typeof(AbilityTypeEnm), abilitiyXml.Attributes.GetNamedItem("type").Value.Trim());
                 ability.Name = abilitiyXml.Attributes.GetNamedItem("name").Value.Trim();
+                ability.CostType =  (ResourceType)System.Enum.Parse(typeof(ResourceType), abilitiyXml.Attributes.GetNamedItem("costtype").Value.Trim()) ;
+                ability.Cost = (short)int.Parse( abilitiyXml.Attributes.GetNamedItem("cost").Value.Trim());
                 //events
                 foreach (XmlElement xmlevent in abilitiyXml.SelectNodes("Event") ) 
                 {

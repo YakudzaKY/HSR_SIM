@@ -19,6 +19,7 @@ namespace HSR_SIM_LIB
 
         public enum ResourceType
         {
+            nil,//dont use type
             TP,
             SP
         }

@@ -21,8 +21,24 @@ namespace HSR_SIM_LIB
         public List<Event> Events { get => events; set => events = value; }
 
         private List<Event> events = new List<Event>();
-        
 
+        /// <summary>
+        /// Get text description of step
+        /// </summary>
+        /// <param name="step"></param>
+        /// <returns></returns>
+        public string GetStepDescription()
+        {
+            string res;
+            if (StepType == StepTypeEnm.SimInit)
+                res = "summulation was initialized";
+            else if (StepType == StepTypeEnm.TechniqueUse)
+                res = Actor.Name + " used " + ActorAbility.Name;
+            else
+                throw new NotImplementedException();
+            return res;
+
+        }
 
         public Step()
         {
