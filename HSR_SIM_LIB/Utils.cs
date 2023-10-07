@@ -9,12 +9,20 @@ using ImageMagick;
 
 namespace HSR_SIM_LIB
 {
+    /// <summary>
+    /// some utility stuff
+    /// </summary>
     internal static  class Utils
     {
         private static string dataFolder = AppDomain.CurrentDomain.BaseDirectory + "DATA\\";
 
         public static string DataFolder { get => dataFolder; set => dataFolder = value; }
 
+        /// <summary>
+        /// Create bitmap with convertation 
+        /// </summary>
+        /// <param name="fi"></param>
+        /// <returns></returns>
         public static Bitmap NewBitmap(this FileInfo fi)
         {
             Bitmap bitmap = null;
@@ -45,7 +53,11 @@ namespace HSR_SIM_LIB
             }
             return bitmap;
         }
-
+        /// <summary>
+        /// we can load png or webp frames
+        /// </summary>
+        /// <param name="unitCode"></param>
+        /// <returns></returns>
         public static string getAvalableImageFile(string unitCode)
         {
             string imageFileName = DataFolder + "Images\\" + unitCode;

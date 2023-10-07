@@ -10,6 +10,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\HSR_SIM_LIB\HSR_SIM_LIB.csproj" />
   </ItemGroup>
   <ItemGroup>

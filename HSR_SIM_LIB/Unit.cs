@@ -71,6 +71,11 @@ namespace HSR_SIM_LIB
             Imaginary
 
         }
+        public enum unitHostility
+        {
+            Friendly,
+            Hostile
+        }
 
     }
 

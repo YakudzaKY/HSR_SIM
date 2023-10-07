@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace HSR_SIM_LIB
 {
+    /// <summary>
+    /// Step-time simulator unit
+    /// </summary>
     public class Step
     {
         private StepTypeEnm stepType;

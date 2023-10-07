@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using static HSR_SIM_LIB.Constant;
 using System.Drawing;
+using static HSR_SIM_LIB.Resource;
+using static HSR_SIM_LIB.Unit;
 
 namespace HSR_SIM_LIB
 {/// <summary>
@@ -17,11 +19,11 @@ namespace HSR_SIM_LIB
         /// <summary>
         /// Render current situation in combat
         /// </summary>
-        public static Bitmap RenderCombat(SimCls Combat)
+        public static Bitmap RenderCombat(SimCls sim)
         {
 
             Bitmap res = new Bitmap(CombatImgSize.Width, CombatImgSize.Height);
-            if (Combat != null)
+            if (sim != null)
             {
                 //background
                 using (Graphics gfx = Graphics.FromImage(res))
@@ -31,23 +33,24 @@ namespace HSR_SIM_LIB
                         gfx.FillRectangle(brush, 0, 0, res.Width, res.Height);
                     }
                     //party draw
-                    DrawUnits(gfx, Combat.Party, unitHostility.Friendly, new Point(10, CombatImgSize.Height - TotalUnitSize.Height - 10));
+                    DrawUnits(gfx, sim.Party, unitHostility.Friendly, new Point(LeftSideWithSpace, BottomSideWithSpace));
                     //TP draw
-                    DrawText(CombatImgSize.Width - 100, CombatImgSize.Height / 2, gfx, String.Format("TP: {0:d}/{1:d}", Combat.Tp, Constant.MaxTp));
+                    DrawText(PartyResourceX, PartyResourceY, gfx, String.Format("TP: {0:d}/{1:d}", sim.GetRes(ResourceType.TP).ResVal, Constant.MaxTp));
                     //enemy draw
-                    if (Combat.CurrentFight != null)
+                    if (sim.CurrentFight != null)
                     {
-                        DrawUnits(gfx, Combat.CurrentFight.Units, unitHostility.Hostile, new Point(10, 10));
-                        DrawText(CombatImgSize.Width - 100, CombatImgSize.Height / 2 - 15, gfx, String.Format("Fight: {0:d}/{1:d}",
-                            Combat.CurrentScenario.Fights.IndexOf(Combat.CurrentFight), Combat.CurrentScenario.Fights.Count));
+                        DrawUnits(gfx, sim.CurrentFight.Units, unitHostility.Hostile, new Point(LeftSideWithSpace, TopSideWithSpace));
+                        DrawText(PartyResourceX, PartyResourceY- DefaultFontSize, gfx, String.Format("Fight: {0:d}/{1:d}",
+                            sim.CurrentScenario.Fights.IndexOf(sim.CurrentFight), sim.CurrentScenario.Fights.Count));
                     }
                    
 
-                    if (Combat.CurrentFight is null && Combat.NextFight != null)
+                    if (sim.CurrentFight is null && sim.NextFight != null)
                     {
                         DrawCenterText(gfx, "waiting for combat");
+                        DrawStartQueue(gfx, new Point(LeftSideWithSpace, TopSideForQueue), sim.BeforeStartQueue);
                     }
-                    else if (Combat.CurrentFight is null && Combat.NextFight == null)
+                    else if (sim.CurrentFight is null && sim.NextFight == null)
                     {
                         DrawCenterText(gfx, "scenario completed");
                     }
@@ -55,22 +58,45 @@ namespace HSR_SIM_LIB
             }
             return res;
         }
-   
-
-    /// <summary>
-    /// draw units in row
-    /// </summary>
-    /// <param name="gfx"> graphics</param>
-    /// <param name="units"> Unit list</param>
-    /// <param name="hstl">hostile type</param>
-    /// <param name="point"> start point</param>
-    private static void DrawUnits(Graphics gfx, List<Unit> units, unitHostility hstl, Point point)
+        /// <summary>
+        /// Draw start skills queue(technique etc)
+        /// </summary>
+        /// <param name="gfx"></param>
+        /// <param name="units"></param>
+        /// <param name="hstl"></param>
+        /// <param name="point"></param>
+        private static void DrawStartQueue(Graphics gfx,Point point,List<Ability> startQueue)
+        {
+          
+          
+            short i = 0;
+            if (startQueue.Count > 0)
+            {
+                DrawText(point.X, point.Y + ((StartQueuefontSize + StartQueuefontSizeSpc) * i), gfx, "Start skills queue:", null, new Font("Tahoma", StartQueuefontSize));
+                i++;
+            }
+            
+            foreach (Ability ability in startQueue)
+            {
+                DrawText(point.X, point.Y + ((StartQueuefontSize + StartQueuefontSizeSpc) * i), gfx, String.Format("{0:s}: {1:s}", ability.Parent.Name, ability.Name),
+                    Brushes.Lime, new Font("Tahoma", StartQueuefontSize));              
+                i++;
+            }
+        }
+        /// <summary>
+        /// draw units in row
+        /// </summary>
+        /// <param name="gfx"> graphics</param>
+        /// <param name="units"> Unit list</param>
+        /// <param name="hstl">hostile type</param>
+        /// <param name="point"> start point</param>
+        private static void DrawUnits(Graphics gfx, List<Unit> units, unitHostility hstl, Point point)
     {
         short i = 0;
-        int spaceXSize = (int)Math.Round((double)((CombatImgSize.Width - (5 * TotalUnitSize.Width)) / 5));
+       
         foreach (Unit unit in units)
         {
-            Point portraitPoint = new Point(point.X + (i * (spaceXSize + TotalUnitSize.Width)), point.Y);
+            Point portraitPoint = new Point(point.X + (i * (UnitSpaceSize + TotalUnitSize.Width)), point.Y);
             //portrait
             gfx.DrawImage(unit.Portrait, portraitPoint);
             //name
@@ -85,7 +111,7 @@ namespace HSR_SIM_LIB
                 int greenWidth = (int)Math.Floor((double)HealthBarSize.Width * (unit.Stats.CurrentHp) / unit.Stats.MaxHp);
                 gfx.FillRectangle(brush, portraitPoint.X, portraitPoint.Y + PortraitSize.Height, greenWidth, HealthBarSize.Height);
             }
-            DrawText(portraitPoint.X + 5, portraitPoint.Y + PortraitSize.Height, gfx, String.Format("{0:d}/{1:d}", unit.Stats.CurrentHp, unit.Stats.MaxHp), null, new Font("Tahoma", 7));
+            DrawText(portraitPoint.X + 5, portraitPoint.Y + PortraitSize.Height, gfx, String.Format("{0:d}/{1:d}", unit.Stats.CurrentHp, unit.Stats.MaxHp), null, new Font("Tahoma", BarFontSize));
             //Energy bar
             if (unit.Stats.BaseMaxEnergy > 0)
             {
@@ -99,7 +125,12 @@ namespace HSR_SIM_LIB
                     int blueWidth = (int)Math.Floor((double)EnergyBarSize.Width * (unit.Stats.CurrentEnergy) / unit.Stats.BaseMaxEnergy);
                     gfx.FillRectangle(brush, portraitPoint.X, portraitPoint.Y + PortraitSize.Height + HealthBarSize.Height, blueWidth, EnergyBarSize.Height);
                 }
-                DrawText(portraitPoint.X + 5, portraitPoint.Y + PortraitSize.Height + HealthBarSize.Height, gfx, String.Format("{0:d}/{1:d}", unit.Stats.CurrentEnergy, unit.Stats.BaseMaxEnergy), null, new Font("Tahoma", 7));
+                DrawText(portraitPoint.X + 5
+                    , portraitPoint.Y + PortraitSize.Height + HealthBarSize.Height
+                    , gfx
+                    , String.Format("{0:d}/{1:d}", unit.Stats.CurrentEnergy, unit.Stats.BaseMaxEnergy)
+                    , null
+                    , new Font("Tahoma", BarFontSize));
             }
 
 
@@ -111,7 +142,7 @@ namespace HSR_SIM_LIB
     /// </summary>
     private static void DrawCenterText(Graphics gfx, string text, Brush brush = null)
     {
-        DrawText((int)Math.Round(CombatImgSize.Width * 0.4), (int)Math.Round(CombatImgSize.Height * 0.4), gfx, text, brush);
+        DrawText(CenterTextX, CenterTextY, gfx, text, brush);
     }
 
     /// <summary>
@@ -128,7 +159,7 @@ namespace HSR_SIM_LIB
         if (brush == null)
             brush = Brushes.Black;
         if (font == null)
-            font = new Font("Tahoma", 14, FontStyle.Bold);
+            font = new Font("Tahoma", DefaultFontSize, FontStyle.Bold);
         RectangleF rectf = new RectangleF(x, y, CombatImgSize.Width - x, CombatImgSize.Height - y);
         gfx.DrawString(text, font, brush, rectf);
     }

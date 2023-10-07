@@ -18,6 +18,9 @@ using ImageMagick;
 using static HSR_SIM_LIB.Constant;
 using static HSR_SIM_LIB.Step;
 using System.Net.Mail;
+using static HSR_SIM_LIB.Event;
+using static HSR_SIM_LIB.Resource;
+using System.Resources;
 
 namespace HSR_SIM_LIB
 {
@@ -29,14 +32,13 @@ namespace HSR_SIM_LIB
 
 
         CallBackStr cbLog;
-        public CallBackStr CbLog { get => cbLog; set => cbLog = value; }
+        public CallBackStr CbLog { get => cbLog; set => cbLog = value; }//Calback log procedure. Used for output
 
-        CallBackRender cbRend;
+        CallBackRender cbRend; 
+        public CallBackRender CbRend { get => cbRend; set => cbRend = value; }//Callback render procedure. used for graphical output
         private SimCls sim = null;
+        public SimCls Sim { get => sim; set => sim = value; }//simulation class( combat ,fights etc in this shit)
 
-        public CallBackRender CbRend { get => cbRend; set => cbRend = value; }
-
-        public SimCls Sim { get => sim; set => sim = value; }
         /// <summary>
         /// Load and parse xml file with scenario
         /// </summary>
@@ -53,18 +55,32 @@ namespace HSR_SIM_LIB
         /// </summary>
         public void ExecuteTechnique(Step step, Ability ability)
         {
-            step.Events.AddRange(ability.Events);
-            step.Actor = ability.Parent;
-            step.ActorAbility= ability;
+            step.Events.AddRange(ability.Events);//copy events from ability reference
+            step.Events.Add(new Event() { Type = EventType.PartyResourceDrain, ResType= ResourceType.TP, ResourceValue=1 }) ;//add default energy drain
+            step.Actor = ability.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
+            step.ActorAbility= ability;//WAT ABILITY is casting
             step.StepType = StepTypeEnm.TechniqueUse;
         }
 
         /// <summary>
         /// Proc all events in step
         /// </summary>
-        public void ProcEvents(bool rewind = false)
+        public void ProcEvents(Step step,bool rewind = false)
         {
-            //Combat.BeforeStartQueue.Add(ability);
+            //for all events saved in step
+            foreach(Event ent in step.Events)
+            {
+                if (ent.Type == EventType.PartyResourceDrain)//SP or technical points
+                {
+                    Sim.GetRes(ent.ResType).ResVal -= 1;
+                }
+                else if (ent.Type == EventType.CombatStartSkillQueue)//party buffs or opening
+                    sim.BeforeStartQueue.Add(step.ActorAbility);
+                else if (ent.Type == EventType.EnterCombat)//entering combat
+                    sim.DoEnterCombat = true;
+                else
+                    throw new NotImplementedException();
+            }
         }
 
         //Cast all techniques before fights starts
@@ -81,7 +97,9 @@ namespace HSR_SIM_LIB
             {
                 
                 //TODO: choose technique by conditions
+                //TODO check skill queue for starter skills
                 ExecuteTechnique(step,ability);
+                return;
             }
 
             return;
@@ -93,32 +111,45 @@ namespace HSR_SIM_LIB
         /// </summary>
         public void DoSomething()
         {
+            if (sim==null)
+            {
+                LogText("Load scenario first!!!");
+                return;
+            }    
             Step newStep= new Step();
             //TODO rewind, scheck existed step when next 
             if (Sim.CurrentStep==null)
             {
+                //simulation preparations
                 Sim.Prepare();
                 newStep.StepType = StepTypeEnm.SimInit;
             }
             //buff before fight
-            if (newStep.StepType == StepTypeEnm.Iddle)  TechniqueWork(newStep);
+            if (newStep.StepType == StepTypeEnm.Iddle&& sim.DoEnterCombat==false)  TechniqueWork(newStep);
 
+            //enter the combat
+            if (newStep.StepType == StepTypeEnm.Iddle && sim.DoEnterCombat == true) throw new NotImplementedException();
 
+            //if we doing somethings then need proced the events
             if (newStep.StepType != StepTypeEnm.Iddle)
             {
                 Sim.CurrentStep = newStep;
                 Sim.Steps.Add(Sim.CurrentStep);
-                //TODO: proc the event steps
                 LogStepDescription(newStep);
-                
+                ProcEvents(newStep);
             }            
             else 
                 LogText(" nothing to do...");
 
+            //render combat situitatuiom
             DrawCombat();
 
         }
-
+        /// <summary>
+        /// output text description of completed step
+        /// </summary>
+        /// <param name="step">completed step</param>
+        /// <exception cref="NotImplementedException"></exception>
         private void LogStepDescription(Step step)
         {
             string OutText = " Step# " + Sim.Steps.IndexOf(Sim.CurrentStep).ToString() +" ["+ step.StepType.ToString()+ "] ";
@@ -153,12 +184,6 @@ namespace HSR_SIM_LIB
                 CbLog  (new KeyValuePair<string, string>(Constant.MsgLog, msg));
         }
 
-
-        public  Worker()
-        {            
-         
-
-        }
 
         public void Init()
         {

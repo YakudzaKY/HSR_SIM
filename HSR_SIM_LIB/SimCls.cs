@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using static HSR_SIM_LIB.Resource;
 
 namespace HSR_SIM_LIB
 {/// <summary>
@@ -15,8 +16,13 @@ namespace HSR_SIM_LIB
 
         Step currentStep =null;
         int currentFightStep = 0;
-        int sp = 0;//Skill points
-        int tp = 0;// tehcnique pounts
+        private List<Resource> resources= null;
+
+
+        List<Unit> party;
+
+        SimFight currentFight = null;
+
 
         public Step CurrentStep { get => currentStep; set => currentStep = value; }
         internal Scenario CurrentScenario { get => currentScenario; set => currentScenario = value; }
@@ -24,9 +30,32 @@ namespace HSR_SIM_LIB
         public List<Step> Steps { get => steps; set => steps = value; }
         public List<Unit> Party { get => party; set => party = value; }
         internal SimFight CurrentFight { get => currentFight; set => currentFight = value; }
-        public int Tp { get => tp; set => tp = value; }
-        public int Sp { get => sp; set => sp = value; }
-        public List<Ability> BeforeStartQueue = new List<Ability>();
+        public int CurrentFightStep { get => currentFightStep; set => currentFightStep = value; }
+        /// <summary>
+        /// Do enter combat on next step proc
+        /// </summary>
+        public bool DoEnterCombat { get; internal set; }
+       
+        public List<Resource> Resources {
+            get 
+            {//create all resources
+                if (resources == null)
+                {
+                    resources = new List<Resource>();
+                    foreach (string name in Enum.GetNames<ResourceType>())
+                    {
+                        Resource res =new Resource();
+                        res.ResType = (ResourceType)System.Enum.Parse(typeof(ResourceType), name);
+                        res.ResVal = 0;
+                        resources.Add(res);
+                    }
+                } 
+                return resources;
+            }
+            set => resources = value; }
+
+        private List<Ability> beforeStartQueue = new List<Ability>();
+        public List<Ability> BeforeStartQueue { get => beforeStartQueue; set => beforeStartQueue = value; }
 
         private Fight nextFight;
         public Fight NextFight { 
@@ -43,11 +72,10 @@ namespace HSR_SIM_LIB
             }
         }
 
-        public int CurrentFightStep { get => currentFightStep; set => currentFightStep = value; }
+        
 
-        List<Unit> party;
 
-        SimFight currentFight=null;
+
 
         /// <summary>
         /// construcotor
@@ -76,15 +104,25 @@ namespace HSR_SIM_LIB
         }
 
         /// <summary>
+        /// Get resource By Type
+        /// </summary>
+        public Resource GetRes(ResourceType rt)
+        {
+            return Resources.Where(resource => resource.ResType == rt).First();
+        }
+
+        /// <summary>
         /// prepare things to combat simulation
         /// </summary>
         public void Prepare()
         {
   
             Party = getCombatUnits(CurrentScenario.Party);
-            Tp= Constant.MaxTp;
 
-            //clone scenario party into current party
+            GetRes(ResourceType.TP).ResVal = 5;
+            GetRes(ResourceType.SP).ResVal = 5;
+
+
 
         }
     }
