@@ -146,7 +146,7 @@ namespace HSR_SIM_LIB
     /// </summary>
     private static void DrawCenterText(Graphics gfx, string text, Brush brush = null)
     {
-        DrawText(CombatImgSize.Width-(text.Length * DefaultFontSizeSpace), CenterTextY, gfx, text, brush);
+        DrawText((CombatImgSize.Width/2)-(text.Length * DefaultFontSizeSpace), CenterTextY, gfx, text, brush);
     }
 
     /// <summary>

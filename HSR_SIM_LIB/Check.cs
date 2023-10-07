@@ -43,7 +43,8 @@ namespace HSR_SIM_LIB
             ResourceQuantity,
             ResourceType,
             CombatStartSkillQueue,
-            EventType
+            EventType,
+            WeaknessType
         }
         public enum CheckObjectEnm
         {

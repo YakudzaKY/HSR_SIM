@@ -17,6 +17,7 @@
 					<Check type="ResourceType" value="TP"/>
 					<Check type="ResourceQuantity" value="1"/>
 				</Check>
+				<!--Have no unit in party who can use technique on weakness-->
 				<Check  type="FindTarget" value="Party" clause="false">
 					<Check type="Alive" value="true"/>
 					<Check type="HaveSkill">
@@ -26,7 +27,11 @@
 						<Check type="HaveEvent">
 							<Check type="EventType" value="EnterCombat" />
 						</Check>
-					</Check>			
+					</Check>	
+					<Check  type="FindTarget" value="hostiles">				
+						<Check type="Alive" value="true"/>
+						<Check type="WeaknessType" value="@PartyUnitElement"/>	
+					</Check>				
 				</Check>		
 			</Condition>		
 		</ExecuteWhen>

@@ -9,6 +9,7 @@ using HSR_SIM_LIB;
 using static HSR_SIM_LIB.Ability;
 using static HSR_SIM_LIB.Check;
 using static HSR_SIM_LIB.Resource;
+using static HSR_SIM_LIB.Unit;
 
 namespace HSR_SIM_LIB
 {
@@ -224,11 +225,24 @@ namespace HSR_SIM_LIB
                         unit.Element = (Unit.ElementEnm)System.Enum.Parse(typeof(Unit.ElementEnm), elementVal);
                     unit.Stats = ExctractStats(xRoot);
                     unit.Abilities = ExctractAbilities(xRoot,unit);
+                    unit.Weaknesses = ExctractWeaknesses(xRoot);
                     units.Add(unit);
                 }
                 
             }
             return units;
+        }
+
+        private static List<ElementEnm> ExctractWeaknesses(XmlElement xmlItems)
+        {
+            List<ElementEnm> weaknesses = new List<ElementEnm>();
+            foreach (XmlElement weaknessXml in xmlItems.SelectNodes("Weakness"))
+            {
+                ElementEnm weakness = (ElementEnm)System.Enum.Parse(typeof(ElementEnm), weaknessXml.Attributes.GetNamedItem("type").Value.Trim());
+                weaknesses.Add(weakness);
+            }
+            return weaknesses;
+
         }
 
         /// <summary>

@@ -1,3 +1,4 @@
 <Unit>	
 	<Stats maxHp="500000" attack="10" />
+	<Weakness type="Wind"/>
 </Unit>

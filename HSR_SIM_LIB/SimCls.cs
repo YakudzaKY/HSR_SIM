@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using static HSR_SIM_LIB.Ability;
 using static HSR_SIM_LIB.Check;
 using static HSR_SIM_LIB.Event;
 using static HSR_SIM_LIB.Resource;
+using static HSR_SIM_LIB.Unit;
 
 namespace HSR_SIM_LIB
 {/// <summary>
@@ -22,10 +24,39 @@ namespace HSR_SIM_LIB
         private List<Resource> resources= null;
 
 
+        List<Unit> hostileParty;
         List<Unit> party;
 
         SimFight currentFight = null;
 
+        /// <summary>
+        /// Return from scenario if no fight. or hostileParty if fight active
+        /// </summary>
+        public List<Unit> HostileParty 
+        { 
+            get
+            {
+                if (CurrentFight == null)
+                {
+                    List<Unit> nextEnemys= new List<Unit>();
+                    //gather enemys from all waves
+                    foreach (Wave wave in nextFight.Waves)
+                    {
+                        nextEnemys.AddRange(wave.Units);
+                    }
+                    return nextEnemys;
+                }
+
+                else
+                {
+                    if (hostileParty==null)
+                        hostileParty= new List<Unit>();
+                    return hostileParty;
+                }
+                
+            }
+            set => hostileParty = value; 
+        }
 
         public Step CurrentStep { get => currentStep; set => currentStep = value; }
         internal Scenario CurrentScenario { get => currentScenario; set => currentScenario = value; }
@@ -75,7 +106,9 @@ namespace HSR_SIM_LIB
             }
         }
 
-        
+   
+
+
 
 
 
@@ -122,7 +155,7 @@ namespace HSR_SIM_LIB
   
             Party = getCombatUnits(CurrentScenario.Party);
 
-            GetRes(ResourceType.TP).ResVal = 1;
+            GetRes(ResourceType.TP).ResVal = 5;
             GetRes(ResourceType.SP).ResVal = 5;
 
 
@@ -205,7 +238,7 @@ namespace HSR_SIM_LIB
         /// <param name="essence"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        private bool ExecuteCheck(Check check, CheckEssence essence)
+        private bool ExecuteCheck(Check check, CheckEssence essence, Unit caster =null)
         {
             bool res = false;
             if (check.CheckType == CheckTypeEnm.CombatStartSkillQueue)
@@ -219,7 +252,21 @@ namespace HSR_SIM_LIB
             else if (check.CheckType == CheckTypeEnm.FindTarget)
             {
                 if (String.Equals(check.Value, "party", StringComparison.OrdinalIgnoreCase))
-                    res = ExecuteCheckList(check, new List<CheckEssence>(Party));
+                    res = ExecuteCheckList(check, new List<CheckEssence>(Party),((Ability)essence).Parent );
+                else if (String.Equals(check.Value, "Hostiles", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (essence is Ability)
+                    {
+                        res = ExecuteCheckList(check, new List<CheckEssence>(HostileParty), ((Ability)essence).Parent);
+                    }
+                    else if (essence is Unit)
+                    {
+                        res = ExecuteCheckList(check, new List<CheckEssence>(HostileParty), ((Unit)essence));
+                    }
+                    else
+                        throw new NotImplementedException();
+
+                }   
                 else
                     throw new NotImplementedException();
 
@@ -236,6 +283,29 @@ namespace HSR_SIM_LIB
             else if (check.CheckType == CheckTypeEnm.AbilityType)
             {
                 res = ((Ability)essence).AbilityType == (AbilityTypeEnm)System.Enum.Parse(typeof(AbilityTypeEnm), check.Value);
+            }
+            else if (check.CheckType == CheckTypeEnm.WeaknessType)
+            {
+                foreach (ElementEnm weakness in ((Unit)essence).Weaknesses )
+                {
+                    ElementEnm findVal;
+                    if( check.Value== "@CasterElement")
+                    {
+                        findVal = caster.Element;
+                    }
+                    else if (check.Value == "@PartyUnitElement")
+                    {
+                        findVal = caster.Element;
+                    }
+                    else
+                        findVal=(ElementEnm)System.Enum.Parse(typeof(ElementEnm), check.Value);
+
+                    if (weakness== findVal)
+                    {
+                        res=true; 
+                        break;
+                    }
+                }
             }
             else if (check.CheckType == CheckTypeEnm.AbilityCostType)
             {
@@ -276,21 +346,29 @@ namespace HSR_SIM_LIB
 
             return check.Clause ? res : !res; ;
         }
-
-        private bool ExecuteCheckList(Check check, List<CheckEssence> essences)
+        /// <summary>
+        /// Search for only one essence with ALL checks
+        /// </summary>
+        /// <param name="check"></param>
+        /// <param name="essences"></param>
+        /// <param name="caster"></param>
+        /// <returns></returns>
+        private bool ExecuteCheckList(Check check, List<CheckEssence> essences, Unit caster = null)
         {
             bool res=false;
             //gather all essences
             foreach (CheckEssence essence in essences)
             {
                 bool checkAreOk = true;
+
                 foreach (Check innerCheck in check.InnerChecks)
                 {
-                    checkAreOk = ExecuteCheck(innerCheck, essence);
+                    checkAreOk = ExecuteCheck(innerCheck, essence,caster);
                     //if one fail then all check false
                     if (!checkAreOk)
                         break;
                 }
+
                 //if find good item then stop search 
                 if (checkAreOk)
                 {

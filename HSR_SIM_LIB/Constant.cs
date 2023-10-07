@@ -26,7 +26,7 @@ namespace HSR_SIM_LIB
         //Some of sizes or coords
         public static readonly sbyte BarFontSize = (sbyte) (Math.Round((double)(CombatImgSize.Height / 57.14)));
         public static readonly sbyte DefaultFontSize = (sbyte)(Math.Round((double)(CombatImgSize.Height / 40)));
-        public static readonly sbyte DefaultFontSizeSpace = (sbyte)(Math.Round((double)(DefaultFontSize * 1.75)));
+        public static readonly sbyte DefaultFontSizeSpace = (sbyte)(Math.Round((double)(DefaultFontSize * 0.4)));
         public static readonly short CenterTextY = (short)Math.Round((double)(CombatImgSize.Height * 0.4));
         public static readonly sbyte UnitSpaceSize = (sbyte)Math.Round((double)((CombatImgSize.Width - (5 * TotalUnitSize.Width)) / 5));
         public static readonly sbyte StartQueuefontSize = (sbyte)(DefaultFontSize * 0.90);

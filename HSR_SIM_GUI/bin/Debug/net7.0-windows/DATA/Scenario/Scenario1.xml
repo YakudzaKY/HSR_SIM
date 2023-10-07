@@ -1,7 +1,8 @@
 <Scenario name="Default test scenario">
 	<Party>
 		<Unit template="Blade"/>
-		<Unit template="Bronya"/>		
+		<Unit template="Bronya"/>	
+		<Unit template="Luocha"/>	
 	</Party>
 	<Fights>
 		<Fight name="First fight">		

@@ -24,6 +24,7 @@ namespace HSR_SIM_LIB
         public ElementEnm Element { get => element; set => element = value; }
 
         private ElementEnm element;
+        private List<ElementEnm> weaknesses = null;
         //TODO unit role on battlefield
         //role changes on PRE-FIGHT(depend on weakness). changes on party dead or enemy dead(depend on weakness)---
 
@@ -60,7 +61,8 @@ namespace HSR_SIM_LIB
             } 
             set => stats = value; }
 
-     
+        public List<ElementEnm> Weaknesses { get => weaknesses; set => weaknesses = value; }
+
         public enum ElementEnm
         {
             NPC,
