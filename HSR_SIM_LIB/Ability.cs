@@ -9,7 +9,7 @@ namespace HSR_SIM_LIB
 {/// <summary>
 /// Ability class
 /// </summary>
-    public class Ability
+    public class Ability: CheckEssence
     {
 
         private AbilityTypeEnm abilityType;

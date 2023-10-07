@@ -21,6 +21,7 @@ using System.Net.Mail;
 using static HSR_SIM_LIB.Event;
 using static HSR_SIM_LIB.Resource;
 using System.Resources;
+using static HSR_SIM_LIB.Check;
 
 namespace HSR_SIM_LIB
 {
@@ -112,15 +113,13 @@ namespace HSR_SIM_LIB
             var orderedAbilities = from ability in abilities
                                   where PartyHaveRes(ability)
                                   orderby ability.Events.Exists(ent=> ent.Type== EventType.EnterCombat) ascending//non combat first
-                                        //TODO add element order
-                                        //TODO priority order
                                       , ability.Cost descending//start from Hight cost abilities
                                  select ability;            
             foreach (Ability ability in orderedAbilities)
             {
 
                 //TODO: choose technique by conditions
-                if (FullFiledConditions(ability))
+                if (sim.FullFiledConditions(ability))
                 {
                     ExecuteTechnique(step, ability);
                     return;
@@ -130,22 +129,9 @@ namespace HSR_SIM_LIB
             return;
          
         }
-        /// <summary>
-        /// Check conditions are ok for use ability
-        /// </summary>
-        /// <param name="ability"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        private bool FullFiledConditions(Ability ability)
-        {
-            bool res = true;
-            foreach (Condition condition in ability.ExecuteWhen)
-            {
 
-            }
-            return res;
-        }
 
+        
         /// <summary>
         /// Do next step by logic priority
         /// </summary>

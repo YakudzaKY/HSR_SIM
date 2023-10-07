@@ -13,9 +13,10 @@ namespace HSR_SIM_LIB
     {
         private List<Check> innerChecks;
         private CheckTypeEnm checkType;
+        private bool clause=true;
 
         public string Value { get; internal set; }
-        public bool Clause { get; internal set; }
+        public bool Clause { get => clause; internal set => clause = value; }
 
         internal List<Check> InnerChecks { get
             {
@@ -34,12 +35,24 @@ namespace HSR_SIM_LIB
             HaveSkill,
             AbilityType,
             AbilityCost,
+            AbilityCostType,
             HaveEvent,
             ResourceCheck,
             FindBuff,
             Buff,
             ResourceQuantity,
-            ResourceType
+            ResourceType,
+            CombatStartSkillQueue,
+            EventType
         }
+        public enum CheckObjectEnm
+        {
+            CombatQueue
+           
+        }
+
+
+
+
     }
 }

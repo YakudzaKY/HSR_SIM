@@ -4,10 +4,8 @@
 		<Event name="CombatStartSkillQueue"/>
 		<ExecuteWhen>
 			<Condition>
-				<Check type="FindBuff" value="party" clause="false">
-					<Check type="Buff" value="@self"/>
-				</Check>				
-			</Condition>
+				<Check type="CombatStartSkillQueue" value="self" clause="false"/>							
+			</Condition>			
 			<Condition orgroup="TP_SPENDING">
 				<Check  type="ResourceCheck" value="party" clause="true">
 					<Check type="ResourceType" value="TP"/>
@@ -17,14 +15,17 @@
 			<Condition orgroup="TP_SPENDING">
 				<Check  type="ResourceCheck" value="party" clause="true">
 					<Check type="ResourceType" value="TP"/>
-					<Check type="ResourceQuantity" value="2"/>
+					<Check type="ResourceQuantity" value="1"/>
 				</Check>
 				<Check  type="FindTarget" value="Party" clause="false">
-					<Check type="Alive" value="Alive"/>
+					<Check type="Alive" value="true"/>
 					<Check type="HaveSkill">
 						<Check type="AbilityType" value="Technique" />
-						<Check type="AbilityCost" value="1" />
-						<Check type="HaveEvent" value="EnterCombat"/>
+						<Check type="AbilityCostType" value="TP" />
+						<Check type="AbilityCost" value="1" />						
+						<Check type="HaveEvent">
+							<Check type="EventType" value="EnterCombat" />
+						</Check>
 					</Check>			
 				</Check>		
 			</Condition>		

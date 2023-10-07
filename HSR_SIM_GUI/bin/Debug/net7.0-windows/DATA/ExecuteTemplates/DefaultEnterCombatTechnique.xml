@@ -9,11 +9,14 @@
 			<!--Execute when otehrs have no penetrate skills-->
 			<Condition orgroup="WEAKNESS_CHECK">		
 				<Check  type="FindTarget" value="Party" clause="false">
-					<Check type="Alive" value="Alive"/>
+					<Check type="Alive" value="true"/>
 					<Check type="HaveSkill">
 						<Check type="AbilityType" value="Technique" />
-						<Check type="AbilityCost" value="1" />
-						<Check type="HaveEvent" value="EnterCombat"/>
+						<Check type="AbilityCostType" value="TP" />
+						<Check type="AbilityCost" value="1" />						
+						<Check type="HaveEvent">
+							<Check type="EventType" value="EnterCombat" />
+						</Check>
 					</Check>					
 					<Check  type="FindTarget" value="Hostiles">				
 						<Check type="Alive" value="Alive"/>

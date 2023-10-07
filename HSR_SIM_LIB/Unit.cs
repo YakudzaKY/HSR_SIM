@@ -12,7 +12,7 @@ namespace HSR_SIM_LIB
 {/// <summary>
 /// Unit class. Stats skills etc
 /// </summary>
-    public class Unit
+    public class Unit: CheckEssence
     {
         
         string name = string.Empty;

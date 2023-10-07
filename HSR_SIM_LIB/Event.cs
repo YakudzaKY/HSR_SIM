@@ -9,7 +9,7 @@ namespace HSR_SIM_LIB
     /// <summary>
     /// Events. Situation changed when event was proceded
     /// </summary>
-    public class Event
+    public class Event:CheckEssence
     {
         private EventType type;
         private Resource.ResourceType resType;

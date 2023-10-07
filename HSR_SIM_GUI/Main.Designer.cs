@@ -39,16 +39,16 @@
             // LogWindow
             // 
             LogWindow.ForeColor = System.Drawing.SystemColors.WindowText;
-            LogWindow.Location = new System.Drawing.Point(8, 430);
+            LogWindow.Location = new System.Drawing.Point(8, 620);
             LogWindow.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             LogWindow.Name = "LogWindow";
-            LogWindow.Size = new System.Drawing.Size(800, 305);
+            LogWindow.Size = new System.Drawing.Size(1200, 215);
             LogWindow.TabIndex = 0;
             LogWindow.Text = "";
             // 
             // button1
             // 
-            button1.Location = new System.Drawing.Point(14, 741);
+            button1.Location = new System.Drawing.Point(13, 841);
             button1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             button1.Name = "button1";
             button1.Size = new System.Drawing.Size(120, 35);
@@ -62,13 +62,13 @@
             combatOut.Location = new System.Drawing.Point(8, 14);
             combatOut.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             combatOut.Name = "combatOut";
-            combatOut.Size = new System.Drawing.Size(800, 400);
+            combatOut.Size = new System.Drawing.Size(1200, 600);
             combatOut.TabIndex = 2;
             combatOut.TabStop = false;
             // 
             // button2
             // 
-            button2.Location = new System.Drawing.Point(253, 741);
+            button2.Location = new System.Drawing.Point(171, 841);
             button2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             button2.Name = "button2";
             button2.Size = new System.Drawing.Size(120, 35);
@@ -78,7 +78,7 @@
             // 
             // button3
             // 
-            button3.Location = new System.Drawing.Point(380, 741);
+            button3.Location = new System.Drawing.Point(329, 841);
             button3.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             button3.Name = "button3";
             button3.Size = new System.Drawing.Size(120, 35);
@@ -90,7 +90,7 @@
             // Main
             // 
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            ClientSize = new System.Drawing.Size(826, 796);
+            ClientSize = new System.Drawing.Size(1215, 888);
             Controls.Add(button3);
             Controls.Add(button2);
             Controls.Add(combatOut);

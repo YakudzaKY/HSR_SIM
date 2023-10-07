@@ -9,7 +9,7 @@ namespace HSR_SIM_LIB
     /// <summary>
     /// Class for resources. It can be party (like SP) or character HP
     /// </summary>
-    public class Resource
+    public class Resource: CheckEssence
     {
         private ResourceType resType;
         private int resVal;
