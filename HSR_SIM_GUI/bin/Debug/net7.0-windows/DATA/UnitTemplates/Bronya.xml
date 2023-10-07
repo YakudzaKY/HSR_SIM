@@ -3,13 +3,31 @@
 	<Ability name="Banner of Command" type="Technique" costtype="TP" cost="1">
 		<Event name="CombatStartSkillQueue"/>
 		<ExecuteWhen>
+			<Condition>
+				<Check type="FindBuff" value="party" clause="false">
+					<Check type="Buff" value="@self"/>
+				</Check>				
+			</Condition>
 			<Condition orgroup="TP_SPENDING">
-				<ResourceCheck resCheck="party" resType="TP" quantity ="2" equal=">="/>
+				<Check  type="ResourceCheck" value="party" clause="true">
+					<Check type="ResourceType" value="TP"/>
+					<Check type="ResourceQuantity" value="2"/>
+				</Check>				
 			</Condition>			
 			<Condition orgroup="TP_SPENDING">
-				<ResourceCheck resCheck="party" resType="TP" quantity ="1" equal=">="/>
-				<partyMemeberExists alive="true" haveSkill="Technique_EnterCombat" clause="false"/>
-			</Condition>
+				<Check  type="ResourceCheck" value="party" clause="true">
+					<Check type="ResourceType" value="TP"/>
+					<Check type="ResourceQuantity" value="2"/>
+				</Check>
+				<Check  type="FindTarget" value="Party" clause="false">
+					<Check type="Alive" value="Alive"/>
+					<Check type="HaveSkill">
+						<Check type="AbilityType" value="Technique" />
+						<Check type="AbilityCost" value="1" />
+						<Check type="HaveEvent" value="EnterCombat"/>
+					</Check>			
+				</Check>		
+			</Condition>		
 		</ExecuteWhen>
 	</Ability>
 </Unit>

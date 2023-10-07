@@ -7,6 +7,7 @@ using System.Xml;
 using System.Xml.Linq;
 using HSR_SIM_LIB;
 using static HSR_SIM_LIB.Ability;
+using static HSR_SIM_LIB.Check;
 using static HSR_SIM_LIB.Resource;
 
 namespace HSR_SIM_LIB
@@ -115,15 +116,90 @@ namespace HSR_SIM_LIB
                     ability.Events.Add(ent);
 
                 }
+                //execute conditions by tags
+                foreach (XmlElement xmlExecute in abilitiyXml.SelectNodes("ExecuteWhen"))
+                {
+                    //execute conditions by template
+                    string template = xmlExecute.Attributes.GetNamedItem("template")?.Value.Trim();
+                    if (template != null)
+                    {
+                        XmlDocument tempalteDoc= new XmlDocument();
+                        tempalteDoc.Load(Utils.DataFolder + "ExecuteTemplates\\" + template + ".xml");
+                        XmlElement templateRoot = tempalteDoc.DocumentElement;
+                        FillExecuteWhen(templateRoot, ability);
+                    }
+                    else
+                        FillExecuteWhen(xmlExecute, ability);
+                }
+   
                 abilities.Add(ability);
               
                  
             }
                 return abilities;
         }
+        /// <summary>
+        /// parse ExecuteWhen->Condition
+        /// </summary>
+        /// <param name="xmlExecute"></param>
+        /// <param name="ability"></param>
+        private static void FillExecuteWhen(XmlElement xmlExecute, Ability ability)
+        {
+            foreach (XmlElement xmlCondition in xmlExecute.SelectNodes("Condition"))
+            {
+                Condition condition = new Condition();
+                condition.OrGroup = xmlCondition.Attributes.GetNamedItem("orgroup")?.Value.Trim();
+                FillConditionChecks(xmlCondition, condition);
+
+                ability.ExecuteWhen.Add(condition);
+            }
+        }
+        /// <summary>
+        /// parse Condition->Check
+        /// </summary>
+        /// <param name="xmlCondition"></param>
+        /// <param name="condition"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private static void FillConditionChecks(XmlElement xmlCondition, Condition condition)
+        {
+            foreach (XmlElement xmlCheck in xmlCondition.SelectNodes("Check"))
+            {
+   
+                condition.Checks.Add(ExctractCheck(xmlCheck));
+            }
+        }
+
+        /// <summary>
+        /// Exctract Check
+        /// </summary>
+        /// <param name="xmlCheck"></param>
+        /// <returns></returns>
+        private static Check ExctractCheck(XmlElement xmlCheck)
+        {
+            Check check = new Check();
+            //parse all attributes 
+            foreach (XmlAttribute xmlAttrib in xmlCheck.Attributes)
+            {
+
+                if (String.Equals(xmlAttrib.Name,"type",StringComparison.OrdinalIgnoreCase) )           
+                    check.CheckType = (CheckTypeEnm)System.Enum.Parse(typeof(CheckTypeEnm), xmlAttrib.Value.Trim());
+                else if (String.Equals(xmlAttrib.Name, "value", StringComparison.OrdinalIgnoreCase))
+                    check.Value =xmlAttrib.Value.Trim();
+                else if (String.Equals(xmlAttrib.Name, "clause", StringComparison.OrdinalIgnoreCase))
+                    check.Clause = bool.Parse(xmlAttrib.Value.Trim());
+                else
+                    throw new NotImplementedException();
+
+            }
             
+            foreach (XmlElement xmlInnerCheck in xmlCheck.SelectNodes("Check"))
+            {
+                check.InnerChecks.Add(ExctractCheck(xmlInnerCheck));
+            }
 
+            return check;
 
+        }
         /// <summary>
         /// Exctract unit list from xml elemenet
         /// </summary>
@@ -150,8 +226,7 @@ namespace HSR_SIM_LIB
                     unit.Abilities = ExctractAbilities(xRoot,unit);
                     units.Add(unit);
                 }
-
-
+                
             }
             return units;
         }

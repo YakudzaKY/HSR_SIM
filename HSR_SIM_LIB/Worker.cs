@@ -115,20 +115,35 @@ namespace HSR_SIM_LIB
                                         //TODO add element order
                                         //TODO priority order
                                       , ability.Cost descending//start from Hight cost abilities
-                                 select ability;
-            
-            //Use techniques starts from non combat
+                                 select ability;            
             foreach (Ability ability in orderedAbilities)
             {
-                
+
                 //TODO: choose technique by conditions
-                //TODO check skill queue for starter skills
-                ExecuteTechnique(step,ability);
-                return;
+                if (FullFiledConditions(ability))
+                {
+                    ExecuteTechnique(step, ability);
+                    return;
+                }
             }
 
             return;
          
+        }
+        /// <summary>
+        /// Check conditions are ok for use ability
+        /// </summary>
+        /// <param name="ability"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        private bool FullFiledConditions(Ability ability)
+        {
+            bool res = true;
+            foreach (Condition condition in ability.ExecuteWhen)
+            {
+
+            }
+            return res;
         }
 
         /// <summary>

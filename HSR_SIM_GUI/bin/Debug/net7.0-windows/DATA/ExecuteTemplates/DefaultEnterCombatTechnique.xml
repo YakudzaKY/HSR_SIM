@@ -1,0 +1,25 @@
+<ExecuteWhen>
+			<!--Execute when we can penetrate weakness-->
+			<Condition orgroup="WEAKNESS_CHECK">
+				<Check  type="FindTarget" value="Hostiles">				
+					<Check type="Alive" value="Alive"/>
+					<Check type="Weakness" value="@self.Element"/>		
+				</Check>
+			</Condition>		
+			<!--Execute when otehrs have no penetrate skills-->
+			<Condition orgroup="WEAKNESS_CHECK">		
+				<Check  type="FindTarget" value="Party" clause="false">
+					<Check type="Alive" value="Alive"/>
+					<Check type="HaveSkill">
+						<Check type="AbilityType" value="Technique" />
+						<Check type="AbilityCost" value="1" />
+						<Check type="HaveEvent" value="EnterCombat"/>
+					</Check>					
+					<Check  type="FindTarget" value="Hostiles">				
+						<Check type="Alive" value="Alive"/>
+						<Check type="Weakness" value="@self.Element"/>		
+					</Check>				
+				</Check>
+				
+			</Condition>			
+</ExecuteWhen>

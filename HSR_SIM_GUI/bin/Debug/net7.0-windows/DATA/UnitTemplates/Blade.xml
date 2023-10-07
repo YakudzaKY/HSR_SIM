@@ -1,8 +1,10 @@
 <Unit element="Wind">	
 	<Stats maxHp="10000" attack="10" energy="90"/>
+	<!--Karma Wind-->
 	<Ability name="Karma Wind" type="Technique" costtype="TP" cost="1">
 		<Event name="CombatStartSkillQueue"/>
 		<Event name="EnterCombat"/>
+		<!--Execution conditions-->
+		<ExecuteWhen template="DefaultEnterCombatTechnique"/>					
 	</Ability>
-
 </Unit>
