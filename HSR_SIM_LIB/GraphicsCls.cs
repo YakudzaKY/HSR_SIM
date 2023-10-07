@@ -50,7 +50,7 @@ namespace HSR_SIM_LIB
                         DrawStartQueue(gfx, new Point(LeftSideWithSpace, TopSideForQueue), sim.BeforeStartQueue);
                     }
 
-                    //TODO: draw next fight units 
+                    //TODO: draw next fight units (with weaknes)
                     DrawCenterText(gfx, sim.CurrentStep.GetStepDescription());
                 }
             }
