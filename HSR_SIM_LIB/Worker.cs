@@ -106,7 +106,10 @@ namespace HSR_SIM_LIB
                         }
                         Step newStep = sim.WorkIteration();
                         if (newStep.StepType != StepTypeEnm.Iddle)
+                        {
+                            sim.CurrentStep= newStep; 
                             LogStepDescription(newStep);
+                        }
 
                         //if no changes at step then scenario completed
                         if (stepndx > 0 && sim?.CurrentStep == sim?.steps[stepndx - 1])

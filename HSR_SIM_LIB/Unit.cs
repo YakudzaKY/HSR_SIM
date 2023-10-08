@@ -57,7 +57,15 @@ namespace HSR_SIM_LIB
         {
             Stats.MaxHp = Stats.BaseMaxHp;
             Stats.CurrentHp = Stats.MaxHp;
-
+            //Clone abilities from template
+            List<Ability> clonedAbilities= new List<Ability>();
+            foreach (Ability ability in Reference.Abilities)
+            {
+                Ability newAbility = (Ability)ability.Clone();
+                newAbility.Parent = this;
+                clonedAbilities.Add(newAbility);
+            }
+            Abilities = clonedAbilities;
 
         }
 
@@ -76,6 +84,7 @@ namespace HSR_SIM_LIB
         }
 
         public List<ElementEnm> Weaknesses { get => weaknesses; set => weaknesses = value; }
+        public Unit Reference { get; internal set; }
 
         public enum ElementEnm
         {

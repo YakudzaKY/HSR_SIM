@@ -146,6 +146,7 @@ namespace HSR_SIM_LIB
             foreach (Unit unit in units)
             {
                 Unit newUnit = (Unit)unit.Clone();
+                newUnit.Reference = unit;
                 res.Add(newUnit);
                 newUnit.InitToCombat();
             }
