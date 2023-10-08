@@ -8,6 +8,8 @@
 		<Fight name="First fight">		
 			<Wave>
 				<Unit template="Dummy"/>
+				<Unit template="Eblan"/>
+				<Unit template="Dummy"/>
 			</Wave>		
 		</Fight>
 		<Fight name="Second fight">		
@@ -16,9 +18,9 @@
 				<Unit template="Dummy"/>
 			</Wave>
 			<Wave>
+				<Unit template="Eblan"/>
 				<Unit template="Dummy"/>
-				<Unit template="Dummy"/>
-				<Unit template="Dummy"/>
+				<Unit template="Eblan"/>
 			</Wave>	
 		</Fight>
 	</Fights>

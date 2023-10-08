@@ -34,7 +34,7 @@ namespace HSR_SIM_LIB
         {
             string res;
             if (StepType == StepTypeEnm.SimInit)
-                res = "summulation was initialized";
+                res = "sim was initialized";
             else if (StepType == StepTypeEnm.TechniqueUse)
                 res = Actor.Name + " used " + ActorAbility.Name;
             else if (StepType == StepTypeEnm.StartCombat)

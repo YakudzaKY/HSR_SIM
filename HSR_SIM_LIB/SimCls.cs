@@ -110,7 +110,7 @@ namespace HSR_SIM_LIB
                 if (nextFight == null)
                 {
                     if (CurrentFightStep < CurrentScenario.Fights.Count)
-                        nextFight = CurrentScenario.Fights[CurrentFightStep + 1];
+                        nextFight = CurrentScenario.Fights[CurrentFightStep];
                 }
 
                 return nextFight;
