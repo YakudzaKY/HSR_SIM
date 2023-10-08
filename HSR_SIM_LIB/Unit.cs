@@ -7,45 +7,46 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using static HSR_SIM_LIB.Constant;
+using static HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_LIB
 {/// <summary>
 /// Unit class. Stats skills etc
 /// </summary>
-    public class Unit: CheckEssence
+    public class Unit : CheckEssence
     {
-        
+
         string name = string.Empty;
         Bitmap portrait = null;
         UnitStats stats = null;
         List<Ability> abilities = null;
-        public Bitmap Portrait { 
+        public Bitmap Portrait
+        {
             get
             {
                 if (portrait == null)
                 {
-                    FileInfo fi = new FileInfo(Utils.getAvalableImageFile(Name));
-                    //load portrait
-                    portrait = Utils.NewBitmap(fi);
+
                     //resize
-                    portrait = new Bitmap(Portrait, PortraitSize);
+                    portrait = new Bitmap(LoadBitmap(Name), PortraitSize);
 
                 }
                 return portrait;
             }
-            set => portrait = value; }
+            set => portrait = value;
+        }
         public List<Ability> Abilities { get => abilities; set => abilities = value; }
-        public ElementEnm Element { get => element; set => element = value; }
+        public ElementEnm? Element { get => element; set => element = value; }
 
-        private ElementEnm element;
+        private ElementEnm? element;
         private List<ElementEnm> weaknesses = null;
         //TODO unit role on battlefield
         //role changes on PRE-FIGHT(depend on weakness). changes on party dead or enemy dead(depend on weakness)---
 
 
-        public Unit() {
-            Element = ElementEnm.NPC;//first NPC- default value on class init
-            Abilities =new List<Ability>(); 
+        public Unit()
+        {
+            Abilities = new List<Ability>();
         }
 
         public bool IsAlive = true;
@@ -56,27 +57,28 @@ namespace HSR_SIM_LIB
         {
             Stats.MaxHp = Stats.BaseMaxHp;
             Stats.CurrentHp = Stats.MaxHp;
-            
-           
+
+
         }
 
-        
+
 
         public string Name { get => name; set => name = value; }
-        public UnitStats Stats { 
-            get 
-            { 
-                if (stats==null)
+        public UnitStats Stats
+        {
+            get
+            {
+                if (stats == null)
                     stats = new UnitStats();
                 return stats;
-            } 
-            set => stats = value; }
+            }
+            set => stats = value;
+        }
 
         public List<ElementEnm> Weaknesses { get => weaknesses; set => weaknesses = value; }
 
         public enum ElementEnm
         {
-            NPC,
             Wind,
             Physical,
             Fire,

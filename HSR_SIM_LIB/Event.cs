@@ -27,7 +27,9 @@ namespace HSR_SIM_LIB
             CombatStartSkillQueue,
             ResourceDrain,
             PartyResourceDrain,
-            EnterCombat
+            EnterCombat,
+            StartCombat,
+            StartWave
         }
 
 

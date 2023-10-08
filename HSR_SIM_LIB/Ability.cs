@@ -12,8 +12,8 @@ namespace HSR_SIM_LIB
     public class Ability: CheckEssence
     {
 
-        private AbilityTypeEnm abilityType;
-        private Unit parent;
+        private AbilityTypeEnm abilityType;//Technique, ultimate etc..
+        private Unit parent;//caster
         private short cost=0;
         private ResourceType costType= ResourceType.nil;
 

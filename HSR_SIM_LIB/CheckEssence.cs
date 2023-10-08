@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace HSR_SIM_LIB
 {
-    public class CheckEssence
+    public class CheckEssence : ICloneable
     {
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
     }
 }

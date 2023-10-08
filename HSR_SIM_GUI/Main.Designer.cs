@@ -29,10 +29,10 @@
         private void InitializeComponent()
         {
             LogWindow = new System.Windows.Forms.RichTextBox();
-            button1 = new System.Windows.Forms.Button();
+            BtnOpen = new System.Windows.Forms.Button();
             combatOut = new System.Windows.Forms.PictureBox();
-            button2 = new System.Windows.Forms.Button();
-            button3 = new System.Windows.Forms.Button();
+            BtnBack = new System.Windows.Forms.Button();
+            BtnNext = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)combatOut).BeginInit();
             SuspendLayout();
             // 
@@ -46,16 +46,16 @@
             LogWindow.TabIndex = 0;
             LogWindow.Text = "";
             // 
-            // button1
+            // BtnOpen
             // 
-            button1.Location = new System.Drawing.Point(13, 841);
-            button1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            button1.Name = "button1";
-            button1.Size = new System.Drawing.Size(120, 35);
-            button1.TabIndex = 1;
-            button1.Text = "Open Scenario";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            BtnOpen.Location = new System.Drawing.Point(13, 841);
+            BtnOpen.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            BtnOpen.Name = "BtnOpen";
+            BtnOpen.Size = new System.Drawing.Size(120, 35);
+            BtnOpen.TabIndex = 1;
+            BtnOpen.Text = "Open Scenario";
+            BtnOpen.UseVisualStyleBackColor = true;
+            BtnOpen.Click += button1_Click;
             // 
             // combatOut
             // 
@@ -66,35 +66,36 @@
             combatOut.TabIndex = 2;
             combatOut.TabStop = false;
             // 
-            // button2
+            // BtnBack
             // 
-            button2.Location = new System.Drawing.Point(171, 841);
-            button2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            button2.Name = "button2";
-            button2.Size = new System.Drawing.Size(120, 35);
-            button2.TabIndex = 3;
-            button2.Text = "Prev Step";
-            button2.UseVisualStyleBackColor = true;
+            BtnBack.Location = new System.Drawing.Point(171, 841);
+            BtnBack.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            BtnBack.Name = "BtnBack";
+            BtnBack.Size = new System.Drawing.Size(120, 35);
+            BtnBack.TabIndex = 3;
+            BtnBack.Text = "Prev Step";
+            BtnBack.UseVisualStyleBackColor = true;
+            BtnBack.Click += button2_Click;
             // 
-            // button3
+            // BtnNext
             // 
-            button3.Location = new System.Drawing.Point(329, 841);
-            button3.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            button3.Name = "button3";
-            button3.Size = new System.Drawing.Size(120, 35);
-            button3.TabIndex = 4;
-            button3.Text = "Next step";
-            button3.UseVisualStyleBackColor = true;
-            button3.Click += button3_Click;
+            BtnNext.Location = new System.Drawing.Point(329, 841);
+            BtnNext.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            BtnNext.Name = "BtnNext";
+            BtnNext.Size = new System.Drawing.Size(120, 35);
+            BtnNext.TabIndex = 4;
+            BtnNext.Text = "Next step";
+            BtnNext.UseVisualStyleBackColor = true;
+            BtnNext.Click += button3_Click;
             // 
             // Main
             // 
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             ClientSize = new System.Drawing.Size(1215, 888);
-            Controls.Add(button3);
-            Controls.Add(button2);
+            Controls.Add(BtnNext);
+            Controls.Add(BtnBack);
             Controls.Add(combatOut);
-            Controls.Add(button1);
+            Controls.Add(BtnOpen);
             Controls.Add(LogWindow);
             Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             Name = "Main";
@@ -107,10 +108,10 @@
         #endregion
 
         private System.Windows.Forms.RichTextBox LogWindow;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button BtnOpen;
         private System.Windows.Forms.PictureBox combatOut;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button BtnBack;
+        private System.Windows.Forms.Button BtnNext;
     }
 }
 

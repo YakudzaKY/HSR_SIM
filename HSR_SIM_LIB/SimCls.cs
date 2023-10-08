@@ -9,6 +9,7 @@ using static HSR_SIM_LIB.Ability;
 using static HSR_SIM_LIB.Check;
 using static HSR_SIM_LIB.Event;
 using static HSR_SIM_LIB.Resource;
+using static HSR_SIM_LIB.Step;
 using static HSR_SIM_LIB.Unit;
 
 namespace HSR_SIM_LIB
@@ -19,94 +20,104 @@ namespace HSR_SIM_LIB
     {
         Scenario currentScenario;
 
-        Step currentStep =null;
+        Step currentStep = null;
         int currentFightStep = 0;
-        private List<Resource> resources= null;
+        private List<Resource> resources = null;
 
 
         List<Unit> hostileParty;
         List<Unit> party;
 
-        SimFight currentFight = null;
+        CombatFight currentFight = null;
 
         /// <summary>
         /// Return from scenario if no fight. or hostileParty if fight active
         /// </summary>
-        public List<Unit> HostileParty 
-        { 
+        public List<Unit> HostileParty
+        {
             get
             {
                 if (CurrentFight == null)
                 {
-                    List<Unit> nextEnemys= new List<Unit>();
+                    List<Unit> nextEnemys = new List<Unit>();
+                    List<Unit> nextEnemysDistinct = new List<Unit>();
                     //gather enemys from all waves
                     foreach (Wave wave in nextFight.Waves)
                     {
                         nextEnemys.AddRange(wave.Units);
+
                     }
-                    return nextEnemys;
+                    //get distinct
+                    foreach (Unit unit in nextEnemys.DistinctBy(x => x.Name))
+                    {
+                        nextEnemysDistinct.Add(unit);
+                    }
+                    return nextEnemysDistinct;
                 }
 
                 else
                 {
-                    if (hostileParty==null)
-                        hostileParty= new List<Unit>();
+                    if (hostileParty == null)
+                        hostileParty = new List<Unit>();
                     return hostileParty;
                 }
-                
+
             }
-            set => hostileParty = value; 
+            set => hostileParty = value;
         }
 
         public Step CurrentStep { get => currentStep; set => currentStep = value; }
         internal Scenario CurrentScenario { get => currentScenario; set => currentScenario = value; }
-        public List<Step> steps= new List<Step>();
+        public List<Step> steps = new List<Step>();
         public List<Step> Steps { get => steps; set => steps = value; }
         public List<Unit> Party { get => party; set => party = value; }
-        internal SimFight CurrentFight { get => currentFight; set => currentFight = value; }
+        internal CombatFight CurrentFight { get => currentFight; set => currentFight = value; }
         public int CurrentFightStep { get => currentFightStep; set => currentFightStep = value; }
         /// <summary>
         /// Do enter combat on next step proc
         /// </summary>
         public bool DoEnterCombat { get; internal set; }
-       
-        public List<Resource> Resources {
-            get 
+
+        public List<Resource> Resources
+        {
+            get
             {//create all resources
                 if (resources == null)
                 {
                     resources = new List<Resource>();
                     foreach (string name in Enum.GetNames<ResourceType>())
                     {
-                        Resource res =new Resource();
+                        Resource res = new Resource();
                         res.ResType = (ResourceType)System.Enum.Parse(typeof(ResourceType), name);
                         res.ResVal = 0;
                         resources.Add(res);
                     }
-                } 
+                }
                 return resources;
             }
-            set => resources = value; }
+            set => resources = value;
+        }
 
         private List<Ability> beforeStartQueue = new List<Ability>();
         public List<Ability> BeforeStartQueue { get => beforeStartQueue; set => beforeStartQueue = value; }
 
         private Fight nextFight;
-        public Fight NextFight { 
+        public Fight NextFight
+        {
             get
             {
                 //try search next fight
                 if (nextFight == null)
                 {
                     if (CurrentFightStep < CurrentScenario.Fights.Count)
-                        nextFight= CurrentScenario.Fights[CurrentFightStep + 1];
+                        nextFight = CurrentScenario.Fights[CurrentFightStep + 1];
                 }
 
                 return nextFight;
             }
         }
 
-   
+
 
 
 
@@ -118,23 +129,25 @@ namespace HSR_SIM_LIB
         /// </summary>
         public SimCls()
         {
-           
+
         }
 
 
 
 
         /// <summary>
-        /// Convert unit list to combat units list
+        /// Get unit list and clone to new combat unit list
         /// </summary>
         /// <param name="units"></param>
         /// <returns></returns>
         public List<Unit> getCombatUnits(List<Unit> units)
         {
-            List<Unit> res = new List<Unit>(units);
-            foreach (Unit unit in res)
+            List<Unit> res = new List<Unit>();
+            foreach (Unit unit in units)
             {
-                unit.InitToCombat();               
+                Unit newUnit = (Unit)unit.Clone();
+                res.Add(newUnit);
+                newUnit.InitToCombat();
             }
             return res;
         }
@@ -152,7 +165,7 @@ namespace HSR_SIM_LIB
         /// </summary>
         public void Prepare()
         {
-  
+
             Party = getCombatUnits(CurrentScenario.Party);
 
             GetRes(ResourceType.TP).ResVal = 5;
@@ -176,13 +189,13 @@ namespace HSR_SIM_LIB
             foreach (Condition condition in ((Ability)essence).ExecuteWhen)
             {
                 bool condRes = true;
-                bool? currentValue = null; 
+                bool? currentValue = null;
                 List<KeyValuePair<String, bool?>> localSrch = new List<KeyValuePair<string, bool?>>();
-      
+
 
                 localSrch.AddRange(orGroupsRes.Where(x => x.Key == (condition.OrGroup ?? nullReplacer)));
                 //search exists keyval
-                if (localSrch.Count == 0)             
+                if (localSrch.Count == 0)
                 {
                     orGroupsRes.Add(condition.OrGroup ?? nullReplacer, null);//default true
                 }
@@ -190,12 +203,12 @@ namespace HSR_SIM_LIB
                 //if some mandatory false then no reason to do other mandatory
                 //OR if some ORGROUP true then no reason to do other checks from this group
                 if ((condition.OrGroup == null && currentValue != false)
-                  ||(condition.OrGroup != null && currentValue != true))
+                  || (condition.OrGroup != null && currentValue != true))
                 {
                     condRes = ExecuteCondition(condition, essence);
                     orGroupsRes[condition.OrGroup ?? nullReplacer] = condRes;
-                }               
-                
+                }
+
 
 
             }
@@ -238,7 +251,7 @@ namespace HSR_SIM_LIB
         /// <param name="essence"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        private bool ExecuteCheck(Check check, CheckEssence essence, Unit caster =null)
+        private bool ExecuteCheck(Check check, CheckEssence essence, Unit caster = null)
         {
             bool res = false;
             if (check.CheckType == CheckTypeEnm.CombatStartSkillQueue)
@@ -252,7 +265,7 @@ namespace HSR_SIM_LIB
             else if (check.CheckType == CheckTypeEnm.FindTarget)
             {
                 if (String.Equals(check.Value, "party", StringComparison.OrdinalIgnoreCase))
-                    res = ExecuteCheckList(check, new List<CheckEssence>(Party),((Ability)essence).Parent );
+                    res = ExecuteCheckList(check, new List<CheckEssence>(Party), ((Ability)essence).Parent);
                 else if (String.Equals(check.Value, "Hostiles", StringComparison.OrdinalIgnoreCase))
                 {
                     if (essence is Ability)
@@ -266,7 +279,7 @@ namespace HSR_SIM_LIB
                     else
                         throw new NotImplementedException();
 
-                }   
+                }
                 else
                     throw new NotImplementedException();
 
@@ -286,10 +299,10 @@ namespace HSR_SIM_LIB
             }
             else if (check.CheckType == CheckTypeEnm.WeaknessType)
             {
-                foreach (ElementEnm weakness in ((Unit)essence).Weaknesses )
+                foreach (ElementEnm weakness in ((Unit)essence).Weaknesses)
                 {
-                    ElementEnm findVal;
-                    if( check.Value== "@CasterElement")
+                    ElementEnm? findVal;
+                    if (check.Value == "@CasterElement")
                     {
                         findVal = caster.Element;
                     }
@@ -298,11 +311,11 @@ namespace HSR_SIM_LIB
                         findVal = caster.Element;
                     }
                     else
-                        findVal=(ElementEnm)System.Enum.Parse(typeof(ElementEnm), check.Value);
+                        findVal = (ElementEnm)System.Enum.Parse(typeof(ElementEnm), check.Value);
 
-                    if (weakness== findVal)
+                    if (weakness == findVal)
                     {
-                        res=true; 
+                        res = true;
                         break;
                     }
                 }
@@ -313,7 +326,7 @@ namespace HSR_SIM_LIB
             }
             else if (check.CheckType == CheckTypeEnm.AbilityCost)
             {
-                res = ((Ability)essence).Cost  >= int.Parse(check.Value);
+                res = ((Ability)essence).Cost >= int.Parse(check.Value);
             }
             else if (check.CheckType == CheckTypeEnm.HaveEvent)
             {
@@ -355,7 +368,7 @@ namespace HSR_SIM_LIB
         /// <returns></returns>
         private bool ExecuteCheckList(Check check, List<CheckEssence> essences, Unit caster = null)
         {
-            bool res=false;
+            bool res = false;
             //gather all essences
             foreach (CheckEssence essence in essences)
             {
@@ -363,7 +376,7 @@ namespace HSR_SIM_LIB
 
                 foreach (Check innerCheck in check.InnerChecks)
                 {
-                    checkAreOk = ExecuteCheck(innerCheck, essence,caster);
+                    checkAreOk = ExecuteCheck(innerCheck, essence, caster);
                     //if one fail then all check false
                     if (!checkAreOk)
                         break;
@@ -379,5 +392,56 @@ namespace HSR_SIM_LIB
             }
             return res;
         }
+
+        /// <summary>
+        /// Do next step by logic priority
+        /// No actions here or changes, fill only step.events and set step type
+        /// newStep- null of nothing to do
+        /// </summary>
+        public Step WorkIteration()
+        {
+            Step newStep = new Step(this);
+            if (CurrentStep == null)
+            {
+                //simulation preparations
+                Prepare();
+                newStep.StepType = StepTypeEnm.SimInit;
+            }
+            //buff before fight
+            if (newStep.StepType == StepTypeEnm.Iddle && DoEnterCombat == false && CurrentFight == null) newStep.TechniqueWork();
+
+            //enter the combat
+            if (newStep.StepType == StepTypeEnm.Iddle && DoEnterCombat == true) newStep.LoadBattleWork();
+
+            //load the wave
+            if (currentFight != null && currentFight.CurrentWave == null)
+            {
+                //fight is over
+                if (currentFight.CurrentWaveCnt == currentFight.ReferenceFight.Waves.Count)
+                {
+                    throw new NotImplementedException();
+                }
+                else
+                {
+                    newStep.StepType = StepTypeEnm.StartWave;
+                    newStep.Events.Add(new Event { Type = EventType.StartWave });
+                }
+
+            }
+
+            //if we doing somethings then need proced the events
+            if (newStep.StepType != StepTypeEnm.Iddle)
+            {
+                CurrentStep = newStep;
+                Steps.Add(CurrentStep);
+                newStep.ProcEvents();
+            }
+
+            return newStep;
+
+        }
+
+
     }
+
 }

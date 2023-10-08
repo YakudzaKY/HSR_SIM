@@ -74,7 +74,12 @@ namespace HSR_SIM_GUI
 
         private void button3_Click(object sender, EventArgs e)
         {
-            wrk.DoSomething();
+            wrk.Rewind();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            wrk.Rewind(true);
         }
     }
 }

@@ -12,11 +12,13 @@ namespace HSR_SIM_LIB
     /// <summary>
     /// some utility stuff
     /// </summary>
-    internal static  class Utils
+    internal static class Utils
     {
         private static string dataFolder = AppDomain.CurrentDomain.BaseDirectory + "DATA\\";
 
         public static string DataFolder { get => dataFolder; set => dataFolder = value; }
+        public static Dictionary<String, Bitmap> imageCache = new Dictionary<String, Bitmap>();
+
 
         /// <summary>
         /// Create bitmap with convertation 
@@ -52,6 +54,17 @@ namespace HSR_SIM_LIB
                 }
             }
             return bitmap;
+        }
+        /// <summary>
+        /// Load file into bitmap. or get it from cache
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        public static Bitmap LoadBitmap(string filename)
+        {
+            if (!imageCache.ContainsKey(filename))
+                imageCache[filename] = NewBitmap(new FileInfo(getAvalableImageFile(filename)));
+            return imageCache[filename];
         }
         /// <summary>
         /// we can load png or webp frames

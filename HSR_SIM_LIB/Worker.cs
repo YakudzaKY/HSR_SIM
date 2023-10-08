@@ -35,11 +35,15 @@ namespace HSR_SIM_LIB
         CallBackStr cbLog;
         public CallBackStr CbLog { get => cbLog; set => cbLog = value; }//Calback log procedure. Used for output
 
-        CallBackRender cbRend; 
+        CallBackRender cbRend;
         public CallBackRender CbRend { get => cbRend; set => cbRend = value; }//Callback render procedure. used for graphical output
         private SimCls sim = null;
         public SimCls Sim { get => sim; set => sim = value; }//simulation class( combat ,fights etc in this shit)
+        private bool replay = false;//is replay not new gen
 
+        //TODO вообще надо сделать на старте выбор списка сценариев и количество итераций для каждого
+        //далее в несколько потоков собрать справочник СЦЕНАРИЙ:Результаты(агрегировать при выполнении каждой итерации)
+        //Графическая оболочка только для отладки
         /// <summary>
         /// Load and parse xml file with scenario
         /// </summary>
@@ -48,140 +52,98 @@ namespace HSR_SIM_LIB
         {
             Sim = XMLLoader.LoadCombatFromXml(SelectedPath);
             LogText("Scenario  " + Sim.CurrentScenario.Name + " was loaded");
-            DoSomething();
-        }
-
-        /// <summary>
-        /// Execute the technique
-        /// </summary>
-        public void ExecuteTechnique(Step step, Ability ability)
-        {
-            step.Events.AddRange(ability.Events);//copy events from ability reference
-            if (ability.CostType != ResourceType.nil)
-                step.Events.Add(new Event() { Type = EventType.PartyResourceDrain, ResType= ability.CostType, ResourceValue= ability.Cost }) ;//energy drain
-            step.Actor = ability.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
-            step.ActorAbility= ability;//WAT ABILITY is casting
-            step.StepType = StepTypeEnm.TechniqueUse;
-        }
-
-        /// <summary>
-        /// Proc all events in step
-        /// </summary>
-        public void ProcEvents(Step step,bool rewind = false)
-        {
-            //for all events saved in step
-            foreach(Event ent in step.Events)
-            {
-                if (ent.Type == EventType.PartyResourceDrain)//SP or technical points
-                {
-                    Sim.GetRes(ent.ResType).ResVal -= 1;
-                }
-                else if (ent.Type == EventType.CombatStartSkillQueue)//party buffs or opening
-                    sim.BeforeStartQueue.Add(step.ActorAbility);
-                else if (ent.Type == EventType.EnterCombat)//entering combat
-                    sim.DoEnterCombat = true;
-                else
-                    throw new NotImplementedException();
-            }
-        }
-
-        /// <summary>
-        /// Party have res to cast abilitiy
-        /// if res not found then false
-        /// </summary>
-        /// <returns></returns>
-        private bool PartyHaveRes(Ability ability)
-        {
-            foreach (Resource res in sim.Resources)
-            {
-                if (res.ResType==ability.CostType)                
-                    return res.ResVal>=ability.Cost;                
-            }
-            return false;
-        }
-
-        //Cast all techniques before fights starts
-        public void TechniqueWork(Step step)
-        {
-            List<Ability> abilities = new List<Ability>();
-            //gather all abilities from party alive members
-            foreach (Unit unit in sim.Party.Where(partyMember => partyMember.IsAlive))
-            {
-                abilities.AddRange(unit.Abilities.Where(ability => ability.AbilityType==Ability.AbilityTypeEnm.Technique));
-            }
-            
-            var orderedAbilities = from ability in abilities
-                                  where PartyHaveRes(ability)
-                                  orderby ability.Events.Exists(ent=> ent.Type== EventType.EnterCombat) ascending//non combat first
-                                      , ability.Cost descending//start from Hight cost abilities
-                                 select ability;            
-            foreach (Ability ability in orderedAbilities)
-            {
-
-                //TODO: choose technique by conditions
-                if (sim.FullFiledConditions(ability))
-                {
-                    ExecuteTechnique(step, ability);
-                    return;
-                }
-            }
-
-            return;
-         
-        }
-
-
-        
-        /// <summary>
-        /// Do next step by logic priority
-        /// </summary>
-        public void DoSomething()
-        {
-            if (sim==null)
-            {
-                LogText("Load scenario first!!!");
-                return;
-            }    
-            Step newStep= new Step();
-            //TODO rewind, scheck existed step when next 
-            if (Sim.CurrentStep==null)
-            {
-                //simulation preparations
-                Sim.Prepare();
-                newStep.StepType = StepTypeEnm.SimInit;
-            }
-            //buff before fight
-            if (newStep.StepType == StepTypeEnm.Iddle&& sim.DoEnterCombat==false)  TechniqueWork(newStep);
-
-            //enter the combat
-            if (newStep.StepType == StepTypeEnm.Iddle && sim.DoEnterCombat == true) throw new NotImplementedException();
-
-            //if we doing somethings then need proced the events
-            if (newStep.StepType != StepTypeEnm.Iddle)
-            {
-                Sim.CurrentStep = newStep;
-                Sim.Steps.Add(Sim.CurrentStep);
-                LogStepDescription(newStep);
-                ProcEvents(newStep);
-            }            
-            else 
-                LogText(" nothing to do...");
-
-            //render combat situitatuiom
+            Rewind();
             DrawCombat();
+        }
+
+        /// <summary>
+        /// Revert step
+        /// </summary>
+        public void Rewind(bool goBack = false, int stepcount = 1)
+        {
+            int stepndx = sim?.steps?.IndexOf(sim.CurrentStep) ?? 0;
+            Step oldStep = sim?.CurrentStep;
+
+            if (goBack)
+            {
+                for (int i = 0; i < stepcount; i++)
+                {
+
+                    if (stepndx <= 0)
+                    {
+                        break;
+                    }
+                    //revert first
+                    replay = true;
+                    LogStepDescription(sim.CurrentStep, true);
+                    sim.CurrentStep.ProcEvents(true);
+                    stepndx -= 1;
+                    sim.CurrentStep = sim.steps[stepndx];
+
+
+                }
+
+            }
+            else//go forward
+            {
+                for (int i = 0; i < stepcount; i++)
+                {
+                    stepndx += 1;
+                    if (sim?.steps.Count >= stepndx + 1)
+                    {
+                        replay = true;
+                        sim.CurrentStep = sim.steps[stepndx];
+                        sim.steps[stepndx].ProcEvents();
+                        LogStepDescription(sim.steps[stepndx]);
+                    }
+                    else
+                    {
+                        replay = false;
+                        if (sim == null)
+                        {
+                            LogText("Load scenario first!!!");
+                            return;
+                        }
+                        Step newStep = sim.WorkIteration();
+                        if (newStep.StepType != StepTypeEnm.Iddle)
+                            LogStepDescription(newStep);
+
+                        //if no changes at step then scenario completed
+                        if (stepndx > 0 && sim?.CurrentStep == sim?.steps[stepndx - 1])
+                        {
+                            break;
+                        }
+                    }
+
+
+                }
+            }
+            if (sim?.CurrentStep != oldStep)
+            {
+                DrawCombat();
+            }
+            else
+                LogText("step has no changed");
 
         }
+
+
 
         /// <summary>
         /// output text description of completed step
         /// </summary>
         /// <param name="step">completed step</param>
+        /// <param name="revert">we revert this step? </param>
         /// <exception cref="NotImplementedException"></exception>
-        private void LogStepDescription(Step step)
+        private void LogStepDescription(Step step, bool revert = false)
         {
-            string OutText = " Step# " + Sim.Steps.IndexOf(Sim.CurrentStep).ToString() +" ["+ step.StepType.ToString()+ "] " + step.GetStepDescription();          
+            string OutText = " Step# " + Sim.Steps.IndexOf(Sim.CurrentStep).ToString() + " [" + step.StepType.ToString() + "] " + step.GetStepDescription();
+            if (revert)
+                OutText = "reverted: " + OutText;
+            else if (replay)
+                OutText = "reproduced: " + OutText;
             LogText(OutText);
-            
+
         }
 
 
@@ -191,9 +153,9 @@ namespace HSR_SIM_LIB
         private void DrawCombat()
         {
             if (CbRend != null)
-                CbRend(GraphicsCls.RenderCombat(Sim));
-        }        
-             
+                CbRend(GraphicsCls.RenderCombat(Sim, replay));
+        }
+
 
         /// <summary>
         /// wrapper for Text callback using for log output
@@ -201,8 +163,8 @@ namespace HSR_SIM_LIB
         /// <param name="msg">message to print</param>
         private void LogText(string msg)
         {
-            if (CbLog!= null)
-                CbLog  (new KeyValuePair<string, string>(Constant.MsgLog, msg));
+            if (CbLog != null)
+                CbLog(new KeyValuePair<string, string>(Constant.MsgLog, msg));
         }
 
 
