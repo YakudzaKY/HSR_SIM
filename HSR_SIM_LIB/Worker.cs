@@ -22,6 +22,7 @@ using static HSR_SIM_LIB.Event;
 using static HSR_SIM_LIB.Resource;
 using System.Resources;
 using static HSR_SIM_LIB.Check;
+using System.Drawing;
 
 namespace HSR_SIM_LIB
 {
@@ -39,7 +40,13 @@ namespace HSR_SIM_LIB
         public CallBackRender CbRend { get => cbRend; set => cbRend = value; }//Callback render procedure. used for graphical output
         private SimCls sim = null;
         public SimCls Sim { get => sim; set => sim = value; }//simulation class( combat ,fights etc in this shit)
+        public bool Completed { get => completed; set => completed = value; }
+        public bool CompleteSuccess { get => completeSuccess; set => completeSuccess = value; }
+
+        private bool completeSuccess = false;
+
         private bool replay = false;//is replay not new gen
+        private bool completed = false;
 
         //TODO вообще надо сделать на старте выбор списка сценариев и количество итераций для каждого
         //далее в несколько потоков собрать справочник СЦЕНАРИЙ:Результаты(агрегировать при выполнении каждой итерации)
@@ -48,25 +55,24 @@ namespace HSR_SIM_LIB
         /// Load and parse xml file with scenario
         /// </summary>
         /// <param name="selectedPath">file path to file</param>
-        public void LoadScenarioFromXml(string SelectedPath)
+        public void LoadScenarioFromXml(string scenarioPath, string profilePath)
         {
-            Sim = XMLLoader.LoadCombatFromXml(SelectedPath);
+            Init();
+            Sim = XMLLoader.LoadCombatFromXml(scenarioPath, profilePath);
             LogText("Scenario  " + Sim.CurrentScenario.Name + " was loaded");
-            Rewind();
-            DrawCombat();
         }
 
         /// <summary>
-        /// Revert step
+        /// GoNextStep or go back
         /// </summary>
-        public void Rewind(bool goBack = false, int stepcount = 1)
+        public void MoveStep(bool goBack = false, int stepcount = 1)
         {
             int stepndx = sim?.steps?.IndexOf(sim.CurrentStep) ?? 0;
             Step oldStep = sim?.CurrentStep;
 
             if (goBack)
             {
-                for (int i = 0; i < stepcount; i++)
+                for (int i = 0; i < stepcount || stepcount == -1; i++)
                 {
 
                     if (stepndx <= 0)
@@ -86,7 +92,7 @@ namespace HSR_SIM_LIB
             }
             else//go forward
             {
-                for (int i = 0; i < stepcount; i++)
+                for (int i = 0; i < stepcount||stepcount==-1; i++)
                 {
                     stepndx += 1;
                     if (sim?.steps.Count >= stepndx + 1)
@@ -98,24 +104,39 @@ namespace HSR_SIM_LIB
                     }
                     else
                     {
-                        replay = false;
-                        if (sim == null)
+                        if (!Completed)
                         {
-                            LogText("Load scenario first!!!");
-                            return;
-                        }
-                        Step newStep = sim.WorkIteration();
-                        if (newStep.StepType != StepTypeEnm.Iddle)
-                        {
-                            sim.CurrentStep= newStep; 
-                            LogStepDescription(newStep);
-                        }
+                            replay = false;
+                            if (sim == null)
+                            {
+                                LogText("Load scenario first!!!");
+                                return;
+                            }
+                            Step newStep = sim.WorkIteration();
 
-                        //if no changes at step then scenario completed
-                        if (stepndx > 0 && sim?.CurrentStep == sim?.steps[stepndx - 1])
-                        {
-                            break;
+
+
+
+
+                            sim.CurrentStep = newStep;
+                            LogStepDescription(newStep);
+
+                            if (newStep.StepType == StepTypeEnm.Iddle)
+                            {
+                                Completed = true;
+                                LogText("scenario complete. Success: " + CompleteSuccess);
+                            }
+
+
+                            //if no changes at step then scenario completed
+                            if (stepndx > 0 && sim?.CurrentStep == sim?.steps[stepndx - 1])
+                            {
+                                break;
+                            }
+                            newStep = null;
                         }
+                        else
+                            break;
                     }
 
 
@@ -125,8 +146,8 @@ namespace HSR_SIM_LIB
             {
                 DrawCombat();
             }
-            else
-                LogText("step has no changed");
+
+            oldStep = null;
 
         }
 
@@ -156,7 +177,12 @@ namespace HSR_SIM_LIB
         private void DrawCombat()
         {
             if (CbRend != null)
-                CbRend(GraphicsCls.RenderCombat(Sim, replay));
+            {
+                Bitmap render = GraphicsCls.RenderCombat(Sim, replay);
+                CbRend(render);
+                render.Dispose();
+
+            }
         }
 
 
@@ -173,6 +199,8 @@ namespace HSR_SIM_LIB
 
         public void Init()
         {
+            Completed = false;
+            CompleteSuccess = false;
             LogText("lib loaded");
         }
     }

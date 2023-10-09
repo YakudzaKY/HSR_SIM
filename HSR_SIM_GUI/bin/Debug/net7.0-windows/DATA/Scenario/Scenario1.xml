@@ -1,26 +1,21 @@
-<Scenario name="Default test scenario">
-	<Party>
-		<Unit template="Blade"/>
-		<Unit template="Bronya"/>	
-		<Unit template="Luocha"/>	
-	</Party>
+<Scenario name="Default test scenario">	
 	<Fights>
 		<Fight name="First fight">		
 			<Wave>
-				<Unit template="Dummy"/>
-				<Unit template="Eblan"/>
-				<Unit template="Dummy"/>
+				<Unit template="Vagrant"/>
+				<Unit template="Automaton Beetle"/>
+				<Unit template="Vagrant"/>
 			</Wave>		
 		</Fight>
 		<Fight name="Second fight">		
 			<Wave>
-				<Unit template="Dummy"/>
-				<Unit template="Dummy"/>
+				<Unit template="Vagrant"/>
+				<Unit template="Vagrant"/>
 			</Wave>
 			<Wave>
-				<Unit template="Eblan"/>
-				<Unit template="Dummy"/>
-				<Unit template="Eblan"/>
+				<Unit template="Automaton Beetle"/>
+				<Unit template="Vagrant"/>
+				<Unit template="Automaton Beetle"/>
 			</Wave>	
 		</Fight>
 	</Fights>

@@ -23,6 +23,7 @@ namespace HSR_SIM_LIB
         public int MaxHp { get => maxHp; set => maxHp = value; }
         public int CurrentEnergy { get => currentEnergy; set => currentEnergy = value; }
         public int BaseMaxEnergy { get => baseMaxEnergy; set => baseMaxEnergy = value; }
+        public int FlatSpeed { get; internal set; }
 
         public UnitStats() { }
 

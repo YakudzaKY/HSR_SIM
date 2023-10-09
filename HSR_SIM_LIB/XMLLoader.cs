@@ -15,7 +15,7 @@ namespace HSR_SIM_LIB
 {
     public static class XMLLoader
     {
-        public static SimCls LoadCombatFromXml(string ScenarioPath)
+        public static SimCls LoadCombatFromXml(string scenarioPath, string profilePath)
         {
 
             SimCls Combat = new SimCls();
@@ -23,8 +23,10 @@ namespace HSR_SIM_LIB
             Combat.CurrentScenario = new Scenario();
 
             Combat.CurrentScenario.Fights = new List<Fight>();
+
+            //Scenario
             XmlDocument xDoc = new XmlDocument();
-            xDoc.Load(ScenarioPath);
+            xDoc.Load(scenarioPath);
             XmlElement xRoot = xDoc.DocumentElement;
             if (xRoot != null)
             {
@@ -45,6 +47,27 @@ namespace HSR_SIM_LIB
 
 
             }
+            //Profile
+            if (profilePath != null)
+            {
+                xDoc = new XmlDocument();
+                xDoc.Load(profilePath);
+                xRoot = xDoc.DocumentElement;
+                if (xRoot != null)
+                {
+
+                    //parse all items
+                    foreach (XmlElement xnode in xRoot)
+                    {
+
+                        if (xnode.Name == "Party")
+                        {
+                            Combat.CurrentScenario.Party = ExtractUnits(xnode);
+                        }
+                    }
+                }
+            }
+
             return Combat;
         }
 
@@ -73,7 +96,7 @@ namespace HSR_SIM_LIB
                 unitStats.BaseMaxHp = int.Parse(xnode.Attributes.GetNamedItem("maxHp").Value.Trim());
                 unitStats.BaseAttack = int.Parse(xnode.Attributes.GetNamedItem("attack").Value.Trim());
                 unitStats.BaseMaxEnergy = SafeToInt(xnode.Attributes.GetNamedItem("energy")?.Value.Trim());
-
+                unitStats.FlatSpeed = SafeToInt(xnode.Attributes.GetNamedItem("flatSpeed")?.Value.Trim());
             }
 
             return unitStats;

@@ -39,6 +39,10 @@ namespace HSR_SIM_LIB
         public static readonly short TopSideForQueue = (short)(CombatImgSize.Height * 0.4);
         public static readonly short PartyResourceX = (short)(CombatImgSize.Width - (int)(CombatImgSize.Width / 8));
         public static readonly short PartyResourceY = (short)(CombatImgSize.Height / 2);
+        public static readonly Color clrGreen = Color.FromArgb(87, 166, 74);
+        public static readonly Color clrDefault = Color.FromArgb(220, 220, 170);
+
+
 
     }
 }

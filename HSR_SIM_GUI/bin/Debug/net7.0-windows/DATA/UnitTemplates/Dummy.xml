@@ -1,5 +1,0 @@
-<Unit>	
-	<Stats maxHp="500000" attack="10" />
-	<Weakness type="Wind"/>
-	<Weakness type="Ice"/>
-</Unit>

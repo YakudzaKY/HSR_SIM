@@ -1,0 +1,6 @@
+<Unit element="Physical">	
+	<Stats maxHp="104" attack="12" flatSpeed="100" />
+	<Weakness type="Fire"/>
+	<Weakness type="Ice"/>
+	<Weakness type="Imaginary"/>
+</Unit>

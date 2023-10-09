@@ -1,5 +1,5 @@
 <Unit element="Imaginary">
-	<Stats maxHp="10000" attack="10" energy="90"/>
+	<Stats maxHp="10000" attack="10" energy="90" flatSpeed = "105"/>
 	<Ability name="TEST" type="Technique" costtype="TP" cost="1">
 		<Event name="CombatStartSkillQueue"/>
 		<Event name="EnterCombat"/>

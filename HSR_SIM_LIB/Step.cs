@@ -40,7 +40,9 @@ namespace HSR_SIM_LIB
             else if (StepType == StepTypeEnm.StartCombat)
                 res = "Starting the combat!";
             else if (StepType == StepTypeEnm.StartWave)
-                res = "Wave "+ parent.CurrentFight.CurrentWaveCnt.ToString();
+                res = "Wave " + parent.CurrentFight.CurrentWaveCnt.ToString();
+            else if (StepType == StepTypeEnm.Iddle)
+                res = "Iddle step(scenario completed?)";
             else
                 throw new NotImplementedException();
             return res;
@@ -68,7 +70,7 @@ namespace HSR_SIM_LIB
         public void ProcEvents( bool revert = false)
         {
             //for all events saved in step
-            List<Event> events = new List<Event>();
+            List<Event> events = new List<Event>();            
             events.AddRange(Events);
             //rollback changes from the end of list
             if (revert)
@@ -108,12 +110,12 @@ namespace HSR_SIM_LIB
                     if (!revert)
                     {
                         parent.CurrentFight.CurrentWaveCnt += 1;
-                        parent.CurrentFight.CurrentWave = parent.CurrentFight.ReferenceFight.Waves[parent.CurrentFight.CurrentWaveCnt-1];
+                        parent.CurrentFight.CurrentWave = parent.CurrentFight.ReferenceFight.Waves[parent.CurrentFight.CurrentWaveCnt-1];                        
                         parent.HostileParty = parent.getCombatUnits(parent.CurrentFight.CurrentWave.Units);                        
                         
                     }
                     else
-                    {
+                    {                    
                         parent.HostileParty.Clear();
                         parent.CurrentFight.CurrentWaveCnt -= 1;
                         if (parent.CurrentFight.CurrentWaveCnt>0)
@@ -125,6 +127,8 @@ namespace HSR_SIM_LIB
                 else
                     throw new NotImplementedException();
             }
+            events.Clear();
+            events = null;
         }
         /// <summary>
         /// Party have res to cast abilitiy
@@ -165,8 +169,9 @@ namespace HSR_SIM_LIB
                     return;
                 }
             }
-
-            return;
+            abilities.Clear();
+            abilities = null;
+            orderedAbilities = null;          
 
         }
 

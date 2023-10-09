@@ -42,7 +42,7 @@ namespace HSR_SIM_LIB
                     List<Unit> nextEnemys = new List<Unit>();
                     List<Unit> nextEnemysDistinct = new List<Unit>();
                     //gather enemys from all waves
-                    foreach (Wave wave in nextFight.Waves)
+                    foreach (Wave wave in NextFight.Waves)
                     {
                         nextEnemys.AddRange(wave.Units);
 
@@ -209,7 +209,8 @@ namespace HSR_SIM_LIB
                     condRes = ExecuteCondition(condition, essence);
                     orGroupsRes[condition.OrGroup ?? nullReplacer] = condRes;
                 }
-
+                localSrch.Clear();
+                localSrch = null;
 
 
             }
@@ -222,7 +223,10 @@ namespace HSR_SIM_LIB
                     break;
                 }
             }
+            orGroupsRes.Clear();
+            orGroupsRes = null;
             return res;
+           
         }
 
         /// <summary>
@@ -431,12 +435,11 @@ namespace HSR_SIM_LIB
             }
 
             //if we doing somethings then need proced the events
-            if (newStep.StepType != StepTypeEnm.Iddle)
-            {
-                CurrentStep = newStep;
-                Steps.Add(CurrentStep);
-                newStep.ProcEvents();
-            }
+
+            CurrentStep = newStep;
+            Steps.Add(CurrentStep);
+            newStep.ProcEvents();
+
 
             return newStep;
 

@@ -29,7 +29,7 @@ namespace HSR_SIM_LIB
             {
                 //background
                 using Graphics gfx = Graphics.FromImage(res);
-                using SolidBrush brush = new(Color.FromArgb(155, 155, 155));
+                using SolidBrush brush = new(Color.FromArgb(50, 50, 50));
                 gfx.FillRectangle(brush, 0, 0, res.Width, res.Height);
 
                 //party draw
@@ -65,13 +65,13 @@ namespace HSR_SIM_LIB
                 if (replay)
                 {
                     Bitmap bitmap = LoadBitmap("replay");
-                    gfx.DrawImage(bitmap, new Point(CombatImgSize.Width - bitmap.Width, CombatImgSize.Height - bitmap.Height));
+                    gfx.DrawImage(LoadBitmap("replay"), new Point(CombatImgSize.Width - bitmap.Width, CombatImgSize.Height - bitmap.Height));                    
                 }
 
 
                 gfx.Dispose();
                 brush.Dispose();
-            }
+            }            
             return res;
         }
 
@@ -101,6 +101,7 @@ namespace HSR_SIM_LIB
                         elemList.Add(elm);
                 }
             }
+
             //Weakness
             i = 0;
             foreach (ElementEnm elm in elemList)
@@ -110,7 +111,7 @@ namespace HSR_SIM_LIB
                 i++;
             }
 
-
+            elemList.Clear();
         }
 
         /// <summary>
@@ -134,7 +135,7 @@ namespace HSR_SIM_LIB
             foreach (Ability ability in startQueue)
             {
                 DrawText(point.X, point.Y + ((StartQueuefontSize + StartQueuefontSizeSpc) * i), gfx, String.Format("{0:s}: {1:s}", ability.Parent.Name, ability.Name),
-                    Brushes.Lime, new Font("Tahoma", StartQueuefontSize));
+                    new SolidBrush(clrGreen), new Font("Tahoma", StartQueuefontSize));
                 i++;
             }
         }
@@ -196,7 +197,11 @@ namespace HSR_SIM_LIB
                     //gray filter if unit is dead
                     Bitmap grayPortrait = ConvertBlackAndWhite(unit.Portrait);
                     gfx.DrawImage(grayPortrait, portraitPoint);
+                    grayPortrait.Dispose(); 
                 }
+                //name
+                DrawText(portraitPoint.X + 3, portraitPoint.Y + 3, gfx, String.Format("{0:s}({1:d})", unit.Name, unit.Level), null, new Font("Tahoma", 12, FontStyle.Bold));
+
                 //elements
                 if (unit.Element != null)
                     gfx.DrawImage(new Bitmap(LoadBitmap(unit.Element.ToString()), ElemSizeMini), new Point(portraitPoint.X + PortraitSize.Width - ElemSizeMini.Width, portraitPoint.Y));
@@ -204,17 +209,16 @@ namespace HSR_SIM_LIB
                 short j = 0;
                 foreach (ElementEnm weak in unit.Weaknesses)
                 {
-                    gfx.DrawImage(new Bitmap(LoadBitmap(weak.ToString()), ElemSizeMini), new Point(portraitPoint.X + PortraitSize.Width - ElemSizeMini.Width, portraitPoint.Y + j * ElemSizeMini.Height));
+                    gfx.DrawImage(new Bitmap(LoadBitmap(weak.ToString()), ElemSizeMini), new Point(portraitPoint.X + j * ElemSizeMini.Width,portraitPoint.Y + (int)(PortraitSize.Height*0.8) ));
                     j++;
                 }
-                //name
-                DrawText(portraitPoint.X + 3, portraitPoint.Y + 3, gfx, unit.Name, null, new Font("Tahoma", 12, FontStyle.Bold));
+
                 //healthbar
                 using (SolidBrush brush = new(Color.FromArgb(170, 000, 000)))
                 {
                     gfx.FillRectangle(brush, portraitPoint.X, portraitPoint.Y + PortraitSize.Height, HealthBarSize.Width, HealthBarSize.Height);
                 }
-                using (SolidBrush brush = new(Color.FromArgb(000, 170, 000)))
+                using (SolidBrush brush = new(clrGreen))
                 {
                     int greenWidth = (int)Math.Floor((double)HealthBarSize.Width * (unit.Stats.CurrentHp) / unit.Stats.MaxHp);
                     gfx.FillRectangle(brush, portraitPoint.X, portraitPoint.Y + PortraitSize.Height, greenWidth, HealthBarSize.Height);
@@ -224,11 +228,11 @@ namespace HSR_SIM_LIB
                 if (unit.Stats.BaseMaxEnergy > 0)
                 {
 
-                    using (SolidBrush brush = new(Color.FromArgb(252, 217, 167)))
+                    using (SolidBrush brush = new(Color.FromArgb(13, 26, 43)))
                     {
                         gfx.FillRectangle(brush, portraitPoint.X, portraitPoint.Y + PortraitSize.Height + HealthBarSize.Height, EnergyBarSize.Width, EnergyBarSize.Height);
                     }
-                    using (SolidBrush brush = new(Color.FromArgb(4, 232, 255)))
+                    using (SolidBrush brush = new(Color.FromArgb(43, 83, 140)))
                     {
                         int blueWidth = (int)Math.Floor((double)EnergyBarSize.Width * (unit.Stats.CurrentEnergy) / unit.Stats.BaseMaxEnergy);
                         gfx.FillRectangle(brush, portraitPoint.X, portraitPoint.Y + PortraitSize.Height + HealthBarSize.Height, blueWidth, EnergyBarSize.Height);
@@ -270,7 +274,7 @@ namespace HSR_SIM_LIB
         /// <param name="font"></param>
         private static void DrawText(int x, int y, Graphics gfx, string text, Brush brush = null, Font font = null)
         {
-            brush ??= Brushes.Black;
+            brush ??= new SolidBrush(clrDefault);
             font ??= new("Tahoma", DefaultFontSize, FontStyle.Bold);
             RectangleF rectf = new(x, y, CombatImgSize.Width - x, CombatImgSize.Height - y);
             gfx.DrawString(text, font, brush, rectf);

@@ -17,6 +17,7 @@ namespace HSR_SIM_LIB
     {
 
         string name = string.Empty;
+        int level = 1;
         Bitmap portrait = null;
         UnitStats stats = null;
         List<Ability> abilities = null;
@@ -85,6 +86,7 @@ namespace HSR_SIM_LIB
 
         public List<ElementEnm> Weaknesses { get => weaknesses; set => weaknesses = value; }
         public Unit Reference { get; internal set; }
+        public int Level { get => level; set => level = value; }
 
         public enum ElementEnm
         {
