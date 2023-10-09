@@ -1,6 +1,6 @@
 <Profile>
 	<Party>
-		<Unit template="Blade"/>
+		<Unit template="Blade"/><!--Add mod traces LC and gear-->
 		<Unit template="Bronya"/>	
 		<Unit template="Luocha"/>	
 	</Party>

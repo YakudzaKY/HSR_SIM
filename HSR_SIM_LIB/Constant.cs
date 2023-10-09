@@ -41,6 +41,8 @@ namespace HSR_SIM_LIB
         public static readonly short PartyResourceY = (short)(CombatImgSize.Height / 2);
         public static readonly Color clrGreen = Color.FromArgb(87, 166, 74);
         public static readonly Color clrDefault = Color.FromArgb(220, 220, 170);
+        public static readonly short fHCycleAvFirst = 150;
+        public static readonly short fHCycleAvNext = 150;
 
 
 

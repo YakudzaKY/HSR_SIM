@@ -1,4 +1,7 @@
 <Scenario name="Default test scenario">	
+	<Special>
+		<Unit template="Forgotten Hall"/>
+	</Special>
 	<Fights>
 		<Fight name="First fight">		
 			<Wave>

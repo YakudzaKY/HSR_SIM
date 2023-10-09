@@ -38,7 +38,7 @@ namespace HSR_SIM_LIB
         }
         public List<Ability> Abilities { get => abilities; set => abilities = value; }
         public ElementEnm? Element { get => element; set => element = value; }
-
+        public List<Mod> Mods { get; set; }= new List<Mod>();
         private ElementEnm? element;
         private List<ElementEnm> weaknesses = null;
         //TODO unit role on battlefield
@@ -105,6 +105,14 @@ namespace HSR_SIM_LIB
             Hostile
         }
 
+        public void ApplyMod(Mod mod)
+        {
+            Mods.Add(mod);
+        }
+        public void RemoveMod(Mod mod)
+        {
+            Mods.Remove(mod);
+        }
     }
 
 }

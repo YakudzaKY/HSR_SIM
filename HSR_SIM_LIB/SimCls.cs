@@ -27,6 +27,9 @@ namespace HSR_SIM_LIB
 
         List<Unit> hostileParty;
         List<Unit> party;
+        List<Unit> specialUnits;
+
+        //ForgottenHall Cycles
 
         CombatFight currentFight = null;
 
@@ -66,11 +69,22 @@ namespace HSR_SIM_LIB
             set => hostileParty = value;
         }
 
+        public IEnumerable<Unit> AllUnits
+        {
+            get
+            {
+                return Party.Concat(HostileParty.Concat(SpecialUnits));
+            }
+            set { throw new NotImplementedException(); }
+        }
+
+
         public Step CurrentStep { get => currentStep; set => currentStep = value; }
         internal Scenario CurrentScenario { get => currentScenario; set => currentScenario = value; }
         public List<Step> steps = new List<Step>();
         public List<Step> Steps { get => steps; set => steps = value; }
         public List<Unit> Party { get => party; set => party = value; }
+        public List<Unit> SpecialUnits { get => specialUnits; set => specialUnits = value; }
         internal CombatFight CurrentFight { get => currentFight; set => currentFight = value; }
         public int CurrentFightStep { get => currentFightStep; set => currentFightStep = value; }
         /// <summary>
@@ -117,12 +131,7 @@ namespace HSR_SIM_LIB
             }
         }
 
-
-
-
-
-
-
+        
 
         /// <summary>
         /// construcotor
@@ -168,6 +177,7 @@ namespace HSR_SIM_LIB
         {
 
             Party = getCombatUnits(CurrentScenario.Party);
+            SpecialUnits= getCombatUnits(CurrentScenario.SpecialUnits);
 
             GetRes(ResourceType.TP).ResVal = 5;
             GetRes(ResourceType.SP).ResVal = 5;
@@ -413,13 +423,15 @@ namespace HSR_SIM_LIB
                 newStep.StepType = StepTypeEnm.SimInit;
             }
             //buff before fight
-            if (newStep.StepType == StepTypeEnm.Iddle && DoEnterCombat == false && CurrentFight == null) newStep.TechniqueWork();
+            else if (newStep.StepType == StepTypeEnm.Idle && DoEnterCombat == false && CurrentFight == null) 
+                newStep.TechniqueWork();
 
             //enter the combat
-            if (newStep.StepType == StepTypeEnm.Iddle && DoEnterCombat == true) newStep.LoadBattleWork();
+            else if (newStep.StepType == StepTypeEnm.Idle && DoEnterCombat == true) 
+                newStep.LoadBattleWork();
 
             //load the wave
-            if (currentFight != null && currentFight.CurrentWave == null)
+            else if (newStep.StepType == StepTypeEnm.Idle &&  currentFight is { CurrentWave: null })
             {
                 //fight is over
                 if (currentFight.CurrentWaveCnt == currentFight.ReferenceFight.Waves.Count)
@@ -432,6 +444,12 @@ namespace HSR_SIM_LIB
                     newStep.Events.Add(new Event { Type = EventType.StartWave });
                 }
 
+            }
+
+            //Execute start fight skill queue
+            else if (newStep.StepType == StepTypeEnm.Idle && currentFight?.CurrentWave != null&&BeforeStartQueue.Count>0)
+            {
+                newStep.ExecuteAbilityFromQueue();
             }
 
             //if we doing somethings then need proced the events

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -42,6 +43,11 @@ namespace HSR_SIM_LIB
                     if (xnode.Name == "Party")
                     {
                         Combat.CurrentScenario.Party = ExtractUnits(xnode);
+                    }
+
+                    if (xnode.Name == "Special")
+                    {
+                        Combat.CurrentScenario.SpecialUnits = ExtractUnits(xnode);
                     }
                 }
 
@@ -96,7 +102,7 @@ namespace HSR_SIM_LIB
                 unitStats.BaseMaxHp = int.Parse(xnode.Attributes.GetNamedItem("maxHp").Value.Trim());
                 unitStats.BaseAttack = int.Parse(xnode.Attributes.GetNamedItem("attack").Value.Trim());
                 unitStats.BaseMaxEnergy = SafeToInt(xnode.Attributes.GetNamedItem("energy")?.Value.Trim());
-                unitStats.FlatSpeed = SafeToInt(xnode.Attributes.GetNamedItem("flatSpeed")?.Value.Trim());
+                unitStats.BaseSpeed = SafeToInt(xnode.Attributes.GetNamedItem("baseSpeed")?.Value.Trim());
             }
 
             return unitStats;
@@ -122,7 +128,7 @@ namespace HSR_SIM_LIB
         /// </summary>
         /// <param name="xmlItems"></param>
         /// <returns></returns>
-        private static List<Ability> ExctractAbilities(XmlElement xmlItems,Unit parent)
+        private static List<Ability> ExctractAbilities(XmlElement xmlItems, Unit parent)
         {
             List<Ability> abilities = new List<Ability>();
             foreach (XmlElement abilitiyXml in xmlItems.SelectNodes("Ability"))
@@ -131,14 +137,39 @@ namespace HSR_SIM_LIB
                 Ability ability = new Ability(parent);
                 ability.AbilityType = (AbilityTypeEnm)System.Enum.Parse(typeof(AbilityTypeEnm), abilitiyXml.Attributes.GetNamedItem("type").Value.Trim());
                 ability.Name = abilitiyXml.Attributes.GetNamedItem("name").Value.Trim();
-                ability.CostType =  (ResourceType)System.Enum.Parse(typeof(ResourceType), abilitiyXml.Attributes.GetNamedItem("costtype").Value.Trim()) ;
-                ability.Cost = (short)int.Parse( abilitiyXml.Attributes.GetNamedItem("cost").Value.Trim());
+                ability.CostType = (ResourceType)System.Enum.Parse(typeof(ResourceType), abilitiyXml.Attributes.GetNamedItem("costtype").Value.Trim());
+                ability.Cost = (short)int.Parse(abilitiyXml.Attributes.GetNamedItem("cost").Value.Trim());
                 //events
-                foreach (XmlElement xmlevent in abilitiyXml.SelectNodes("Event") ) 
+                foreach (XmlElement xmlevent in abilitiyXml.SelectNodes("Event"))
                 {
-                    Event ent = new Event() { Type = (Event.EventType)System.Enum.Parse(typeof(Event.EventType), xmlevent.Attributes.GetNamedItem("name").Value.Trim()) };
-                    ability.Events.Add(ent);
+                    Event ent = new Event()
+                    {
+                        Type = (Event.EventType)System.Enum.Parse(typeof(Event.EventType), xmlevent.Attributes.GetNamedItem("name").Value.Trim())
+                        ,
+                        OnStepType = (Step.StepTypeEnm)System.Enum.Parse(typeof(Step.StepTypeEnm), xmlevent.Attributes.GetNamedItem("onStep").Value.Trim())
+                    };
+                    
 
+                    foreach (XmlElement xmlmod in xmlevent.SelectNodes("Mod"))
+                    {
+                        Mod mod = new Mod()
+                        {
+                            Type = (Mod.ModType)System.Enum.Parse(typeof(Mod.ModType), xmlmod.Attributes.GetNamedItem("type").Value.Trim())
+                            ,
+                            Target = (Mod.ModTarget)System.Enum.Parse(typeof(Mod.ModTarget), xmlmod.Attributes.GetNamedItem("target").Value.Trim())
+                            ,
+                            Modifier = (Mod.ModifierType)System.Enum.Parse(typeof(Mod.ModifierType), xmlmod.Attributes.GetNamedItem("modifier").Value.Trim())
+                            ,
+                            Value = int.Parse(xmlmod.Attributes.GetNamedItem("value").Value?.Trim() )
+                            ,
+                            Duration = int.Parse(xmlmod.Attributes.GetNamedItem("duration").Value?.Trim())
+                            ,
+                            Dispellable = bool.Parse(xmlmod.Attributes.GetNamedItem("dispellable").Value?.Trim())
+                        };
+                        ent.Mods.Add(mod);
+                    }
+
+                    ability.Events.Add(ent);
                 }
                 //execute conditions by tags
                 foreach (XmlElement xmlExecute in abilitiyXml.SelectNodes("ExecuteWhen"))
@@ -147,7 +178,7 @@ namespace HSR_SIM_LIB
                     string template = xmlExecute.Attributes.GetNamedItem("template")?.Value.Trim();
                     if (template != null)
                     {
-                        XmlDocument tempalteDoc= new XmlDocument();
+                        XmlDocument tempalteDoc = new XmlDocument();
                         tempalteDoc.Load(Utils.DataFolder + "ExecuteTemplates\\" + template + ".xml");
                         XmlElement templateRoot = tempalteDoc.DocumentElement;
                         FillExecuteWhen(templateRoot, ability);
@@ -155,12 +186,12 @@ namespace HSR_SIM_LIB
                     else
                         FillExecuteWhen(xmlExecute, ability);
                 }
-   
+
                 abilities.Add(ability);
-              
-                 
+
+
             }
-                return abilities;
+            return abilities;
         }
         /// <summary>
         /// parse ExecuteWhen->Condition
@@ -188,7 +219,7 @@ namespace HSR_SIM_LIB
         {
             foreach (XmlElement xmlCheck in xmlCondition.SelectNodes("Check"))
             {
-   
+
                 condition.Checks.Add(ExctractCheck(xmlCheck));
             }
         }
@@ -205,17 +236,17 @@ namespace HSR_SIM_LIB
             foreach (XmlAttribute xmlAttrib in xmlCheck.Attributes)
             {
 
-                if (String.Equals(xmlAttrib.Name,"type",StringComparison.OrdinalIgnoreCase) )           
+                if (String.Equals(xmlAttrib.Name, "type", StringComparison.OrdinalIgnoreCase))
                     check.CheckType = (CheckTypeEnm)System.Enum.Parse(typeof(CheckTypeEnm), xmlAttrib.Value.Trim());
                 else if (String.Equals(xmlAttrib.Name, "value", StringComparison.OrdinalIgnoreCase))
-                    check.Value =xmlAttrib.Value.Trim();
+                    check.Value = xmlAttrib.Value.Trim();
                 else if (String.Equals(xmlAttrib.Name, "clause", StringComparison.OrdinalIgnoreCase))
                     check.Clause = bool.Parse(xmlAttrib.Value.Trim());
                 else
                     throw new NotImplementedException();
 
             }
-            
+
             foreach (XmlElement xmlInnerCheck in xmlCheck.SelectNodes("Check"))
             {
                 check.InnerChecks.Add(ExctractCheck(xmlInnerCheck));
@@ -246,12 +277,13 @@ namespace HSR_SIM_LIB
                     string elementVal = xRoot.Attributes.GetNamedItem("element")?.Value.Trim();
                     if (elementVal != null)
                         unit.Element = (Unit.ElementEnm)System.Enum.Parse(typeof(Unit.ElementEnm), elementVal);
+                    unit.Level = int.Parse(xRoot.Attributes.GetNamedItem("level")?.Value.Trim()??"1");
                     unit.Stats = ExctractStats(xRoot);
-                    unit.Abilities = ExctractAbilities(xRoot,unit);
+                    unit.Abilities = ExctractAbilities(xRoot, unit);
                     unit.Weaknesses = ExctractWeaknesses(xRoot);
                     units.Add(unit);
                 }
-                
+
             }
             return units;
         }
@@ -272,7 +304,7 @@ namespace HSR_SIM_LIB
         /// Parsing XML part of Fights
         /// </summary>
         /// <param name="xnode">xml segment</param>
-        private static void FillFights(XmlElement xnode,SimCls Combat)
+        private static void FillFights(XmlElement xnode, SimCls Combat)
         {
 
 

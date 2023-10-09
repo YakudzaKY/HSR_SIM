@@ -12,7 +12,6 @@ namespace HSR_SIM_LIB
     internal class Wave
     {
         List<Unit> units;
-
         internal List<Unit> Units { get => units; set => units = value; }
     }
 }

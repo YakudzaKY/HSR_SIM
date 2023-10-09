@@ -1,19 +1,22 @@
 <Unit element="Wind">
-	<Stats maxHp="10000" attack="10" energy="90" flatSpeed="119"/>
+	<Stats maxHp="10000" attack="10" energy="90" baseSpeed="119"/>
 	<Ability name="Banner of Command" type="Technique" costtype="TP" cost="1">
-		<Event name="CombatStartSkillQueue"/>
+		<Event onStep="TechniqueUse" name="CombatStartSkillQueue"/>
+		<Event onStep="ExecuteStartQueue" name="Mod">
+			<Mod type="Buff" target="Party" modifier="AtkPrc" value="15" duration="2" dispellable="true" />
+		</Event>
 		<ExecuteWhen>
 			<Condition>
 				<Check type="CombatStartSkillQueue" value="self" clause="false"/>							
 			</Condition>			
 			<Condition orgroup="TP_SPENDING">
-				<Check  type="ResourceCheck" value="party" clause="true">
+				<Check  type="ResourceCheck" value="Party" clause="true">
 					<Check type="ResourceType" value="TP"/>
 					<Check type="ResourceQuantity" value="2"/>
 				</Check>				
 			</Condition>			
 			<Condition orgroup="TP_SPENDING">
-				<Check  type="ResourceCheck" value="party" clause="true">
+				<Check  type="ResourceCheck" value="Party" clause="true">
 					<Check type="ResourceType" value="TP"/>
 					<Check type="ResourceQuantity" value="1"/>
 				</Check>

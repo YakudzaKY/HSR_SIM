@@ -9,7 +9,7 @@ namespace Ini
     /// </summary>
     public class IniFile
     {
-        public string path;
+        public string Path;
 
         [DllImport("kernel32")]
         private static extern long WritePrivateProfileString(string section,
@@ -23,9 +23,9 @@ namespace Ini
         /// INIFile Constructor.
         /// </summary>
         /// <PARAM name="INIPath"></PARAM>
-        public IniFile(string INIPath)
+        public IniFile(string iniPath)
         {
-            path = INIPath;
+            Path = iniPath;
         }
         /// <summary>
         /// Write Data to the INI File
@@ -36,9 +36,9 @@ namespace Ini
         /// Key Name
         /// <PARAM name="Value"></PARAM>
         /// Value Name
-        public void IniWriteValue(string Section, string Key, string Value)
+        public void IniWriteValue(string section, string key, string value)
         {
-            WritePrivateProfileString(Section, Key, Value, this.path);
+            WritePrivateProfileString(section, key, value, this.Path);
         }
 
         /// <summary>
@@ -48,11 +48,11 @@ namespace Ini
         /// <PARAM name="Key"></PARAM>
         /// <PARAM name="Path"></PARAM>
         /// <returns></returns>
-        public string IniReadValue(string Section, string Key)
+        public string IniReadValue(string section, string key)
         {
             StringBuilder temp = new StringBuilder(255);
-            int i = GetPrivateProfileString(Section, Key, "", temp,
-                                            255, this.path);
+            int i = GetPrivateProfileString(section, key, "", temp,
+                                            255, this.Path);
             return temp.ToString();
 
         }

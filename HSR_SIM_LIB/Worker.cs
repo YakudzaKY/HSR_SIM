@@ -121,7 +121,7 @@ namespace HSR_SIM_LIB
                             sim.CurrentStep = newStep;
                             LogStepDescription(newStep);
 
-                            if (newStep.StepType == StepTypeEnm.Iddle)
+                            if (newStep.StepType == StepTypeEnm.Idle)
                             {
                                 Completed = true;
                                 LogText("scenario complete. Success: " + CompleteSuccess);

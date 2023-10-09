@@ -1,5 +1,5 @@
 <Unit element="Physical">	
-	<Stats maxHp="112" attack="12" flatSpeed="100" />
+	<Stats maxHp="112" attack="12" baseSpeed="100" />
 	<Weakness type="Lightning"/>
 	<Weakness type="Wind"/>
 	<Weakness type="Imaginary"/>

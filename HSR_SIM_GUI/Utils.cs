@@ -40,7 +40,7 @@ namespace HSR_SIM_GUI
             box.AppendText(line);
         }
 
-        public static Color zcolor(int r, int g, int b)
+        public static Color Zcolor(int r, int g, int b)
         {
             return Color.FromArgb(r, g, b);
         }

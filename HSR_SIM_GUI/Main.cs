@@ -48,21 +48,20 @@ namespace HSR_SIM_GUI
                 combatOut.BackgroundImage = new Bitmap(combatImg);
             }
         }
-         void ApplyTheme(Color back, Color pan, Color btn, Color tbox, Color combox, Color TextColor)
+         void ApplyTheme(Color back, Color pan, Color btn, Color tbox, Color combox, Color textColor)
         {
             BackColor = back;
-
 
             foreach (Control item in Controls)
             {
                 if (!(item is System.Windows.Forms.Label))
                 {
                     item.BackColor = btn;
-                    item.ForeColor = TextColor;
+                    item.ForeColor = textColor;
                 }
                 else
                 {
-                    item.ForeColor = TextColor;
+                    item.ForeColor = textColor;
                 }
             
             }
@@ -82,10 +81,10 @@ namespace HSR_SIM_GUI
             wrk.CbLog += callBackStr;
             wrk.CbRend += callBackRender;
             if (ShouldSystemUseDarkMode())            
-                ApplyTheme(Utils.zcolor(30, 30, 30), Utils.zcolor(45, 45, 48), Utils.zcolor(104, 104, 104), Utils.zcolor(51, 51, 51), Color.Black, HSR_SIM_LIB.Constant.clrDefault);
+                ApplyTheme(Utils.Zcolor(30, 30, 30), Utils.Zcolor(45, 45, 48), Utils.Zcolor(104, 104, 104), Utils.Zcolor(51, 51, 51), Color.Black, HSR_SIM_LIB.Constant.clrDefault);
             
             else
-                ApplyTheme(Color.White, Utils.zcolor(240, 240, 240), Utils.zcolor(181, 181, 181), Utils.zcolor(110, 110, 110), Color.White, Color.Black);
+                ApplyTheme(Color.White, Utils.Zcolor(240, 240, 240), Utils.Zcolor(181, 181, 181), Utils.Zcolor(110, 110, 110), Color.White, Color.Black);
         }
 
 
@@ -95,7 +94,7 @@ namespace HSR_SIM_GUI
         {
 
 
-            refreshCbs();
+            RefreshCbs();
             cbScenario.Text = ini.IniReadValue("form", "Scenario");
             cbProfile.Text = ini.IniReadValue("form", "Profile");
         }
@@ -114,7 +113,7 @@ namespace HSR_SIM_GUI
 
 
 
-        private void refreshCbs()
+        private void RefreshCbs()
         {
             cbScenario.Items.Clear();
             cbProfile.Items.Clear();
@@ -149,7 +148,7 @@ namespace HSR_SIM_GUI
 
         private void button1_Click_1(object sender, EventArgs e)
         {
-            refreshCbs();
+            RefreshCbs();
         }
 
         private void button2_Click_1(object sender, EventArgs e)

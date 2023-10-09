@@ -14,6 +14,7 @@ namespace HSR_SIM_LIB
         public string Name { get; internal set; }
         internal List<Fight> Fights { get => fights; set => fights = value; }
         internal List<Unit> Party { get => party; set => party = value; }
+        public List<Unit> SpecialUnits { get; set; }
 
         List<Unit> party;
     }
