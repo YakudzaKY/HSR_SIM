@@ -202,7 +202,7 @@ namespace HSR_SIM_LIB
                     grayPortrait.Dispose();
                 }
                 //name
-                DrawText(portraitPoint.X + 3, portraitPoint.Y + 3, gfx, String.Format("{0:s}({1:d})", unit.Name, unit.Level), null, new Font("Tahoma", 12, FontStyle.Bold),true);
+                DrawText(portraitPoint.X + 3, portraitPoint.Y + 3, gfx, String.Format("{0:s}({1:d})", unit.Name, unit.Level), null, new Font("Tahoma", 12, FontStyle.Bold));
 
                 //elements
                 if (unit.Element != null)
@@ -303,33 +303,14 @@ namespace HSR_SIM_LIB
         /// <param name="text"></param>
         /// <param name="brush"></param>
         /// <param name="font"></param>
-        private static void DrawText(int x, int y, Graphics gfx, string text, Brush brush = null, Font font = null, bool outline=false)
+        private static void DrawText(int x, int y, Graphics gfx, string text, Brush brush = null, Font font = null)
         {
             
             brush ??= new SolidBrush(clrDefault);
-            var sf = new StringFormat(StringFormatFlags.LineLimit | StringFormatFlags.NoClip);
             font ??= new("Tahoma", DefaultFontSize, FontStyle.Bold);
-            gfx.DrawString(text, font, brush, new Point(x,y),sf);
+            gfx.DrawString(text, font, brush, new Point(x,y));
             
 
-            if (outline) {
-                Brush foreGround = new SolidBrush(Color.Black);
-                var gp = new GraphicsPath();
-                var emSize = gfx.DpiY * font.SizeInPoints / 72;
-                gp.AddString(text, font.FontFamily, (int)font.Style, emSize, new Point(x, y-1), sf);
-                var rec = gp.GetBounds();
-                var p = new Pen(foreGround, 1)
-                {
-                    LineJoin = LineJoin.Round
-                };
-                gfx.DrawPath(p, gp);
-                gp.Dispose();
-                
-                p.Dispose();
-                foreGround.Dispose();
-
-            }
-            sf.Dispose();
 
         }
 
