@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -45,7 +46,7 @@ namespace HSR_SIM_LIB
             else if (StepType == StepTypeEnm.Idle)
                 res = "Idle step(scenario completed?)";
             else if (StepType == StepTypeEnm.ExecuteStartQueue)
-                res = "Executed " + Actor.Name+ " " + ActorAbility.Name;
+                res = "Executed " + Actor.Name + " " + ActorAbility.Name;
             else
                 throw new NotImplementedException();
             return res;
@@ -67,7 +68,118 @@ namespace HSR_SIM_LIB
             , StartWave//on wave starts
             , ExecuteStartQueue
         }
+        /// <summary>
+        /// Proc one event
+        /// </summary>
+        /// <param name="ent"></param>
+        /// <param name="revert"></param>
+        public void ProcEvent(Event ent, bool revert)
+        {
+            if (ent.Type == EventType.PartyResourceDrain)//SP or technical points
+            {
+                Parent.GetRes(ent.ResType).ResVal -= revert ? (int)Math.Round((double)-ent.Val) : (int)Math.Round((double)ent.Val);
+            }
+            else if (ent.Type == EventType.CombatStartSkillQueue)//party buffs or opening
+                if (!revert)
+                    Parent.BeforeStartQueue.Add(ActorAbility);
+                else
+                    Parent.BeforeStartQueue.Remove(ActorAbility);
+            else if (ent.Type == EventType.CombatStartSkillDeQueue)//DEQUEUE party buffs or opening
+                if (!revert)
+                    Parent.BeforeStartQueue.Remove(ActorAbility);
+                else
+                    Parent.BeforeStartQueue.Add(ActorAbility);
+            else if (ent.Type == EventType.EnterCombat)//entering combat
+                Parent.DoEnterCombat = !revert;
+            else if (ent.Type == EventType.StartCombat)//Loading combat
+            {
+                if (!revert)
+                {
+                    Parent.DoEnterCombat = false;
+                    Parent.CurrentFight = new CombatFight(Parent.CurrentScenario.Fights[Parent.CurrentFightStep]);
+                    Parent.CurrentFightStep += 1;
+                }
+                else
+                {
+                    Parent.DoEnterCombat = true;
+                    Parent.CurrentFight = null;
+                    Parent.CurrentFightStep -= 1;
+                }
 
+            }
+            else if (ent.Type == EventType.ModActionValue) //Loading wave
+            {
+                throw new NotImplementedException();
+            }
+            else if (ent.Type == EventType.StartWave)//Loading wave
+            {
+                if (!revert)
+                {
+                    Parent.CurrentFight.CurrentWaveCnt += 1;
+                    Parent.CurrentFight.CurrentWave = Parent.CurrentFight.ReferenceFight.Waves[Parent.CurrentFight.CurrentWaveCnt - 1];
+                    Parent.HostileParty = Parent.getCombatUnits(Parent.CurrentFight.CurrentWave.Units);
+                    //set start action value
+                    foreach (Unit unit in Parent.AllUnits)
+                    {
+                        unit.Stats.ResetAV();
+                    }
+
+                }
+                else
+                {
+                    Parent.HostileParty.Clear();
+                    Parent.CurrentFight.CurrentWaveCnt -= 1;
+                    if (Parent.CurrentFight.CurrentWaveCnt > 0)
+                        Parent.CurrentFight.CurrentWave = Parent.CurrentFight.ReferenceFight.Waves[Parent.CurrentFight.CurrentWaveCnt - 1];
+
+                }
+
+            }
+            else if (ent.Type == EventType.Mod) //Apply mod
+            {
+
+                foreach (var mod in ent.Mods)
+                {
+                    if (mod.Target == Mod.ModTarget.Party)
+                    {
+                        foreach (var unit in Parent.Party)
+                            if (!revert)
+                                unit.ApplyMod(mod);
+                            else
+                                unit.RemoveMod(mod);
+                    }
+                    else
+                    {
+
+                        throw new NotImplementedException();
+                    }
+                }
+
+            }
+            else if (ent.Type == EventType.ResourceDrain) //Resource drain
+            {
+                if (ent.RealVal == null)
+                {
+                    ent.RealVal = (double)Math.Min((double)ent.TargetUnit.GetRes(ent.ResType).ResVal, (double)ent.Val);
+                    if (!ent.CanSetToZero && ent.RealVal < ent.Val)
+                    {
+                        ent.RealVal -= 1;
+                    }
+                }
+                ent.TargetUnit.GetRes(ent.ResType).ResVal -= revert ? (int)Math.Round((double)-ent.RealVal) : (int)Math.Round((double)ent.RealVal);
+            }
+            else if (ent.Type == EventType.DirectDamage) //Resource drain
+            {
+                //TODO чёнить
+            }
+            else if (ent.Type == EventType.ShieldBreak) //Resource drain
+            {
+                //TODO чёнить
+            }
+            else
+                throw new NotImplementedException();
+            Parent.OnTriggerProc(this, ent, revert);
+        }
         /// <summary>
         /// Proc all events in step. No random here or smart thinking. Do it on DoSomething...
         /// </summary>
@@ -82,95 +194,7 @@ namespace HSR_SIM_LIB
 
             foreach (Event ent in events)
             {
-                if (ent.Type == EventType.PartyResourceDrain)//SP or technical points
-                {
-                    Parent.GetRes(ent.ResType).ResVal -= revert ? -ent.Val : ent.Val;
-                }
-                else if (ent.Type == EventType.CombatStartSkillQueue)//party buffs or opening
-                    if (!revert)
-                        Parent.BeforeStartQueue.Add(ActorAbility);
-                    else
-                        Parent.BeforeStartQueue.Remove(ActorAbility);
-                else if (ent.Type == EventType.CombatStartSkillDeQueue)//DEQUEUE party buffs or opening
-                    if (!revert)
-                        Parent.BeforeStartQueue.Remove(ActorAbility);
-                    else
-                        Parent.BeforeStartQueue.Add(ActorAbility);
-                else if (ent.Type == EventType.EnterCombat)//entering combat
-                    Parent.DoEnterCombat = !revert;
-                else if (ent.Type == EventType.StartCombat)//Loading combat
-                {
-                    if (!revert)
-                    {
-                        Parent.DoEnterCombat = false;
-                        Parent.CurrentFight = new CombatFight(Parent.CurrentScenario.Fights[Parent.CurrentFightStep]);
-                        Parent.CurrentFightStep += 1;
-                    }
-                    else
-                    {
-                        Parent.DoEnterCombat = true;
-                        Parent.CurrentFight = null;
-                        Parent.CurrentFightStep -= 1;
-                    }
-
-                }
-                else if (ent.Type == EventType.ModActionValue) //Loading wave
-                {
-                    throw new NotImplementedException();
-                }
-                else if (ent.Type == EventType.StartWave)//Loading wave
-                {
-                    if (!revert)
-                    {
-                        Parent.CurrentFight.CurrentWaveCnt += 1;
-                        Parent.CurrentFight.CurrentWave = Parent.CurrentFight.ReferenceFight.Waves[Parent.CurrentFight.CurrentWaveCnt - 1];
-                        Parent.HostileParty = Parent.getCombatUnits(Parent.CurrentFight.CurrentWave.Units);
-                        //set start action value
-                        foreach (Unit unit in Parent.AllUnits)
-                        {
-                            unit.Stats.ResetAV();
-                        }
-                        
-                    }
-                    else
-                    {
-                        Parent.HostileParty.Clear();
-                        Parent.CurrentFight.CurrentWaveCnt -= 1;
-                        if (Parent.CurrentFight.CurrentWaveCnt > 0)
-                            Parent.CurrentFight.CurrentWave = Parent.CurrentFight.ReferenceFight.Waves[Parent.CurrentFight.CurrentWaveCnt - 1];
-
-                    }
-
-                }
-                else if (ent.Type == EventType.Mod) //Apply mod
-                {
-
-                    foreach (var mod in ent.Mods)
-                    {
-                        if (mod.Target == Mod.ModTarget.Party)
-                        {
-                            foreach (var unit in Parent.Party)
-                                if (!revert)
-                                    unit.ApplyMod(mod);
-                                else
-                                    unit.RemoveMod(mod);
-                        }
-                        else
-                        {
-
-                            throw new NotImplementedException();
-                        }
-                    }
-
-                }
-                else if (ent.Type == EventType.ResourceDrain) //Resource drain
-                {
-
-                    this.Actor.GetRes(ent.ResType).ResVal -= revert ? -ent.Val : ent.Val;
-                }
-                else
-                    throw new NotImplementedException();
-                Parent.OnTriggerProc( this, ent, revert);
+                ProcEvent(ent,revert);
             }
 
             events.Clear();
@@ -220,25 +244,25 @@ namespace HSR_SIM_LIB
             orderedAbilities = null;
 
         }
-
-        //Cast all techniques before fights starts
-        public void ExecuteAbilityFromQueue()
+        /// <summary>
+        /// Execute one ability
+        /// </summary>
+        /// <param name="ability"></param>
+        public void ExecuteAbility(Ability ability)
         {
-            StepType = StepTypeEnm.ExecuteStartQueue;
-            List<Ability> abilities = new List<Ability>();
-            Ability fromQ = Parent.BeforeStartQueue.First();
-            Actor = fromQ.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
-            ActorAbility = fromQ;//WAT ABILITY is casting
+            Actor = ability.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
+            ActorAbility = ability;//WAT ABILITY is casting
 
-            Events.AddRange(fromQ.Events.Where(x => x.OnStepType == StepType && x.NeedCalc==false));//copy events from ability reference
+            Events.AddRange(ability.Events.Where(x => x.OnStepType == StepType && x.NeedCalc == false));//copy events from ability reference
             //Need some calc? 
-            foreach ( Event ent in  fromQ.Events.Where(x => x.OnStepType == StepType && x.NeedCalc==true))            {
-                
+            foreach (Event ent in ability.Events.Where(x => x.OnStepType == StepType && x.NeedCalc == true))
+            {
+
 
                 if (ent.TargetType == Ability.TargetTypeEnm.AOE)
                 {
                     //if Enemy
-                    if (Parent.HostileParty.IndexOf(this.Actor)>0)
+                    if (Parent.HostileParty.IndexOf(this.Actor) > 0)
                     {
                         foreach (Unit unit in Parent.Party)
                         {
@@ -252,13 +276,17 @@ namespace HSR_SIM_LIB
                     {
                         foreach (Unit unit in Parent.HostileParty)
                         {
-                            Event unitEnt = (Event)ent.Clone();
-                            unitEnt.TargetUnit = unit;
-                            unitEnt.Calc(this);
-                            Events.Add(unitEnt);
+
+                                Event unitEnt = (Event)ent.Clone();
+                                unitEnt.TargetUnit = unit;
+                                if (Parent.FullFiledConditions(unitEnt))
+                                {
+                                    unitEnt.Calc(this);
+                                    Events.Add(unitEnt);
+                                }
                         }
                     }
-                    
+
                 }
                 else if (ent.TargetType == Ability.TargetTypeEnm.Self)
                 {
@@ -274,9 +302,18 @@ namespace HSR_SIM_LIB
 
             }
 
-            Events.Add(new Event() { Type = EventType.CombatStartSkillDeQueue, AbilityValue = fromQ  });
+            Events.Add(new Event() { Type = EventType.CombatStartSkillDeQueue, AbilityValue = ability });
 
 
+
+        }
+        //Cast all techniques before fights starts
+        public void ExecuteAbilityFromQueue()
+        {
+            StepType = StepTypeEnm.ExecuteStartQueue;
+            List<Ability> abilities = new List<Ability>();
+            Ability fromQ = Parent.BeforeStartQueue.First();
+            ExecuteAbility(fromQ);
             abilities.Clear();
             abilities = null;
             fromQ = null;

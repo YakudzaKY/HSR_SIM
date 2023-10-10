@@ -5,20 +5,20 @@
 	<Fights>
 		<Fight name="First fight">		
 			<Wave>
-				<Unit template="Vagrant"/>
-				<Unit template="Automaton Beetle"/>
-				<Unit template="Vagrant"/>
+				<Unit template="Vagrant"  level="80"/>
+				<Unit template="Automaton Beetle"  level="80"/>
+				<Unit template="Vagrant"  level="80"/>
 			</Wave>		
 		</Fight>
 		<Fight name="Second fight">		
 			<Wave>
-				<Unit template="Vagrant"/>
-				<Unit template="Vagrant"/>
+				<Unit template="Vagrant" level="80"/>
+				<Unit template="Vagrant" level="80"/>
 			</Wave>
 			<Wave>
-				<Unit template="Automaton Beetle"/>
-				<Unit template="Vagrant"/>
-				<Unit template="Automaton Beetle"/>
+				<Unit template="Automaton Beetle" level="80"/>
+				<Unit template="Vagrant" level="80"/>
+				<Unit template="Automaton Beetle" level="80"/>
 			</Wave>	
 		</Fight>
 	</Fights>

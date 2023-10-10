@@ -8,8 +8,10 @@ namespace HSR_SIM_LIB
 {
     public class Trigger
     {
+        public TriggerType TrType { get; init; }
+
         public enum TriggerType {
-            OnResChange
+            ShieldBreakeTrigger
         }
 
      

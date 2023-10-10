@@ -16,6 +16,11 @@ namespace HSR_SIM_LIB
         private EventType type;
         private Resource.ResourceType resType;
         private Ability abilityValue;
+        private double? val;//Theoretical value
+        private double? realVal;//Real hit value(cant exceed)
+        private string strValue;
+
+        public bool CanSetToZero { get; init;  } = true;
         public bool NeedCalc { get; init; } = false;
 
         public List<Mod> Mods { get; init; } = new List<Mod>();
@@ -24,12 +29,20 @@ namespace HSR_SIM_LIB
         public Step.StepTypeEnm OnStepType { get; init; }
         public EventType Type { get => type; set => type = value; }
         public Ability AbilityValue { get => abilityValue; set => abilityValue = value; }
-        public int Val { get => val; set => val = value; }
+        public double? Val { get => val; set => val = value; }
+        public double? RealVal { get => realVal; set => realVal = value; }
         public string StrValue { get => strValue; set => strValue = value; }
         public Resource.ResourceType ResType { get => resType; set => resType = value; }
+        public Step ParentStep { get; set; } = null;
 
-        private int val;
-        private string strValue;
+        private List<Trigger> triggers = null;
+
+        public List<Trigger> Triggers
+        {
+            get { return triggers ??= new List<Trigger>(); }
+            set => triggers=value;
+        } 
+
 
 
         /// <summary>
@@ -46,8 +59,10 @@ namespace HSR_SIM_LIB
                 {
                     string[] words = StrValue.Split('.');
                     Unit who = null;
-                    int? what = null;
-                    int? prcMulti = null;
+                    this.ParentStep = parentStep;
+                    
+                    double? what = null;
+                    double? prcMulti = null;
                     //Go calc
                     foreach (var word in words)
                     {
@@ -131,7 +146,7 @@ namespace HSR_SIM_LIB
             StartWave,
             Mod,
             ModActionValue,
-            ToughnessDamage,
+            ShieldBreak,
             DirectDamage
         }
 
@@ -144,17 +159,21 @@ namespace HSR_SIM_LIB
             else if (Type == EventType.CombatStartSkillQueue)
                 res = "Queue ability to start skill queue";
             else if (Type == EventType.CombatStartSkillDeQueue)
-                res = "Remove ability to start skill queue";
+                res = "Remove ability from start skill queue";
             else if (Type == EventType.PartyResourceDrain)
                 res = "Party res drain : " + this.Val + " " + this.ResType.ToString();
             else if (Type == EventType.ResourceDrain)
-                res = "Unit res drain : " + this.Val + " " + this.ResType.ToString();
+                res = this.TargetUnit.Name+" res drain : " + this.Val + " " + this.ResType.ToString()+"(by "+this.ParentStep.Actor.Name+")";
             else if (Type == EventType.EnterCombat)
                 res = "entering the combat...";
             else if (Type == EventType.Mod)
                 res = "Apply modifications";
             else if (Type == EventType.StartWave)
                 res = "next wave";
+            else if (Type == EventType.DirectDamage)
+                res = "Dealing damage";//TODO need expand
+            else if (Type == EventType.ShieldBreak)
+                res = this.TargetUnit.Name+ " shield broken";
             else
                 throw new NotImplementedException();
             return res;

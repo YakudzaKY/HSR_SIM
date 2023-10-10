@@ -131,7 +131,7 @@ namespace HSR_SIM_LIB
             }
         }
 
-        
+
 
         /// <summary>
         /// construcotor
@@ -177,7 +177,7 @@ namespace HSR_SIM_LIB
         {
 
             Party = getCombatUnits(CurrentScenario.Party);
-            SpecialUnits= getCombatUnits(CurrentScenario.SpecialUnits);
+            SpecialUnits = getCombatUnits(CurrentScenario.SpecialUnits);
 
             GetRes(ResourceType.TP).ResVal = 5;
             GetRes(ResourceType.SP).ResVal = 5;
@@ -197,7 +197,7 @@ namespace HSR_SIM_LIB
             bool res = true;//Total search res 
             string nullReplacer = "%mandatory%";
             Dictionary<String, bool?> orGroupsRes = new Dictionary<String, bool?>();
-            foreach (Condition condition in ((Ability)essence).ExecuteWhen)
+            foreach (Condition condition in essence.ExecuteWhen)
             {
                 bool condRes = true;
                 bool? currentValue = null;
@@ -236,7 +236,7 @@ namespace HSR_SIM_LIB
             orGroupsRes.Clear();
             orGroupsRes = null;
             return res;
-           
+
         }
 
         /// <summary>
@@ -290,6 +290,10 @@ namespace HSR_SIM_LIB
                     else if (essence is Unit)
                     {
                         res = ExecuteCheckList(check, new List<CheckEssence>(HostileParty), ((Unit)essence));
+                    }
+                    else if (essence is Event)
+                    {
+                        res = ExecuteCheckList(check, new List<CheckEssence>(){((Event)essence).TargetUnit }, ((Event)essence).AbilityValue.Parent);
                     }
                     else
                         throw new NotImplementedException();
@@ -423,15 +427,15 @@ namespace HSR_SIM_LIB
                 newStep.StepType = StepTypeEnm.SimInit;
             }
             //buff before fight
-            else if (newStep.StepType == StepTypeEnm.Idle && DoEnterCombat == false && CurrentFight == null) 
+            else if (newStep.StepType == StepTypeEnm.Idle && DoEnterCombat == false && CurrentFight == null)
                 newStep.TechniqueWork();
 
             //enter the combat
-            else if (newStep.StepType == StepTypeEnm.Idle && DoEnterCombat == true) 
+            else if (newStep.StepType == StepTypeEnm.Idle && DoEnterCombat == true)
                 newStep.LoadBattleWork();
 
             //load the wave
-            else if (newStep.StepType == StepTypeEnm.Idle &&  currentFight is { CurrentWave: null })
+            else if (newStep.StepType == StepTypeEnm.Idle && currentFight is { CurrentWave: null })
             {
                 //fight is over
                 if (currentFight.CurrentWaveCnt == currentFight.ReferenceFight.Waves.Count)
@@ -441,13 +445,13 @@ namespace HSR_SIM_LIB
                 else
                 {
                     newStep.StepType = StepTypeEnm.StartWave;
-                    newStep.Events.Add(new Event() { Type = EventType.StartWave  });
+                    newStep.Events.Add(new Event() { Type = EventType.StartWave });
                 }
 
             }
 
             //Execute start fight skill queue
-            else if (newStep.StepType == StepTypeEnm.Idle && currentFight?.CurrentWave != null&&BeforeStartQueue.Count>0)
+            else if (newStep.StepType == StepTypeEnm.Idle && currentFight?.CurrentWave != null && BeforeStartQueue.Count > 0)
             {
                 newStep.ExecuteAbilityFromQueue();
             }
@@ -464,10 +468,22 @@ namespace HSR_SIM_LIB
         }
 
 
-        public void OnTriggerProc(Step  step,Event ent, bool revert)
+        public void OnTriggerProc(Step step, Event ent, bool revert)
         {
-            //TODO search all triggers
-            //throw new NotImplementedException();
+            // Shield breake. Если по этому евенту не было тригера на щит
+            if (!revert 
+                && ent.Triggers.All(x => x.TrType != Trigger.TriggerType.ShieldBreakeTrigger) 
+                &&ent.Type == EventType.ResourceDrain 
+                && ent.ResType== ResourceType.Toughness
+                && ent.RealVal > 0 
+                && ent.TargetUnit.GetRes(ResourceType.Toughness).ResVal == 0)
+            {
+                Event shieldBrkEvent= new Event(){Type=EventType.ShieldBreak,AbilityValue = ent.AbilityValue,NeedCalc = true,TargetUnit = ent.TargetUnit,ParentStep=step} ;
+                ent.Triggers.Add(new Trigger(){TrType=Trigger.TriggerType.ShieldBreakeTrigger});
+                step.Events.Add(shieldBrkEvent);
+                step.ProcEvent(shieldBrkEvent,revert);
+
+            }
         }
     }
 

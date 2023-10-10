@@ -12,10 +12,10 @@ namespace HSR_SIM_LIB
     public class Resource: CheckEssence
     {
         private ResourceType resType;
-        private int resVal;
+        private double? resVal;
 
         public ResourceType ResType { get => resType; set => resType = value; }
-        public int ResVal { get => resVal; set => resVal = value; }
+        public double? ResVal { get => resVal; set => resVal = value; }
 
         public enum ResourceType
         {

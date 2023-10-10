@@ -1,6 +1,101 @@
 <Unit element="Physical">	
-	<Stats maxHp="112" attack="12" baseSpeed="100" />
-	<Weakness type="Lightning"/>
-	<Weakness type="Wind"/>
-	<Weakness type="Imaginary"/>
+<DamageRes type="Physical" value="20"/>
+<DamageRes type="Lightning" value="20"/>
+<DamageRes type="Wind" value="20"/>
+<DamageRes type="Quantum" value="20"/>
+<Weakness type="Lightning"/>
+<Weakness type="Wind"/>
+<Weakness type="Imaginary"/>
+<Stats level="1 " maxHp="104 " attack="12 " baseSpeed="100 " DEF="210 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="2 " maxHp="137 " attack="14 " baseSpeed="100 " DEF="220 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="3 " maxHp="143 " attack="15 " baseSpeed="100 " DEF="230 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="4 " maxHp="177 " attack="20 " baseSpeed="100 " DEF="240 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="5 " maxHp="186 " attack="21 " baseSpeed="100 " DEF="250 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="6 " maxHp="195 " attack="22 " baseSpeed="100 " DEF="260 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="7 " maxHp="204 " attack="23 " baseSpeed="100 " DEF="270 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="8 " maxHp="213 " attack="25 " baseSpeed="100 " DEF="280 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="9 " maxHp="222 " attack="26 " baseSpeed="100 " DEF="290 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="10 " maxHp="231 " attack="26 " baseSpeed="100 " DEF="300 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="11 " maxHp="248 " attack="29 " baseSpeed="100 " DEF="310 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="12 " maxHp="264 " attack="32 " baseSpeed="100 " DEF="320 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="13 " maxHp="280 " attack="34 " baseSpeed="100 " DEF="330 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="14 " maxHp="296 " attack="37 " baseSpeed="100 " DEF="340 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="15 " maxHp="313 " attack="40 " baseSpeed="100 " DEF="350 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="16 " maxHp="329 " attack="42 " baseSpeed="100 " DEF="360 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="17 " maxHp="345 " attack="45 " baseSpeed="100 " DEF="370 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="18 " maxHp="361 " attack="48 " baseSpeed="100 " DEF="380 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="19 " maxHp="378 " attack="50 " baseSpeed="100 " DEF="390 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="20 " maxHp="394 " attack="53 " baseSpeed="100 " DEF="400 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="21 " maxHp="423 " attack="57 " baseSpeed="100 " DEF="410 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="22 " maxHp="452 " attack="62 " baseSpeed="100 " DEF="420 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="23 " maxHp="481 " attack="66 " baseSpeed="100 " DEF="430 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="24 " maxHp="509 " attack="71 " baseSpeed="100 " DEF="440 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="25 " maxHp="538 " attack="75 " baseSpeed="100 " DEF="450 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="26 " maxHp="567 " attack="80 " baseSpeed="100 " DEF="460 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="27 " maxHp="596 " attack="84 " baseSpeed="100 " DEF="470 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="28 " maxHp="625 " attack="89 " baseSpeed="100 " DEF="480 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="29 " maxHp="654 " attack="93 " baseSpeed="100 " DEF="490 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="30 " maxHp="683 " attack="94 " baseSpeed="100 " DEF="500 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="31 " maxHp="738 " attack="104 " baseSpeed="100 " DEF="510 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="32 " maxHp="794 " attack="109 " baseSpeed="100 " DEF="520 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="33 " maxHp="850 " attack="115 " baseSpeed="100 " DEF="530 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="34 " maxHp="906 " attack="121 " baseSpeed="100 " DEF="540 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="35 " maxHp="961 " attack="127 " baseSpeed="100 " DEF="550 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="36 " maxHp="1017 " attack="132 " baseSpeed="100 " DEF="560 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="37 " maxHp="1073 " attack="138 " baseSpeed="100 " DEF="570 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="38 " maxHp="1129 " attack="144 " baseSpeed="100 " DEF="580 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="39 " maxHp="1184 " attack="150 " baseSpeed="100 " DEF="590 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="40 " maxHp="1240 " attack="155 " baseSpeed="100 " DEF="600 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="41 " maxHp="1404 " attack="163 " baseSpeed="100 " DEF="610 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="42 " maxHp="1569 " attack="171 " baseSpeed="100 " DEF="620 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="43 " maxHp="1733 " attack="179 " baseSpeed="100 " DEF="630 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="44 " maxHp="1897 " attack="187 " baseSpeed="100 " DEF="640 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="45 " maxHp="2061 " attack="195 " baseSpeed="100 " DEF="650 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="46 " maxHp="2226 " attack="203 " baseSpeed="100 " DEF="660 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="47 " maxHp="2390 " attack="210 " baseSpeed="100 " DEF="670 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="48 " maxHp="2554 " attack="218 " baseSpeed="100 " DEF="680 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="49 " maxHp="2718 " attack="226 " baseSpeed="100 " DEF="690 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="50 " maxHp="2883 " attack="234 " baseSpeed="100 " DEF="700 " EHR="0" ER="10" maxToughness="60" />
+<Stats level="51 " maxHp="3281 " attack="244 " baseSpeed="100 " DEF="710 " EHR="0.8" ER="10.4" maxToughness="60" />
+<Stats level="52 " maxHp="3679 " attack="255 " baseSpeed="100 " DEF="720 " EHR="1.6" ER="10.8" maxToughness="60" />
+<Stats level="53 " maxHp="4077 " attack="265 " baseSpeed="100 " DEF="730 " EHR="2.4" ER="11.2" maxToughness="60" />
+<Stats level="54 " maxHp="4475 " attack="276 " baseSpeed="100 " DEF="740 " EHR="3.2" ER="11.6" maxToughness="60" />
+<Stats level="55 " maxHp="4874 " attack="286 " baseSpeed="100 " DEF="750 " EHR="4" ER="12" maxToughness="60" />
+<Stats level="56 " maxHp="5272 " attack="297 " baseSpeed="100 " DEF="760 " EHR="4.8" ER="12.4" maxToughness="60" />
+<Stats level="57 " maxHp="5670 " attack="307 " baseSpeed="100 " DEF="770 " EHR="5.6" ER="12.8" maxToughness="60" />
+<Stats level="58 " maxHp="6068 " attack="317 " baseSpeed="100 " DEF="780 " EHR="6.4" ER="13.2" maxToughness="60" />
+<Stats level="59 " maxHp="6466 " attack="328 " baseSpeed="100 " DEF="790 " EHR="7.2" ER="13.6" maxToughness="60" />
+<Stats level="60 " maxHp="6865 " attack="338 " baseSpeed="100 " DEF="800 " EHR="8" ER="14" maxToughness="60" />
+<Stats level="61 " maxHp="7415 " attack="348 " baseSpeed="100 " DEF="810 " EHR="8.8" ER="14.4" maxToughness="60" />
+<Stats level="62 " maxHp="7965 " attack="358 " baseSpeed="100 " DEF="820 " EHR="9.6" ER="14.8" maxToughness="60" />
+<Stats level="63 " maxHp="8515 " attack="368 " baseSpeed="100 " DEF="830 " EHR="10.4" ER="15.2" maxToughness="60" />
+<Stats level="64 " maxHp="9066 " attack="377 " baseSpeed="100 " DEF="840 " EHR="11.2" ER="15.6" maxToughness="60" />
+<Stats level="65 " maxHp="9616 " attack="387 " baseSpeed="110 " DEF="850 " EHR="12" ER="16" maxToughness="60" />
+<Stats level="66 " maxHp="10166 " attack="397 " baseSpeed="110 " DEF="860 " EHR="12.8" ER="16.4" maxToughness="60" />
+<Stats level="67 " maxHp="10717 " attack="407 " baseSpeed="110 " DEF="870 " EHR="13.6" ER="16.8" maxToughness="60" />
+<Stats level="68 " maxHp="11267 " attack="416 " baseSpeed="110 " DEF="880 " EHR="14.4" ER="17.2" maxToughness="60" />
+<Stats level="69 " maxHp="11817 " attack="426 " baseSpeed="110 " DEF="890 " EHR="15.2" ER="17.6" maxToughness="60" />
+<Stats level="70 " maxHp="12367 " attack="436 " baseSpeed="110 " DEF="900 " EHR="16" ER="18" maxToughness="60" />
+<Stats level="71 " maxHp="13058 " attack="447 " baseSpeed="110 " DEF="910 " EHR="16.8" ER="18.4" maxToughness="60" />
+<Stats level="72 " maxHp="13748 " attack="459 " baseSpeed="110 " DEF="920 " EHR="17.6" ER="18.8" maxToughness="60" />
+<Stats level="73 " maxHp="14438 " attack="471 " baseSpeed="110 " DEF="930 " EHR="18.4" ER="19.2" maxToughness="60" />
+<Stats level="74 " maxHp="15129 " attack="482 " baseSpeed="110 " DEF="940 " EHR="19.2" ER="19.6" maxToughness="60" />
+<Stats level="75 " maxHp="15819 " attack="494 " baseSpeed="110 " DEF="950 " EHR="20" ER="20" maxToughness="60" />
+<Stats level="76 " maxHp="16510 " attack="506 " baseSpeed="110 " DEF="960 " EHR="20.8" ER="20" maxToughness="60" />
+<Stats level="77 " maxHp="17200 " attack="517 " baseSpeed="110 " DEF="970 " EHR="21.6" ER="20" maxToughness="60" />
+<Stats level="78 " maxHp="17890 " attack="529 " baseSpeed="120 " DEF="980 " EHR="22.4" ER="20" maxToughness="60" />
+<Stats level="79 " maxHp="18581 " attack="541 " baseSpeed="120 " DEF="990 " EHR="23.2" ER="20" maxToughness="60" />
+<Stats level="80 " maxHp="19271 " attack="552 " baseSpeed="120 " DEF="1000 " EHR="24" ER="20" maxToughness="60" />
+<Stats level="81 " maxHp="20244 " attack="563 " baseSpeed="120 " DEF="1010 " EHR="24.8" ER="20" maxToughness="60" />
+<Stats level="82 " maxHp="21254 " attack="574 " baseSpeed="120 " DEF="1020 " EHR="25.6" ER="20" maxToughness="60" />
+<Stats level="83 " maxHp="22301 " attack="585 " baseSpeed="120 " DEF="1030 " EHR="26.4" ER="20" maxToughness="60" />
+<Stats level="84 " maxHp="23386 " attack="597 " baseSpeed="120 " DEF="1040 " EHR="27.2" ER="20" maxToughness="60" />
+<Stats level="85 " maxHp="24512 " attack="608 " baseSpeed="120 " DEF="1050 " EHR="28" ER="20" maxToughness="60" />
+<Stats level="86 " maxHp="25679 " attack="619 " baseSpeed="132 " DEF="1060 " EHR="28.8" ER="20" maxToughness="60" />
+<Stats level="87 " maxHp="26890 " attack="630 " baseSpeed="132 " DEF="1070 " EHR="29.6" ER="20" maxToughness="60" />
+<Stats level="88 " maxHp="28145 " attack="641 " baseSpeed="132 " DEF="1080 " EHR="30.4" ER="20" maxToughness="60" />
+<Stats level="89 " maxHp="29447 " attack="652 " baseSpeed="132 " DEF="1090 " EHR="31.2" ER="20" maxToughness="60" />
+<Stats level="90 " maxHp="30797 " attack="663 " baseSpeed="132 " DEF="1100 " EHR="32" ER="20" maxToughness="60" />
+
+
 </Unit>

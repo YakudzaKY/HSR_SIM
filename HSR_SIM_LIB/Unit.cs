@@ -98,6 +98,7 @@ namespace HSR_SIM_LIB
         {
             Stats.MaxHp = Stats.BaseMaxHp;
             GetRes(ResourceType.HP).ResVal = Stats.MaxHp;
+            GetRes(ResourceType.Toughness).ResVal = Stats.MaxToughness;
             //Clone abilities from template
             List<Ability> clonedAbilities= new List<Ability>();
             foreach (Ability ability in Reference.Abilities)

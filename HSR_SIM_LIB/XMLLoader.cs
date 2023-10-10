@@ -114,20 +114,26 @@ namespace HSR_SIM_LIB
         /// </summary>
         /// <param name="xnode"></param>
         /// <returns></returns>
-        private static UnitStats ExctractStats(XmlElement xmlItems)
+        private static UnitStats ExctractStats(XmlElement xmlItems, int searchLvl)
         {
             UnitStats unitStats = new UnitStats();
+            int? lvl;
             //parse all items
             foreach (XmlElement xnode in xmlItems.SelectNodes("Stats"))
             {
-                unitStats.BaseMaxHp = int.Parse(xnode.Attributes.GetNamedItem("maxHp").Value.Trim());
-                unitStats.BaseAttack = int.Parse(xnode.Attributes.GetNamedItem("attack").Value.Trim());
-                unitStats.BaseMaxEnergy = SafeToInt(xnode.Attributes.GetNamedItem("energy")?.Value.Trim());
-                unitStats.BaseSpeed = SafeToInt(xnode.Attributes.GetNamedItem("baseSpeed")?.Value.Trim());
-                if (xnode.Attributes.GetNamedItem("baseActionValue") is not null)
+                lvl=SafeToIntNull(xnode.Attributes.GetNamedItem("level")?.Value?.Trim());
+                if (lvl == null || lvl == searchLvl)
                 {
-                    unitStats.BaseActionValue =
-                        SafeToInt(xnode.Attributes.GetNamedItem("baseActionValue")?.Value.Trim());
+                    unitStats.BaseMaxHp = int.Parse(xnode.Attributes.GetNamedItem("maxHp").Value.Trim());
+                    unitStats.BaseAttack = int.Parse(xnode.Attributes.GetNamedItem("attack").Value.Trim());
+                    unitStats.BaseMaxEnergy = SafeToInt(xnode.Attributes.GetNamedItem("energy")?.Value.Trim());
+                    unitStats.BaseSpeed = SafeToInt(xnode.Attributes.GetNamedItem("baseSpeed")?.Value.Trim());
+                    unitStats.MaxToughness = SafeToInt(xnode.Attributes.GetNamedItem("maxToughness")?.Value.Trim());
+                    if (xnode.Attributes.GetNamedItem("baseActionValue") is not null)
+                    {
+                        unitStats.BaseActionValue =
+                            SafeToInt(xnode.Attributes.GetNamedItem("baseActionValue")?.Value.Trim());
+                    }
                 }
             }
 
@@ -186,11 +192,14 @@ namespace HSR_SIM_LIB
                         StrValue = xmlevent.Attributes.GetNamedItem("strValue")?.Value?.Trim()
                         ,
                         TargetType = (TargetTypeEnm)Enum.Parse(typeof(TargetTypeEnm), xmlevent.Attributes.GetNamedItem("target")?.Value?.Trim() ?? TargetTypeEnm.Self.ToString())
-
+                        ,
+                        CanSetToZero= SafeToBool(xmlevent.Attributes.GetNamedItem("canSetToZero")?.Value?.Trim())
+                        ,
+                        AbilityValue = ability
 
 
                     };
-
+                    
 
                     foreach (XmlElement xmlmod in xmlevent.SelectNodes("Mod"))
                     {
@@ -211,23 +220,13 @@ namespace HSR_SIM_LIB
                         ent.Mods.Add(mod);
                     }
 
+                    FillExecuteWhenFromXml(xmlevent,ent.ExecuteWhen);
                     ability.Events.Add(ent);
+
                 }
-                //execute conditions by tags
-                foreach (XmlElement xmlExecute in abilitiyXml.SelectNodes("ExecuteWhen"))
-                {
-                    //execute conditions by template
-                    string template = xmlExecute.Attributes.GetNamedItem("template")?.Value.Trim();
-                    if (template != null)
-                    {
-                        XmlDocument tempalteDoc = new XmlDocument();
-                        tempalteDoc.Load(Utils.DataFolder + "ExecuteTemplates\\" + template + ".xml");
-                        XmlElement templateRoot = tempalteDoc.DocumentElement;
-                        FillExecuteWhen(templateRoot, ability);
-                    }
-                    else
-                        FillExecuteWhen(xmlExecute, ability);
-                }
+
+                FillExecuteWhenFromXml(abilitiyXml,ability.ExecuteWhen);
+                
 
                 abilities.Add(ability);
 
@@ -235,12 +234,32 @@ namespace HSR_SIM_LIB
             }
             return abilities;
         }
+
+        private static void FillExecuteWhenFromXml(XmlElement abilitiyXml, List<Condition> executeWhen)
+        {
+            //execute conditions by tags
+            foreach (XmlElement xmlExecute in abilitiyXml.SelectNodes("ExecuteWhen"))
+            {
+                //execute conditions by template
+                string template = xmlExecute.Attributes.GetNamedItem("template")?.Value.Trim();
+                if (template != null)
+                {
+                    XmlDocument tempalteDoc = new XmlDocument();
+                    tempalteDoc.Load(Utils.DataFolder + "ExecuteTemplates\\" + template + ".xml");
+                    XmlElement templateRoot = tempalteDoc.DocumentElement;
+                    FillExecuteWhen(templateRoot, executeWhen);
+                }
+                else
+                    FillExecuteWhen(xmlExecute, executeWhen);
+            }
+        }
+
         /// <summary>
         /// parse ExecuteWhen->Condition
         /// </summary>
         /// <param name="xmlExecute"></param>
         /// <param name="ability"></param>
-        private static void FillExecuteWhen(XmlElement xmlExecute, Ability ability)
+        private static void FillExecuteWhen(XmlElement xmlExecute, List<Condition> executeWhen)
         {
             foreach (XmlElement xmlCondition in xmlExecute.SelectNodes("Condition"))
             {
@@ -248,7 +267,7 @@ namespace HSR_SIM_LIB
                 condition.OrGroup = xmlCondition.Attributes.GetNamedItem("orgroup")?.Value.Trim();
                 FillConditionChecks(xmlCondition, condition);
 
-                ability.ExecuteWhen.Add(condition);
+                executeWhen.Add(condition);
             }
         }
         /// <summary>
@@ -311,6 +330,7 @@ namespace HSR_SIM_LIB
                 Unit unit = new Unit();
                 //load xml by 
                 string unitCode = unitNode.Attributes.GetNamedItem("template").Value.Trim();
+                unit.Level = int.Parse(unitNode.Attributes.GetNamedItem("level")?.Value?.Trim() ?? "1");
                 unitDoc.Load(Utils.DataFolder + "UnitTemplates\\" + unitCode + ".xml");
                 XmlElement xRoot = unitDoc.DocumentElement;
                 if (xRoot != null)
@@ -319,8 +339,7 @@ namespace HSR_SIM_LIB
                     string elementVal = xRoot.Attributes.GetNamedItem("element")?.Value.Trim();
                     if (elementVal != null)
                         unit.Element = (Unit.ElementEnm)System.Enum.Parse(typeof(Unit.ElementEnm), elementVal);
-                    unit.Level = int.Parse(xRoot.Attributes.GetNamedItem("level")?.Value.Trim() ?? "1");
-                    unit.Stats = ExctractStats(xRoot);
+                    unit.Stats = ExctractStats(xRoot, unit.Level);
                     unit.Abilities = ExctractAbilities(xRoot, unit);
                     unit.Weaknesses = ExctractWeaknesses(xRoot);
                     units.Add(unit);

@@ -18,6 +18,8 @@ namespace HSR_SIM_LIB
         public int CurrentEnergy { get; set; } = 0;
         public int BaseMaxEnergy { get; set; } = 0;
 
+        public int MaxToughness { get; set; } = 0;
+
         private int? baseActionValue ;//TODO при выборе кто ходит, учесть пачку с 0 AV, надо отсортировать . мб сделать минусовые значения
         public int BaseActionValue
         {

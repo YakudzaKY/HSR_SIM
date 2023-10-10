@@ -27,10 +27,10 @@ namespace HSR_SIM_LIB
         public List<Event> Events { get => events; set => events = value; }
         public short Cost { get => cost; set => cost = value; }
         public ResourceType CostType { get => costType; set => costType = value; }
-        internal List<Condition> ExecuteWhen { get => executeWhen; set => executeWhen = value; }
+
 
         private List<Event> events = new List<Event>();
-        private List<Condition> executeWhen = new List<Condition>();
+        
 
         public Ability(Unit parent) 
         { 
