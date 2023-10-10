@@ -8,7 +8,7 @@
 		<Event onStep="ExecuteStartQueue" target ="AOE" type="ResourceDrain" resType="Toughness"  strValue="Target.Toughness.100%" needCalc="true">
 			<ExecuteWhen>
 				<Condition orgroup="WEAKNESS_CHECK">
-					<Check  type="FindTarget" value="hostiles">				
+					<Check  type="CheckTarget">				
 						<Check type="Alive" value="true"/>
 						<Check type="WeaknessType" value="@CasterElement"/>					
 					</Check>

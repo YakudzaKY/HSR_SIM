@@ -293,7 +293,7 @@ namespace HSR_SIM_LIB
                     }
                     else if (essence is Event)
                     {
-                        res = ExecuteCheckList(check, new List<CheckEssence>(){((Event)essence).TargetUnit }, ((Event)essence).AbilityValue.Parent);
+                        res = ExecuteCheckList(check, new List<CheckEssence>(HostileParty), ((Event)essence).AbilityValue.Parent);
                     }
                     else
                         throw new NotImplementedException();
@@ -301,6 +301,20 @@ namespace HSR_SIM_LIB
                 }
                 else
                     throw new NotImplementedException();
+
+            }
+            else if (check.CheckType == CheckTypeEnm.CheckTarget)
+            {
+
+                if (essence is Event)
+                {
+                    res = ExecuteCheckList(check, new List<CheckEssence>() { ((Event)essence).TargetUnit }, ((Event)essence).AbilityValue.Parent);
+                }
+                else
+                    throw new NotImplementedException();
+
+
+
 
             }
             else if (check.CheckType == CheckTypeEnm.Alive)
@@ -471,17 +485,17 @@ namespace HSR_SIM_LIB
         public void OnTriggerProc(Step step, Event ent, bool revert)
         {
             // Shield breake. Если по этому евенту не было тригера на щит
-            if (!revert 
-                && ent.Triggers.All(x => x.TrType != Trigger.TriggerType.ShieldBreakeTrigger) 
-                &&ent.Type == EventType.ResourceDrain 
-                && ent.ResType== ResourceType.Toughness
-                && ent.RealVal > 0 
+            if (!revert
+                && ent.Triggers.All(x => x.TrType != Trigger.TriggerType.ShieldBreakeTrigger)
+                && ent.Type == EventType.ResourceDrain
+                && ent.ResType == ResourceType.Toughness
+                && ent.RealVal > 0
                 && ent.TargetUnit.GetRes(ResourceType.Toughness).ResVal == 0)
             {
-                Event shieldBrkEvent= new Event(){Type=EventType.ShieldBreak,AbilityValue = ent.AbilityValue,NeedCalc = true,TargetUnit = ent.TargetUnit,ParentStep=step} ;
-                ent.Triggers.Add(new Trigger(){TrType=Trigger.TriggerType.ShieldBreakeTrigger});
+                Event shieldBrkEvent = new Event() { Type = EventType.ShieldBreak, AbilityValue = ent.AbilityValue, NeedCalc = true, TargetUnit = ent.TargetUnit, ParentStep = step };
+                ent.Triggers.Add(new Trigger() { TrType = Trigger.TriggerType.ShieldBreakeTrigger });
                 step.Events.Add(shieldBrkEvent);
-                step.ProcEvent(shieldBrkEvent,revert);
+                step.ProcEvent(shieldBrkEvent, revert);
 
             }
         }
