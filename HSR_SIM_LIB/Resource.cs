@@ -21,7 +21,9 @@ namespace HSR_SIM_LIB
         {
             nil,//dont use type
             TP,
-            SP
+            SP,
+            HP,
+            Toughness
         }
     }
 }

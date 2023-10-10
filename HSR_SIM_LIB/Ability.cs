@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using static HSR_SIM_LIB.Resource;
+using static HSR_SIM_LIB.Unit;
 
 namespace HSR_SIM_LIB
 {/// <summary>
@@ -16,7 +18,8 @@ namespace HSR_SIM_LIB
         private Unit parent;//caster
         private short cost=0;
         private ResourceType costType= ResourceType.nil;
-
+        private ElementEnm? element;//element of skill
+        public ElementEnm? Element { get => element; set => element = value; }
         public AbilityTypeEnm AbilityType { get => abilityType; set => abilityType = value; }
         public Unit Parent { get => parent; set => parent = value; }
 
@@ -31,7 +34,7 @@ namespace HSR_SIM_LIB
 
         public Ability(Unit parent) 
         { 
-            Parent= parent; 
+            Parent= parent;
         }
       
 
@@ -41,7 +44,19 @@ namespace HSR_SIM_LIB
             Skill,
             Ultimate,
             Talent,
-            Technique
+            Technique,
+            Trigger
         }
+
+        public enum TargetTypeEnm
+        {
+            Self,
+            Target,
+            Hostiles,
+            Party,
+            AOE,
+            Blast
+        }
+            
     }
 }

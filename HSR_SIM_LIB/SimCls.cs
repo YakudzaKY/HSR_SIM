@@ -271,7 +271,7 @@ namespace HSR_SIM_LIB
             bool res = false;
             if (check.CheckType == CheckTypeEnm.CombatStartSkillQueue)
             {
-                if (String.Equals(check.Value, "self", StringComparison.OrdinalIgnoreCase))
+                if (String.Equals(check.Value, TargetTypeEnm.Self.ToString(), StringComparison.OrdinalIgnoreCase))
                     res = (BeforeStartQueue.IndexOf(essence as Ability) >= 0);
                 else
                     throw new NotImplementedException();
@@ -279,9 +279,9 @@ namespace HSR_SIM_LIB
             }
             else if (check.CheckType == CheckTypeEnm.FindTarget)
             {
-                if (String.Equals(check.Value, "party", StringComparison.OrdinalIgnoreCase))
+                if (String.Equals(check.Value, TargetTypeEnm.Party.ToString(), StringComparison.OrdinalIgnoreCase))
                     res = ExecuteCheckList(check, new List<CheckEssence>(Party), ((Ability)essence).Parent);
-                else if (String.Equals(check.Value, "Hostiles", StringComparison.OrdinalIgnoreCase))
+                else if (String.Equals(check.Value, TargetTypeEnm.Hostiles.ToString(), StringComparison.OrdinalIgnoreCase))
                 {
                     if (essence is Ability)
                     {
@@ -441,7 +441,7 @@ namespace HSR_SIM_LIB
                 else
                 {
                     newStep.StepType = StepTypeEnm.StartWave;
-                    newStep.Events.Add(new Event { Type = EventType.StartWave });
+                    newStep.Events.Add(new Event() { Type = EventType.StartWave  });
                 }
 
             }
@@ -464,6 +464,11 @@ namespace HSR_SIM_LIB
         }
 
 
+        public void OnTriggerProc(Step  step,Event ent, bool revert)
+        {
+            //TODO search all triggers
+            //throw new NotImplementedException();
+        }
     }
 
 }

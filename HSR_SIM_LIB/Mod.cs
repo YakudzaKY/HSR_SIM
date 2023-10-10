@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static HSR_SIM_LIB.Event;
 
 namespace HSR_SIM_LIB
 {
@@ -28,6 +29,21 @@ namespace HSR_SIM_LIB
         public enum ModifierType
         {
             AtkPrc
+        }
+
+        public string GetDescription()
+        {
+
+
+
+            return String.Format(">> {0:s} {1:s} for {2:s} val= {3:D} duration={4:D} dispellable={5:s}", 
+                this.Type.ToString()
+                ,this.Target.ToString()
+                ,this.Modifier.ToString()
+                ,this.Value.ToString()
+                ,this.Duration.ToString()
+                ,this.Dispellable.ToString()
+                );
         }
     }
 }

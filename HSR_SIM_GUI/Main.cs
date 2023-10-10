@@ -32,7 +32,7 @@ namespace HSR_SIM_GUI
         {
             if (String.Equals(kv.Key, Constant.MsgLog))
             {
-                Utils.AddLine(LogWindow, kv.Value, 200);
+                Utils.AddLine(LogWindow, kv.Value, 400);
                 LogWindow.ScrollToCaret();
             }
         }

@@ -13,14 +13,16 @@ namespace HSR_SIM_LIB
     {
         public int BaseMaxHp { get; set; } = 0;
         public int BaseAttack { get; set; } = 0;
-        public int CurrentHp { get; set; } = 0;
+      
         public int MaxHp { get; set; } = 0;
         public int CurrentEnergy { get; set; } = 0;
         public int BaseMaxEnergy { get; set; } = 0;
+
+        private int? baseActionValue ;//TODO при выборе кто ходит, учесть пачку с 0 AV, надо отсортировать . мб сделать минусовые значения
         public int BaseActionValue
         {
-            get => 10000 / Speed;
-            set => throw new NotImplementedException();
+            get => baseActionValue?? 10000 / Speed;//semi auto. 
+            set => baseActionValue=value;
         }
 
         public int ActionValue { get; set; } = 0;

@@ -57,7 +57,16 @@ namespace HSR_SIM_LIB
 
                 }
                 DrawStartQueue(gfx, new Point(LeftSideWithSpace, TopSideForQueue), sim.BeforeStartQueue);
-                DrawCenterText(gfx, sim.CurrentStep.GetStepDescription());
+                //step
+                DrawCenterText(gfx, sim.CurrentStep.GetDescription());
+                //events
+                short i = 2;
+                foreach (Event ent in sim.CurrentStep.Events)
+                {
+                    DrawText((int)(CombatImgSize.Width / 2.8) , CenterTextY+(i* DefaultFontSize), gfx, ent.GetDescription(), new SolidBrush(clrDefault), new("Tahoma", (int)(DefaultFontSize * 0.6), FontStyle.Bold));
+                    i++;
+                }
+                //TODO draw events description
                 DrawText(PartyResourceX, PartyResourceY - 3 * (int)(DefaultFontSize * 1.2), gfx, String.Format("Fight: {0:d}/{1:d}",
                         sim.CurrentFightStep, sim.CurrentScenario.Fights.Count));
                 if (sim.CurrentFight != null)
@@ -228,13 +237,13 @@ namespace HSR_SIM_LIB
                     using (SolidBrush brush = new(clrGreen))
                     {
                         int greenWidth =
-                            (int)Math.Floor((double)HealthBarSize.Width * (unit.Stats.CurrentHp) / unit.Stats.MaxHp);
+                            (int)Math.Floor((double)HealthBarSize.Width * (unit.GetRes(ResourceType.HP).ResVal) / unit.Stats.MaxHp);
                         gfx.FillRectangle(brush, portraitPoint.X, portraitPoint.Y + PortraitSize.Height, greenWidth,
                             HealthBarSize.Height);
                     }
 
                     DrawText(portraitPoint.X + 5, portraitPoint.Y + PortraitSize.Height, gfx,
-                        String.Format("{0:d}/{1:d}", unit.Stats.CurrentHp, unit.Stats.MaxHp), null,
+                        String.Format("{0:d}/{1:d}", unit.GetRes(ResourceType.HP).ResVal, unit.Stats.MaxHp), null,
                         new Font("Tahoma", BarFontSize));
                 }
 

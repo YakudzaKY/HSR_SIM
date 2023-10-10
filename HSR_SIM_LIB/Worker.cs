@@ -161,12 +161,27 @@ namespace HSR_SIM_LIB
         /// <exception cref="NotImplementedException"></exception>
         private void LogStepDescription(Step step, bool revert = false)
         {
-            string OutText = " Step# " + Sim.Steps.IndexOf(Sim.CurrentStep).ToString() + " [" + step.StepType.ToString() + "] " + step.GetStepDescription();
+            string OutText = " Step# " + Sim.Steps.IndexOf(Sim.CurrentStep).ToString() + " [" + step.StepType.ToString() + "] " + step.GetDescription();
             if (revert)
                 OutText = "reverted: " + OutText;
             else if (replay)
                 OutText = "reproduced: " + OutText;
             LogText(OutText);
+            foreach (Event ent in step.Events)
+            {
+                OutText = " * " + ent.GetDescription();
+                if (revert)
+                    OutText = "reverted: " + OutText;
+                else if (replay)
+                    OutText = "reproduced: " + OutText;
+                LogText(OutText);
+                foreach (Mod mod in ent.Mods)
+                {
+                    OutText = " * " + mod.GetDescription();
+                    LogText(OutText);
+
+                }
+            }
 
         }
 

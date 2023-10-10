@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static HSR_SIM_LIB.Event;
 using static HSR_SIM_LIB.Resource;
+using static HSR_SIM_LIB.Trigger;
 
 namespace HSR_SIM_LIB
 {
@@ -30,7 +31,7 @@ namespace HSR_SIM_LIB
         /// </summary>
         /// <param name="step"></param>
         /// <returns></returns>
-        public string GetStepDescription()
+        public string GetDescription()
         {
             string res;
             if (StepType == StepTypeEnm.SimInit)
@@ -83,7 +84,7 @@ namespace HSR_SIM_LIB
             {
                 if (ent.Type == EventType.PartyResourceDrain)//SP or technical points
                 {
-                    Parent.GetRes(ent.ResType).ResVal -= revert ? -1 : 1;
+                    Parent.GetRes(ent.ResType).ResVal -= revert ? -ent.Val : ent.Val;
                 }
                 else if (ent.Type == EventType.CombatStartSkillQueue)//party buffs or opening
                     if (!revert)
@@ -156,14 +157,22 @@ namespace HSR_SIM_LIB
                         }
                         else
                         {
+
                             throw new NotImplementedException();
                         }
                     }
 
                 }
+                else if (ent.Type == EventType.ResourceDrain) //Resource drain
+                {
+
+                    this.Actor.GetRes(ent.ResType).ResVal -= revert ? -ent.Val : ent.Val;
+                }
                 else
                     throw new NotImplementedException();
+                Parent.OnTriggerProc( this, ent, revert);
             }
+
             events.Clear();
             events = null;
         }
@@ -218,10 +227,55 @@ namespace HSR_SIM_LIB
             StepType = StepTypeEnm.ExecuteStartQueue;
             List<Ability> abilities = new List<Ability>();
             Ability fromQ = Parent.BeforeStartQueue.First();
-            Events.AddRange(fromQ.Events.Where(x => x.OnStepType == StepType));//copy events from ability reference
-            Events.Add(new Event() { Type = EventType.CombatStartSkillDeQueue, AbilityValue = fromQ });//energy drain
             Actor = fromQ.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
             ActorAbility = fromQ;//WAT ABILITY is casting
+
+            Events.AddRange(fromQ.Events.Where(x => x.OnStepType == StepType && x.NeedCalc==false));//copy events from ability reference
+            //Need some calc? 
+            foreach ( Event ent in  fromQ.Events.Where(x => x.OnStepType == StepType && x.NeedCalc==true))            {
+                
+
+                if (ent.TargetType == Ability.TargetTypeEnm.AOE)
+                {
+                    //if Enemy
+                    if (Parent.HostileParty.IndexOf(this.Actor)>0)
+                    {
+                        foreach (Unit unit in Parent.Party)
+                        {
+                            Event unitEnt = (Event)ent.Clone();
+                            unitEnt.TargetUnit = unit;
+                            unitEnt.Calc(this);
+                            Events.Add(unitEnt);
+                        }
+                    }
+                    else
+                    {
+                        foreach (Unit unit in Parent.HostileParty)
+                        {
+                            Event unitEnt = (Event)ent.Clone();
+                            unitEnt.TargetUnit = unit;
+                            unitEnt.Calc(this);
+                            Events.Add(unitEnt);
+                        }
+                    }
+                    
+                }
+                else if (ent.TargetType == Ability.TargetTypeEnm.Self)
+                {
+                    Event newEnt = (Event)ent.Clone();
+                    newEnt.TargetUnit = this.Actor;
+                    newEnt.Calc(this);
+                    Events.Add(newEnt);
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+
+            }
+
+            Events.Add(new Event() { Type = EventType.CombatStartSkillDeQueue, AbilityValue = fromQ  });
+
 
             abilities.Clear();
             abilities = null;
@@ -237,7 +291,7 @@ namespace HSR_SIM_LIB
             StepType = StepTypeEnm.TechniqueUse;
             Events.AddRange(ability.Events.Where(x => x.OnStepType == StepType));//copy events from ability reference
             if (ability.CostType != ResourceType.nil)
-                Events.Add(new Event() { Type = EventType.PartyResourceDrain, ResType = ability.CostType, ResourceValue = ability.Cost });//energy drain
+                Events.Add(new Event() { Type = EventType.PartyResourceDrain, ResType = ability.CostType, Val = ability.Cost });//energy drain
             Actor = ability.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
             ActorAbility = ability;//WAT ABILITY is casting
 

@@ -1,9 +1,12 @@
 <Unit element="Wind">	
 	<Stats maxHp="10000" attack="10" energy="90" baseSpeed="120"/>
 	<!--Karma Wind-->
-	<Ability name="Karma Wind" type="Technique" costtype="TP" cost="1">
-		<Event onStep="TechniqueUse" name="CombatStartSkillQueue"/>
-		<Event onStep="TechniqueUse" name="EnterCombat"/>
+	<Ability name="Karma Wind" type="Technique" costType="TP" cost="1" element="Wind">
+		<Event onStep="TechniqueUse" type="CombatStartSkillQueue"/>
+		<Event onStep="TechniqueUse" type="EnterCombat"/>		
+		<Event onStep="ExecuteStartQueue" target ="AOE" type="ToughnessDamage"  strValue="Target.Toughness.100%" needCalc="true"/>
+		<Event onStep="ExecuteStartQueue" target ="AOE" type="DirectDamage" strValue="Self.MaxHp.40%" needCalc="true"/>
+		<Event onStep="ExecuteStartQueue" target ="Self" type="ResourceDrain" resType="HP" strValue="Self.MaxHp.20%" needCalc="true"/>
 		<!--Execution conditions-->
 		<ExecuteWhen template="DefaultEnterCombatTechnique"/>					
 	</Ability>
