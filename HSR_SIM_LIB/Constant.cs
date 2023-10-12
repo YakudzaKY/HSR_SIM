@@ -35,7 +35,8 @@ namespace HSR_SIM_LIB
         public static readonly sbyte StartQueuefontSizeSpc = (sbyte)Math.Round((double)(StartQueuefontSize / 7.5));
         public static readonly short LeftSideWithSpace = (short)(CombatImgSize.Width / 80);
         public static readonly short TopSideWithSpace = (short)(CombatImgSize.Width / 80);
-        public static readonly short BottomSideWithSpace = (short)(CombatImgSize.Height - TotalUnitSize.Height - (int)(CombatImgSize.Height / 40));
+        public static readonly short BottomSideWithSpace = (short)(CombatImgSize.Height - TotalUnitSize.Height - 
+                                                                   (CombatImgSize.Height / 40));
         public static readonly short TopSideForQueue = (short)(CombatImgSize.Height * 0.4);
         public static readonly short PartyResourceX = (short)(CombatImgSize.Width - (int)(CombatImgSize.Width / 8));
         public static readonly short PartyResourceY = (short)(CombatImgSize.Height / 2);

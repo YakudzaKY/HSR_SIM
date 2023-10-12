@@ -11,27 +11,27 @@ namespace HSR_SIM_LIB
 /// </summary>
     public class UnitStats
     {
-        public int BaseMaxHp { get; set; } = 0;
-        public int BaseAttack { get; set; } = 0;
+        public double BaseMaxHp { get; set; } = 0;
+        public double BaseAttack { get; set; } = 0;
       
-        public int MaxHp { get; set; } = 0;
+        public double MaxHp { get; set; } = 0;
         public int CurrentEnergy { get; set; } = 0;
         public int BaseMaxEnergy { get; set; } = 0;
 
         public int MaxToughness { get; set; } = 0;
 
-        private int? baseActionValue ;//TODO при выборе кто ходит, учесть пачку с 0 AV, надо отсортировать . мб сделать минусовые значения
-        public int BaseActionValue
+        private double? baseActionValue ;//TODO при выборе кто ходит, учесть пачку с 0 AV, надо отсортировать . мб сделать минусовые значения
+        public double BaseActionValue
         {
             get => baseActionValue?? 10000 / Speed;//semi auto. 
             set => baseActionValue=value;
         }
 
-        public int ActionValue { get; set; } = 0;
-        public int FlatSpeed { get; internal set; }
-        public int BaseSpeed { get; internal set; }
-        public int SpdPrc { get; internal set; } = 0;
-        public int Speed//speed for calcing
+        public double ActionValue { get; set; } = 0;
+        public double FlatSpeed { get; internal set; }
+        public double BaseSpeed { get; internal set; }
+        public double SpdPrc { get; internal set; } = 0;
+        public double Speed//speed for calcing
         {
             get
             {

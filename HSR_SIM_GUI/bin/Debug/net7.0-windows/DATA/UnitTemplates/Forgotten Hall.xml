@@ -1,5 +1,5 @@
 <Unit level="0">	
-	<Stats maxHp="0" attack="0" baseActionValue="150"/>
+	<Stats baseActionValue="150"/>
 	<!--<Ability name="ReduceAV" type="Trigger">
 		<Event onStep="OnMoveStart" type="Mod">
 			<Mod type="Buff" target="Self" modifier="BaseAv" value="-50" duration=1/>

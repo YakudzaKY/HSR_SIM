@@ -12,7 +12,7 @@ namespace HSR_SIM_LIB
     /// <summary>
     /// some utility stuff
     /// </summary>
-    internal static class Utils
+    public static class Utils
     {
         private static string dataFolder = AppDomain.CurrentDomain.BaseDirectory + "DATA\\";
 

@@ -88,13 +88,11 @@ namespace HSR_SIM_LIB
                                 .GetProperty("Stats")
                                 .GetValue(who, null);
                             //try stats
-                            what = unitstats.GetType().GetProperty(word)?.GetValue(unitstats, null) as int?;
-                            //try resources
-                            if (what == null)
-                            {
-                                what = who.GetRes(
-                                    (Resource.ResourceType)Enum.Parse(typeof(Resource.ResourceType), word)).ResVal;
-                            }
+                            what = unitstats.GetType().GetProperty(word)?.GetValue(unitstats, null) as int? 
+                                   ?? unitstats.GetType().GetProperty(word)?.GetValue(unitstats, null) as double?
+                                   ??who.GetRes(
+                                       (Resource.ResourceType)Enum.Parse(typeof(Resource.ResourceType), word)).ResVal;
+                           
                         }
                         else
                         {
@@ -111,7 +109,7 @@ namespace HSR_SIM_LIB
 
                     if (who != null & what != null)
                     {
-                        Val = (int) Math.Round ((double)what * ((double)prcMulti /100));
+                        Val = what * (prcMulti /100);
                     }
                     else
                     {
@@ -123,9 +121,6 @@ namespace HSR_SIM_LIB
                 {
                     throw new NotImplementedException();
                 }
-
-                //Val = (int)Math.Round((double)(CurHp) * (double)int.Parse(StrCost.Substring(0, StrCost.Length - 1)) / 100);
-                //Val = Math.Min(Val, CurHp - 1);
 
 
             }

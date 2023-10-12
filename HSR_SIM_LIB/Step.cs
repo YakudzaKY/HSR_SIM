@@ -77,7 +77,7 @@ namespace HSR_SIM_LIB
         {
             if (ent.Type == EventType.PartyResourceDrain)//SP or technical points
             {
-                Parent.GetRes(ent.ResType).ResVal -= revert ? (int)Math.Round((double)-ent.Val) : (int)Math.Round((double)ent.Val);
+                Parent.GetRes(ent.ResType).ResVal -= revert ? -ent.Val :ent.Val;
             }
             else if (ent.Type == EventType.CombatStartSkillQueue)//party buffs or opening
                 if (!revert)
@@ -160,13 +160,13 @@ namespace HSR_SIM_LIB
             {
                 if (ent.RealVal == null)
                 {
-                    ent.RealVal = (double)Math.Min((double)ent.TargetUnit.GetRes(ent.ResType).ResVal, (double)ent.Val);
+                    ent.RealVal = Math.Min((double)ent.TargetUnit.GetRes(ent.ResType).ResVal, (double)ent.Val);
                     if (!ent.CanSetToZero && ent.RealVal < ent.Val)
                     {
                         ent.RealVal -= 1;
                     }
                 }
-                ent.TargetUnit.GetRes(ent.ResType).ResVal -= revert ? (int)Math.Round((double)-ent.RealVal) : (int)Math.Round((double)ent.RealVal);
+                ent.TargetUnit.GetRes(ent.ResType).ResVal -= revert ? -ent.RealVal : ent.RealVal;
             }
             else if (ent.Type == EventType.DirectDamage) //Resource drain
             {

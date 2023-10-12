@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Unit name="Blade" level="80" rank="2">
+  <Stats hp="2628.36" atk="1125.4319999999998" def="815.85" spd="97" crit_rate="0.05" crit_dmg="0.5" />
+  <Skills>
+    <Skill name="Shard Sword" level="6" />
+    <Skill name="Hellscape" level="10" />
+    <Skill name="Death Sentence" level="10" />
+    <Skill name="Shuhu's Gift" level="10" />
+    <Skill name="120506" level="0" />
+    <Skill name="Karma Wind" level="1" />
+    <Skill name="Forest of Swords" level="6" />
+  </Skills>
+</Unit>

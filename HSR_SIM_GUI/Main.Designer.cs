@@ -1,4 +1,5 @@
-﻿namespace HSR_SIM_GUI
+﻿using static HSR_SIM_GUI.Utils;
+namespace HSR_SIM_GUI
 {
     partial class Main
     {
@@ -13,8 +14,8 @@
         /// <param name="disposing">истинно, если управляемый ресурс должен быть удален; иначе ложно.</param>
         protected override void Dispose(bool disposing)
         {
-            ini.IniWriteValue("form", "Scenario", cbScenario.Text);
-            ini.IniWriteValue("form", "Profile", cbProfile.Text);
+            IniF.IniWriteValue("form", "Scenario", cbScenario.Text);
+            IniF.IniWriteValue("form", "Profile", cbProfile.Text);
             if (disposing && (components != null))
             {
                 components.Dispose();
@@ -42,6 +43,7 @@
             button1 = new System.Windows.Forms.Button();
             button2 = new System.Windows.Forms.Button();
             button3 = new System.Windows.Forms.Button();
+            button4 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)combatOut).BeginInit();
             SuspendLayout();
             // 
@@ -163,10 +165,22 @@
             button3.UseVisualStyleBackColor = true;
             button3.Click += button3_Click_1;
             // 
+            // button4
+            // 
+            button4.Location = new System.Drawing.Point(389, 634);
+            button4.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            button4.Name = "button4";
+            button4.Size = new System.Drawing.Size(120, 30);
+            button4.TabIndex = 12;
+            button4.Text = "Open Wargear";
+            button4.UseVisualStyleBackColor = true;
+            button4.Click += button4_Click;
+            // 
             // Main
             // 
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             ClientSize = new System.Drawing.Size(1225, 834);
+            Controls.Add(button4);
             Controls.Add(button3);
             Controls.Add(button2);
             Controls.Add(button1);
@@ -203,6 +217,7 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button button4;
     }
 }
 

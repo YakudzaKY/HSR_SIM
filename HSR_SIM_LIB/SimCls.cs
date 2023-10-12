@@ -293,7 +293,8 @@ namespace HSR_SIM_LIB
                     }
                     else if (essence is Event)
                     {
-                        res = ExecuteCheckList(check, new List<CheckEssence>(HostileParty), ((Event)essence).AbilityValue.Parent);
+                        throw new NotImplementedException();
+                        //res = ExecuteCheckList(check, new List<CheckEssence>(HostileParty), ((Event)essence).AbilityValue.Parent);
                     }
                     else
                         throw new NotImplementedException();

@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Unit name="Silver Wolf" level="80" rank="6">
+  <Stats hp="2000.376" atk="1116.612" def="791.595" spd="107" crit_rate="0.05" crit_dmg="0.5" />
+  <Skills>
+    <Skill name="System Warning" level="7" />
+    <Skill name="Allow Changes?" level="12" />
+    <Skill name="User Banned" level="12" />
+    <Skill name="Awaiting System Response..." level="12" />
+    <Skill name="100606" level="0" />
+    <Skill name="Force Quit Program" level="1" />
+  </Skills>
+</Unit>

@@ -124,11 +124,11 @@ namespace HSR_SIM_LIB
                 lvl=SafeToIntNull(xnode.Attributes.GetNamedItem("level")?.Value?.Trim());
                 if (lvl == null || lvl == searchLvl)
                 {
-                    unitStats.BaseMaxHp = int.Parse(xnode.Attributes.GetNamedItem("maxHp").Value.Trim());
-                    unitStats.BaseAttack = int.Parse(xnode.Attributes.GetNamedItem("attack").Value.Trim());
+                    unitStats.BaseMaxHp = SafeToDouble(xnode.Attributes.GetNamedItem("hp")?.Value.Trim());
+                    unitStats.BaseAttack = SafeToDouble(xnode.Attributes.GetNamedItem("atk")?.Value.Trim());
                     unitStats.BaseMaxEnergy = SafeToInt(xnode.Attributes.GetNamedItem("energy")?.Value.Trim());
-                    unitStats.BaseSpeed = SafeToInt(xnode.Attributes.GetNamedItem("baseSpeed")?.Value.Trim());
-                    unitStats.MaxToughness = SafeToInt(xnode.Attributes.GetNamedItem("maxToughness")?.Value.Trim());
+                    unitStats.BaseSpeed = SafeToDouble(xnode.Attributes.GetNamedItem("spd")?.Value.Trim());
+                    unitStats.MaxToughness = SafeToInt(xnode.Attributes.GetNamedItem("tgh")?.Value.Trim());
                     if (xnode.Attributes.GetNamedItem("baseActionValue") is not null)
                     {
                         unitStats.BaseActionValue =
@@ -138,6 +138,13 @@ namespace HSR_SIM_LIB
             }
 
             return unitStats;
+        }
+
+        private static double SafeToDouble(string pStr)
+        {
+            if (pStr != null)
+                return Double.Parse(pStr.Replace(".",","));
+            return 0;
         }
 
         /// <summary>
@@ -340,6 +347,13 @@ namespace HSR_SIM_LIB
                     if (elementVal != null)
                         unit.Element = (Unit.ElementEnm)System.Enum.Parse(typeof(Unit.ElementEnm), elementVal);
                     unit.Stats = ExctractStats(xRoot, unit.Level);
+                    //override by wargear
+                    string wargear = unitNode.Attributes.GetNamedItem("wargear")?.Value.Trim();
+                    if (!string.IsNullOrEmpty(wargear))
+                    {
+                        ExctractStatsFromWargear(wargear, unit);
+                    }
+
                     unit.Abilities = ExctractAbilities(xRoot, unit);
                     unit.Weaknesses = ExctractWeaknesses(xRoot);
                     units.Add(unit);
@@ -347,6 +361,20 @@ namespace HSR_SIM_LIB
 
             }
             return units;
+        }
+
+        private  static void ExctractStatsFromWargear(string wargear, Unit unit)
+        {
+            XmlDocument unitDoc = new XmlDocument();
+            UnitStats unitstats;
+            unitDoc.Load(Utils.DataFolder + "WarGear\\" + wargear + ".xml");
+            XmlElement xRoot = unitDoc.DocumentElement;
+            string unitCode = xRoot.Attributes.GetNamedItem("name").Value.Trim();
+            unit.Level = int.Parse(xRoot.Attributes.GetNamedItem("level").Value.Trim());
+            if (unitCode != unit.Name)
+                throw new Exception(String.Format("Looking wargear for {0:s} but loaded for {1:s}",unit.Name,unitCode));
+            unit.Stats= ExctractStats(xRoot,unit.Level);
+
         }
 
         private static List<ElementEnm> ExctractWeaknesses(XmlElement xmlItems)

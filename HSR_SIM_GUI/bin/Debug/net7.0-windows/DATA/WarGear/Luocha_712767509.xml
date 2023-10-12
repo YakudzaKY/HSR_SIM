@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Unit name="Luocha" level="80" rank="1">
+  <Stats hp="2444.9039999999995" atk="1338.8759999999997" def="760.725" spd="101" crit_rate="0.05" crit_dmg="0.5" />
+  <Skills>
+    <Skill name="Thorns of the Abyss" level="4" />
+    <Skill name="Prayer of Abyss Flower" level="7" />
+    <Skill name="Death Wish" level="6" />
+    <Skill name="Cycle of Life" level="7" />
+    <Skill name="120306" level="0" />
+    <Skill name="Mercy of a Fool" level="1" />
+  </Skills>
+</Unit>

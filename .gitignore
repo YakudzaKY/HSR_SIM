@@ -67,3 +67,22 @@
 /HSR_SIM_LIB/obj/Debug/net7.0/HSR_SIM_LIB.pdb
 /HSR_SIM_GUI/obj/project.assets.json
 /HSR_SIM_GUI/bin/Debug/net7.0-windows/config.ini
+/HSR_SIM_GUI/obj/Debug/net7.0-windows/HSR_SIM_GUI.WarGear.resources
+/WarGear editor/obj/Debug/net6.0-windows/.NETCoreApp,Version=v6.0.AssemblyAttributes.cs
+/WarGear editor/obj/Debug/net6.0-windows/WarGear editor.AssemblyInfo.cs
+/WarGear editor/obj/Debug/net6.0-windows/WarGear editor.GlobalUsings.g.cs
+/WarGear editor/obj/Debug/net6.0-windows/WarGear editor.designer.deps.json
+/WarGear editor/obj/Debug/net6.0-windows/WarGear editor.designer.runtimeconfig.json
+/WarGear editor/obj/WarGear editor.csproj.nuget.dgspec.json
+/WarGear editor/obj/WarGear editor.csproj.nuget.g.props
+/WarGear editor/obj/WarGear editor.csproj.nuget.g.targets
+/WarGear editor/obj/project.assets.json
+/WargearEditor/obj/Debug/net6.0-windows/.NETCoreApp,Version=v6.0.AssemblyAttributes.cs
+/WargearEditor/obj/Debug/net6.0-windows/WargearEditor.AssemblyInfo.cs
+/WargearEditor/obj/Debug/net6.0-windows/WargearEditor.GlobalUsings.g.cs
+/WargearEditor/obj/Debug/net6.0-windows/WargearEditor.designer.deps.json
+/WargearEditor/obj/Debug/net6.0-windows/WargearEditor.designer.runtimeconfig.json
+/WargearEditor/obj/WargearEditor.csproj.nuget.dgspec.json
+/WargearEditor/obj/WargearEditor.csproj.nuget.g.props
+/WargearEditor/obj/WargearEditor.csproj.nuget.g.targets
+/WargearEditor/obj/project.assets.json

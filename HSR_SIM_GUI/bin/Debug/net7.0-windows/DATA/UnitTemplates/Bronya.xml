@@ -1,5 +1,4 @@
 <Unit element="Wind">
-	<Stats maxHp="10000" attack="10" energy="90" baseSpeed="119"/>
 	<Ability name="Banner of Command" type="Technique" costType="TP" cost="1">
 		<Event onStep="TechniqueUse" type="CombatStartSkillQueue"/>
 		<Event onStep="ExecuteStartQueue" type="Mod">

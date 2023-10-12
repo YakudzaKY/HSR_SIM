@@ -15,13 +15,13 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolBar;
 using static HSR_SIM_LIB.CallBacks;
 using static HSR_SIM_LIB.Worker;
+using static HSR_SIM_GUI.Utils;
 
 namespace HSR_SIM_GUI
 {
     public partial class Main : Form
     {
         Worker wrk;
-        IniFile ini = new IniFile(AppDomain.CurrentDomain.BaseDirectory + "config.ini");
 
 
         /// <summary>
@@ -48,31 +48,12 @@ namespace HSR_SIM_GUI
                 combatOut.BackgroundImage = new Bitmap(combatImg);
             }
         }
-         void ApplyTheme(Color back, Color pan, Color btn, Color tbox, Color combox, Color textColor)
-        {
-            BackColor = back;
 
-            foreach (Control item in Controls)
-            {
-                if (!(item is System.Windows.Forms.Label))
-                {
-                    item.BackColor = btn;
-                    item.ForeColor = textColor;
-                }
-                else
-                {
-                    item.ForeColor = textColor;
-                }
-            
-            }
-
-           
-        }
 
         public Main()
         {
-            [DllImport("UXTheme.dll", SetLastError = true, EntryPoint = "#138")]
-            static extern bool ShouldSystemUseDarkMode();
+            
+
 
             CallBackStr callBackStr = new CallBackStr(WorkerCallBackString);
             CallBackRender callBackRender = new CallBackRender(WorkerCallBackImages);
@@ -80,11 +61,7 @@ namespace HSR_SIM_GUI
             wrk = new Worker();
             wrk.CbLog += callBackStr;
             wrk.CbRend += callBackRender;
-            if (ShouldSystemUseDarkMode())            
-                ApplyTheme(Utils.Zcolor(30, 30, 30), Utils.Zcolor(45, 45, 48), Utils.Zcolor(104, 104, 104), Utils.Zcolor(51, 51, 51), Color.Black, HSR_SIM_LIB.Constant.clrDefault);
-            
-            else
-                ApplyTheme(Color.White, Utils.Zcolor(240, 240, 240), Utils.Zcolor(181, 181, 181), Utils.Zcolor(110, 110, 110), Color.White, Color.Black);
+            Utils.ApplyDarkLightTheme(this);
         }
 
 
@@ -95,8 +72,8 @@ namespace HSR_SIM_GUI
 
 
             RefreshCbs();
-            cbScenario.Text = ini.IniReadValue("form", "Scenario");
-            cbProfile.Text = ini.IniReadValue("form", "Profile");
+            cbScenario.Text = IniF.IniReadValue("form", "Scenario");
+            cbProfile.Text = IniF.IniReadValue("form", "Profile");
         }
 
 
@@ -162,6 +139,13 @@ namespace HSR_SIM_GUI
         private void button3_Click_1(object sender, EventArgs e)
         {
             wrk.MoveStep(true, -1);
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            WarGear wg = new WarGear();
+            wg.StartPosition = FormStartPosition.CenterScreen;
+            wg.Show();
         }
     }
 }
