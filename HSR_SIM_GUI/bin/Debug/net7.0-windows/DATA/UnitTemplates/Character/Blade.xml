@@ -1,4 +1,4 @@
-<Unit element="Wind">	
+<Unit element="Wind" type="Character">	
 	<!--Karma Wind-->
 	<Ability name="Karma Wind" type="Technique" costType="TP" cost="1" element="Wind">
 		<Event onStep="TechniqueUse" type="CombatStartSkillQueue"/>

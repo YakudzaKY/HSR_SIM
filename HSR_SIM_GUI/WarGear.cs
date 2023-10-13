@@ -166,6 +166,7 @@ namespace HSR_SIM_GUI
         {
             public string name;
             public int level;
+            public int max_level;
 
         }
         public class Character
@@ -197,7 +198,7 @@ namespace HSR_SIM_GUI
 
             txtLvl.Value = mainCharacter.Level;
             txtRank.Value = mainCharacter.Rank;
-            AvatarBox.Image = new Bitmap(HSR_SIM_LIB.Utils.LoadBitmap(mainCharacter.Name), new Size(AvatarBox.Width, AvatarBox.Height));
+            AvatarBox.Image = new Bitmap(HSR_SIM_LIB.Utils.LoadBitmap("Character\\" + mainCharacter.Name), new Size(AvatarBox.Width, AvatarBox.Height));
             label1.Text = mainCharacter.Name;
 
             //stats
@@ -217,13 +218,14 @@ namespace HSR_SIM_GUI
             {
                 dgSkills.Rows.RemoveAt(0);
             }
-            if (mainCharacter.skills.Count>0)
+            if (mainCharacter.skills.Count > 0)
                 dgSkills.Rows.Add(mainCharacter.skills.Count);
             foreach (Skill skl in mainCharacter.skills)
             {
 
                 dgSkills.Rows[mainCharacter.skills.IndexOf(skl)].Cells[0].Value = skl.name;
                 dgSkills.Rows[mainCharacter.skills.IndexOf(skl)].Cells[1].Value = skl.level.ToString();
+                dgSkills.Rows[mainCharacter.skills.IndexOf(skl)].Cells[2].Value = skl.max_level.ToString();
             }
 
 
@@ -281,7 +283,7 @@ namespace HSR_SIM_GUI
                         foreach (Character character in data.characters)
                         {
                             XElement unit = new XElement("Unit");
-                            unit.SetAttributeValue("template", character.Name);
+                            unit.SetAttributeValue("template", "Character\\" + character.Name);
                             unit.SetAttributeValue("wargear", GetDefaultFileName(character, false));
                             party.Add(unit);
                         }
@@ -348,22 +350,6 @@ namespace HSR_SIM_GUI
             mainCharacter.Rank = (int)((NumericUpDown)sender).Value;
         }
 
-        private void label5_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void dataGridView1_CellContentClick_1(object sender, DataGridViewCellEventArgs e)
-        {
-           /* int rw = e.RowIndex;
-            string val = ((DataGridView)sender).Rows[e.RowIndex].Cells[1].Value?.ToString();
-            string prop = ((DataGridView)sender).Rows[e.RowIndex].Cells[0].Value?.ToString();
-
-            if (prop != null)
-            {
-
-            }*/
-        }
 
         private string GetWarGearPath()
         {
@@ -418,8 +404,9 @@ namespace HSR_SIM_GUI
             foreach (Skill skl in character.skills)
             {
                 XElement skill = new XElement("Skill");
-                skill.SetAttributeValue("name",skl.name);
-                skill.SetAttributeValue("level",skl.level.ToString());
+                skill.SetAttributeValue("name", skl.name);
+                skill.SetAttributeValue("level", skl.level.ToString());
+                skill.SetAttributeValue("max_level", skl.max_level.ToString());
                 skills.Add(skill);
 
             }
@@ -441,14 +428,14 @@ namespace HSR_SIM_GUI
 
             if (openFile.ShowDialog() == DialogResult.OK)
             {
-                mainCharacter=XmlLoad(openFile.FileName);
+                mainCharacter = XmlLoad(openFile.FileName);
 
 
                 LoadCharacter();
             }
         }
 
-        private Character XmlLoad( string openFileFileName)
+        private Character XmlLoad(string openFileFileName)
         {
             Character character
                 = new Character();
@@ -458,9 +445,9 @@ namespace HSR_SIM_GUI
             XmlElement xRoot = xDoc.DocumentElement;
             if (xRoot != null)
             {
-                character.Level= int.Parse(xRoot.Attributes.GetNamedItem("level")?.Value.ToString()??"0");
-                character.Name= xRoot.Attributes.GetNamedItem("name")?.Value.ToString();
-                character.Rank= int.Parse(xRoot.Attributes.GetNamedItem("rank")?.Value.ToString()??"0");
+                character.Level = int.Parse(xRoot.Attributes.GetNamedItem("level")?.Value.ToString() ?? "0");
+                character.Name = xRoot.Attributes.GetNamedItem("name")?.Value.ToString();
+                character.Rank = int.Parse(xRoot.Attributes.GetNamedItem("rank")?.Value.ToString() ?? "0");
                 character.attributes = new List<Attribute>();
                 character.skills = new List<Skill>();
                 //parse all items
@@ -482,18 +469,32 @@ namespace HSR_SIM_GUI
                         foreach (XmlElement xmlSkill in xnode)
                         {
                             Skill skl = new Skill();
-                            skl.name = xmlSkill.Attributes.GetNamedItem("name")?.Value.ToString();;
+                            skl.name = xmlSkill.Attributes.GetNamedItem("name")?.Value.ToString(); ;
                             skl.level = int.Parse(xmlSkill.Attributes.GetNamedItem("level")?.Value.ToString());
+                            skl.max_level = int.Parse(xmlSkill.Attributes.GetNamedItem("max_level")?.Value.ToString());
                             character.skills.Add(skl);
                         }
                     }
-                   
+
                 }
 
 
             }
 
             return character;
+        }
+
+        private void dgSkills_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            int rw = e.RowIndex;
+            string skillName = ((DataGridView)sender).Rows[e.RowIndex].Cells[0].Value?.ToString();
+            int lvl = int.Parse(((DataGridView)sender).Rows[e.RowIndex].Cells[1].Value.ToString());
+            int max_lvl = int.Parse(((DataGridView)sender).Rows[e.RowIndex].Cells[2].Value.ToString());
+            if (skillName != null)
+            {
+                mainCharacter.skills.First(x => x.name == skillName).level = lvl;
+                mainCharacter.skills.First(x => x.name == skillName).max_level = max_lvl;
+            }
         }
     }
 }

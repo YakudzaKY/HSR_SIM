@@ -1,4 +1,4 @@
-<Unit level="0">	
+<Unit type="Special">	
 	<Stats baseActionValue="150"/>
 	<!--<Ability name="ReduceAV" type="Trigger">
 		<Event onStep="OnMoveStart" type="Mod">

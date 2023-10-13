@@ -33,27 +33,28 @@ namespace HSR_SIM_LIB
                 gfx.FillRectangle(brush, 0, 0, res.Width, res.Height);
 
                 //party draw
-                DrawUnits(gfx, sim.Party, unitHostility.Friendly, new Point(LeftSideWithSpace, BottomSideWithSpace), sim.CurrentStep);
+                DrawUnits(gfx, sim.PartyTeam.Units, new Point(LeftSideWithSpace, BottomSideWithSpace), sim.CurrentStep);
 
                 //party draw
                 if (sim.CurrentFight != null)
-                    DrawText(PartyResourceX, PartyResourceY, gfx, String.Format("SP: {0:d}/{1:d}", (int) sim.GetRes(ResourceType.SP).ResVal, Constant.MaxSp));
+                    DrawText(PartyResourceX, PartyResourceY, gfx, String.Format("SP: {0:d}/{1:d}", (int) sim.PartyTeam.GetRes(ResourceType.SP).ResVal, Constant.MaxSp));
                 else
-                    DrawText(PartyResourceX, PartyResourceY, gfx, String.Format("TP: {0:d}/{1:d}", (int) sim.GetRes(ResourceType.TP).ResVal, Constant.MaxTp));
+                    DrawText(PartyResourceX, PartyResourceY, gfx, String.Format("TP: {0:d}/{1:d}", (int) sim.PartyTeam.GetRes(ResourceType.TP).ResVal, Constant.MaxTp));
 
                 //enemy draw
-                if (sim.CurrentFight != null)
+                if (sim.CurrentFight != null && sim.CurrentFight.CurrentWave!=null)
                 {
-                    DrawUnits(gfx, sim.HostileParty, unitHostility.Hostile,
+                    DrawUnits(gfx, sim.HostileTeam.Units, 
                         new Point(LeftSideWithSpace, TopSideWithSpace), sim.CurrentStep);
                    
                 }
                 //Forgotten hall
-                DrawUnits(gfx,  sim.SpecialUnits, unitHostility.Hostile, new Point((int)(CombatImgSize.Width / 1.75), CombatImgSize.Height / 2), sim.CurrentStep);
+                DrawUnits(gfx,  sim.SpecialTeam.Units, new Point((int)(CombatImgSize.Width / 1.75), CombatImgSize.Height / 2), sim.CurrentStep);
 
                 if (sim.CurrentFight is null && sim.NextFight != null)
                 {
-                    DrawNextHostile(gfx, sim.HostileParty, new Point((CombatImgSize.Width / 2) - 3 * PortraitSizeMini.Width, TopSideWithSpace));
+                    //enemies of first Party unit
+                    DrawNextHostile(gfx, sim.PartyTeam.Units.First().Enemies, new Point((CombatImgSize.Width / 2) - 3 * PortraitSizeMini.Width, TopSideWithSpace));
 
                 }
                 DrawStartQueue(gfx, new Point(LeftSideWithSpace, TopSideForQueue), sim.BeforeStartQueue);
@@ -192,7 +193,7 @@ namespace HSR_SIM_LIB
         /// <param name="units"> Unit list</param>
         /// <param name="hstl">hostile type</param>
         /// <param name="point"> start point</param>
-        private static void DrawUnits(Graphics gfx, List<Unit> units, unitHostility hstl, Point point, Step step)
+        private static void DrawUnits(Graphics gfx, List<Unit> units, Point point, Step step)
         {
             short i = 0;
 

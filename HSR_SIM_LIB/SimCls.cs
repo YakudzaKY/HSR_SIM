@@ -11,6 +11,8 @@ using static HSR_SIM_LIB.Event;
 using static HSR_SIM_LIB.Resource;
 using static HSR_SIM_LIB.Step;
 using static HSR_SIM_LIB.Unit;
+using static HSR_SIM_LIB.Team;
+using System.Xml.Linq;
 
 namespace HSR_SIM_LIB
 {/// <summary>
@@ -22,58 +24,28 @@ namespace HSR_SIM_LIB
 
         Step currentStep = null;
         int currentFightStep = 0;
-        private List<Resource> resources = null;
 
 
-        List<Unit> hostileParty;
-        List<Unit> party;
-        List<Unit> specialUnits;
+        public List<Team> Teams { get; } = new List<Team>();
+
 
         //ForgottenHall Cycles
 
         CombatFight currentFight = null;
 
-        /// <summary>
-        /// Return from scenario if no fight. or hostileParty if fight active
-        /// </summary>
-        public List<Unit> HostileParty
-        {
-            get
-            {
-                if (CurrentFight == null)
-                {
-                    List<Unit> nextEnemys = new List<Unit>();
-                    List<Unit> nextEnemysDistinct = new List<Unit>();
-                    //gather enemys from all waves
-                    foreach (Wave wave in NextFight.Waves)
-                    {
-                        nextEnemys.AddRange(wave.Units);
 
-                    }
-                    //get distinct
-                    foreach (Unit unit in nextEnemys.DistinctBy(x => x.Name))
-                    {
-                        nextEnemysDistinct.Add(unit);
-                    }
-                    return nextEnemysDistinct;
-                }
-
-                else
-                {
-                    if (hostileParty == null)
-                        hostileParty = new List<Unit>();
-                    return hostileParty;
-                }
-
-            }
-            set => hostileParty = value;
-        }
 
         public IEnumerable<Unit> AllUnits
         {
             get
             {
-                return Party.Concat(HostileParty.Concat(SpecialUnits));
+                IEnumerable<Unit> units = new List<Unit>();
+                foreach (Team team in Teams)
+                {
+                    units=units.Concat(team.Units);
+                }
+                return units;
+
             }
             set { throw new NotImplementedException(); }
         }
@@ -83,8 +55,6 @@ namespace HSR_SIM_LIB
         internal Scenario CurrentScenario { get => currentScenario; set => currentScenario = value; }
         public List<Step> steps = new List<Step>();
         public List<Step> Steps { get => steps; set => steps = value; }
-        public List<Unit> Party { get => party; set => party = value; }
-        public List<Unit> SpecialUnits { get => specialUnits; set => specialUnits = value; }
         internal CombatFight CurrentFight { get => currentFight; set => currentFight = value; }
         public int CurrentFightStep { get => currentFightStep; set => currentFightStep = value; }
         /// <summary>
@@ -92,25 +62,7 @@ namespace HSR_SIM_LIB
         /// </summary>
         public bool DoEnterCombat { get; internal set; }
 
-        public List<Resource> Resources
-        {
-            get
-            {//create all resources
-                if (resources == null)
-                {
-                    resources = new List<Resource>();
-                    foreach (string name in Enum.GetNames<ResourceType>())
-                    {
-                        Resource res = new Resource();
-                        res.ResType = (ResourceType)System.Enum.Parse(typeof(ResourceType), name);
-                        res.ResVal = 0;
-                        resources.Add(res);
-                    }
-                }
-                return resources;
-            }
-            set => resources = value;
-        }
+
 
         private List<Ability> beforeStartQueue = new List<Ability>();
         public List<Ability> BeforeStartQueue { get => beforeStartQueue; set => beforeStartQueue = value; }
@@ -131,7 +83,41 @@ namespace HSR_SIM_LIB
             }
         }
 
+        public Team PartyTeam
+        {
+            get
+            {
+                return Teams.First(x => x.controledTeam == true);
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
 
+        public Team HostileTeam
+        {
+            get
+            {
+                return Teams.First(x => x.controledTeam == false && x.TeamType == TeamTypeEnm.UnitPack);
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public Team SpecialTeam
+        {
+            get
+            {
+                return Teams.First(x => x.TeamType == TeamTypeEnm.Special);
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
 
         /// <summary>
         /// construcotor
@@ -165,23 +151,33 @@ namespace HSR_SIM_LIB
         /// <summary>
         /// Get resource By Type
         /// </summary>
-        public Resource GetRes(ResourceType rt)
-        {
-            return Resources.Where(resource => resource.ResType == rt).First();
-        }
+
 
         /// <summary>
         /// prepare things to combat simulation
         /// </summary>
         public void Prepare()
         {
+            Team team = null;
 
-            Party = getCombatUnits(CurrentScenario.Party);
-            SpecialUnits = getCombatUnits(CurrentScenario.SpecialUnits);
+            //main team
+            team = new Team(this);
+            team.BindUnits(getCombatUnits(CurrentScenario.Party));
+            team.TeamType = Team.TeamTypeEnm.UnitPack;
+            team.controledTeam = true;
+            Teams.Add(team);
 
-            GetRes(ResourceType.TP).ResVal = 5;
-            GetRes(ResourceType.SP).ResVal = 5;
 
+            //Special
+            team = new Team(this);
+            team.BindUnits(getCombatUnits(CurrentScenario.SpecialUnits));
+            team.TeamType = Team.TeamTypeEnm.Special;
+            Teams.Add(team);
+
+            //enemy team
+            team = new Team(this);
+            team.TeamType = Team.TeamTypeEnm.UnitPack;
+            Teams.Add(team);
 
 
         }
@@ -279,29 +275,23 @@ namespace HSR_SIM_LIB
             }
             else if (check.CheckType == CheckTypeEnm.FindTarget)
             {
-                if (String.Equals(check.Value, TargetTypeEnm.Party.ToString(), StringComparison.OrdinalIgnoreCase))
-                    res = ExecuteCheckList(check, new List<CheckEssence>(Party), ((Ability)essence).Parent);
-                else if (String.Equals(check.Value, TargetTypeEnm.Hostiles.ToString(), StringComparison.OrdinalIgnoreCase))
+                TargetTypeEnm targetType = (TargetTypeEnm)System.Enum.Parse(typeof(TargetTypeEnm), check.Value,true);
+                if (essence is Ability)
                 {
-                    if (essence is Ability)
-                    {
-                        res = ExecuteCheckList(check, new List<CheckEssence>(HostileParty), ((Ability)essence).Parent);
-                    }
-                    else if (essence is Unit)
-                    {
-                        res = ExecuteCheckList(check, new List<CheckEssence>(HostileParty), ((Unit)essence));
-                    }
-                    else if (essence is Event)
-                    {
-                        throw new NotImplementedException();
-                        //res = ExecuteCheckList(check, new List<CheckEssence>(HostileParty), ((Event)essence).AbilityValue.Parent);
-                    }
-                    else
-                        throw new NotImplementedException();
-
+                    res = ExecuteCheckList(check, new List<CheckEssence>(((Ability)essence).Parent.GetTargets(targetType)), ((Ability)essence).Parent);
+                }
+                else if (essence is Unit)
+                {
+                    res = ExecuteCheckList(check, new List<CheckEssence>(((Unit)essence).GetTargets(targetType)), ((Unit)essence));
+                }
+                else if (essence is Event)
+                {
+                    throw new NotImplementedException();
+                    //res = ExecuteCheckList(check, new List<CheckEssence>(HostileParty), ((Event)essence).AbilityValue.Parent);
                 }
                 else
                     throw new NotImplementedException();
+
 
             }
             else if (check.CheckType == CheckTypeEnm.CheckTarget)
@@ -329,7 +319,7 @@ namespace HSR_SIM_LIB
             }
             else if (check.CheckType == CheckTypeEnm.AbilityType)
             {
-                res = ((Ability)essence).AbilityType == (AbilityTypeEnm)System.Enum.Parse(typeof(AbilityTypeEnm), check.Value);
+                res = ((Ability)essence).AbilityType == (AbilityTypeEnm)System.Enum.Parse(typeof(AbilityTypeEnm), check.Value,true);
             }
             else if (check.CheckType == CheckTypeEnm.WeaknessType)
             {
@@ -345,7 +335,7 @@ namespace HSR_SIM_LIB
                         findVal = caster.Element;
                     }
                     else
-                        findVal = (ElementEnm)System.Enum.Parse(typeof(ElementEnm), check.Value);
+                        findVal = (ElementEnm)System.Enum.Parse(typeof(ElementEnm), check.Value, true);
 
                     if (weakness == findVal)
                     {
@@ -356,7 +346,7 @@ namespace HSR_SIM_LIB
             }
             else if (check.CheckType == CheckTypeEnm.AbilityCostType)
             {
-                res = ((Ability)essence).CostType == (ResourceType)System.Enum.Parse(typeof(ResourceType), check.Value);
+                res = ((Ability)essence).CostType == (ResourceType)System.Enum.Parse(typeof(ResourceType), check.Value, true);
             }
             else if (check.CheckType == CheckTypeEnm.AbilityCost)
             {
@@ -368,13 +358,13 @@ namespace HSR_SIM_LIB
             }
             else if (check.CheckType == CheckTypeEnm.EventType)
             {
-                res = ((Event)essence).Type == (EventType)System.Enum.Parse(typeof(EventType), check.Value);
+                res = ((Event)essence).Type == (EventType)System.Enum.Parse(typeof(EventType), check.Value, true);
             }
             else if (check.CheckType == CheckTypeEnm.ResourceCheck)
             {
                 if (String.Equals(check.Value, "party", StringComparison.OrdinalIgnoreCase))
                 {
-                    res = ExecuteCheckList(check, new List<CheckEssence>(Resources));
+                    res = ExecuteCheckList(check, new List<CheckEssence>(((Ability)essence).Parent.ParentTeam.Resources));
                 }
                 else
                     throw new NotImplementedException();
@@ -382,7 +372,7 @@ namespace HSR_SIM_LIB
             }
             else if (check.CheckType == CheckTypeEnm.ResourceType)
             {
-                res = ((Resource)essence).ResType == (ResourceType)System.Enum.Parse(typeof(ResourceType), check.Value);
+                res = ((Resource)essence).ResType == (ResourceType)System.Enum.Parse(typeof(ResourceType), check.Value, true);
             }
             else if (check.CheckType == CheckTypeEnm.ResourceQuantity)
             {
@@ -443,7 +433,7 @@ namespace HSR_SIM_LIB
             }
             //buff before fight
             else if (newStep.StepType == StepTypeEnm.Idle && DoEnterCombat == false && CurrentFight == null)
-                newStep.TechniqueWork();
+                newStep.TechniqueWork(PartyTeam);
 
             //enter the combat
             else if (newStep.StepType == StepTypeEnm.Idle && DoEnterCombat == true)

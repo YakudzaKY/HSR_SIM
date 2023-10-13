@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
@@ -174,13 +175,13 @@ namespace HSR_SIM_LIB
             {
 
                 Ability ability = new Ability(parent);
-                ability.AbilityType = (AbilityTypeEnm)System.Enum.Parse(typeof(AbilityTypeEnm), abilitiyXml.Attributes.GetNamedItem("type").Value.Trim());
+                ability.AbilityType = (AbilityTypeEnm)System.Enum.Parse(typeof(AbilityTypeEnm), abilitiyXml.Attributes.GetNamedItem("type").Value.Trim(), true);
                 ability.Name = abilitiyXml.Attributes.GetNamedItem("name").Value.Trim();
-                ability.CostType = (ResourceType)System.Enum.Parse(typeof(ResourceType), abilitiyXml.Attributes.GetNamedItem("costType").Value.Trim());
+                ability.CostType = (ResourceType)System.Enum.Parse(typeof(ResourceType), abilitiyXml.Attributes.GetNamedItem("costType").Value.Trim(),true);
                 ability.Cost = (short)int.Parse(abilitiyXml.Attributes.GetNamedItem("cost").Value.Trim());
                 if (abilitiyXml.Attributes.GetNamedItem("element") != null)
                     ability.Element = (ElementEnm)System.Enum.Parse(typeof(ElementEnm),
-                        abilitiyXml.Attributes.GetNamedItem("element")?.Value?.Trim());
+                        abilitiyXml.Attributes.GetNamedItem("element")?.Value?.Trim(), true);
                 else
                     ability.Element = parent.Element;
                 //events
@@ -188,17 +189,17 @@ namespace HSR_SIM_LIB
                 {
                     Event ent = new Event()
                     {
-                        Type = (Event.EventType)System.Enum.Parse(typeof(Event.EventType), xmlevent.Attributes.GetNamedItem("type").Value.Trim())
+                        Type = (Event.EventType)System.Enum.Parse(typeof(Event.EventType), xmlevent.Attributes.GetNamedItem("type").Value.Trim(), true)
                         ,
-                        OnStepType = (Step.StepTypeEnm)System.Enum.Parse(typeof(Step.StepTypeEnm), xmlevent.Attributes.GetNamedItem("onStep").Value.Trim())
+                        OnStepType = (Step.StepTypeEnm)System.Enum.Parse(typeof(Step.StepTypeEnm), xmlevent.Attributes.GetNamedItem("onStep").Value.Trim(), true)
                         ,
                         NeedCalc = SafeToBool(xmlevent.Attributes.GetNamedItem("needCalc")?.Value?.Trim())
                         ,
-                        ResType = (ResourceType)Enum.Parse(typeof(ResourceType), xmlevent.Attributes.GetNamedItem("resType")?.Value?.Trim() ?? ResourceType.nil.ToString())
+                        ResType = (ResourceType)Enum.Parse(typeof(ResourceType), xmlevent.Attributes.GetNamedItem("resType")?.Value?.Trim() ?? ResourceType.nil.ToString(),true)
                         ,
                         StrValue = xmlevent.Attributes.GetNamedItem("strValue")?.Value?.Trim()
                         ,
-                        TargetType = (TargetTypeEnm)Enum.Parse(typeof(TargetTypeEnm), xmlevent.Attributes.GetNamedItem("target")?.Value?.Trim() ?? TargetTypeEnm.Self.ToString())
+                        TargetType = (TargetTypeEnm)Enum.Parse(typeof(TargetTypeEnm), xmlevent.Attributes.GetNamedItem("target")?.Value?.Trim() ?? TargetTypeEnm.Self.ToString(), true)
                         ,
                         CanSetToZero= SafeToBool(xmlevent.Attributes.GetNamedItem("canSetToZero")?.Value?.Trim())
                         ,
@@ -212,11 +213,11 @@ namespace HSR_SIM_LIB
                     {
                         Mod mod = new Mod()
                         {
-                            Type = (Mod.ModType)System.Enum.Parse(typeof(Mod.ModType), xmlmod.Attributes.GetNamedItem("type").Value.Trim())
+                            Type = (Mod.ModType)System.Enum.Parse(typeof(Mod.ModType), xmlmod.Attributes.GetNamedItem("type").Value.Trim(),true)
                             ,
-                            Target = (Mod.ModTarget)System.Enum.Parse(typeof(Mod.ModTarget), xmlmod.Attributes.GetNamedItem("target").Value.Trim())
+                            Target = (Mod.ModTarget)System.Enum.Parse(typeof(Mod.ModTarget), xmlmod.Attributes.GetNamedItem("target").Value.Trim(), true)
                             ,
-                            Modifier = (Mod.ModifierType)System.Enum.Parse(typeof(Mod.ModifierType), xmlmod.Attributes.GetNamedItem("modifier").Value.Trim())
+                            Modifier = (Mod.ModifierType)System.Enum.Parse(typeof(Mod.ModifierType), xmlmod.Attributes.GetNamedItem("modifier").Value.Trim(), true)
                             ,
                             Value = int.Parse(xmlmod.Attributes.GetNamedItem("value").Value?.Trim())
                             ,
@@ -305,7 +306,7 @@ namespace HSR_SIM_LIB
             {
 
                 if (String.Equals(xmlAttrib.Name, "type", StringComparison.OrdinalIgnoreCase))
-                    check.CheckType = (CheckTypeEnm)System.Enum.Parse(typeof(CheckTypeEnm), xmlAttrib.Value.Trim());
+                    check.CheckType = (CheckTypeEnm)System.Enum.Parse(typeof(CheckTypeEnm), xmlAttrib.Value.Trim(), true);
                 else if (String.Equals(xmlAttrib.Name, "value", StringComparison.OrdinalIgnoreCase))
                     check.Value = xmlAttrib.Value.Trim();
                 else if (String.Equals(xmlAttrib.Name, "clause", StringComparison.OrdinalIgnoreCase))
@@ -338,14 +339,18 @@ namespace HSR_SIM_LIB
                 //load xml by 
                 string unitCode = unitNode.Attributes.GetNamedItem("template").Value.Trim();
                 unit.Level = int.Parse(unitNode.Attributes.GetNamedItem("level")?.Value?.Trim() ?? "1");
-                unitDoc.Load(Utils.DataFolder + "UnitTemplates\\" + unitCode + ".xml");
+                string unitFile = Utils.DataFolder + "UnitTemplates\\" + unitCode + ".xml";
+                unit.Name = Path.GetFileNameWithoutExtension(unitFile);
+               
+                unitDoc.Load(unitFile);
                 XmlElement xRoot = unitDoc.DocumentElement;
                 if (xRoot != null)
                 {
-                    unit.Name = unitCode;
+                   
                     string elementVal = xRoot.Attributes.GetNamedItem("element")?.Value.Trim();
                     if (elementVal != null)
-                        unit.Element = (Unit.ElementEnm)System.Enum.Parse(typeof(Unit.ElementEnm), elementVal);
+                        unit.Element = (Unit.ElementEnm)System.Enum.Parse(typeof(Unit.ElementEnm), elementVal, true);
+                    unit.UnitType = (Unit.TypeEnm)System.Enum.Parse(typeof(Unit.TypeEnm), xRoot.Attributes.GetNamedItem("type").Value.Trim(), true);
                     unit.Stats = ExctractStats(xRoot, unit.Level);
                     //override by wargear
                     string wargear = unitNode.Attributes.GetNamedItem("wargear")?.Value.Trim();
@@ -366,12 +371,11 @@ namespace HSR_SIM_LIB
         private  static void ExctractStatsFromWargear(string wargear, Unit unit)
         {
             XmlDocument unitDoc = new XmlDocument();
-            UnitStats unitstats;
             unitDoc.Load(Utils.DataFolder + "WarGear\\" + wargear + ".xml");
             XmlElement xRoot = unitDoc.DocumentElement;
             string unitCode = xRoot.Attributes.GetNamedItem("name").Value.Trim();
             unit.Level = int.Parse(xRoot.Attributes.GetNamedItem("level").Value.Trim());
-            if (unitCode != unit.Name)
+            if ((unitCode) != unit.Name)
                 throw new Exception(String.Format("Looking wargear for {0:s} but loaded for {1:s}",unit.Name,unitCode));
             unit.Stats= ExctractStats(xRoot,unit.Level);
 
@@ -382,7 +386,7 @@ namespace HSR_SIM_LIB
             List<ElementEnm> weaknesses = new List<ElementEnm>();
             foreach (XmlElement weaknessXml in xmlItems.SelectNodes("Weakness"))
             {
-                ElementEnm weakness = (ElementEnm)System.Enum.Parse(typeof(ElementEnm), weaknessXml.Attributes.GetNamedItem("type").Value.Trim());
+                ElementEnm weakness = (ElementEnm)System.Enum.Parse(typeof(ElementEnm), weaknessXml.Attributes.GetNamedItem("type").Value.Trim(), true);
                 weaknesses.Add(weakness);
             }
             return weaknesses;

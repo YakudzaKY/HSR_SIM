@@ -10,6 +10,7 @@ using System.Xml.Linq;
 using static HSR_SIM_LIB.Constant;
 using static HSR_SIM_LIB.Utils;
 using static HSR_SIM_LIB.Resource;
+using static HSR_SIM_LIB.Ability;
 
 namespace HSR_SIM_LIB
 {/// <summary>
@@ -17,7 +18,7 @@ namespace HSR_SIM_LIB
 /// </summary>
     public class Unit : CheckEssence
     {
-
+        public Team ParentTeam { get; set; } = null;
         string name = string.Empty;
         int level = 1;
         Bitmap portrait = null;
@@ -32,7 +33,7 @@ namespace HSR_SIM_LIB
                 {
 
                     //resize
-                    portrait = new Bitmap(LoadBitmap(Name), PortraitSize);
+                    portrait = new Bitmap(LoadBitmap(UnitType.ToString() + "\\" + Name), PortraitSize);
 
                 }
                 return portrait;
@@ -41,7 +42,7 @@ namespace HSR_SIM_LIB
         }
         public List<Ability> Abilities { get => abilities; set => abilities = value; }
         public ElementEnm? Element { get => element; set => element = value; }
-        public List<Mod> Mods { get; set; }= new List<Mod>();
+        public List<Mod> Mods { get; set; } = new List<Mod>();
         private ElementEnm? element;
         private List<ElementEnm> weaknesses = null;
         private List<Resource> resources = null;
@@ -81,6 +82,8 @@ namespace HSR_SIM_LIB
             set => resources = value;
         }
 
+        public TypeEnm UnitType { get; set; }
+
         //TODO unit role on battlefield
         //role changes on PRE-FIGHT(depend on weakness). changes on party dead or enemy dead(depend on weakness)---
 
@@ -90,7 +93,7 @@ namespace HSR_SIM_LIB
             Abilities = new List<Ability>();
         }
 
-       
+
         /// <summary>
         /// Prepare to combat
         /// </summary>
@@ -100,11 +103,22 @@ namespace HSR_SIM_LIB
             GetRes(ResourceType.HP).ResVal = Stats.MaxHp;
             GetRes(ResourceType.Toughness).ResVal = Stats.MaxToughness;
             //Clone abilities from template
-            List<Ability> clonedAbilities= new List<Ability>();
+            List<Ability> clonedAbilities = new List<Ability>();
             foreach (Ability ability in Reference.Abilities)
             {
                 Ability newAbility = (Ability)ability.Clone();
                 newAbility.Parent = this;
+                List<Event> clonedEvents = new List<Event>();
+                foreach (Event ent in newAbility.Events)
+                {
+                    Event newEvent = (Event)ent.Clone();
+                    newEvent.AbilityValue = newAbility;
+                    clonedEvents.Add(newEvent);
+
+                }
+
+                newAbility.Events = clonedEvents;
+
                 clonedAbilities.Add(newAbility);
             }
             Abilities = clonedAbilities;
@@ -129,12 +143,15 @@ namespace HSR_SIM_LIB
             Imaginary
 
         }
-        public enum unitHostility
-        {
-            Friendly,
-            Hostile
-        }
 
+        public enum TypeEnm
+        {
+            Special,
+            NPC,
+            Character
+
+        }
+ 
         public void ApplyMod(Mod mod)
         {
             Mods.Add(mod);
@@ -142,6 +159,67 @@ namespace HSR_SIM_LIB
         public void RemoveMod(Mod mod)
         {
             Mods.Remove(mod);
+        }
+
+        /// <summary>
+        /// Enemies
+        /// </summary>
+        /// <returns></returns>
+        public List<Unit> Enemies
+        {
+            get
+            {
+
+
+                //next fight units
+                if (ParentTeam.ParentSim.CurrentFight == null)
+                {
+                    List<Unit> nextEnemys = new List<Unit>();
+                    List<Unit> nextEnemysDistinct = new List<Unit>();
+                    //gather enemys from all waves
+                    foreach (Wave wave in ParentTeam.ParentSim.NextFight.Waves)
+                    {
+                        nextEnemys.AddRange(wave.Units);
+
+                    }
+
+                    //get distinct
+                    foreach (Unit unit in nextEnemys.DistinctBy(x => x.Name))
+                    {
+                        nextEnemysDistinct.Add(unit);
+                    }
+
+                    return nextEnemysDistinct;
+                }
+                else
+                {
+                    //return first othjer team
+                    return ParentTeam.ParentSim.Teams
+                        .First(x => x != ParentTeam && x.TeamType != Team.TeamTypeEnm.Special).Units;
+
+                }
+            }
+            set => throw new NotImplementedException();
+        }
+        /// <summary>
+        /// Get Friends List
+        /// </summary>
+        /// <returns></returns>
+        public List<Unit> Friends
+        {
+            get => ParentTeam.Units;
+
+            set => throw new NotImplementedException();
+        }
+
+        public IEnumerable<CheckEssence> GetTargets(TargetTypeEnm targetType)
+        {
+            if (targetType == TargetTypeEnm.Party)
+                return Friends;
+            else if (targetType == TargetTypeEnm.Hostiles)
+                return Enemies;
+
+            throw new NotImplementedException();
         }
     }
 

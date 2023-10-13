@@ -77,7 +77,7 @@ namespace HSR_SIM_LIB
         {
             if (ent.Type == EventType.PartyResourceDrain)//SP or technical points
             {
-                Parent.GetRes(ent.ResType).ResVal -= revert ? -ent.Val :ent.Val;
+                Actor.ParentTeam.GetRes(ent.ResType).ResVal -= revert ? -ent.Val : ent.Val;
             }
             else if (ent.Type == EventType.CombatStartSkillQueue)//party buffs or opening
                 if (!revert)
@@ -117,7 +117,7 @@ namespace HSR_SIM_LIB
                 {
                     Parent.CurrentFight.CurrentWaveCnt += 1;
                     Parent.CurrentFight.CurrentWave = Parent.CurrentFight.ReferenceFight.Waves[Parent.CurrentFight.CurrentWaveCnt - 1];
-                    Parent.HostileParty = Parent.getCombatUnits(Parent.CurrentFight.CurrentWave.Units);
+                    Parent.HostileTeam.BindUnits(Parent.getCombatUnits(Parent.CurrentFight.CurrentWave.Units));
                     //set start action value
                     foreach (Unit unit in Parent.AllUnits)
                     {
@@ -127,10 +127,14 @@ namespace HSR_SIM_LIB
                 }
                 else
                 {
-                    Parent.HostileParty.Clear();
+                    Parent.HostileTeam.UnBindUnits();
                     Parent.CurrentFight.CurrentWaveCnt -= 1;
                     if (Parent.CurrentFight.CurrentWaveCnt > 0)
                         Parent.CurrentFight.CurrentWave = Parent.CurrentFight.ReferenceFight.Waves[Parent.CurrentFight.CurrentWaveCnt - 1];
+                    else
+                    {
+                        Parent.CurrentFight.CurrentWave = null;
+                    }
 
                 }
 
@@ -142,7 +146,7 @@ namespace HSR_SIM_LIB
                 {
                     if (mod.Target == Mod.ModTarget.Party)
                     {
-                        foreach (var unit in Parent.Party)
+                        foreach (var unit in ent.AbilityValue.Parent.Friends)
                             if (!revert)
                                 unit.ApplyMod(mod);
                             else
@@ -194,39 +198,26 @@ namespace HSR_SIM_LIB
 
             foreach (Event ent in events)
             {
-                ProcEvent(ent,revert);
+                ProcEvent(ent, revert);
             }
 
             events.Clear();
             events = null;
         }
-        /// <summary>
-        /// Party have res to cast abilitiy
-        /// if res not found then false
-        /// </summary>
-        /// <returns></returns>
-        private bool PartyHaveRes(Ability ability)
-        {
-            foreach (Resource res in Parent.Resources)
-            {
-                if (res.ResType == ability.CostType)
-                    return res.ResVal >= ability.Cost;
-            }
-            return false;
-        }
+
 
         //Cast all techniques before fights starts
-        public void TechniqueWork()
+        public void TechniqueWork(Team whosTeam)
         {
             List<Ability> abilities = new List<Ability>();
             //gather all abilities from party alive members
-            foreach (Unit unit in Parent.Party.Where(partyMember => partyMember.IsAlive))
+            foreach (Unit unit in whosTeam.Units.Where(partyMember => partyMember.IsAlive))
             {
                 abilities.AddRange(unit.Abilities.Where(ability => ability.AbilityType == Ability.AbilityTypeEnm.Technique));
             }
 
             var orderedAbilities = from ability in abilities
-                                   where PartyHaveRes(ability)
+                                   where whosTeam.HaveRes(ability)
                                    orderby ability.Events.Exists(ent => ent.Type == EventType.EnterCombat) ascending//non combat first
                                        , ability.Cost descending//start from Hight cost abilities
                                    select ability;
@@ -261,31 +252,19 @@ namespace HSR_SIM_LIB
 
                 if (ent.TargetType == Ability.TargetTypeEnm.AOE)
                 {
-                    //if Enemy
-                    if (Parent.HostileParty.IndexOf(this.Actor) > 0)
+
+                    foreach (Unit unit in ent.AbilityValue.Parent.Enemies)
                     {
-                        foreach (Unit unit in Parent.Party)
+
+                        Event unitEnt = (Event)ent.Clone();
+                        unitEnt.TargetUnit = unit;
+                        if (Parent.FullFiledConditions(unitEnt))
                         {
-                            Event unitEnt = (Event)ent.Clone();
-                            unitEnt.TargetUnit = unit;
                             unitEnt.Calc(this);
                             Events.Add(unitEnt);
                         }
                     }
-                    else
-                    {
-                        foreach (Unit unit in Parent.HostileParty)
-                        {
 
-                                Event unitEnt = (Event)ent.Clone();
-                                unitEnt.TargetUnit = unit;
-                                if (Parent.FullFiledConditions(unitEnt))
-                                {
-                                    unitEnt.Calc(this);
-                                    Events.Add(unitEnt);
-                                }
-                        }
-                    }
 
                 }
                 else if (ent.TargetType == Ability.TargetTypeEnm.Self)

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Unit name="Jingliu" level="80" rank="1">
+  <Stats hp="2600.136" atk="1261.26" def="882" spd="96" crit_rate="0.05" crit_dmg="0.5" />
+  <Skills>
+    <Skill name="Lucent Moonglow" level="6" max_level="9" />
+    <Skill name="Transcendent Flash" level="9" max_level="15" />
+    <Skill name="Florephemeral Dreamflux" level="9" max_level="15" />
+    <Skill name="Crescent Transmigration" level="10" max_level="15" />
+    <Skill name="121206" level="0" max_level="1" />
+    <Skill name="Shine of Truth" level="1" max_level="1" />
+    <Skill name="Moon On Glacial River" level="9" max_level="15" />
+  </Skills>
+</Unit>

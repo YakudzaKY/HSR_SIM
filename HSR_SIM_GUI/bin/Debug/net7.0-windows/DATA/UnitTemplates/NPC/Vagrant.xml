@@ -1,4 +1,4 @@
-<Unit element="Physical">	
+<Unit element="Physical" type="NPC">	
 <DamageRes type="Lightning" value="20"/>
 <DamageRes type="Physical" value="20"/>
 <DamageRes type="Ice" value="20"/>

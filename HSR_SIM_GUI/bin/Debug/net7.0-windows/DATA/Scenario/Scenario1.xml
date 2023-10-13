@@ -1,24 +1,24 @@
 <Scenario name="Default test scenario">	
 	<Special>
-		<Unit template="Forgotten Hall"/>
+		<Unit template="Special\Forgotten Hall" level="0"/>
 	</Special>
 	<Fights>
 		<Fight name="First fight">		
-			<Wave>
-				<Unit template="Vagrant"  level="80"/>
-				<Unit template="Automaton Beetle"  level="80"/>
-				<Unit template="Vagrant"  level="80"/>
+			<Wave>			
+				<Unit template="NPC\Vagrant"  level="80"/>
+				<Unit template="NPC\Automaton Beetle"  level="80"/>
+				<Unit template="NPC\Vagrant"  level="80"/>
 			</Wave>		
 		</Fight>
 		<Fight name="Second fight">		
 			<Wave>
-				<Unit template="Vagrant" level="80"/>
-				<Unit template="Vagrant" level="80"/>
+				<Unit template="NPC\Vagrant" level="80"/>
+				<Unit template="NPC\Vagrant" level="80"/>
 			</Wave>
 			<Wave>
-				<Unit template="Automaton Beetle" level="80"/>
-				<Unit template="Vagrant" level="80"/>
-				<Unit template="Automaton Beetle" level="80"/>
+				<Unit template="NPC\Automaton Beetle" level="80"/>
+				<Unit template="NPC\Vagrant" level="80"/>
+				<Unit template="NPC\Automaton Beetle" level="80"/>
 			</Wave>	
 		</Fight>
 	</Fights>

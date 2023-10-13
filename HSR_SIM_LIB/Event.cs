@@ -91,7 +91,7 @@ namespace HSR_SIM_LIB
                             what = unitstats.GetType().GetProperty(word)?.GetValue(unitstats, null) as int? 
                                    ?? unitstats.GetType().GetProperty(word)?.GetValue(unitstats, null) as double?
                                    ??who.GetRes(
-                                       (Resource.ResourceType)Enum.Parse(typeof(Resource.ResourceType), word)).ResVal;
+                                       (Resource.ResourceType)Enum.Parse(typeof(Resource.ResourceType), word,true)).ResVal;
                            
                         }
                         else

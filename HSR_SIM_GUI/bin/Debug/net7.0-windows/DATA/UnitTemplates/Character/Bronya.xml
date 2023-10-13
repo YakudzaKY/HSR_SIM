@@ -1,4 +1,4 @@
-<Unit element="Wind">
+<Unit element="Wind" type="Character">
 	<Ability name="Banner of Command" type="Technique" costType="TP" cost="1">
 		<Event onStep="TechniqueUse" type="CombatStartSkillQueue"/>
 		<Event onStep="ExecuteStartQueue" type="Mod">

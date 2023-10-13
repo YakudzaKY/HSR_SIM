@@ -43,6 +43,7 @@
             dgSkills = new System.Windows.Forms.DataGridView();
             dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             SaveXML = new System.Windows.Forms.Button();
             chAutoSave = new System.Windows.Forms.CheckBox();
             label6 = new System.Windows.Forms.Label();
@@ -159,21 +160,20 @@
             label5.Size = new System.Drawing.Size(33, 15);
             label5.TabIndex = 10;
             label5.Text = "Skills";
-            label5.Click += label5_Click;
             // 
             // dgSkills
             // 
             dgSkills.AllowUserToAddRows = false;
             dgSkills.AllowUserToDeleteRows = false;
             dgSkills.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgSkills.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { dataGridViewTextBoxColumn1, dataGridViewTextBoxColumn2 });
+            dgSkills.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { dataGridViewTextBoxColumn1, dataGridViewTextBoxColumn2, Column1 });
             dgSkills.Location = new System.Drawing.Point(252, 139);
             dgSkills.Name = "dgSkills";
             dgSkills.RowHeadersVisible = false;
             dgSkills.RowTemplate.Height = 25;
-            dgSkills.Size = new System.Drawing.Size(213, 251);
+            dgSkills.Size = new System.Drawing.Size(353, 251);
             dgSkills.TabIndex = 11;
-            dgSkills.CellContentClick += dataGridView1_CellContentClick_1;
+            dgSkills.CellEndEdit += dgSkills_CellEndEdit;
             // 
             // dataGridViewTextBoxColumn1
             // 
@@ -185,6 +185,11 @@
             // 
             dataGridViewTextBoxColumn2.HeaderText = "Level";
             dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
+            // 
+            // Column1
+            // 
+            Column1.HeaderText = "MaxLevel";
+            Column1.Name = "Column1";
             // 
             // SaveXML
             // 
@@ -272,11 +277,12 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.DataGridView dgSkills;
-        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
         private System.Windows.Forms.Button SaveXML;
         private System.Windows.Forms.CheckBox chAutoSave;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
     }
 }
