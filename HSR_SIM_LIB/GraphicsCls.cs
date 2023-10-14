@@ -294,10 +294,11 @@ namespace HSR_SIM_LIB
                     gfx.DrawRectangle(new Pen(Color.YellowGreen, 3), portraitPoint.X, portraitPoint.Y, PortraitSize.Width, PortraitSize.Height);
                 }
                 //if target
-                if (step.Events.Any(x => x.TargetUnit == unit))
+                if (step.Events.Any(x => x.TargetUnit == unit||(x.Type==Event.EventType.Mod&&x.Mods.Any(y=>y.TargetUnit==unit))))
                 {
                     gfx.DrawRectangle(new Pen(Color.BurlyWood, 3), portraitPoint.X+(int)(PortraitSize.Width*0.05), portraitPoint.Y+(int)(PortraitSize.Height*0.05), PortraitSize.Width-(int)(PortraitSize.Width*0.1), PortraitSize.Height-(int)(PortraitSize.Width*0.1));
                 }
+
 
                 //Buffs
                 j = 0;
