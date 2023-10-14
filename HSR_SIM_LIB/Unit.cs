@@ -30,23 +30,14 @@ namespace HSR_SIM_LIB
         public IFighter Fighter
         {
             get =>
-                fighter = fighter ?? ((IFighter)Activator.CreateInstance(Type.GetType(FighterClassName)!, this));
+                fighter ??= ((IFighter)Activator.CreateInstance(Type.GetType(FighterClassName)!, this));
             set => fighter = value;
         }
 
         public Bitmap Portrait
         {
-            get
-            {
-                if (portrait == null)
-                {
-
-                    //resize
-                    portrait = new Bitmap(LoadBitmap(UnitType.ToString() + "\\" + Name), PortraitSize);
-
-                }
-                return portrait;
-            }
+            get =>
+                portrait ??= new Bitmap(LoadBitmap(UnitType.ToString() + "\\" + Name), PortraitSize);
             set => portrait = value;
         }
         public List<Mod> Mods { get; set; } = new List<Mod>();
@@ -55,12 +46,7 @@ namespace HSR_SIM_LIB
         public string Name { get => name; set => name = value; }
         public UnitStats Stats
         {
-            get
-            {
-                if (stats == null)
-                    stats = new UnitStats();
-                return stats;
-            }
+            get => stats ??= new UnitStats();
             set => stats = value;
         }
 
@@ -77,9 +63,11 @@ namespace HSR_SIM_LIB
                     resources = new List<Resource>();
                     foreach (string name in Enum.GetNames<ResourceType>())
                     {
-                        Resource res = new Resource();
-                        res.ResType = (ResourceType)Enum.Parse(typeof(ResourceType), name);
-                        res.ResVal = 0;
+                        Resource res = new()
+                        {
+                            ResType = (ResourceType)Enum.Parse(typeof(ResourceType), name),
+                            ResVal = 0
+                        };
                         resources.Add(res);
                     }
                 }
@@ -89,9 +77,6 @@ namespace HSR_SIM_LIB
         }
 
         public TypeEnm UnitType { get; set; }
-
-        //TODO unit role on battlefield
-        //role changes on PRE-FIGHT(depend on weakness). changes on party dead or enemy dead(depend on weakness)---
 
 
         public Unit()
@@ -161,8 +146,8 @@ namespace HSR_SIM_LIB
                 //next fight units
                 if (ParentTeam.ParentSim.CurrentFight == null)
                 {
-                    List<Unit> nextEnemys = new List<Unit>();
-                    List<Unit> nextEnemysDistinct = new List<Unit>();
+                    List<Unit> nextEnemys = new();
+                    List<Unit> nextEnemysDistinct = new();
                     //gather enemys from all waves
                     foreach (Wave wave in ParentTeam.ParentSim.NextFight.Waves)
                     {

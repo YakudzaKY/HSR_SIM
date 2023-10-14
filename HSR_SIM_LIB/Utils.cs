@@ -14,10 +14,8 @@ namespace HSR_SIM_LIB
     /// </summary>
     public static class Utils
     {
-        private static string dataFolder = AppDomain.CurrentDomain.BaseDirectory + "DATA\\";
-
-        public static string DataFolder { get => dataFolder; set => dataFolder = value; }
-        public static Dictionary<String, Bitmap> imageCache = new Dictionary<String, Bitmap>();
+        public static string DataFolder { get; set; } = AppDomain.CurrentDomain.BaseDirectory + "DATA\\";
+        private static readonly Dictionary<string, Bitmap> ImageCache = new();
 
 
         /// <summary>
@@ -36,22 +34,22 @@ namespace HSR_SIM_LIB
             {
                 // use 'MagickImage()' if you want just the 1st frame of an animated image. 
                 // 'MagickImageCollection()' returns all frames
-                using (var magickImages = new MagickImageCollection(fi))
+                using var magickImages = new MagickImageCollection(fi);
+                var ms = new MemoryStream();
+                if (magickImages.Count > 1)
                 {
-                    var ms = new MemoryStream();
-                    if (magickImages.Count > 1)
-                    {
-                        magickImages.Write(ms, MagickFormat.Gif);
-                    }
-                    else
-                    {
-                        magickImages.Write(ms, MagickFormat.Png);
-                    }
-                    bitmap?.Dispose();
-                    bitmap = new Bitmap(ms);
-                    // keep MemoryStream from being garbage collected while Bitmap is in use
-                    bitmap.Tag = ms;
+                    magickImages.Write(ms, MagickFormat.Gif);
                 }
+                else
+                {
+                    magickImages.Write(ms, MagickFormat.Png);
+                }
+                bitmap?.Dispose();
+                magickImages.Dispose();
+                bitmap = new(ms)
+                {
+                    Tag = ms
+                };
             }
             return bitmap;
         }
@@ -62,16 +60,16 @@ namespace HSR_SIM_LIB
         /// <returns></returns>
         public static Bitmap LoadBitmap(string filename)
         {
-            if (!imageCache.ContainsKey(filename))
-                imageCache[filename] = NewBitmap(new FileInfo(getAvalableImageFile(filename)));
-            return imageCache[filename];
+            if (!ImageCache.ContainsKey(filename))
+                ImageCache[filename] = NewBitmap(new FileInfo(GetAvalableImageFile(filename)));
+            return ImageCache[filename];
         }
         /// <summary>
         /// we can load png or webp frames
         /// </summary>
         /// <param name="unitCode"></param>
         /// <returns></returns>
-        public static string getAvalableImageFile(string unitCode)
+        public static string GetAvalableImageFile(string unitCode)
         {
             string imageFileName = DataFolder + "Images\\" + unitCode;
             if (File.Exists(imageFileName + ".png"))

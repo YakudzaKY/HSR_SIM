@@ -95,7 +95,7 @@ namespace HSR_SIM_LIB
         private static void DrawNextHostile(Graphics gfx, List<Unit> hostileParty, Point point)
         {
             short i = 0;
-            List<ElementEnm> elemList = new List<ElementEnm>();
+            List<ElementEnm> elemList = new ();
             foreach (Unit unit in hostileParty)
             {
                 //portrait
@@ -160,11 +160,11 @@ namespace HSR_SIM_LIB
 
         {
             //create a blank bitmap the same size as original
-            Bitmap newBitmap = new Bitmap(original.Width, original.Height);
+            Bitmap newBitmap = new(original.Width, original.Height);
             //get a graphics object from the new image
             Graphics g = Graphics.FromImage(newBitmap);
             //create the grayscale ColorMatrix
-            ColorMatrix colorMatrix = new ColorMatrix(
+            ColorMatrix colorMatrix = new (
                new float[][]
               {
                  new float[] {.3f, .3f, .3f, 0, 0},
@@ -174,7 +174,7 @@ namespace HSR_SIM_LIB
                  new float[] {0, 0, 0, 0, 1}
               });
             //create some image attributes
-            ImageAttributes attributes = new ImageAttributes();
+            ImageAttributes attributes = new();
             //set the color matrix attribute
             attributes.SetColorMatrix(colorMatrix);
             //draw the original image on the new image

@@ -20,7 +20,7 @@ namespace HSR_SIM_LIB
 
         public int MaxToughness { get; set; } = 0;
 
-        private double? baseActionValue ;//TODO при выборе кто ходит, учесть пачку с 0 AV, надо отсортировать . мб сделать минусовые значения
+        private double? baseActionValue ;//TODO при выборе кто ходит,  отсортировать . мб сделать минусовые значения
         public double BaseActionValue
         {
             get => baseActionValue?? 10000 / Speed;//semi auto. 

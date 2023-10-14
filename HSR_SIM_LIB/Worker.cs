@@ -51,7 +51,7 @@ namespace HSR_SIM_LIB
         //TODO вообще надо сделать на старте выбор списка сценариев и количество итераций для каждого
         //далее в несколько потоков собрать справочник СЦЕНАРИЙ:Результаты(агрегировать при выполнении каждой итерации)
         //Графическая оболочка только для отладки
-        /// <summary>
+        /// <summary> 
         /// Load and parse xml file with scenario
         /// </summary>
         /// <param name="selectedPath">file path to file</param>
@@ -133,7 +133,6 @@ namespace HSR_SIM_LIB
                             {
                                 break;
                             }
-                            newStep = null;
                         }
                         else
                             break;
@@ -146,9 +145,6 @@ namespace HSR_SIM_LIB
             {
                 DrawCombat();
             }
-
-            oldStep = null;
-
         }
 
 
@@ -207,8 +203,7 @@ namespace HSR_SIM_LIB
         /// <param name="msg">message to print</param>
         private void LogText(string msg)
         {
-            if (CbLog != null)
-                CbLog(new KeyValuePair<string, string>(Constant.MsgLog, msg));
+            CbLog?.Invoke(new KeyValuePair<string, string>(Constant.MsgLog, msg));
         }
 
 

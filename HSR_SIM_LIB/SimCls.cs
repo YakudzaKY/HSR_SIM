@@ -54,7 +54,7 @@ namespace HSR_SIM_LIB
 
         public Step CurrentStep { get => currentStep; set => currentStep = value; }
         internal Scenario CurrentScenario { get => currentScenario; set => currentScenario = value; }
-        public List<Step> steps = new List<Step>();
+        public List<Step> steps = new();
         public List<Step> Steps { get => steps; set => steps = value; }
         internal CombatFight CurrentFight { get => currentFight; set => currentFight = value; }
         public int CurrentFightStep { get => currentFightStep; set => currentFightStep = value; }
@@ -136,9 +136,9 @@ namespace HSR_SIM_LIB
         /// </summary>
         /// <param name="units"></param>
         /// <returns></returns>
-        public List<Unit> getCombatUnits(List<Unit> units)
+        public static List<Unit> GetCombatUnits(List<Unit> units)
         {
-            List<Unit> res = new List<Unit>();
+            List<Unit> res = new();
             foreach (Unit unit in units)
             {
                 Unit newUnit = (Unit)unit.Clone();
@@ -159,11 +159,11 @@ namespace HSR_SIM_LIB
         /// </summary>
         public void Prepare()
         {
-            Team team = null;
+            Team team ;
 
             //main team
             team = new Team(this);
-            team.BindUnits(getCombatUnits(CurrentScenario.Party));
+            team.BindUnits(GetCombatUnits(CurrentScenario.Party));
             team.TeamType = Team.TeamTypeEnm.UnitPack;
             team.controledTeam = true;
             Teams.Add(team);
@@ -171,13 +171,15 @@ namespace HSR_SIM_LIB
 
             //Special
             team = new Team(this);
-            team.BindUnits(getCombatUnits(CurrentScenario.SpecialUnits));
+            team.BindUnits(GetCombatUnits(CurrentScenario.SpecialUnits));
             team.TeamType = Team.TeamTypeEnm.Special;
             Teams.Add(team);
 
             //enemy team
-            team = new Team(this);
-            team.TeamType = Team.TeamTypeEnm.UnitPack;
+            team = new Team(this)
+            {
+                TeamType = Team.TeamTypeEnm.UnitPack
+            };
             Teams.Add(team);
 
 
@@ -193,12 +195,14 @@ namespace HSR_SIM_LIB
         {
             bool res = true;//Total search res 
             string nullReplacer = "%mandatory%";
+#pragma warning disable IDE0090 // Используйте "new(...)".
             Dictionary<String, bool?> orGroupsRes = new Dictionary<String, bool?>();
+#pragma warning restore IDE0090 // Используйте "new(...)".
             foreach (Condition condition in essence.ExecuteWhen)
             {
                 bool condRes = true;
                 bool? currentValue = null;
-                List<KeyValuePair<String, bool?>> localSrch = new List<KeyValuePair<string, bool?>>();
+                List<KeyValuePair<String, bool?>> localSrch = new();
 
 
                 localSrch.AddRange(orGroupsRes.Where(x => x.Key == (condition.OrGroup ?? nullReplacer)));
@@ -277,13 +281,13 @@ namespace HSR_SIM_LIB
             else if (check.CheckType == CheckTypeEnm.FindTarget)
             {
                 TargetTypeEnm targetType = (TargetTypeEnm)System.Enum.Parse(typeof(TargetTypeEnm), check.Value,true);
-                if (essence is Ability)
+                if (essence is Ability ability)
                 {
-                    res = ExecuteCheckList(check, new List<CheckEssence>(((Ability)essence).Parent.GetTargets(targetType)), ((Ability)essence).Parent);
+                    res = ExecuteCheckList(check, new List<CheckEssence>(ability.Parent.GetTargets(targetType)), ability.Parent);
                 }
-                else if (essence is Unit)
+                else if (essence is Unit unit)
                 {
-                    res = ExecuteCheckList(check, new List<CheckEssence>(((Unit)essence).GetTargets(targetType)), ((Unit)essence));
+                    res = ExecuteCheckList(check, new List<CheckEssence>(unit.GetTargets(targetType)), unit);
                 }
                 else if (essence is Event)
                 {
@@ -298,9 +302,9 @@ namespace HSR_SIM_LIB
             else if (check.CheckType == CheckTypeEnm.CheckTarget)
             {
 
-                if (essence is Event)
+                if (essence is Event @event)
                 {
-                    res = ExecuteCheckList(check, new List<CheckEssence>() { ((Event)essence).TargetUnit }, ((Event)essence).AbilityValue.Parent);
+                    res = ExecuteCheckList(check, new List<CheckEssence>() { @event.TargetUnit }, @event.AbilityValue.Parent);
                 }
                 else
                     throw new NotImplementedException();
@@ -425,7 +429,7 @@ namespace HSR_SIM_LIB
         /// </summary>
         public Step WorkIteration()
         {
-            Step newStep = new Step(this);
+            Step newStep = new(this);
             if (CurrentStep == null)
             {
                 //simulation preparations
@@ -484,7 +488,7 @@ namespace HSR_SIM_LIB
                 && ent.RealVal > 0
                 && ent.TargetUnit.GetRes(ResourceType.Toughness).ResVal == 0)
             {
-                Event shieldBrkEvent = new Event() { Type = EventType.ShieldBreak, AbilityValue = ent.AbilityValue, TargetUnit = ent.TargetUnit, ParentStep = step };
+                Event shieldBrkEvent = new () { Type = EventType.ShieldBreak, AbilityValue = ent.AbilityValue, TargetUnit = ent.TargetUnit, ParentStep = step };
                 ent.Triggers.Add(new Trigger() { TrType = Trigger.TriggerType.ShieldBreakeTrigger });
                 step.Events.Add(shieldBrkEvent);
                 step.ProcEvent(shieldBrkEvent, revert);

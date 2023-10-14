@@ -21,14 +21,17 @@ namespace HSR_SIM_LIB
         public static SimCls LoadCombatFromXml(string scenarioPath, string profilePath)
         {
 
-            SimCls Combat = new SimCls();
-            Combat.CurrentStep = null;
-            Combat.CurrentScenario = new Scenario();
-
-            Combat.CurrentScenario.Fights = new List<Fight>();
+            SimCls Combat = new()
+            {
+                CurrentStep = null,
+                CurrentScenario = new()
+                {
+                    Fights = new List<Fight>()
+                }
+            };
 
             //Scenario
-            XmlDocument xDoc = new XmlDocument();
+            XmlDocument xDoc = new();
             xDoc.Load(scenarioPath);
             XmlElement xRoot = xDoc.DocumentElement;
             if (xRoot != null)
@@ -96,19 +99,7 @@ namespace HSR_SIM_LIB
                 return int.Parse(pStr);
             return null;
         }
-        private static bool? SafeToBoolNull(string pStr)
-        {
-            if (pStr != null)
-                return bool.Parse(pStr);
-            return null;
-        }
-
-        private static bool SafeToBool(string pStr)
-        {
-            if (pStr != null)
-                return bool.Parse(pStr);
-            return false;
-        }
+       
 
 
         /// <summary>
@@ -118,7 +109,7 @@ namespace HSR_SIM_LIB
         /// <returns></returns>
         private static UnitStats ExctractStats(XmlElement xmlItems, int searchLvl)
         {
-            UnitStats unitStats = new UnitStats();
+            UnitStats unitStats = new();
             int? lvl;
             //parse all items
             foreach (XmlElement xnode in xmlItems.SelectNodes("Stats"))
@@ -159,11 +150,11 @@ namespace HSR_SIM_LIB
         /// <returns></returns>
         private static List<Unit> ExtractUnits(XmlElement unitPack)
         {
-            List<Unit> units = new List<Unit>();
+            List<Unit> units = new();
             foreach (XmlElement unitNode in unitPack.SelectNodes("Unit"))
             {
-                XmlDocument unitDoc = new XmlDocument();
-                Unit unit = new Unit();
+                XmlDocument unitDoc = new ();
+                Unit unit = new();
                 //load xml by 
                 string unitCode = unitNode.Attributes.GetNamedItem("template").Value.Trim();
                 string[] words = unitCode.Split('\\');
@@ -196,7 +187,7 @@ namespace HSR_SIM_LIB
 
         private  static void ExctractStatsFromWargear(string wargear, Unit unit)
         {
-            XmlDocument unitDoc = new XmlDocument();
+            XmlDocument unitDoc = new ();
             unitDoc.Load(GetWarGearFile(wargear));
             XmlElement xRoot = unitDoc.DocumentElement;
             string unitCode = xRoot.Attributes.GetNamedItem("name").Value.Trim();
@@ -220,14 +211,18 @@ namespace HSR_SIM_LIB
 
             foreach (XmlElement fightXml in xnode.ChildNodes)
             {
-                Fight fg = new Fight();
-                fg.Name = fightXml.Attributes.GetNamedItem("name").Value.Trim();
-                fg.Waves = new List<Wave>();
+                Fight fg = new()
+                {
+                    Name = fightXml.Attributes.GetNamedItem("name").Value.Trim(),
+                    Waves = new List<Wave>()
+                };
 
                 foreach (XmlElement waveXml in fightXml.SelectNodes("Wave"))
                 {
-                    Wave ww = new Wave();
-                    ww.Units = ExtractUnits(waveXml);
+                    Wave ww = new()
+                    {
+                        Units = ExtractUnits(waveXml)
+                    };
 
                     fg.Waves.Add(ww);
                 }

@@ -66,7 +66,7 @@ namespace HSR_SIM_GUI
             BtnOpen.TabIndex = 1;
             BtnOpen.Text = "Open Scenario";
             BtnOpen.UseVisualStyleBackColor = true;
-            BtnOpen.Click += button1_Click;
+            BtnOpen.Click += Button1_Click;
             // 
             // combatOut
             // 
@@ -86,7 +86,7 @@ namespace HSR_SIM_GUI
             BtnBack.TabIndex = 3;
             BtnBack.Text = "Prev step";
             BtnBack.UseVisualStyleBackColor = true;
-            BtnBack.Click += button2_Click;
+            BtnBack.Click += Button2_Click;
             // 
             // BtnNext
             // 
@@ -97,7 +97,7 @@ namespace HSR_SIM_GUI
             BtnNext.TabIndex = 4;
             BtnNext.Text = "Next step";
             BtnNext.UseVisualStyleBackColor = true;
-            BtnNext.Click += button3_Click;
+            BtnNext.Click += Button3_Click;
             // 
             // cbScenario
             // 
@@ -123,7 +123,7 @@ namespace HSR_SIM_GUI
             label1.Size = new System.Drawing.Size(41, 15);
             label1.TabIndex = 7;
             label1.Text = "Profile";
-            label1.Click += label1_Click;
+            label1.Click += Label1_Click;
             // 
             // label2
             // 
@@ -143,7 +143,7 @@ namespace HSR_SIM_GUI
             button1.TabIndex = 9;
             button1.Text = "refresh";
             button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click_1;
+            button1.Click += Button1_Click_1;
             // 
             // button2
             // 
@@ -153,7 +153,7 @@ namespace HSR_SIM_GUI
             button2.TabIndex = 10;
             button2.Text = "To finish";
             button2.UseVisualStyleBackColor = true;
-            button2.Click += button2_Click_1;
+            button2.Click += Button2_Click_1;
             // 
             // button3
             // 
@@ -163,7 +163,7 @@ namespace HSR_SIM_GUI
             button3.TabIndex = 11;
             button3.Text = "To start";
             button3.UseVisualStyleBackColor = true;
-            button3.Click += button3_Click_1;
+            button3.Click += Button3_Click_1;
             // 
             // button4
             // 
@@ -174,7 +174,7 @@ namespace HSR_SIM_GUI
             button4.TabIndex = 12;
             button4.Text = "Open Wargear";
             button4.UseVisualStyleBackColor = true;
-            button4.Click += button4_Click;
+            button4.Click += Button4_Click;
             // 
             // Main
             // 

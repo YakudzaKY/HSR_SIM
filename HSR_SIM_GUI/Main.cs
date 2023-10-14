@@ -21,7 +21,7 @@ namespace HSR_SIM_GUI
 {
     public partial class Main : Form
     {
-        Worker wrk;
+        readonly Worker wrk;
 
 
         /// <summary>
@@ -55,8 +55,8 @@ namespace HSR_SIM_GUI
             
 
 
-            CallBackStr callBackStr = new CallBackStr(WorkerCallBackString);
-            CallBackRender callBackRender = new CallBackRender(WorkerCallBackImages);
+            CallBackStr callBackStr = new(WorkerCallBackString);
+            CallBackRender callBackRender = new(WorkerCallBackImages);
             InitializeComponent();
             wrk = new Worker();
             wrk.CbLog += callBackStr;
@@ -82,7 +82,7 @@ namespace HSR_SIM_GUI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void button1_Click(object sender, EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
             wrk.LoadScenarioFromXml(AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\" + cbScenario.Text,
                 AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\" + cbProfile.Text);
@@ -108,27 +108,27 @@ namespace HSR_SIM_GUI
             }
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void Button3_Click(object sender, EventArgs e)
         {
             wrk.MoveStep();
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void Button2_Click(object sender, EventArgs e)
         {
             wrk.MoveStep(true);
         }
 
-        private void label1_Click(object sender, EventArgs e)
+        private void Label1_Click(object sender, EventArgs e)
         {
 
         }
 
-        private void button1_Click_1(object sender, EventArgs e)
+        private void Button1_Click_1(object sender, EventArgs e)
         {
             RefreshCbs();
         }
 
-        private void button2_Click_1(object sender, EventArgs e)
+        private void Button2_Click_1(object sender, EventArgs e)
         {
 
             wrk.MoveStep(false, -1);
@@ -136,15 +136,17 @@ namespace HSR_SIM_GUI
 
         }
 
-        private void button3_Click_1(object sender, EventArgs e)
+        private void Button3_Click_1(object sender, EventArgs e)
         {
             wrk.MoveStep(true, -1);
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private void Button4_Click(object sender, EventArgs e)
         {
-            WarGear wg = new WarGear();
-            wg.StartPosition = FormStartPosition.CenterScreen;
+            WarGear wg = new()
+            {
+                StartPosition = FormStartPosition.CenterScreen
+            };
             wg.Show();
         }
     }

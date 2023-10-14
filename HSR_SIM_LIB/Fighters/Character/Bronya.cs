@@ -18,7 +18,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             ability.Events.Add(new Event() { OnStepType = Step.StepTypeEnm.ExecuteAbilityUse, Type = Event.EventType.CombatStartSkillQueue });
             //buff apply
 
-            Event eventBuff = new Event()
+            Event eventBuff = new()
                 { OnStepType = Step.StepTypeEnm.ExecuteStartQueue, Type = Event.EventType.Mod, AbilityValue = ability };
             eventBuff.Mods.Add(new Mod(){Type=Mod.ModType.Buff,Modifier = Mod.ModifierType.AtkPrc,Value = 15,Duration=2,Dispellable = true,CalculateTargets = GetFriends});
             ability.Events.Add(eventBuff);

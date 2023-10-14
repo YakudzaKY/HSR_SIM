@@ -25,7 +25,7 @@ namespace HSR_SIM_LIB
         public Ability ActorAbility { get => actorAbility; set => actorAbility = value; }
         public List<Event> Events { get => events; set => events = value; }
 
-        private List<Event> events = new List<Event>();
+        private List<Event> events = new();
 
         /// <summary>
         /// Get text description of step
@@ -120,7 +120,7 @@ namespace HSR_SIM_LIB
                 {
                     Parent.CurrentFight.CurrentWaveCnt += 1;
                     Parent.CurrentFight.CurrentWave = Parent.CurrentFight.ReferenceFight.Waves[Parent.CurrentFight.CurrentWaveCnt - 1];
-                    Parent.HostileTeam.BindUnits(Parent.getCombatUnits(Parent.CurrentFight.CurrentWave.Units));
+                    Parent.HostileTeam.BindUnits(SimCls.GetCombatUnits(Parent.CurrentFight.CurrentWave.Units));
                     //set start action value
                     foreach (Unit unit in Parent.AllUnits)
                     {
@@ -191,7 +191,7 @@ namespace HSR_SIM_LIB
         public void ProcEvents(bool revert = false)
         {
             //for all events saved in step
-            List<Event> events = new List<Event>();
+            List<Event> events = new ();
             events.AddRange(Events);
             //rollback changes from the end of list
             if (revert)
@@ -203,7 +203,6 @@ namespace HSR_SIM_LIB
             }
 
             events.Clear();
-            events = null;
         }
 
 
@@ -254,7 +253,7 @@ namespace HSR_SIM_LIB
             foreach (Event ent in Events.Where(x=>x.Type==EventType.Mod))
             {
 
-                List<Mod> newMods = new List<Mod>();
+                List<Mod> newMods = new ();
               
                 //calculated mods
                 foreach (Mod mod in ent.Mods.Where(x=>x.CalculateTargets!=null))
@@ -270,7 +269,7 @@ namespace HSR_SIM_LIB
                 IEnumerable<Mod> oldList = ent.Mods.Where(x => x.CalculateTargets == null);
 
                 //non calculated mods
-                if (oldList.Count() > 0)
+                if (oldList.Any())
                 {
                     newMods = (List<Mod>)newMods.Concat(oldList);
                 }
@@ -282,13 +281,8 @@ namespace HSR_SIM_LIB
         public void ExecuteAbilityFromQueue()
         {
             StepType = StepTypeEnm.ExecuteStartQueue;
-            List<Ability> abilities = new List<Ability>();
             Ability fromQ = Parent.BeforeStartQueue.First();
             ExecuteAbility(fromQ);
-            abilities.Clear();
-            abilities = null;
-            fromQ = null;
-
         }
 
         /// <summary>

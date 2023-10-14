@@ -80,9 +80,11 @@ namespace HSR_SIM_LIB
                     resources = new List<Resource>();
                     foreach (string name in Enum.GetNames<ResourceType>())
                     {
-                        Resource res = new Resource();
-                        res.ResType = (ResourceType)System.Enum.Parse(typeof(ResourceType), name, true);
-                        res.ResVal = 0;
+                        Resource res = new()
+                        {
+                            ResType = (ResourceType)System.Enum.Parse(typeof(ResourceType), name, true),
+                            ResVal = 0
+                        };
                         resources.Add(res);
                     }
                 }
@@ -91,7 +93,6 @@ namespace HSR_SIM_LIB
             set => resources = value;
         }
 
-        //todo: учесть в выборе таргета, что ищем юниты с чужой тимы, но не special
         public enum TeamTypeEnm
         {
             UnitPack,

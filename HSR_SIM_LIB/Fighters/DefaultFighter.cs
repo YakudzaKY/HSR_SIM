@@ -35,7 +35,9 @@ namespace HSR_SIM_LIB.Fighters
             return Parent.Enemies.Where(x => x.IsAlive && x.Fighter.Weaknesses.Any(x => x == attackerUnit.Fighter.Element));
         }
         //alive firends
+#pragma warning disable IDE0060 // Удалите неиспользуемый параметр
         public IEnumerable<Unit> GetFriends(Event ent)
+#pragma warning restore IDE0060 // Удалите неиспользуемый параметр
         {
             return Parent.Friends.Where(x => x.IsAlive);
         }
