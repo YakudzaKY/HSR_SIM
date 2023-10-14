@@ -14,7 +14,7 @@ namespace HSR_SIM_LIB
         public double BaseMaxHp { get; set; } = 0;
         public double BaseAttack { get; set; } = 0;
       
-        public double MaxHp { get; set; } = 0;
+        public double MaxHp { get; set; } = 0;//TODO baseMaxHP * mod
         public int CurrentEnergy { get; set; } = 0;
         public int BaseMaxEnergy { get; set; } = 0;
 

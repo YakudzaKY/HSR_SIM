@@ -37,7 +37,7 @@ namespace HSR_SIM_LIB
             string res;
             if (StepType == StepTypeEnm.SimInit)
                 res = "sim was initialized";
-            else if (StepType == StepTypeEnm.TechniqueUse)
+            else if (StepType == StepTypeEnm.ExecuteAbilityUse)
                 res = Actor.Name + " used " + ActorAbility.Name;
             else if (StepType == StepTypeEnm.StartCombat)
                 res = "Starting the combat!";
@@ -63,7 +63,7 @@ namespace HSR_SIM_LIB
         {
             SimInit//on scenario load and combat init
             , Idle//on Idle, nothing to_do
-            , TechniqueUse
+            , ExecuteAbilityUse
             , StartCombat//on fight starts
             , StartWave//on wave starts
             , ExecuteStartQueue
@@ -75,6 +75,9 @@ namespace HSR_SIM_LIB
         /// <param name="revert"></param>
         public void ProcEvent(Event ent, bool revert)
         {
+            //calc value first
+            if (ent.CalculateValue != null && ent.Val == null)
+                ent.Val = ent.CalculateValue(ent);
             if (ent.Type == EventType.PartyResourceDrain)//SP or technical points
             {
                 Actor.ParentTeam.GetRes(ent.ResType).ResVal -= revert ? -ent.Val : ent.Val;
@@ -144,19 +147,16 @@ namespace HSR_SIM_LIB
 
                 foreach (var mod in ent.Mods)
                 {
-                    if (mod.Target == Mod.ModTarget.Party)
-                    {
-                        foreach (var unit in ent.AbilityValue.Parent.Friends)
-                            if (!revert)
-                                unit.ApplyMod(mod);
-                            else
-                                unit.RemoveMod(mod);
-                    }
-                    else
-                    {
+                    //calc value first
+                    if (mod.CalculateValue != null && mod.Value == null)
+                        mod.Value  = mod.CalculateValue(ent);
 
-                        throw new NotImplementedException();
-                    }
+                    if (!revert)
+                        mod.TargetUnit.ApplyMod(mod);
+                    else
+                        mod.TargetUnit.RemoveMod(mod);
+
+
                 }
 
             }
@@ -183,6 +183,7 @@ namespace HSR_SIM_LIB
             else
                 throw new NotImplementedException();
             Parent.OnTriggerProc(this, ent, revert);
+
         }
         /// <summary>
         /// Proc all events in step. No random here or smart thinking. Do it on DoSomething...
@@ -209,30 +210,17 @@ namespace HSR_SIM_LIB
         //Cast all techniques before fights starts
         public void TechniqueWork(Team whosTeam)
         {
-            List<Ability> abilities = new List<Ability>();
-            //gather all abilities from party alive members
+            Ability someThingToCast = null;
             foreach (Unit unit in whosTeam.Units.Where(partyMember => partyMember.IsAlive))
             {
-                abilities.AddRange(unit.Abilities.Where(ability => ability.AbilityType == Ability.AbilityTypeEnm.Technique));
-            }
-
-            var orderedAbilities = from ability in abilities
-                                   where whosTeam.HaveRes(ability)
-                                   orderby ability.Events.Exists(ent => ent.Type == EventType.EnterCombat) ascending//non combat first
-                                       , ability.Cost descending//start from Hight cost abilities
-                                   select ability;
-            foreach (Ability ability in orderedAbilities)
-            {
-                //If conditions are ok then cast ability
-                if (Parent.FullFiledConditions(ability))
+                someThingToCast = unit.Fighter.ChooseAbilityToCast(this);
+                if (someThingToCast != null)
                 {
-                    ExecuteTechnique(ability);
-                    return;
+                    ExecuteAbilityUse(someThingToCast);
+                    break;
                 }
+
             }
-            abilities.Clear();
-            abilities = null;
-            orderedAbilities = null;
 
         }
         /// <summary>
@@ -244,47 +232,51 @@ namespace HSR_SIM_LIB
             Actor = ability.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
             ActorAbility = ability;//WAT ABILITY is casting
 
-            Events.AddRange(ability.Events.Where(x => x.OnStepType == StepType && x.NeedCalc == false));//copy events from ability reference
-            //Need some calc? 
-            foreach (Event ent in ability.Events.Where(x => x.OnStepType == StepType && x.NeedCalc == true))
+            foreach (Event ent in ability.Events.Where(x => x.OnStepType == StepType))
             {
-
-
-                if (ent.TargetType == Ability.TargetTypeEnm.AOE)
-                {
-
-                    foreach (Unit unit in ent.AbilityValue.Parent.Enemies)
+                if (ent.CalculateTargets != null)
+                    foreach (Unit unit in ent.CalculateTargets(ent))
                     {
-
                         Event unitEnt = (Event)ent.Clone();
+                        unitEnt.ParentStep = this;
                         unitEnt.TargetUnit = unit;
-                        if (Parent.FullFiledConditions(unitEnt))
-                        {
-                            unitEnt.Calc(this);
-                            Events.Add(unitEnt);
-                        }
+                        Events.Add(unitEnt);
                     }
-
-
-                }
-                else if (ent.TargetType == Ability.TargetTypeEnm.Self)
-                {
-                    Event newEnt = (Event)ent.Clone();
-                    newEnt.TargetUnit = this.Actor;
-                    newEnt.Calc(this);
-                    Events.Add(newEnt);
-                }
                 else
                 {
-                    throw new NotImplementedException();
+                    Event unitEnt = (Event)ent.Clone();
+                    unitEnt.ParentStep = this;
+                    Events.Add(unitEnt);
                 }
 
             }
+            //update mods
+            foreach (Event ent in Events.Where(x=>x.Type==EventType.Mod))
+            {
 
-            Events.Add(new Event() { Type = EventType.CombatStartSkillDeQueue, AbilityValue = ability });
+                List<Mod> newMods = new List<Mod>();
+              
+                //calculated mods
+                foreach (Mod mod in ent.Mods.Where(x=>x.CalculateTargets!=null))
+                {
+                    foreach (Unit unit in mod.CalculateTargets(ent))
+                    {
+                        Mod newMod = (Mod)mod.Clone();
+                        newMod.TargetUnit = unit;
+                        newMods.Add(newMod);
+                    }
+                }
 
+                IEnumerable<Mod> oldList = ent.Mods.Where(x => x.CalculateTargets == null);
 
+                //non calculated mods
+                if (oldList.Count() > 0)
+                {
+                    newMods = (List<Mod>)newMods.Concat(oldList);
+                }
 
+                ent.Mods=newMods;
+            }
         }
         //Cast all techniques before fights starts
         public void ExecuteAbilityFromQueue()
@@ -302,12 +294,17 @@ namespace HSR_SIM_LIB
         /// <summary>
         /// Execute the technique
         /// </summary>
-        public void ExecuteTechnique(Ability ability)
+        public void ExecuteAbilityUse(Ability ability)
         {
-            StepType = StepTypeEnm.TechniqueUse;
+            StepType = StepTypeEnm.ExecuteAbilityUse;
             Events.AddRange(ability.Events.Where(x => x.OnStepType == StepType));//copy events from ability reference
-            if (ability.CostType != ResourceType.nil)
-                Events.Add(new Event() { Type = EventType.PartyResourceDrain, ResType = ability.CostType, Val = ability.Cost });//energy drain
+            if (ability.CostType == ResourceType.TP || ability.CostType == ResourceType.SP)
+            {
+                Events.Add(new Event() { Type = EventType.PartyResourceDrain, ResType = ability.CostType, Val = ability.Cost });
+            }
+            else if (ability.CostType != ResourceType.nil)
+                Events.Add(new Event() { Type = EventType.ResourceDrain, ResType = ability.CostType, Val = ability.Cost });
+
             Actor = ability.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
             ActorAbility = ability;//WAT ABILITY is casting
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -13,25 +14,26 @@ namespace HSR_SIM_LIB
     /// </summary>
     public class Event : CheckEssence
     {
+        public delegate double? CalculateValuePrc(Event ent);
+        public delegate IEnumerable<Unit> CalculateTargetPrc(Event ent);
+
+        public CalculateValuePrc CalculateValue { get; init; }
+        public CalculateTargetPrc CalculateTargets { get; init; }
         private EventType type;
         private Resource.ResourceType resType;
         private Ability abilityValue;
         private double? val;//Theoretical value
         private double? realVal;//Real hit value(cant exceed)
-        private string strValue;
 
         public bool CanSetToZero { get; init;  } = true;
-        public bool NeedCalc { get; init; } = false;
 
-        public List<Mod> Mods { get; init; } = new List<Mod>();
+        public List<Mod> Mods { get; set; } = new List<Mod>();
         public Unit TargetUnit { get; set; }
-        public Ability.TargetTypeEnm TargetType { get; init; }
         public Step.StepTypeEnm OnStepType { get; init; }
         public EventType Type { get => type; set => type = value; }
         public Ability AbilityValue { get => abilityValue; set => abilityValue = value; }
         public double? Val { get => val; set => val = value; }
         public double? RealVal { get => realVal; set => realVal = value; }
-        public string StrValue { get => strValue; set => strValue = value; }
         public Resource.ResourceType ResType { get => resType; set => resType = value; }
         public Step ParentStep { get; set; } = null;
 
@@ -44,96 +46,9 @@ namespace HSR_SIM_LIB
         } 
 
 
-
-        /// <summary>
-        /// Calculating the Event values
-        /// </summary>
-        /// <param name="parentStep"></param>
-        /// <exception cref="NotImplementedException"></exception>
-        public void Calc(Step parentStep)
-        {
-            if (NeedCalc)
-            {
-
-                if (StrValue != null)
-                {
-                    string[] words = StrValue.Split('.');
-                    Unit who = null;
-                    this.ParentStep = parentStep;
-                    
-                    double? what = null;
-                    double? prcMulti = null;
-                    //Go calc
-                    foreach (var word in words)
-                    {
-                        //WHO
-                        if (who == null)
-                        {
-                            if (word == Ability.TargetTypeEnm.Self.ToString())
-                            {
-                                who = parentStep.Actor;
-                                continue;
-                            }
-                            else if (word == Ability.TargetTypeEnm.Target.ToString())
-                            {
-                                who = this.TargetUnit;
-                                continue;
-                            }
-                        }
-
-                        //WHAT
-                        else if (who != null && what == null)
-                        {
-                            UnitStats unitstats = (UnitStats)who.GetType()
-                                .GetProperty("Stats")
-                                .GetValue(who, null);
-                            //try stats
-                            what = unitstats.GetType().GetProperty(word)?.GetValue(unitstats, null) as int? 
-                                   ?? unitstats.GetType().GetProperty(word)?.GetValue(unitstats, null) as double?
-                                   ??who.GetRes(
-                                       (Resource.ResourceType)Enum.Parse(typeof(Resource.ResourceType), word,true)).ResVal;
-                           
-                        }
-                        else
-                        {
-                            if (word.EndsWith('%'))
-                            {
-                                prcMulti = int.Parse(word[..^1]);
-                            }
-                            else
-                            {
-                                throw new NotImplementedException();
-                            }
-                        }
-                    }
-
-                    if (who != null & what != null)
-                    {
-                        Val = what * (prcMulti /100);
-                    }
-                    else
-                    {
-                        throw new NotImplementedException();
-                    }
-
-                }
-                else
-                {
-                    throw new NotImplementedException();
-                }
-
-
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
-        }
-
         public enum EventType
         {
             CombatStartSkillQueue,
-            CombatStartSkillDeQueue,
             ResourceDrain,
             PartyResourceDrain,
             EnterCombat,
@@ -142,7 +57,8 @@ namespace HSR_SIM_LIB
             Mod,
             ModActionValue,
             ShieldBreak,
-            DirectDamage
+            DirectDamage,
+            CombatStartSkillDeQueue
         }
 
 

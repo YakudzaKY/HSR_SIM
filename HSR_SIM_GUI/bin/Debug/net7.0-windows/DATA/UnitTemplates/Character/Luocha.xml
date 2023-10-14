@@ -1,7 +1,0 @@
-<Unit element="Imaginary" type="Character">
-
-	<Ability name="test" type="Technique" costType="TP" cost="0">
-		<Event onStep="TechniqueUse" type="CombatStartSkillQueue"/>
-		<Event onStep="TechniqueUse" type="EnterCombat"/>
-	</Ability>
-</Unit>

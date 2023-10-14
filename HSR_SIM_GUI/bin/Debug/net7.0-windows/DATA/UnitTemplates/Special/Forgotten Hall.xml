@@ -1,9 +1,0 @@
-<Unit type="Special">	
-	<Stats baseActionValue="150"/>
-	<!--<Ability name="ReduceAV" type="Trigger">
-		<Event onStep="OnMoveStart" type="Mod">
-			<Mod type="Buff" target="Self" modifier="BaseAv" value="-50" duration=1/>
-		</Event>
-	</Ability>-->
-	<!--захуярить повышение лвл и абилку на авто инкремент, и установку скорости 100 в начале мува, и 150 в начале боя-->
-</Unit>

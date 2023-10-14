@@ -13,6 +13,7 @@ using static HSR_SIM_LIB.Step;
 using static HSR_SIM_LIB.Unit;
 using static HSR_SIM_LIB.Team;
 using System.Xml.Linq;
+using HSR_SIM_LIB.Fighters;
 
 namespace HSR_SIM_LIB
 {/// <summary>
@@ -315,7 +316,7 @@ namespace HSR_SIM_LIB
             }
             else if (check.CheckType == CheckTypeEnm.HaveSkill)
             {
-                res = ExecuteCheckList(check, new List<CheckEssence>(((Unit)essence).Abilities));
+                res = ExecuteCheckList(check, new List<CheckEssence>(((Unit)essence).Fighter.Abilities));
             }
             else if (check.CheckType == CheckTypeEnm.AbilityType)
             {
@@ -323,16 +324,16 @@ namespace HSR_SIM_LIB
             }
             else if (check.CheckType == CheckTypeEnm.WeaknessType)
             {
-                foreach (ElementEnm weakness in ((Unit)essence).Weaknesses)
+                foreach (ElementEnm weakness in ((Unit)essence).Fighter.Weaknesses)
                 {
                     ElementEnm? findVal;
                     if (check.Value == "@CasterElement")
                     {
-                        findVal = caster.Element;
+                        findVal = caster.Fighter.Element;
                     }
                     else if (check.Value == "@PartyUnitElement")
                     {
-                        findVal = caster.Element;
+                        findVal = caster.Fighter.Element;
                     }
                     else
                         findVal = (ElementEnm)System.Enum.Parse(typeof(ElementEnm), check.Value, true);
@@ -483,12 +484,17 @@ namespace HSR_SIM_LIB
                 && ent.RealVal > 0
                 && ent.TargetUnit.GetRes(ResourceType.Toughness).ResVal == 0)
             {
-                Event shieldBrkEvent = new Event() { Type = EventType.ShieldBreak, AbilityValue = ent.AbilityValue, NeedCalc = true, TargetUnit = ent.TargetUnit, ParentStep = step };
+                Event shieldBrkEvent = new Event() { Type = EventType.ShieldBreak, AbilityValue = ent.AbilityValue, TargetUnit = ent.TargetUnit, ParentStep = step };
                 ent.Triggers.Add(new Trigger() { TrType = Trigger.TriggerType.ShieldBreakeTrigger });
                 step.Events.Add(shieldBrkEvent);
                 step.ProcEvent(shieldBrkEvent, revert);
 
             }
+
+            // handle events
+            //ent.TargetUnit?.Fighter?.EventHandlerProc(ent);
+            //TODO if Target!=Actor
+            //ent.ParentStep.Actor?.Fighter?.EventHandlerProc(ent);
         }
     }
 

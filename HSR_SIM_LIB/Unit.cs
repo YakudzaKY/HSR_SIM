@@ -7,6 +7,7 @@ using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using HSR_SIM_LIB.Fighters;
 using static HSR_SIM_LIB.Constant;
 using static HSR_SIM_LIB.Utils;
 using static HSR_SIM_LIB.Resource;
@@ -23,8 +24,16 @@ namespace HSR_SIM_LIB
         int level = 1;
         Bitmap portrait = null;
         UnitStats stats = null;
-        List<Ability> abilities = null;
         public bool IsAlive = true;
+
+        private IFighter fighter = null;
+        public IFighter Fighter
+        {
+            get =>
+                fighter = fighter ?? ((IFighter)Activator.CreateInstance(Type.GetType(FighterClassName)!, this));
+            set => fighter = value;
+        }
+
         public Bitmap Portrait
         {
             get
@@ -40,12 +49,9 @@ namespace HSR_SIM_LIB
             }
             set => portrait = value;
         }
-        public List<Ability> Abilities { get => abilities; set => abilities = value; }
-        public ElementEnm? Element { get => element; set => element = value; }
         public List<Mod> Mods { get; set; } = new List<Mod>();
-        private ElementEnm? element;
-        private List<ElementEnm> weaknesses = null;
         private List<Resource> resources = null;
+       
         public string Name { get => name; set => name = value; }
         public UnitStats Stats
         {
@@ -58,7 +64,7 @@ namespace HSR_SIM_LIB
             set => stats = value;
         }
 
-        public List<ElementEnm> Weaknesses { get => weaknesses; set => weaknesses = value; }
+       
         public Unit Reference { get; internal set; }
         public int Level { get => level; set => level = value; }
 
@@ -90,7 +96,7 @@ namespace HSR_SIM_LIB
 
         public Unit()
         {
-            Abilities = new List<Ability>();
+        
         }
 
 
@@ -102,26 +108,7 @@ namespace HSR_SIM_LIB
             Stats.MaxHp = Stats.BaseMaxHp;
             GetRes(ResourceType.HP).ResVal = Stats.MaxHp;
             GetRes(ResourceType.Toughness).ResVal = Stats.MaxToughness;
-            //Clone abilities from template
-            List<Ability> clonedAbilities = new List<Ability>();
-            foreach (Ability ability in Reference.Abilities)
-            {
-                Ability newAbility = (Ability)ability.Clone();
-                newAbility.Parent = this;
-                List<Event> clonedEvents = new List<Event>();
-                foreach (Event ent in newAbility.Events)
-                {
-                    Event newEvent = (Event)ent.Clone();
-                    newEvent.AbilityValue = newAbility;
-                    clonedEvents.Add(newEvent);
-
-                }
-
-                newAbility.Events = clonedEvents;
-
-                clonedAbilities.Add(newAbility);
-            }
-            Abilities = clonedAbilities;
+            Fighter = null;
 
         }
         /// <summary>
@@ -211,6 +198,8 @@ namespace HSR_SIM_LIB
 
             set => throw new NotImplementedException();
         }
+
+        public string FighterClassName { get; set; }
 
         public IEnumerable<CheckEssence> GetTargets(TargetTypeEnm targetType)
         {

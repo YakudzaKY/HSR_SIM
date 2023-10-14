@@ -13,24 +13,17 @@ namespace HSR_SIM_LIB
 /// </summary>
     public class Ability: CheckEssence
     {
+        public ElementEnm? Element { get; set; }
 
-        private AbilityTypeEnm abilityType;//Technique, ultimate etc..
-        private Unit parent;//caster
-        private short cost=0;
-        private ResourceType costType= ResourceType.nil;
-        private ElementEnm? element;//element of skill
-        public ElementEnm? Element { get => element; set => element = value; }
-        public AbilityTypeEnm AbilityType { get => abilityType; set => abilityType = value; }
-        public Unit Parent { get => parent; set => parent = value; }
+        public AbilityTypeEnm AbilityType { get; set; }
+
+        public Unit Parent { get; set; }
 
         public string Name { get; internal set; }
-        public List<Event> Events { get => events; set => events = value; }
-        public short Cost { get => cost; set => cost = value; }
-        public ResourceType CostType { get => costType; set => costType = value; }
+        public List<Event> Events { get; set; } = new List<Event>();
+        public short Cost { get; set; } = 0;
+        public ResourceType CostType { get; set; } = ResourceType.nil;
 
-
-        private List<Event> events = new List<Event>();
-        
 
         public Ability(Unit parent) 
         { 
@@ -57,6 +50,5 @@ namespace HSR_SIM_LIB
             AOE,
             Blast
         }
-            
     }
 }

@@ -106,7 +106,7 @@ namespace HSR_SIM_LIB
                     gfx.DrawImage(new Bitmap(LoadBitmap("next"), PortraitSizeMini), new Point(point.X + (i * (int)(PortraitSizeMini.Width * 1.1)), point.Y));
                     break;
                 }
-                foreach (ElementEnm elm in unit.Weaknesses)
+                foreach (ElementEnm elm in unit.Fighter.Weaknesses)
                 {
                     if (elemList.IndexOf(elm) < 0)
                         elemList.Add(elm);
@@ -214,12 +214,12 @@ namespace HSR_SIM_LIB
                 DrawText(portraitPoint.X + 3, portraitPoint.Y + 3, gfx, String.Format("{0:s}({1:d})", unit.Name, unit.Level), null, new Font("Tahoma", 12, FontStyle.Bold));
 
                 //elements
-                if (unit.Element != null)
-                    gfx.DrawImage(new Bitmap(LoadBitmap(unit.Element.ToString()), ElemSizeMini), new Point(portraitPoint.X + PortraitSize.Width - ElemSizeMini.Width, portraitPoint.Y));
+                if (unit.Fighter.Element != null)
+                    gfx.DrawImage(new Bitmap(LoadBitmap(unit.Fighter.Element.ToString()), ElemSizeMini), new Point(portraitPoint.X + PortraitSize.Width - ElemSizeMini.Width, portraitPoint.Y));
                 //weaknesses
                 short j = 0;
-                if (unit.Weaknesses!=null)
-                    foreach (ElementEnm weak in unit.Weaknesses)
+                if (unit.Fighter.Weaknesses!=null)
+                    foreach (ElementEnm weak in unit.Fighter.Weaknesses)
                     {
                         gfx.DrawImage(new Bitmap(LoadBitmap(weak.ToString()), ElemSizeMini), new Point(portraitPoint.X + j * ElemSizeMini.Width, portraitPoint.Y + (int)(PortraitSize.Height * 0.8)));
                         j++;

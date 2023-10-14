@@ -1,11 +1,5 @@
-<Unit element="Physical" type="NPC">	
-<DamageRes type="Lightning" value="20"/>
-<DamageRes type="Physical" value="20"/>
-<DamageRes type="Ice" value="20"/>
-<DamageRes type="Quantum" value="20"/>
-<Weakness type="Fire"/>
-<Weakness type="Ice"/>
-<Weakness type="Imaginary"/>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Unit name="Vagrant">
 <Stats level="1 " hp="112 " atk="12 " spd="100 " def="210 " effect_hit="0" effect_res="10" tgh="60" />
 <Stats level="2 " hp="146 " atk="14 " spd="100 " def="220 " effect_hit="0" effect_res="10" tgh="60" />
 <Stats level="3 " hp="153 " atk="15 " spd="100 " def="230 " effect_hit="0" effect_res="10" tgh="60" />
