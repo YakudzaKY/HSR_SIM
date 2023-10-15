@@ -165,7 +165,7 @@ namespace HSR_SIM_LIB
                 }
                 else
                 {
-                    //return first othjer team
+                    //return first other team
                     return ParentTeam.ParentSim.Teams
                         .First(x => x != ParentTeam && x.TeamType != Team.TeamTypeEnm.Special).Units;
 
@@ -185,6 +185,7 @@ namespace HSR_SIM_LIB
         }
 
         public string FighterClassName { get; set; }
+        public int Rank { get; set; }
 
         public IEnumerable<CheckEssence> GetTargets(TargetTypeEnm targetType)
         {

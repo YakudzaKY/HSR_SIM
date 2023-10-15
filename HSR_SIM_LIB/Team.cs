@@ -24,8 +24,8 @@ namespace HSR_SIM_LIB
         public Team(SimCls parent)
         {
             ParentSim=parent;
-            GetRes(ResourceType.TP).ResVal = 5;
-            GetRes(ResourceType.SP).ResVal = 5;
+            GetRes(ResourceType.TP).ResVal = Constant.MaxTp;
+            GetRes(ResourceType.SP).ResVal = Constant.MaxTp;
             
         }
         /// <summary>

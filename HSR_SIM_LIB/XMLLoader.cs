@@ -162,6 +162,7 @@ namespace HSR_SIM_LIB
                     $"HSR_SIM_LIB.Fighters.{words[0]}.{words[1].Replace(" ", "")}";
                 unit.UnitType = (Unit.TypeEnm)System.Enum.Parse(typeof(Unit.TypeEnm), words[0], true);
                 unit.Level = int.Parse(unitNode.Attributes.GetNamedItem("level")?.Value?.Trim() ?? "1");
+                unit.Rank = int.Parse(unitNode.Attributes.GetNamedItem("rank")?.Value?.Trim() ?? "0");
                 string unitFile = Utils.DataFolder + "UnitTemplates\\" + unitCode + ".xml";
                 unit.Name = Path.GetFileNameWithoutExtension(unitFile);
                 //override by wargear

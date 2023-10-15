@@ -38,7 +38,7 @@ namespace HSR_SIM_LIB
             Ultimate,
             Talent,
             Technique,
-            Trigger
+            Trigger//Add priority Hight Medium Low . Ultimate can use before low. Blade shuhu medium, Locha heal - hight. Kafka-hight, Locha aura - low
         }
 
         public enum TargetTypeEnm

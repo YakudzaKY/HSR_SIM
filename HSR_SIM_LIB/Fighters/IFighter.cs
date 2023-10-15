@@ -19,6 +19,7 @@ namespace HSR_SIM_LIB.Fighters
         public List<Ability> Abilities { get; set; }
         public Unit Parent{ get; set; }
         public Ability ChooseAbilityToCast(Step step);
+        public string GetSpecialText();//text for different triggers counters etc
 
     }
 }

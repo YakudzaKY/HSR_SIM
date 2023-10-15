@@ -10,9 +10,9 @@ namespace HSR_SIM_LIB.Fighters.Character
 {
     public class Blade : DefaultFighter
     {
-
-
-        public new Ability ChooseAbilityToCast(Step step)
+        private int ShuHuCnt ;
+        private readonly int ShuHuMaxCnt ;
+        public override Ability ChooseAbilityToCast(Step step)
         {
             Ability watAbility = null;
 
@@ -24,7 +24,7 @@ namespace HSR_SIM_LIB.Fighters.Character
         {
             return Parent.Stats.MaxHp*0.2;
         }
-        public double? CalculateKarmaThg(Event ent)
+        public static double? CalculateKarmaThg(Event ent)
         {
             return ent.TargetUnit.GetRes(Resource.ResourceType.Toughness).ResVal;
         }
@@ -33,7 +33,11 @@ namespace HSR_SIM_LIB.Fighters.Character
             return  FighterUtils.CalculateBasicDmg(Parent.Stats.MaxHp*0.4,ent);
         }
 
-        
+        public override string GetSpecialText()
+        {
+            return $"SH: {ShuHuCnt:d}\\{ShuHuMaxCnt:d}";
+        }
+
         //Blade constructor
         public Blade(Unit parent) : base(parent)
         {
@@ -51,7 +55,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             //Dequeue
             ability.Events.Add(new Event() { OnStepType = Step.StepTypeEnm.ExecuteStartQueue, Type = Event.EventType.CombatStartSkillDeQueue});
             Abilities.Add(ability);
-
+            ShuHuMaxCnt = (parent.Rank==6 )? 4 : 5;//4 stacks on 6 eidolon 
 
         }
 

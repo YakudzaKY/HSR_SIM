@@ -26,9 +26,11 @@ namespace HSR_SIM_LIB.Fighters
             throw new NotImplementedException();
         }
 
+        public string GetSpecialText()
+        {
+            return null;
+        }
 
-
-     
 
         IFighter.EventHandler IFighter.EventHandlerProc
         {

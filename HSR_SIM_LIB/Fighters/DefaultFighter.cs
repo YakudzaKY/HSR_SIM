@@ -24,27 +24,25 @@ namespace HSR_SIM_LIB.Fighters
             return Parent.Enemies.Where(x => x.IsAlive);
         }
 
-        //enemys with weakness to ability
+        //enemies with weakness to ability
         public IEnumerable<Unit> GetWeaknessTargets(Event ent)
         {
             return Parent.Enemies.Where(x => x.IsAlive && x.Fighter.Weaknesses.Any(x => x == ent.AbilityValue.Element));
         }
-        //enemys with weakness to caster
+        //enemies with weakness to caster
         public IEnumerable<Unit> GetWeaknessTargets(Unit attackerUnit)
         {
             return Parent.Enemies.Where(x => x.IsAlive && x.Fighter.Weaknesses.Any(x => x == attackerUnit.Fighter.Element));
         }
-        //alive firends
-#pragma warning disable IDE0060 // Удалите неиспользуемый параметр
+        //alive friends
         public IEnumerable<Unit> GetFriends(Event ent)
-#pragma warning restore IDE0060 // Удалите неиспользуемый параметр
         {
             return Parent.Friends.Where(x => x.IsAlive);
         }
 
 
         //Try to choose some good ability to cast
-        public Ability ChooseAbilityToCast(Step step)
+        public virtual Ability ChooseAbilityToCast(Step step)
         {
             //Technique before fight
             if (step.Parent.CurrentFight == null)
@@ -59,26 +57,54 @@ namespace HSR_SIM_LIB.Fighters
                     //enter combat skills
                     if (ability.Events.Any(y => y.Type == Event.EventType.EnterCombat))
                     {
+                        /*
+                         *Cast ability if ability not in qeueu
+                         * and we can penetrate weakness
+                         * or others cant do that.
+                         * So basic opener through weakness>>  combat technique that not penetrate
+                         */
                         if (Parent.ParentTeam.ParentSim.BeforeStartQueue.IndexOf(ability) ==
                             -1 //check for existing in queue 
                             && (GetWeaknessTargets(Parent).Any() //We can penetrate shield 
-                                ||!Parent.Friends.Any(x=>GetWeaknessTargets(x).Any()) //or others cant penetrate
+                                || !GetFriends(null).Any(x => x != Parent
+                                                           && GetWeaknessTargets(x).Any()
+                                                           && x.Fighter.Abilities.Any(y =>
+                                                               y.AbilityType == Ability.AbilityTypeEnm.Technique
+                                                               && y.Events.Any(y => y.Type == Event.EventType.EnterCombat))) //or others cant penetrate 
                                 )
-                            &&!(Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= ability.Cost+1
-                                    &&Parent.ParentTeam.Units.Any(x=>x.Fighter.Abilities.Any(y=>y.AbilityType==Ability.AbilityTypeEnm.Technique&&!y.Events.Any(y=>y.Type==Event.EventType.EnterCombat)&&x.ParentTeam.ParentSim.BeforeStartQueue.IndexOf(y)<0)))// no unused buffers here when 2tp+
-                            ) 
+                            && !(Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= ability.Cost + 1
+                                    && GetFriends(null).Any(x => x.Fighter.Abilities.Any(y => y.AbilityType == Ability.AbilityTypeEnm.Technique && !y.Events.Any(y => y.Type == Event.EventType.EnterCombat) && x.ParentTeam.ParentSim.BeforeStartQueue.IndexOf(y) < 0)))// no unused buffers here when 2tp+
+                            )
                         {
                             return ability;
                         }
-                        //HAVE >=2 tp and have buffers and no buff active
+                    
                     }
                     else
                     {
-                        return ability;
+                        //if no skill in queue
+                        if (Parent.ParentTeam.ParentSim.BeforeStartQueue.All(x => x != ability))
+                        {
+                            /*if have 2+ tp or
+                             we have NOT friend who can penetrate weakness through  cost=1 ability
+                            */
+                            if (Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= ability.Cost + 1
+                               || !GetFriends(null).Any(x =>GetWeaknessTargets(x).Any()&& x.Fighter.Abilities.Any(y =>
+                                   y.AbilityType == Ability.AbilityTypeEnm.Technique && y.Cost > 0
+                                   && y.Events.Any(y => y.Type == Event.EventType.EnterCombat)))
+                               )
+                                return ability;
+                        }
+
                     }
                 }
             }
 
+            return null;
+        }
+
+        public virtual string GetSpecialText()
+        {
             return null;
         }
 

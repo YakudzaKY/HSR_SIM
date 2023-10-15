@@ -313,13 +313,16 @@ namespace HSR_SIM_LIB
                 }
 
 
-                //AV
+               
                 if (step.Parent.CurrentFight?.CurrentWave != null)
-
                 {
-
+                    //AV
                     DrawText(portraitPoint.X + 5, portraitPoint.Y + (int)(PortraitSize.Height * 0.4), gfx, Math.Floor(unit.Stats.ActionValue).ToString(), new SolidBrush(Color.WhiteSmoke), new Font("Tahoma", DefaultFontSize));
                 }
+
+                if (step.Parent.CurrentFight!=null)
+                    //Special text
+                    DrawText(portraitPoint.X + 5, portraitPoint.Y + (int)(PortraitSize.Height * 0.6), gfx, unit.Fighter.GetSpecialText(), new SolidBrush(Color.Chartreuse), new Font("Tahoma", DefaultFontSize));
 
                 i++;
             }
