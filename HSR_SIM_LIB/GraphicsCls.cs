@@ -186,6 +186,9 @@ namespace HSR_SIM_LIB
             return newBitmap;
         }
 
+	
+
+
         /// <summary>
         /// draw units in row
         /// </summary>
@@ -211,7 +214,7 @@ namespace HSR_SIM_LIB
                     grayPortrait.Dispose();
                 }
                 //name
-                DrawText(portraitPoint.X + 3, portraitPoint.Y + 3, gfx, String.Format("{0:s}({1:d})", unit.Name, unit.Level), null, new Font("Tahoma", 12, FontStyle.Bold));
+                DrawText(portraitPoint.X + 3, portraitPoint.Y + 3, gfx, String.Format("{0:s}({1:d})", unit.Name, unit.Level), null, new Font("Tahoma", 12, FontStyle.Bold),true);
 
                 //elements
                 if (unit.Fighter.Element != null)
@@ -317,12 +320,12 @@ namespace HSR_SIM_LIB
                 if (step.Parent.CurrentFight?.CurrentWave != null)
                 {
                     //AV
-                    DrawText(portraitPoint.X + 5, portraitPoint.Y + (int)(PortraitSize.Height * 0.4), gfx, Math.Floor(unit.Stats.ActionValue).ToString(), new SolidBrush(Color.WhiteSmoke), new Font("Tahoma", DefaultFontSize));
+                    DrawText(portraitPoint.X + 5, portraitPoint.Y + (int)(PortraitSize.Height * 0.4), gfx, Math.Floor(unit.Stats.ActionValue).ToString(), new SolidBrush(Color.Violet), new Font("Tahoma", DefaultFontSize),true);
                 }
 
                 if (step.Parent.CurrentFight!=null)
                     //Special text
-                    DrawText(portraitPoint.X + 5, portraitPoint.Y + (int)(PortraitSize.Height * 0.6), gfx, unit.Fighter.GetSpecialText(), new SolidBrush(Color.Chartreuse), new Font("Tahoma", DefaultFontSize));
+                    DrawText(portraitPoint.X + 5, portraitPoint.Y + (int)(PortraitSize.Height * 0.6), gfx, unit.Fighter.GetSpecialText(), new SolidBrush(Color.Chartreuse), new Font("Tahoma", DefaultFontSize-2),true);
 
                 i++;
             }
@@ -344,11 +347,16 @@ namespace HSR_SIM_LIB
         /// <param name="text"></param>
         /// <param name="brush"></param>
         /// <param name="font"></param>
-        private static void DrawText(int x, int y, Graphics gfx, string text, Brush brush = null, Font font = null)
+        private static void DrawText(int x, int y, Graphics gfx, string text, Brush brush = null, Font font = null,bool drawBack=false)
         {
-            
+            if (string.IsNullOrEmpty(text))
+                return;
+
             brush ??= new SolidBrush(clrDefault);
             font ??= new("Tahoma", DefaultFontSize, FontStyle.Bold);
+
+            if (drawBack )
+                gfx.FillRectangle(new SolidBrush( Color.FromArgb(155,  50, 50, 50)), x+3, y,(int)Math.Round((double)text.Length*(double)font.Size*0.7), (int)Math.Round(font.Size*1.6));
             gfx.DrawString(text, font, brush, new Point(x,y));
             
 
