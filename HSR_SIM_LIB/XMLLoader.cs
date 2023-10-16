@@ -107,9 +107,9 @@ namespace HSR_SIM_LIB
         /// </summary>
         /// <param name="xnode"></param>
         /// <returns></returns>
-        private static UnitStats ExctractStats(XmlElement xmlItems, int searchLvl)
+        private static UnitStats ExctractStats(XmlElement xmlItems, int searchLvl, Unit unit)
         {
-            UnitStats unitStats = new();
+            UnitStats unitStats = new(unit);
             int? lvl;
             //parse all items
             foreach (XmlElement xnode in xmlItems.SelectNodes("Stats"))
@@ -122,6 +122,10 @@ namespace HSR_SIM_LIB
                     unitStats.BaseMaxEnergy = SafeToInt(xnode.Attributes.GetNamedItem("energy")?.Value.Trim());
                     unitStats.BaseSpeed = SafeToDouble(xnode.Attributes.GetNamedItem("spd")?.Value.Trim());
                     unitStats.MaxToughness = SafeToInt(xnode.Attributes.GetNamedItem("tgh")?.Value.Trim());
+                    unitStats.BaseCritChance = SafeToDouble(xnode.Attributes.GetNamedItem("crit_rate")?.Value.Trim());
+                    unitStats.BaseCritDmg = SafeToDouble(xnode.Attributes.GetNamedItem("crit_dmg")?.Value.Trim());
+                    unitStats.BaseDef = SafeToDoubleNull(xnode.Attributes.GetNamedItem("def")?.Value.Trim());
+                    unitStats.BaseBreakDmg= SafeToDouble(xnode.Attributes.GetNamedItem("break_dmg")?.Value.Trim());
                     if (xnode.Attributes.GetNamedItem("baseActionValue") is not null)
                     {
                         unitStats.BaseActionValue =
@@ -135,12 +139,17 @@ namespace HSR_SIM_LIB
 
         private static double SafeToDouble(string pStr)
         {
-            if (pStr != null)
+            if (!String.IsNullOrEmpty(pStr))
                 return Double.Parse(pStr.Replace(".",","));
             return 0;
         }
 
-
+        private static double? SafeToDoubleNull(string pStr)
+        {
+            if (!String.IsNullOrEmpty(pStr))
+                return Double.Parse(pStr.Replace(".",","));
+            return null;
+        }
 
 
         /// <summary>
@@ -197,7 +206,7 @@ namespace HSR_SIM_LIB
                 unit.Level = SafeToInt(newLevel);
             if ((unitCode) != unit.Name)
                 throw new Exception(String.Format("Looking wargear for {0:s} but loaded for {1:s}",unit.Name,unitCode));
-            unit.Stats= ExctractStats(xRoot,unit.Level);
+            unit.Stats= ExctractStats(xRoot,unit.Level,unit);
 
         }
 

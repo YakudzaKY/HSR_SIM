@@ -10,6 +10,7 @@ namespace HSR_SIM_LIB
     public static class Constant
     {
         public static readonly string MsgLog = "LOG";
+        public static readonly string MsgDebug = "DEBUG";
         public static readonly int MaxSp = 5;
         public static readonly int MaxTp = 5;
 

@@ -37,7 +37,7 @@ namespace HSR_SIM_LIB
             {
                 unit.ParentTeam = null;
             }
-            Units.Clear();
+            //Units.Clear(); disable this clear coz need save team into event field
             units=null;
         }
 

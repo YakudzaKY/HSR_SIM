@@ -11,11 +11,9 @@ namespace HSR_SIM_LIB
     /// </summary>
     public class Resource: CheckEssence
     {
-        private ResourceType resType;
-        private double? resVal;
+        public ResourceType ResType { get; set; }
 
-        public ResourceType ResType { get => resType; set => resType = value; }
-        public double? ResVal { get => resVal; set => resVal = value; }
+        public double ResVal { get; set; }
 
         public enum ResourceType
         {
@@ -23,7 +21,8 @@ namespace HSR_SIM_LIB
             TP,
             SP,
             HP,
-            Toughness
+            Toughness,
+            Barrier
         }
     }
 }

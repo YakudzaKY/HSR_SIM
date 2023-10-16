@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HSR_SIM_LIB.Fighters;
 using static HSR_SIM_LIB.Event;
 using static HSR_SIM_LIB.Resource;
 using static HSR_SIM_LIB.Trigger;
@@ -80,7 +81,7 @@ namespace HSR_SIM_LIB
                 ent.Val = ent.CalculateValue(ent);
             if (ent.Type == EventType.PartyResourceDrain)//SP or technical points
             {
-                Actor.ParentTeam.GetRes(ent.ResType).ResVal -= revert ? -ent.Val : ent.Val;
+                Actor.ParentTeam.GetRes(ent.ResType).ResVal -= (double)(revert ? -ent.Val : ent.Val);
             }
             else if (ent.Type == EventType.CombatStartSkillQueue)//party buffs or opening
                 if (!revert)
@@ -120,7 +121,8 @@ namespace HSR_SIM_LIB
                 {
                     Parent.CurrentFight.CurrentWaveCnt += 1;
                     Parent.CurrentFight.CurrentWave = Parent.CurrentFight.ReferenceFight.Waves[Parent.CurrentFight.CurrentWaveCnt - 1];
-                    Parent.HostileTeam.BindUnits(SimCls.GetCombatUnits(Parent.CurrentFight.CurrentWave.Units));
+                    ent.StartingUnits ??= SimCls.GetCombatUnits(Parent.CurrentFight.CurrentWave.Units);
+                    Parent.HostileTeam.BindUnits(ent.StartingUnits);
                     //set start action value
                     foreach (Unit unit in Parent.AllUnits)
                     {
@@ -149,7 +151,7 @@ namespace HSR_SIM_LIB
                 {
                     //calc value first
                     if (mod.CalculateValue != null && mod.Value == null)
-                        mod.Value  = mod.CalculateValue(ent);
+                        mod.Value = mod.CalculateValue(ent);
 
                     if (!revert)
                         mod.TargetUnit.ApplyMod(mod);
@@ -170,20 +172,56 @@ namespace HSR_SIM_LIB
                         ent.RealVal -= 1;
                     }
                 }
-                ent.TargetUnit.GetRes(ent.ResType).ResVal -= revert ? -ent.RealVal : ent.RealVal;
+                ent.TargetUnit.GetRes(ent.ResType).ResVal -= (double)(revert ? -ent.RealVal : ent.RealVal);
             }
-            else if (ent.Type == EventType.DirectDamage) //Resource drain
+            else if (ent.Type == EventType.DirectDamage|| ent.Type == EventType.ShieldBreak) //Direct damage
             {
-                //TODO чёнить
-            }
-            else if (ent.Type == EventType.ShieldBreak) //Resource drain
-            {
-                //TODO чёнить
+                if (ent.RealVal == null)
+                {
+                    ent.RealBarrierVal = Math.Min((double)ent.TargetUnit.GetRes(ResourceType.Barrier).ResVal,
+                        (double)ent.Val);
+
+                    var resVal = ent.TargetUnit.GetRes(ResourceType.HP).ResVal;
+                    if (resVal != null)
+                        ent.RealVal = Math.Min((double)resVal,
+                            (double)ent.Val - (double)ent.RealBarrierVal);
+                }
+
+
+                ent.TargetUnit.GetRes(ResourceType.Barrier).ResVal -=
+                    (double)(revert ? -ent.RealBarrierVal : ent.RealBarrierVal);
+                ent.TargetUnit.GetRes(ResourceType.HP).ResVal -=(double)( revert ? -ent.RealVal : ent.RealVal);
+
             }
             else
                 throw new NotImplementedException();
-            Parent.OnTriggerProc(this, ent, revert);
+            OnTriggerProc(this, ent, revert);
 
+        }
+
+        public void OnTriggerProc(Step step, Event ent, bool revert)
+        {
+            // Shield broken
+            if (!revert
+                && ent.Triggers.All(x => x.TrType != Trigger.TriggerType.ShieldBreakeTrigger)
+                && ent.Type == EventType.ResourceDrain
+                && ent.ResType == ResourceType.Toughness
+                && ent.RealVal > 0
+                && ent.TargetUnit.GetRes(ResourceType.Toughness).ResVal == 0)
+            {
+                ent.Triggers.Add(new Trigger() { TrType = Trigger.TriggerType.ShieldBreakeTrigger });
+                Event shieldBrkEvent = new () { Type = EventType.ShieldBreak, AbilityValue = ent.AbilityValue, TargetUnit = ent.TargetUnit, ParentStep = step };
+                shieldBrkEvent.Val = FighterUtils.CalculateShieldBrokeDmg(shieldBrkEvent);
+                step.Events.Add(shieldBrkEvent);
+                step.ProcEvent(shieldBrkEvent, revert);
+                //TODO ADD Dot placements and debuffs
+
+            }
+
+            // handle events
+            //ent.TargetUnit?.Fighter?.EventHandlerProc(ent);
+            // if Target!=Actor
+            //ent.ParentStep.Actor?.Fighter?.EventHandlerProc(ent);
         }
         /// <summary>
         /// Proc all events in step. No random here or smart thinking. Do it on DoSomething...
@@ -191,7 +229,7 @@ namespace HSR_SIM_LIB
         public void ProcEvents(bool revert = false)
         {
             //for all events saved in step
-            List<Event> events = new ();
+            List<Event> events = new();
             events.AddRange(Events);
             //rollback changes from the end of list
             if (revert)
@@ -250,13 +288,13 @@ namespace HSR_SIM_LIB
 
             }
             //update mods
-            foreach (Event ent in Events.Where(x=>x.Type==EventType.Mod))
+            foreach (Event ent in Events.Where(x => x.Type == EventType.Mod))
             {
 
-                List<Mod> newMods = new ();
-              
+                List<Mod> newMods = new();
+
                 //calculated mods
-                foreach (Mod mod in ent.Mods.Where(x=>x.CalculateTargets!=null))
+                foreach (Mod mod in ent.Mods.Where(x => x.CalculateTargets != null))
                 {
                     foreach (Unit unit in mod.CalculateTargets(ent))
                     {
@@ -274,7 +312,7 @@ namespace HSR_SIM_LIB
                     newMods = (List<Mod>)newMods.Concat(oldList);
                 }
 
-                ent.Mods=newMods;
+                ent.Mods = newMods;
             }
         }
         //Cast all techniques before fights starts

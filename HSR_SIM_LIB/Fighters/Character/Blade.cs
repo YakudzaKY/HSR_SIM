@@ -50,8 +50,8 @@ namespace HSR_SIM_LIB.Fighters.Character
             ability.Events.Add(new Event() { OnStepType = Step.StepTypeEnm.ExecuteAbilityUse, Type = Event.EventType.EnterCombat });
             //dmg events
             ability.Events.Add(new Event() { OnStepType = Step.StepTypeEnm.ExecuteStartQueue, Type = Event.EventType.ResourceDrain,ResType = Resource.ResourceType.HP, TargetUnit = Parent, CanSetToZero = false, CalculateValue = CalculateKarmaSelfDmg ,AbilityValue = ability});
-            ability.Events.Add(new Event() { OnStepType = Step.StepTypeEnm.ExecuteStartQueue, Type = Event.EventType.ResourceDrain,ResType = Resource.ResourceType.Toughness,CalculateValue = CalculateKarmaThg, CalculateTargets = GetWeaknessTargets ,AbilityValue = ability});
             ability.Events.Add(new Event() { OnStepType = Step.StepTypeEnm.ExecuteStartQueue, Type = Event.EventType.DirectDamage,CalculateValue = CalculateKarmaDmg, CalculateTargets = GetAoeTargets ,AbilityValue = ability});
+            ability.Events.Add(new Event() { OnStepType = Step.StepTypeEnm.ExecuteStartQueue, Type = Event.EventType.ResourceDrain,ResType = Resource.ResourceType.Toughness,CalculateValue = CalculateKarmaThg, CalculateTargets = GetWeaknessTargets ,AbilityValue = ability});
             //Dequeue
             ability.Events.Add(new Event() { OnStepType = Step.StepTypeEnm.ExecuteStartQueue, Type = Event.EventType.CombatStartSkillDeQueue});
             Abilities.Add(ability);

@@ -10,7 +10,7 @@ namespace HSR_SIM_LIB.Fighters
     /// </summary>
     public interface IFighter
     {
-        public Unit.ElementEnm? Element { get; set; }
+        public Unit.ElementEnm Element { get; set; }
         public List<Unit.ElementEnm> Weaknesses { get; set; }
         public List<Resist> Resists { get; set; }
         public delegate void EventHandler(Event ent);

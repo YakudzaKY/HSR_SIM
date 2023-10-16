@@ -26,6 +26,7 @@ namespace HSR_SIM_LIB
         Step currentStep = null;
         int currentFightStep = 0;
 
+        public Worker Parent { get; set; }
 
         public List<Team> Teams { get; } = new List<Team>();
 
@@ -478,28 +479,6 @@ namespace HSR_SIM_LIB
         }
 
 
-        public void OnTriggerProc(Step step, Event ent, bool revert)
-        {
-            // Shield breake. Если по этому евенту не было тригера на щит
-            if (!revert
-                && ent.Triggers.All(x => x.TrType != Trigger.TriggerType.ShieldBreakeTrigger)
-                && ent.Type == EventType.ResourceDrain
-                && ent.ResType == ResourceType.Toughness
-                && ent.RealVal > 0
-                && ent.TargetUnit.GetRes(ResourceType.Toughness).ResVal == 0)
-            {
-                Event shieldBrkEvent = new () { Type = EventType.ShieldBreak, AbilityValue = ent.AbilityValue, TargetUnit = ent.TargetUnit, ParentStep = step };
-                ent.Triggers.Add(new Trigger() { TrType = Trigger.TriggerType.ShieldBreakeTrigger });
-                step.Events.Add(shieldBrkEvent);
-                step.ProcEvent(shieldBrkEvent, revert);
-
-            }
-
-            // handle events
-            //ent.TargetUnit?.Fighter?.EventHandlerProc(ent);
-            //TODO if Target!=Actor
-            //ent.ParentStep.Actor?.Fighter?.EventHandlerProc(ent);
-        }
     }
 
 }

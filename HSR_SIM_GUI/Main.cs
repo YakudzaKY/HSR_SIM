@@ -22,7 +22,7 @@ namespace HSR_SIM_GUI
     public partial class Main : Form
     {
         readonly Worker wrk;
-
+        private DebugWindow dbg;
 
         /// <summary>
         /// For text callback
@@ -34,6 +34,14 @@ namespace HSR_SIM_GUI
             {
                 Utils.AddLine(LogWindow, kv.Value, 400);
                 LogWindow.ScrollToCaret();
+            }
+            else if (String.Equals(kv.Key, Constant.MsgDebug))
+            {
+                if (dbg!=null&&!dbg.IsDisposed)
+                {
+                    dbg.dbgText.AddLine(kv.Value);
+                    LogWindow.ScrollToCaret();
+                }
             }
         }
         /// <summary>
@@ -52,9 +60,8 @@ namespace HSR_SIM_GUI
 
         public Main()
         {
+
             
-
-
             CallBackStr callBackStr = new(WorkerCallBackString);
             CallBackRender callBackRender = new(WorkerCallBackImages);
             InitializeComponent();
@@ -148,6 +155,13 @@ namespace HSR_SIM_GUI
                 StartPosition = FormStartPosition.CenterScreen
             };
             wg.Show();
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            if (dbg ==null || dbg.IsDisposed)
+                dbg= new();
+            dbg.Show();
         }
     }
 }

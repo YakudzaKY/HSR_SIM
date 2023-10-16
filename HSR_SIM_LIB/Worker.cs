@@ -59,6 +59,7 @@ namespace HSR_SIM_LIB
         {
             Init();
             Sim = XMLLoader.LoadCombatFromXml(scenarioPath, profilePath);
+            Sim.Parent = this;
             LogText("Scenario  " + Sim.CurrentScenario.Name + " was loaded");
         }
 
@@ -205,6 +206,16 @@ namespace HSR_SIM_LIB
         {
             CbLog?.Invoke(new KeyValuePair<string, string>(Constant.MsgLog, msg));
         }
+
+        /// <summary>
+        /// wrapper for Text callback using for log output
+        /// </summary>
+        /// <param name="msg">message to print</param>
+        public void LogDebug(string msg)
+        {
+            CbLog?.Invoke(new KeyValuePair<string, string>(Constant.MsgDebug, msg));
+        }
+
 
 
         public void Init()

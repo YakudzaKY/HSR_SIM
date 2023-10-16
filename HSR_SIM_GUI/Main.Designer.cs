@@ -44,6 +44,7 @@ namespace HSR_SIM_GUI
             button2 = new System.Windows.Forms.Button();
             button3 = new System.Windows.Forms.Button();
             button4 = new System.Windows.Forms.Button();
+            button5 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)combatOut).BeginInit();
             SuspendLayout();
             // 
@@ -167,7 +168,7 @@ namespace HSR_SIM_GUI
             // 
             // button4
             // 
-            button4.Location = new System.Drawing.Point(389, 634);
+            button4.Location = new System.Drawing.Point(368, 714);
             button4.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             button4.Name = "button4";
             button4.Size = new System.Drawing.Size(120, 30);
@@ -176,10 +177,22 @@ namespace HSR_SIM_GUI
             button4.UseVisualStyleBackColor = true;
             button4.Click += Button4_Click;
             // 
+            // button5
+            // 
+            button5.Location = new System.Drawing.Point(368, 750);
+            button5.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            button5.Name = "button5";
+            button5.Size = new System.Drawing.Size(120, 30);
+            button5.TabIndex = 13;
+            button5.Text = "Open Debug window";
+            button5.UseVisualStyleBackColor = true;
+            button5.Click += button5_Click;
+            // 
             // Main
             // 
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             ClientSize = new System.Drawing.Size(1225, 834);
+            Controls.Add(button5);
             Controls.Add(button4);
             Controls.Add(button3);
             Controls.Add(button2);
@@ -218,6 +231,7 @@ namespace HSR_SIM_GUI
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button button5;
     }
 }
 

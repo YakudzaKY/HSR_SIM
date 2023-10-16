@@ -17,10 +17,10 @@ namespace HSR_SIM_LIB.Fighters.NPC
             Weaknesses.Add(Unit.ElementEnm.Fire);
             Weaknesses.Add(Unit.ElementEnm.Ice);
             Weaknesses.Add(Unit.ElementEnm.Imaginary);
-            Resists.Add(new Resist(){ResistType=Unit.ElementEnm.Lightning,ResistVal=20});
-            Resists.Add(new Resist(){ResistType=Unit.ElementEnm.Physical,ResistVal=20});
-            Resists.Add(new Resist(){ResistType=Unit.ElementEnm.Ice,ResistVal=20});
-            Resists.Add(new Resist(){ResistType=Unit.ElementEnm.Quantum,ResistVal=20});
+            Resists.Add(new Resist(){ResistType=Unit.ElementEnm.Lightning,ResistVal=0.20});
+            Resists.Add(new Resist(){ResistType=Unit.ElementEnm.Physical,ResistVal=0.20});
+            Resists.Add(new Resist(){ResistType=Unit.ElementEnm.Ice,ResistVal=0.20});
+            Resists.Add(new Resist(){ResistType=Unit.ElementEnm.Quantum,ResistVal=0.20});
         }
     }
 }

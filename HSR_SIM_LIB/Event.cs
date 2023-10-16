@@ -21,29 +21,31 @@ namespace HSR_SIM_LIB
         public CalculateTargetPrc CalculateTargets { get; init; }
         private EventType type;
         private Resource.ResourceType resType;
-        private Ability abilityValue;
         private double? val;//Theoretical value
         private double? realVal;//Real hit value(cant exceed)
 
-        public bool CanSetToZero { get; init;  } = true;
-
+        public bool CanSetToZero { get; init; } = true;
+        public List<Unit> StartingUnits { get; set; }
         public List<Mod> Mods { get; set; } = new List<Mod>();
         public Unit TargetUnit { get; set; }
         public Step.StepTypeEnm OnStepType { get; init; }
         public EventType Type { get => type; set => type = value; }
-        public Ability AbilityValue { get => abilityValue; set => abilityValue = value; }
+        public Ability AbilityValue { get; set; }
         public double? Val { get => val; set => val = value; }
         public double? RealVal { get => realVal; set => realVal = value; }
+        public double? RealBarrierVal { get => realBarrierVal; set => realBarrierVal = value; }
+        public bool IsCrit { get; set; }
         public Resource.ResourceType ResType { get => resType; set => resType = value; }
         public Step ParentStep { get; set; } = null;
 
         private List<Trigger> triggers = null;
+        private double? realBarrierVal;
 
         public List<Trigger> Triggers
         {
             get { return triggers ??= new List<Trigger>(); }
-            set => triggers=value;
-        } 
+            set => triggers = value;
+        }
 
 
         public enum EventType
@@ -58,7 +60,9 @@ namespace HSR_SIM_LIB
             ModActionValue,
             ShieldBreak,
             DirectDamage,
-            CombatStartSkillDeQueue
+            CombatStartSkillDeQueue,
+            DoTDamage,
+            DoTPlace
         }
 
 
@@ -74,7 +78,7 @@ namespace HSR_SIM_LIB
             else if (Type == EventType.PartyResourceDrain)
                 res = "Party res drain : " + this.Val + " " + this.ResType.ToString();
             else if (Type == EventType.ResourceDrain)
-                res = this.TargetUnit.Name+" res drain : " + this.Val + " " + this.ResType.ToString()+"(by "+this.ParentStep.Actor.Name+")";
+                res = this.TargetUnit.Name + " res drain : " + this.Val + " " + this.ResType.ToString() + "(by " + this.ParentStep.Actor.Name + ")";
             else if (Type == EventType.EnterCombat)
                 res = "entering the combat...";
             else if (Type == EventType.Mod)
@@ -82,9 +86,11 @@ namespace HSR_SIM_LIB
             else if (Type == EventType.StartWave)
                 res = "next wave";
             else if (Type == EventType.DirectDamage)
-                res = "Dealing damage";//TODO need expand
+                res = "Dealing damage" + (IsCrit ? " (CRITICAL)" : "") +
+                      $" overall={val:f} to_barier={RealBarrierVal:f} to_hp={RealVal:f}";
             else if (Type == EventType.ShieldBreak)
-                res = this.TargetUnit.Name+ " shield broken";
+                res = this.TargetUnit.Name + " shield broken " +
+                      $" overall={val:f} to_hp={RealVal:f}"; 
             else
                 throw new NotImplementedException();
             return res;

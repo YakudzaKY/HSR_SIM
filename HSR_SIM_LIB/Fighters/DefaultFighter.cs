@@ -13,7 +13,7 @@ namespace HSR_SIM_LIB.Fighters
     /// </summary>
     public class DefaultFighter : IFighter
     {
-        public Unit.ElementEnm? Element { get; set; }
+        public Unit.ElementEnm Element { get; set; }
         public List<Unit.ElementEnm> Weaknesses { get; set; } = null;
         public List<Resist> Resists { get; set; } = new List<Resist>();
         public Unit Parent { get; set; }
@@ -24,10 +24,12 @@ namespace HSR_SIM_LIB.Fighters
             return Parent.Enemies.Where(x => x.IsAlive);
         }
 
-        //enemies with weakness to ability
+        //enemies with weakness to ability and without shield
         public IEnumerable<Unit> GetWeaknessTargets(Event ent)
         {
-            return Parent.Enemies.Where(x => x.IsAlive && x.Fighter.Weaknesses.Any(x => x == ent.AbilityValue.Element));
+            return Parent.Enemies.Where(x => x.IsAlive
+                                             && x.GetRes(Resource.ResourceType.Barrier).ResVal==0
+                                             && x.Fighter.Weaknesses.Any(x => x == ent.AbilityValue.Element));
         }
         //enemies with weakness to caster
         public IEnumerable<Unit> GetWeaknessTargets(Unit attackerUnit)
