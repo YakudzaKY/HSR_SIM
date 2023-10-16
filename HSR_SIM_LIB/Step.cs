@@ -69,160 +69,9 @@ namespace HSR_SIM_LIB
             , StartWave//on wave starts
             , ExecuteStartQueue
         }
-        /// <summary>
-        /// Proc one event
-        /// </summary>
-        /// <param name="ent"></param>
-        /// <param name="revert"></param>
-        public void ProcEvent(Event ent, bool revert)
-        {
-            //calc value first
-            if (ent.CalculateValue != null && ent.Val == null)
-                ent.Val = ent.CalculateValue(ent);
-            if (ent.Type == EventType.PartyResourceDrain)//SP or technical points
-            {
-                Actor.ParentTeam.GetRes(ent.ResType).ResVal -= (double)(revert ? -ent.Val : ent.Val);
-            }
-            else if (ent.Type == EventType.CombatStartSkillQueue)//party buffs or opening
-                if (!revert)
-                    Parent.BeforeStartQueue.Add(ActorAbility);
-                else
-                    Parent.BeforeStartQueue.Remove(ActorAbility);
-            else if (ent.Type == EventType.CombatStartSkillDeQueue)//DEQUEUE party buffs or opening
-                if (!revert)
-                    Parent.BeforeStartQueue.Remove(ActorAbility);
-                else
-                    Parent.BeforeStartQueue.Add(ActorAbility);
-            else if (ent.Type == EventType.EnterCombat)//entering combat
-                Parent.DoEnterCombat = !revert;
-            else if (ent.Type == EventType.StartCombat)//Loading combat
-            {
-                if (!revert)
-                {
-                    Parent.DoEnterCombat = false;
-                    Parent.CurrentFight = new CombatFight(Parent.CurrentScenario.Fights[Parent.CurrentFightStep]);
-                    Parent.CurrentFightStep += 1;
-                }
-                else
-                {
-                    Parent.DoEnterCombat = true;
-                    Parent.CurrentFight = null;
-                    Parent.CurrentFightStep -= 1;
-                }
-
-            }
-            else if (ent.Type == EventType.ModActionValue) //Loading wave
-            {
-                throw new NotImplementedException();
-            }
-            else if (ent.Type == EventType.StartWave)//Loading wave
-            {
-                if (!revert)
-                {
-                    Parent.CurrentFight.CurrentWaveCnt += 1;
-                    Parent.CurrentFight.CurrentWave = Parent.CurrentFight.ReferenceFight.Waves[Parent.CurrentFight.CurrentWaveCnt - 1];
-                    ent.StartingUnits ??= SimCls.GetCombatUnits(Parent.CurrentFight.CurrentWave.Units);
-                    Parent.HostileTeam.BindUnits(ent.StartingUnits);
-                    //set start action value
-                    foreach (Unit unit in Parent.AllUnits)
-                    {
-                        unit.Stats.ResetAV();
-                    }
-
-                }
-                else
-                {
-                    Parent.HostileTeam.UnBindUnits();
-                    Parent.CurrentFight.CurrentWaveCnt -= 1;
-                    if (Parent.CurrentFight.CurrentWaveCnt > 0)
-                        Parent.CurrentFight.CurrentWave = Parent.CurrentFight.ReferenceFight.Waves[Parent.CurrentFight.CurrentWaveCnt - 1];
-                    else
-                    {
-                        Parent.CurrentFight.CurrentWave = null;
-                    }
-
-                }
-
-            }
-            else if (ent.Type == EventType.Mod) //Apply mod
-            {
-
-                foreach (var mod in ent.Mods)
-                {
-                    //calc value first
-                    if (mod.CalculateValue != null && mod.Value == null)
-                        mod.Value = mod.CalculateValue(ent);
-
-                    if (!revert)
-                        mod.TargetUnit.ApplyMod(mod);
-                    else
-                        mod.TargetUnit.RemoveMod(mod);
+       
 
 
-                }
-
-            }
-            else if (ent.Type == EventType.ResourceDrain) //Resource drain
-            {
-                if (ent.RealVal == null)
-                {
-                    ent.RealVal = Math.Min((double)ent.TargetUnit.GetRes(ent.ResType).ResVal, (double)ent.Val);
-                    if (!ent.CanSetToZero && ent.RealVal < ent.Val)
-                    {
-                        ent.RealVal -= 1;
-                    }
-                }
-                ent.TargetUnit.GetRes(ent.ResType).ResVal -= (double)(revert ? -ent.RealVal : ent.RealVal);
-            }
-            else if (ent.Type == EventType.DirectDamage|| ent.Type == EventType.ShieldBreak) //Direct damage
-            {
-                if (ent.RealVal == null)
-                {
-                    ent.RealBarrierVal = Math.Min((double)ent.TargetUnit.GetRes(ResourceType.Barrier).ResVal,
-                        (double)ent.Val);
-
-                    var resVal = ent.TargetUnit.GetRes(ResourceType.HP).ResVal;
-                    if (resVal != null)
-                        ent.RealVal = Math.Min((double)resVal,
-                            (double)ent.Val - (double)ent.RealBarrierVal);
-                }
-
-
-                ent.TargetUnit.GetRes(ResourceType.Barrier).ResVal -=
-                    (double)(revert ? -ent.RealBarrierVal : ent.RealBarrierVal);
-                ent.TargetUnit.GetRes(ResourceType.HP).ResVal -=(double)( revert ? -ent.RealVal : ent.RealVal);
-
-            }
-            else
-                throw new NotImplementedException();
-            OnTriggerProc(this, ent, revert);
-
-        }
-
-        public void OnTriggerProc(Step step, Event ent, bool revert)
-        {
-            // Shield broken
-            if (!revert
-                && ent.Triggers.All(x => x.TrType != Trigger.TriggerType.ShieldBreakeTrigger)
-                && ent.Type == EventType.ResourceDrain
-                && ent.ResType == ResourceType.Toughness
-                && ent.RealVal > 0
-                && ent.TargetUnit.GetRes(ResourceType.Toughness).ResVal == 0)
-            {
-                ent.Triggers.Add(new Trigger() { TrType = Trigger.TriggerType.ShieldBreakeTrigger });
-                Event shieldBrkEvent = new () { Type = EventType.ShieldBreak, AbilityValue = ent.AbilityValue, TargetUnit = ent.TargetUnit, ParentStep = step };
-                shieldBrkEvent.Val = FighterUtils.CalculateShieldBrokeDmg(shieldBrkEvent);
-                step.Events.Add(shieldBrkEvent);
-                step.ProcEvent(shieldBrkEvent, revert);
-                //TODO ADD Dot placements and debuffs
-
-            }
-
-            // handle events
-            //ent.TargetUnit?.Fighter?.EventHandlerProc(ent);
-            // if Target!=Actor
-            //ent.ParentStep.Actor?.Fighter?.EventHandlerProc(ent);
-        }
         /// <summary>
         /// Proc all events in step. No random here or smart thinking. Do it on DoSomething...
         /// </summary>
@@ -236,9 +85,7 @@ namespace HSR_SIM_LIB
                 events.Reverse();
 
             foreach (Event ent in events)
-            {
-                ProcEvent(ent, revert);
-            }
+                ent.ProcEvent(revert);
 
             events.Clear();
         }
@@ -329,13 +176,24 @@ namespace HSR_SIM_LIB
         public void ExecuteAbilityUse(Ability ability)
         {
             StepType = StepTypeEnm.ExecuteAbilityUse;
-            Events.AddRange(ability.Events.Where(x => x.OnStepType == StepType));//copy events from ability reference
+      
+
+            foreach (Event ent in ability.Events.Where(x => x.OnStepType == StepType))
+            {
+   
+                    Event unitEnt = (Event)ent.Clone();
+                    unitEnt.ParentStep = this;
+                    Events.Add(unitEnt);
+                
+
+            }
+
             if (ability.CostType == ResourceType.TP || ability.CostType == ResourceType.SP)
             {
-                Events.Add(new Event() { Type = EventType.PartyResourceDrain, ResType = ability.CostType, Val = ability.Cost });
+                Events.Add(new Event(this) { Type = EventType.PartyResourceDrain, ResType = ability.CostType, Val = ability.Cost });
             }
             else if (ability.CostType != ResourceType.nil)
-                Events.Add(new Event() { Type = EventType.ResourceDrain, ResType = ability.CostType, Val = ability.Cost });
+                Events.Add(new Event(this) { Type = EventType.ResourceDrain, ResType = ability.CostType, Val = ability.Cost });
 
             Actor = ability.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
             ActorAbility = ability;//WAT ABILITY is casting
@@ -350,7 +208,7 @@ namespace HSR_SIM_LIB
         {
             if (Parent.CurrentFight == null)
             {
-                Events.Add(new Event() { Type = EventType.StartCombat });
+                Events.Add(new Event(this) { Type = EventType.StartCombat });
                 StepType = StepTypeEnm.StartCombat;
             }
 

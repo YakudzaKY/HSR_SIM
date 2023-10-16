@@ -46,14 +46,14 @@ namespace HSR_SIM_LIB.Fighters.Character
             Ability ability;
             //Karma Wind
             ability = new Ability(Parent) { AbilityType = Ability.AbilityTypeEnm.Technique, Name = "Karma Wind", Cost = 1, CostType = Resource.ResourceType.TP, Element = Element };
-            ability.Events.Add(new Event() { OnStepType = Step.StepTypeEnm.ExecuteAbilityUse, Type = Event.EventType.CombatStartSkillQueue });
-            ability.Events.Add(new Event() { OnStepType = Step.StepTypeEnm.ExecuteAbilityUse, Type = Event.EventType.EnterCombat });
+            ability.Events.Add(new Event(null) { OnStepType = Step.StepTypeEnm.ExecuteAbilityUse, Type = Event.EventType.CombatStartSkillQueue });
+            ability.Events.Add(new Event(null) { OnStepType = Step.StepTypeEnm.ExecuteAbilityUse, Type = Event.EventType.EnterCombat });
             //dmg events
-            ability.Events.Add(new Event() { OnStepType = Step.StepTypeEnm.ExecuteStartQueue, Type = Event.EventType.ResourceDrain,ResType = Resource.ResourceType.HP, TargetUnit = Parent, CanSetToZero = false, CalculateValue = CalculateKarmaSelfDmg ,AbilityValue = ability});
-            ability.Events.Add(new Event() { OnStepType = Step.StepTypeEnm.ExecuteStartQueue, Type = Event.EventType.DirectDamage,CalculateValue = CalculateKarmaDmg, CalculateTargets = GetAoeTargets ,AbilityValue = ability});
-            ability.Events.Add(new Event() { OnStepType = Step.StepTypeEnm.ExecuteStartQueue, Type = Event.EventType.ResourceDrain,ResType = Resource.ResourceType.Toughness,CalculateValue = CalculateKarmaThg, CalculateTargets = GetWeaknessTargets ,AbilityValue = ability});
+            ability.Events.Add(new Event(null) { OnStepType = Step.StepTypeEnm.ExecuteStartQueue, Type = Event.EventType.ResourceDrain,ResType = Resource.ResourceType.HP, TargetUnit = Parent, CanSetToZero = false, CalculateValue = CalculateKarmaSelfDmg ,AbilityValue = ability});
+            ability.Events.Add(new Event(null) { OnStepType = Step.StepTypeEnm.ExecuteStartQueue, Type = Event.EventType.DirectDamage,CalculateValue = CalculateKarmaDmg, CalculateTargets = GetAoeTargets ,AbilityValue = ability});
+            ability.Events.Add(new Event(null) { OnStepType = Step.StepTypeEnm.ExecuteStartQueue, Type = Event.EventType.ResourceDrain,ResType = Resource.ResourceType.Toughness,CalculateValue = CalculateKarmaThg, CalculateTargets = GetWeaknessTargets ,AbilityValue = ability});
             //Dequeue
-            ability.Events.Add(new Event() { OnStepType = Step.StepTypeEnm.ExecuteStartQueue, Type = Event.EventType.CombatStartSkillDeQueue});
+            ability.Events.Add(new Event(null) { OnStepType = Step.StepTypeEnm.ExecuteStartQueue, Type = Event.EventType.CombatStartSkillDeQueue});
             Abilities.Add(ability);
             ShuHuMaxCnt = (parent.Rank==6 )? 4 : 5;//4 stacks on 6 eidolon 
 

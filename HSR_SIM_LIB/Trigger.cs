@@ -11,7 +11,9 @@ namespace HSR_SIM_LIB
         public TriggerType TrType { get; init; }
 
         public enum TriggerType {
-            ShieldBreakeTrigger
+            ShieldBreakTrigger,
+            Defeated
+
         }
 
      

@@ -456,7 +456,7 @@ namespace HSR_SIM_LIB
                 else
                 {
                     newStep.StepType = StepTypeEnm.StartWave;
-                    newStep.Events.Add(new Event() { Type = EventType.StartWave });
+                    newStep.Events.Add(new Event(newStep) { Type = EventType.StartWave });
                 }
 
             }

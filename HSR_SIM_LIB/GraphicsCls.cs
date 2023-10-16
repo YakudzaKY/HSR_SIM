@@ -218,6 +218,12 @@ namespace HSR_SIM_LIB
                     gfx.DrawImage(grayPortrait, portraitPoint);
                     grayPortrait.Dispose();
                 }
+                //defeat flag
+                if (step.Events.Any(x => x.Type == Event.EventType.Defeat && x.TargetUnit == unit))
+                {
+                    Bitmap btm = new Bitmap(LoadBitmap("defeat"), PortraitSize);
+                    gfx.DrawImage(btm, portraitPoint);
+                }
                 //name
                 DrawText(portraitPoint.X + 3, portraitPoint.Y + 3, gfx, String.Format("{0:s}({1:d})", unit.Name, unit.Level), null, new Font("Tahoma", 12, FontStyle.Bold),true);
 
@@ -306,6 +312,7 @@ namespace HSR_SIM_LIB
                     gfx.DrawRectangle(new Pen(Color.BurlyWood, 3), portraitPoint.X+(int)(PortraitSize.Width*0.05), portraitPoint.Y+(int)(PortraitSize.Height*0.05), PortraitSize.Width-(int)(PortraitSize.Width*0.1), PortraitSize.Height-(int)(PortraitSize.Width*0.1));
                 }
 
+                //dmg got
                 if (drawDirection != null)
                 {
                     j = 0;
@@ -327,7 +334,7 @@ namespace HSR_SIM_LIB
                         DrawText(portraitPoint.X 
                             , pointY
                             , gfx
-                            ,  Math.Ceiling((double)(ent.RealBarrierVal??0)+(double)(ent.RealVal??0)).ToString()
+                            ,  Math.Ceiling((double)(ent.Val??0)).ToString()
                             , new SolidBrush( Color.Red)
                             , new Font("Tahoma",  BarFontSize));
 
