@@ -6,7 +6,7 @@ namespace HSR_SIM_LIB
     public class Mod :CloneClass
     {
         public delegate double? CalculateValuePrc(Event ent);
-        public delegate IEnumerable<Unit> CalculateTargetPrc(Event ent);
+        public delegate IEnumerable<Unit> CalculateTargetPrc();
 
         public CalculateValuePrc CalculateValue { get; init; }
         public CalculateTargetPrc CalculateTargets { get; init; }

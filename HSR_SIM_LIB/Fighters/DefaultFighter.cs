@@ -22,32 +22,28 @@ namespace HSR_SIM_LIB.Fighters
         public ILightCone LightCone { get; set; }
 
         //all alive enemies
-        public IEnumerable<Unit> GetAoeTargets(Event ent)
+        public IEnumerable<Unit> GetAoeTargets()
         {
             return Parent.Enemies.Where(x => x.IsAlive);
         }
 
         //enemies with weakness to ability and without shield
-        public IEnumerable<Unit> GetWeaknessTargets(Event ent)
+        public IEnumerable<Unit> GetWeaknessTargets()
         {
             return Parent.Enemies.Where(x => x.IsAlive
                                              && x.GetRes(Resource.ResourceType.Barrier).ResVal==0
-                                             && x.Fighter.Weaknesses.Any(x => x == ent.AbilityValue.Element));
+                                             && x.Fighter.Weaknesses.Any(x => x == Parent.Fighter.Element));
         }
-        //enemies with weakness to caster
-        public IEnumerable<Unit> GetWeaknessTargets(Unit attackerUnit)
-        {
-            return Parent.Enemies.Where(x => x.IsAlive && x.Fighter.Weaknesses.Any(x => x == attackerUnit.Fighter.Element));
-        }
+
         //alive friends
-        public IEnumerable<Unit> GetFriends(Event ent)
+        public IEnumerable<Unit> GetFriends()
         {
             return Parent.Friends.Where(x => x.IsAlive);
         }
 
-        public static double? CalculateOpeningThg(Event ent)
+        public static double? CalculateOpeningThg(Unit target)
         {
-            return ent.TargetUnit.GetRes(Resource.ResourceType.Toughness).ResVal;
+            return target.GetRes(Resource.ResourceType.Toughness).ResVal;
         }
 
         //Try to choose some good ability to cast
@@ -59,12 +55,12 @@ namespace HSR_SIM_LIB.Fighters
                 //sort by combat then cost. avalable for casting by cost
                 foreach (Ability ability in Abilities
                             .Where(x => x.AbilityType == Ability.AbilityTypeEnm.Technique && x.Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= x.Cost)
-                            .OrderBy(x => x.Events.Any(y => y.Type == Event.EventType.EnterCombat))
+                            .OrderBy(x => x.EnterCombat)
                             .ThenByDescending(x => x.Cost))
                 {
 
                     //enter combat skills
-                    if (ability.Events.Any(y => y.Type == Event.EventType.EnterCombat))
+                    if (ability.EnterCombat)
                     {
                         /*
                          *Cast ability if ability not in qeueu
@@ -74,15 +70,15 @@ namespace HSR_SIM_LIB.Fighters
                          */
                         if (Parent.ParentTeam.ParentSim.BeforeStartQueue.IndexOf(ability) ==
                             -1 //check for existing in queue 
-                            && (GetWeaknessTargets(Parent).Any() //We can penetrate shield 
-                                || !GetFriends(null).Any(x => x != Parent
-                                                           && GetWeaknessTargets(x).Any()
+                            && (GetWeaknessTargets().Any() //We can penetrate shield 
+                                || !GetFriends().Any(x => x != Parent
+                                                           && GetWeaknessTargets().Any()
                                                            && x.Fighter.Abilities.Any(y =>
                                                                y.AbilityType == Ability.AbilityTypeEnm.Technique
-                                                               && y.Events.Any(y => y.Type == Event.EventType.EnterCombat))) //or others cant penetrate 
+                                                               && y.EnterCombat)) //or others cant penetrate 
                                 )
                             && !(Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= ability.Cost + 1
-                                    && GetFriends(null).Any(x => x.Fighter.Abilities.Any(y => y.AbilityType == Ability.AbilityTypeEnm.Technique && !y.Events.Any(y => y.Type == Event.EventType.EnterCombat) && x.ParentTeam.ParentSim.BeforeStartQueue.IndexOf(y) < 0)))// no unused buffers here when 2tp+
+                                    && GetFriends().Any(x => x.Fighter.Abilities.Any(y => y.AbilityType == Ability.AbilityTypeEnm.Technique && !y.EnterCombat && x.ParentTeam.ParentSim.BeforeStartQueue.IndexOf(y) < 0)))// no unused buffers here when 2tp+
                             )
                         {
                             return ability;
@@ -98,9 +94,9 @@ namespace HSR_SIM_LIB.Fighters
                              we have NOT friend who can penetrate weakness through  cost=1 ability
                             */
                             if (Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= ability.Cost + 1
-                               || !GetFriends(null).Any(x =>GetWeaknessTargets(x).Any()&& x.Fighter.Abilities.Any(y =>
+                               || !GetFriends().Any(x =>GetWeaknessTargets().Any()&& x.Fighter.Abilities.Any(y =>
                                    y.AbilityType == Ability.AbilityTypeEnm.Technique && y.Cost > 0
-                                   && y.Events.Any(y => y.Type == Event.EventType.EnterCombat)))
+                                   && y.EnterCombat))
                                )
                                 return ability;
                         }

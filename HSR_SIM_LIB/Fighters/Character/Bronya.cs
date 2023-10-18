@@ -14,17 +14,15 @@ namespace HSR_SIM_LIB.Fighters.Character
             //Elemenet
             Element = Unit.ElementEnm.Wind;
             Ability ability;
-            //Karma Wind
+            //buff tech
             ability = new Ability(Parent) { AbilityType = Ability.AbilityTypeEnm.Technique, Name = "Banner of Command", Cost = 1, CostType = Resource.ResourceType.TP, Element = Element };
-            ability.Events.Add(new Event(null) { OnStepType = Step.StepTypeEnm.ExecuteAbilityUse, Type = Event.EventType.CombatStartSkillQueue });
             //buff apply
 
             Event eventBuff = new(null)
                 { OnStepType = Step.StepTypeEnm.ExecuteStartQueue, Type = Event.EventType.Mod, AbilityValue = ability };
             eventBuff.Mods.Add(new Mod(null){Type=Mod.ModType.Buff,Modifier = Mod.ModifierType.AtkPrc,Value = 0.15,BaseDuration= 2,Dispellable = true,CalculateTargets = GetFriends});
             ability.Events.Add(eventBuff);
-            //Dequeue
-            ability.Events.Add(new Event(null) { OnStepType = Step.StepTypeEnm.ExecuteStartQueue, Type = Event.EventType.CombatStartSkillDeQueue});
+
             Abilities.Add(ability);
 
         }

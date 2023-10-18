@@ -252,7 +252,7 @@ namespace HSR_SIM_LIB
                     using (SolidBrush brush = new(clrGreen))
                     {
                         int greenWidth =
-                            (int)Math.Floor((double)HealthBarSize.Width * ((double)unit.GetRes(ResourceType.HP).ResVal) / unit.Stats.MaxHp);
+                            (int)Math.Ceiling((double)HealthBarSize.Width * ((double)unit.GetRes(ResourceType.HP).ResVal) / unit.Stats.MaxHp);
                         gfx.FillRectangle(brush, portraitPoint.X, portraitPoint.Y + PortraitSize.Height, greenWidth,
                             HealthBarSize.Height);
                     }

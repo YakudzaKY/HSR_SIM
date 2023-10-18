@@ -6,12 +6,16 @@ using System.Threading.Tasks;
 
 namespace HSR_SIM_LIB.Fighters.LightCones
 {
+    /// <summary>
+    /// Light cone interface
+    /// </summary>
     public interface ILightCone
     {
         public delegate void EventHandler(Event ent);
         public delegate void StepHandler(Step step);
         public EventHandler EventHandlerProc{ get; set; }
         public StepHandler StepHandlerProc{ get; set; }
+        public List<Ability> Abilities { get; set; }
         
     }
 }

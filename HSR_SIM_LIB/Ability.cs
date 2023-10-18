@@ -18,14 +18,15 @@ namespace HSR_SIM_LIB
         public AbilityTypeEnm AbilityType { get; set; }
 
         public Unit Parent { get; set; }
-        public delegate double? DCalculateToughnessShred(Event ent);
+        public delegate double? DCalculateToughnessShred(Unit target);
         public DCalculateToughnessShred CalculateToughnessShred { get; init; }
-        public double? ToughnessShred;
+        public double ToughnessShred;
         public string Name { get; internal set; }
         public List<Event> Events { get; set; } = new List<Event>();
         public short Cost { get; set; } = 0;
         public ResourceType CostType { get; set; } = ResourceType.nil;
-
+        public TargetTypeEnm? TargetType { get; set; }
+        public bool EnterCombat { get; set; }
 
         public Ability(Unit parent) 
         { 
@@ -49,7 +50,6 @@ namespace HSR_SIM_LIB
             Target,
             Hostiles,
             Party,
-            AOE,
             Blast
         }
     }

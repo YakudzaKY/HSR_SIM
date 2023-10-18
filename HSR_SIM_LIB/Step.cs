@@ -68,7 +68,7 @@ namespace HSR_SIM_LIB
             , StartWave//on wave starts
             , ExecuteStartQueue
         }
-       
+
 
 
         /// <summary>
@@ -115,16 +115,18 @@ namespace HSR_SIM_LIB
             Actor = ability.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
             ActorAbility = ability;//WAT ABILITY is casting
 
+
+
             foreach (Event ent in ability.Events.Where(x => x.OnStepType == StepType))
             {
                 if (ent.CalculateTargets != null)
-                    foreach (Unit unit in ent.CalculateTargets(ent))
+                    foreach (Unit unit in ent.CalculateTargets())
                     {
                         Event unitEnt = (Event)ent.Clone();
                         unitEnt.ParentStep = this;
                         unitEnt.TargetUnit = unit;
                         Events.Add(unitEnt);
-                        
+
                     }
                 else
                 {
@@ -134,6 +136,43 @@ namespace HSR_SIM_LIB
                 }
 
             }
+            //tougness shred
+            if (ability.ToughnessShred != 0 || ability.CalculateToughnessShred != null)
+            {
+                if (ability.TargetType == Ability.TargetTypeEnm.Hostiles)
+                {
+                    foreach (Unit unit in ((DefaultFighter)ability.Parent.Fighter).GetWeaknessTargets())
+                    {
+                        double? shredVal = 0;
+                        if (ability.CalculateToughnessShred != null)
+                        {
+                            shredVal = ability.CalculateToughnessShred(unit);
+                        }
+                        else
+                        {
+                            shredVal = ability.ToughnessShred;
+                        }
+
+
+                        Events.Add(new Event(null)
+                        {
+                            ParentStep = this,
+                            Type = Event.EventType.ResourceDrain,
+                            TargetUnit = unit,
+                            ResType = Resource.ResourceType.Toughness,
+                            Val = shredVal,
+                            AbilityValue = ability
+                        });
+                    }
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+
+            }
+
+
             //update mods
             foreach (Event ent in Events.Where(x => x.Type == EventType.Mod))
             {
@@ -143,7 +182,7 @@ namespace HSR_SIM_LIB
                 //calculated mods
                 foreach (Mod mod in ent.Mods.Where(x => x.CalculateTargets != null))
                 {
-                    foreach (Unit unit in mod.CalculateTargets(ent))
+                    foreach (Unit unit in mod.CalculateTargets())
                     {
                         Mod newMod = (Mod)mod.Clone();
                         newMod.RefMod = (mod.RefMod ?? mod);
@@ -162,6 +201,17 @@ namespace HSR_SIM_LIB
 
                 ent.Mods = newMods;
             }
+
+            if (ability.AbilityType == Ability.AbilityTypeEnm.Technique)
+            {
+                Events.Add(new Event(this)
+                {
+                    Type = Event.EventType.CombatStartSkillDeQueue,
+                    ParentStep = this,
+                    AbilityValue = ability
+                    
+                });
+            }
         }
         //Cast all techniques before fights starts
         public void ExecuteAbilityFromQueue()
@@ -177,15 +227,33 @@ namespace HSR_SIM_LIB
         public void ExecuteAbilityUse(Ability ability)
         {
             StepType = StepTypeEnm.ExecuteAbilityUse;
-      
+            if (ability.AbilityType == Ability.AbilityTypeEnm.Technique)
+            {
+                Events.Add(new Event(this)
+                {
+                    Type = Event.EventType.CombatStartSkillQueue,
+                    ParentStep = this,
+                    AbilityValue = ability
+                    
+                });
+                if (ability.EnterCombat)
+                    Events.Add(new Event(this)
+                    {
+                        Type = Event.EventType.EnterCombat,
+                        ParentStep = this,
+                        AbilityValue = ability
+                    
+                    });
+
+            }
 
             foreach (Event ent in ability.Events.Where(x => x.OnStepType == StepType))
             {
-   
-                    Event unitEnt = (Event)ent.Clone();
-                    unitEnt.ParentStep = this;
-                    Events.Add(unitEnt);
-                
+
+                Event unitEnt = (Event)ent.Clone();
+                unitEnt.ParentStep = this;
+                Events.Add(unitEnt);
+
 
             }
 
