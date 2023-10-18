@@ -5,10 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HSR_SIM_LIB.Fighters;
-using static HSR_SIM_LIB.Event;
-using static HSR_SIM_LIB.Resource;
+using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.UnitStuff;
+using static HSR_SIM_LIB.TurnBasedClasses.Event;
+using static HSR_SIM_LIB.UnitStuff.Resource;
 
-namespace HSR_SIM_LIB
+namespace HSR_SIM_LIB.TurnBasedClasses
 {
     /// <summary>
     /// Step-time simulator unit
@@ -24,7 +26,9 @@ namespace HSR_SIM_LIB
         public Unit Actor { get => actor; set => actor = value; }
         public Ability ActorAbility { get => actorAbility; set => actorAbility = value; }
         public List<Event> Events { get => events; set => events = value; }
+        public List<Event> ProceedEvents { get => proceedEvents; set => proceedEvents = value; }
         public bool TriggersHandled { get; set; } = false;
+        private List<Event> proceedEvents = new();
         private List<Event> events = new();
 
         /// <summary>
@@ -37,7 +41,7 @@ namespace HSR_SIM_LIB
             string res;
             if (StepType == StepTypeEnm.SimInit)
                 res = "sim was initialized";
-            else if (StepType == StepTypeEnm.ExecuteAbilityUse)
+            else if (StepType == StepTypeEnm.ExecuteTechnique)
                 res = Actor.Name + " used " + ActorAbility.Name;
             else if (StepType == StepTypeEnm.StartCombat)
                 res = "Starting the combat!";
@@ -45,7 +49,7 @@ namespace HSR_SIM_LIB
                 res = "Wave " + Parent.CurrentFight.CurrentWaveCnt.ToString();
             else if (StepType == StepTypeEnm.Idle)
                 res = "Idle step(scenario completed?)";
-            else if (StepType == StepTypeEnm.ExecuteStartQueue)
+            else if (StepType == StepTypeEnm.ExecuteAbility)
                 res = "Executed " + Actor.Name + " " + ActorAbility.Name;
             else
                 throw new NotImplementedException();
@@ -63,10 +67,11 @@ namespace HSR_SIM_LIB
         {
             SimInit//on scenario load and combat init
             , Idle//on Idle, nothing to_do
-            , ExecuteAbilityUse
+            , ExecuteTechnique
             , StartCombat//on fight starts
             , StartWave//on wave starts
-            , ExecuteStartQueue
+            , ExecuteAbility
+            
         }
 
 
@@ -78,6 +83,8 @@ namespace HSR_SIM_LIB
         {
             //for all events saved in step
             List<Event> events = new();
+            proceedEvents = new List<Event>();
+            
             events.AddRange(Events);
             //rollback changes from the end of list
             if (revert)
@@ -87,6 +94,7 @@ namespace HSR_SIM_LIB
                 ent.ProcEvent(revert);
 
             events.Clear();
+            Events = proceedEvents;
         }
 
 
@@ -99,7 +107,7 @@ namespace HSR_SIM_LIB
                 someThingToCast = unit.Fighter.ChooseAbilityToCast(this);
                 if (someThingToCast != null)
                 {
-                    ExecuteAbilityUse(someThingToCast);
+                    ExecuteTechniqueUse(someThingToCast);
                     break;
                 }
 
@@ -157,9 +165,9 @@ namespace HSR_SIM_LIB
                         Events.Add(new Event(null)
                         {
                             ParentStep = this,
-                            Type = Event.EventType.ResourceDrain,
+                            Type = EventType.ResourceDrain,
                             TargetUnit = unit,
-                            ResType = Resource.ResourceType.Toughness,
+                            ResType = ResourceType.Toughness,
                             Val = shredVal,
                             AbilityValue = ability
                         });
@@ -185,7 +193,7 @@ namespace HSR_SIM_LIB
                     foreach (Unit unit in mod.CalculateTargets())
                     {
                         Mod newMod = (Mod)mod.Clone();
-                        newMod.RefMod = (mod.RefMod ?? mod);
+                        newMod.RefMod = mod.RefMod ?? mod;
                         newMod.TargetUnit = unit;
                         newMods.Add(newMod);
                     }
@@ -206,17 +214,17 @@ namespace HSR_SIM_LIB
             {
                 Events.Add(new Event(this)
                 {
-                    Type = Event.EventType.CombatStartSkillDeQueue,
+                    Type = EventType.CombatStartSkillDeQueue,
                     ParentStep = this,
                     AbilityValue = ability
-                    
+
                 });
             }
         }
         //Cast all techniques before fights starts
         public void ExecuteAbilityFromQueue()
         {
-            StepType = StepTypeEnm.ExecuteStartQueue;
+            StepType = StepTypeEnm.ExecuteAbility;
             Ability fromQ = Parent.BeforeStartQueue.First();
             ExecuteAbility(fromQ);
         }
@@ -224,25 +232,25 @@ namespace HSR_SIM_LIB
         /// <summary>
         /// Execute the technique
         /// </summary>
-        public void ExecuteAbilityUse(Ability ability)
+        public void ExecuteTechniqueUse(Ability ability)
         {
-            StepType = StepTypeEnm.ExecuteAbilityUse;
+            StepType = StepTypeEnm.ExecuteTechnique;
             if (ability.AbilityType == Ability.AbilityTypeEnm.Technique)
             {
                 Events.Add(new Event(this)
                 {
-                    Type = Event.EventType.CombatStartSkillQueue,
+                    Type = EventType.CombatStartSkillQueue,
                     ParentStep = this,
                     AbilityValue = ability
-                    
+
                 });
-                if (ability.EnterCombat)
+                if (ability.Attack)
                     Events.Add(new Event(this)
                     {
-                        Type = Event.EventType.EnterCombat,
+                        Type = EventType.EnterCombat,
                         ParentStep = this,
                         AbilityValue = ability
-                    
+
                     });
 
             }

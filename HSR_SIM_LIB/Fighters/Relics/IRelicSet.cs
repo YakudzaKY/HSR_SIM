@@ -6,21 +6,16 @@ using System.Threading.Tasks;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
 
-namespace HSR_SIM_LIB.Fighters.LightCones
+namespace HSR_SIM_LIB.Fighters.Relics
 {
-    /// <summary>
-    /// Light cone/relics interface
-    /// </summary>
-    public interface ILightCone
+    public interface IRelicSet
     {
         public delegate void EventHandler(Event ent);
         public delegate void StepHandler(Step step);
-        public int Rank { get; set; }
-        
+        public int num { get; set; }
 
         public EventHandler EventHandlerProc{ get; set; }
         public StepHandler StepHandlerProc{ get; set; }
         public List<Ability> Abilities { get; set; }
-        
     }
 }

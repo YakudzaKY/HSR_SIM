@@ -19,7 +19,4 @@
     <PackageReference Include="Magick.NET.Core" Version="13.3.0" />
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Fighters\Relics\" />
-  </ItemGroup>
 </Project>

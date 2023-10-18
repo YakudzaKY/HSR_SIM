@@ -4,14 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using static HSR_SIM_LIB.Resource;
-using static HSR_SIM_LIB.Unit;
+using HSR_SIM_LIB.TurnBasedClasses;
+using HSR_SIM_LIB.UnitStuff;
+using static HSR_SIM_LIB.UnitStuff.Resource;
+using static HSR_SIM_LIB.UnitStuff.Unit;
 
-namespace HSR_SIM_LIB
+namespace HSR_SIM_LIB.Skills
 {/// <summary>
 /// Ability class
 /// </summary>
-    public class Ability: CloneClass
+    public class Ability : CloneClass
     {
         public ElementEnm? Element { get; set; }
 
@@ -26,13 +28,13 @@ namespace HSR_SIM_LIB
         public short Cost { get; set; } = 0;
         public ResourceType CostType { get; set; } = ResourceType.nil;
         public TargetTypeEnm? TargetType { get; set; }
-        public bool EnterCombat { get; set; }
+        public bool Attack { get; set; }
 
-        public Ability(Unit parent) 
-        { 
-            Parent= parent;
+        public Ability(Unit parent)
+        {
+            Parent = parent;
         }
-      
+
 
         public enum AbilityTypeEnm
         {

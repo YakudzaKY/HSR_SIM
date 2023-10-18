@@ -1,4 +1,4 @@
-﻿namespace HSR_SIM_LIB
+﻿namespace HSR_SIM_LIB.UnitStuff
 {
     public class Resist
     {

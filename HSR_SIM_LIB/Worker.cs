@@ -8,20 +8,23 @@ using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
-using static HSR_SIM_LIB.CallBacks;
+using static HSR_SIM_LIB.Utils.CallBacks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 using ImageMagick;
-using static HSR_SIM_LIB.Constant;
-using static HSR_SIM_LIB.Step;
+using static HSR_SIM_LIB.Utils.Constant;
+using static HSR_SIM_LIB.TurnBasedClasses.Step;
 using System.Net.Mail;
-using static HSR_SIM_LIB.Event;
-using static HSR_SIM_LIB.Resource;
+using static HSR_SIM_LIB.TurnBasedClasses.Event;
+using static HSR_SIM_LIB.UnitStuff.Resource;
 using System.Resources;
 using System.Drawing;
+using HSR_SIM_LIB.Utils;
+using HSR_SIM_LIB.TurnBasedClasses;
+using HSR_SIM_LIB.Skills;
 
 namespace HSR_SIM_LIB
 {
@@ -32,11 +35,11 @@ namespace HSR_SIM_LIB
     {
 
 
-        CallBackStr cbLog;
-        public CallBackStr CbLog { get => cbLog; set => cbLog = value; }//Calback log procedure. Used for output
+        CallBacks.CallBackStr cbLog;
+        public CallBacks.CallBackStr CbLog { get => cbLog; set => cbLog = value; }//Calback log procedure. Used for output
 
-        CallBackRender cbRend;
-        public CallBackRender CbRend { get => cbRend; set => cbRend = value; }//Callback render procedure. used for graphical output
+        CallBacks.CallBackRender cbRend;
+        public CallBacks.CallBackRender CbRend { get => cbRend; set => cbRend = value; }//Callback render procedure. used for graphical output
         private SimCls sim = null;
         public SimCls Sim { get => sim; set => sim = value; }//simulation class( combat ,fights etc in this shit)
         public bool Completed { get => completed; set => completed = value; }

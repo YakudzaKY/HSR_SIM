@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace HSR_SIM_LIB.Fighters.LightCones.Cones
 {
-    internal class BeforetheTutorialMissionStarts:DefaultLightCone
+    internal class PlanetaryRendezvous:DefaultLightCone
     {
-        public BeforetheTutorialMissionStarts(IFighter parent, int rank) : base(parent, rank)
+        public PlanetaryRendezvous(IFighter parent, int rank) : base(parent, rank)
         {
         }
     }

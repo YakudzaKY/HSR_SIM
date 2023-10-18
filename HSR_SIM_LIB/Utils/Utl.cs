@@ -4,12 +4,12 @@ using System.Drawing;
 using System.IO;
 using ImageMagick;
 
-namespace HSR_SIM_LIB
+namespace HSR_SIM_LIB.Utils
 {
     /// <summary>
     /// some utility stuff
     /// </summary>
-    public static class Utils
+    public static class Utl
     {
         public static string DataFolder { get; set; } = AppDomain.CurrentDomain.BaseDirectory + "DATA\\";
         private static readonly Dictionary<string, Bitmap> ImageCache = new();
@@ -57,7 +57,7 @@ namespace HSR_SIM_LIB
         public static Bitmap LoadBitmap(string filename)
         {
             if (!ImageCache.ContainsKey(filename))
-                ImageCache[filename] = NewBitmap(new FileInfo(GetAvalableImageFile(filename)));
+                ImageCache[filename] = new FileInfo(GetAvalableImageFile(filename)).NewBitmap();
             return ImageCache[filename];
         }
         /// <summary>

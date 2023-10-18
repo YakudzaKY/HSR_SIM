@@ -2,17 +2,13 @@
 <Unit name="Luocha" level="80" rank="1">
   <Stats hp="2444.9039999999995" atk="1338.8759999999997" def="760.725" spd="101" crit_rate="0.05" crit_dmg="0.5" atk_prc="1.467808015625932" hp_prc="0.8826880099065672" def_prc="0.28219999950379" hp_fix="508.032000006875" def_fix="175.700818014564" crit_rate_prc="0.113400002242999" atk_fix="469.2282530211378" heal_rate_prc="0.44560600039548803" crit_dmg_prc="0.226800004485994" break_dmg_prc="0.116640002466738" spd_prc="0.06" />
   <LightCone rank="1" level="80" name="Echoes of the Coffin" />
-  <Skills>
-    <Skill name="Thorns of the Abyss" level="5" max_level="9" />
-    <Skill name="Prayer of Abyss Flower" level="9" max_level="15" />
-    <Skill name="Death Wish" level="7" max_level="15" />
-    <Skill name="Cycle of Life" level="8" max_level="15" />
-    <Skill name="120306" level="0" max_level="1" />
-    <Skill name="Mercy of a Fool" level="1" max_level="1" />
-  </Skills>
-  <RelicSets>
-    <Set name="Passerby of Wandering Cloud" num="2" />
-    <Set name="Messenger Traversing Hackerspace" num="2" />
-    <Set name="Fleet of the Ageless" num="2" />
-  </RelicSets>
+  <Skill name="Thorns of the Abyss" level="5" max_level="9" />
+  <Skill name="Prayer of Abyss Flower" level="9" max_level="15" />
+  <Skill name="Death Wish" level="7" max_level="15" />
+  <Skill name="Cycle of Life" level="8" max_level="15" />
+  <Skill name="120306" level="0" max_level="1" />
+  <Skill name="Mercy of a Fool" level="1" max_level="1" />
+  <RelicSet name="Passerby of Wandering Cloud" num="2" />
+  <RelicSet name="Messenger Traversing Hackerspace" num="2" />
+  <RelicSet name="Fleet of the Ageless" num="2" />
 </Unit>

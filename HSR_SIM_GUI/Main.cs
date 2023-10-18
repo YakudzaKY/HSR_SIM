@@ -13,9 +13,9 @@ using HSR_SIM_LIB;
 using Ini;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolBar;
-using static HSR_SIM_LIB.CallBacks;
 using static HSR_SIM_LIB.Worker;
 using static HSR_SIM_GUI.Utils;
+using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_GUI
 {
@@ -62,8 +62,8 @@ namespace HSR_SIM_GUI
         {
 
 
-            CallBackStr callBackStr = new(WorkerCallBackString);
-            CallBackRender callBackRender = new(WorkerCallBackImages);
+            CallBacks.CallBackStr callBackStr = new(WorkerCallBackString);
+            CallBacks.CallBackRender callBackRender = new(WorkerCallBackImages);
             InitializeComponent();
             wrk = new Worker();
             wrk.CbLog += callBackStr;

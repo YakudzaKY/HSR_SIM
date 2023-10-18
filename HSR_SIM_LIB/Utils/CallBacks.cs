@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HSR_SIM_LIB
+namespace HSR_SIM_LIB.Utils
 {
     public static class CallBacks
     {
 
-        public delegate void CallBackStr(KeyValuePair<String, String> kv);
+        public delegate void CallBackStr(KeyValuePair<string, string> kv);
         public delegate void CallBackRender(Bitmap combatImg);
     }
 }

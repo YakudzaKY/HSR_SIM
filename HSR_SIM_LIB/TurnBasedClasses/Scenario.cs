@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using HSR_SIM_LIB.UnitStuff;
 
-namespace HSR_SIM_LIB
+namespace HSR_SIM_LIB.TurnBasedClasses
 {/// <summary>
 /// Scenario class. Using for combat
 /// </summary>

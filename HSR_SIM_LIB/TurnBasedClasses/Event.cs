@@ -7,11 +7,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using HSR_SIM_LIB.Fighters;
-using static HSR_SIM_LIB.Step;
-using static HSR_SIM_LIB.Event;
-using static HSR_SIM_LIB.Resource;
+using static HSR_SIM_LIB.TurnBasedClasses.Step;
+using static HSR_SIM_LIB.TurnBasedClasses.Event;
+using static HSR_SIM_LIB.UnitStuff.Resource;
+using HSR_SIM_LIB.UnitStuff;
+using HSR_SIM_LIB.Skills;
 
-namespace HSR_SIM_LIB
+namespace HSR_SIM_LIB.TurnBasedClasses
 {
     /// <summary>
     /// Events. Situation changed when event was proceded
@@ -24,7 +26,7 @@ namespace HSR_SIM_LIB
         public CalculateValuePrc CalculateValue { get; init; }
         public CalculateTargetPrc CalculateTargets { get; init; }
         private EventType type;
-        private Resource.ResourceType resType;
+        private ResourceType resType;
         private double? val;//Theoretical value
         private double? realVal;//Real hit value(cant exceed)
 
@@ -32,14 +34,14 @@ namespace HSR_SIM_LIB
         public List<Unit> StartingUnits { get; set; }
         public List<Mod> Mods { get; set; } = new List<Mod>();
         public Unit TargetUnit { get; set; }
-        public Step.StepTypeEnm OnStepType { get; init; }
+        public StepTypeEnm OnStepType { get; init; }
         public EventType Type { get => type; set => type = value; }
         public Ability AbilityValue { get; set; }
         public double? Val { get => val; set => val = value; }
         public double? RealVal { get => realVal; set => realVal = value; }
         public double? RealBarrierVal { get => realBarrierVal; set => realBarrierVal = value; }
         public bool IsCrit { get; set; }
-        public Resource.ResourceType ResType { get => resType; set => resType = value; }
+        public ResourceType ResType { get => resType; set => resType = value; }
         public Step ParentStep { get; set; } = null;
         public bool TriggersHandled { get; set; } = false;
         private double? realBarrierVal;
@@ -61,7 +63,9 @@ namespace HSR_SIM_LIB
             CombatStartSkillDeQueue,
             DoTDamage,
             DoTPlace,
-            FinishCombat
+            FinishCombat,
+            Attack,
+            RemoveMod
         }
 
         public Event(Step parent)
@@ -79,22 +83,26 @@ namespace HSR_SIM_LIB
             else if (Type == EventType.CombatStartSkillDeQueue)
                 res = "Remove ability from start skill queue";
             else if (Type == EventType.PartyResourceDrain)
-                res = "Party res drain : " + this.Val + " " + this.ResType.ToString();
+                res = "Party res drain : " + Val + " " + ResType.ToString();
             else if (Type == EventType.ResourceDrain)
-                res = this.TargetUnit.Name + " res drain : " + this.Val + " " + this.ResType.ToString() + "(by " + this.ParentStep.Actor.Name + ")";
+                res = TargetUnit.Name + " res drain : " + Val + " " + ResType.ToString() + "(by " + ParentStep.Actor.Name + ")";
             else if (Type == EventType.Defeat)
-                res = this.TargetUnit.Name + " get rekt (:";
+                res = TargetUnit.Name + " get rekt (:";
+            else if (Type == EventType.Attack)
+                res = AbilityValue.Parent.Name + " doing Attack";
             else if (Type == EventType.EnterCombat)
                 res = "entering the combat...";
             else if (Type == EventType.Mod)
                 res = "Apply modifications";
+            else if (Type == EventType.RemoveMod)
+                res = "Remove modifications";
             else if (Type == EventType.StartWave)
                 res = "next wave";
             else if (Type == EventType.DirectDamage)
                 res = "Dealing damage" + (IsCrit ? " (CRITICAL)" : "") +
                       $" overall={val:f} to_barier={RealBarrierVal:f} to_hp={RealVal:f}";
             else if (Type == EventType.ShieldBreak)
-                res = this.TargetUnit.Name + " shield broken " +
+                res = TargetUnit.Name + " shield broken " +
                       $" overall={val:f} to_hp={RealVal:f}";
             else
                 throw new NotImplementedException();
@@ -108,6 +116,7 @@ namespace HSR_SIM_LIB
         /// <param name="revert"></param>
         public void ProcEvent(bool revert)
         {
+            ParentStep.ProceedEvents.Add(this);
             //calc value first
             if (CalculateValue != null && Val == null)
                 Val = CalculateValue(this);
@@ -129,7 +138,7 @@ namespace HSR_SIM_LIB
                 ParentStep.Parent.DoEnterCombat = !revert;
             else if (Type == EventType.FinishCombat) //Finish combat
             {
-              
+
                 //todo: reset all passives and counters for characters
                 //also reset for gear and light cones
                 //
@@ -203,6 +212,20 @@ namespace HSR_SIM_LIB
                 }
 
             }
+            else if (Type == EventType.RemoveMod) //remove mod
+            {
+
+                foreach (var mod in Mods)
+                {
+                    if (!revert)
+                        mod.TargetUnit.RemoveMod(mod);
+                    else
+                        mod.TargetUnit.ApplyMod(mod);
+
+
+                }
+
+            }
             else if (Type == EventType.ResourceDrain) //Resource drain
             {
                 if (RealVal == null)
@@ -213,13 +236,21 @@ namespace HSR_SIM_LIB
                         RealVal -= 1;
                     }
                 }
-                SetResByEvent(ResType,(double)-(revert ? -RealVal : RealVal));
+                SetResByEvent(ResType, (double)-(revert ? -RealVal : RealVal));
             }
             else if (Type == EventType.Defeat) //got defeated
             {
                 TargetUnit.IsAlive = revert;
-                //Todo remove buffs on death
-                //TODO AV=0
+                foreach (Mod mod in Mods)
+                    if (!revert)
+                        TargetUnit.RemoveMod(mod);
+                    else
+                        TargetUnit.ApplyMod(mod);
+
+
+            }
+            else if (Type == EventType.Attack) //Just doing attack
+            {
 
             }
             else if (Type == EventType.DirectDamage || Type == EventType.ShieldBreak) //Direct damage
@@ -235,23 +266,24 @@ namespace HSR_SIM_LIB
                             (double)Val - (double)RealBarrierVal);
                 }
 
-                SetResByEvent(ResourceType.Barrier,(double)-(revert ? -RealBarrierVal : RealBarrierVal));
-                SetResByEvent(ResourceType.HP,(double)-(revert ? -RealVal : RealVal));
+                SetResByEvent(ResourceType.Barrier, (double)-(revert ? -RealBarrierVal : RealBarrierVal));
+                SetResByEvent(ResourceType.HP, (double)-(revert ? -RealVal : RealVal));
             }
             else
                 throw new NotImplementedException();
+            
             //call handlers
             if (!TriggersHandled)
             {
                 TriggersHandled = true;
                 foreach (Unit unit in ParentStep.Parent.PartyTeam.Units)
                     unit.Fighter.EventHandlerProc.Invoke(this);
-                if (ParentStep.Parent?.HostileTeam?.Units !=null)
-                foreach (Unit unit in ParentStep.Parent.HostileTeam.Units)
-                    unit.Fighter.EventHandlerProc.Invoke(this);
+                if (ParentStep.Parent?.HostileTeam?.Units != null)
+                    foreach (Unit unit in ParentStep.Parent.HostileTeam.Units)
+                        unit.Fighter.EventHandlerProc.Invoke(this);
             }
 
-        
+
         }
 
         /// <summary>
@@ -259,7 +291,7 @@ namespace HSR_SIM_LIB
         /// </summary>
         /// <param name="resourceType"></param>
         /// <param name="chgVal"></param>
-        private void SetResByEvent(Resource.ResourceType resourceType,double chgVal)
+        private void SetResByEvent(ResourceType resourceType, double chgVal)
         {
             Resource res = TargetUnit.GetRes(resourceType);
             if (chgVal != 0)
@@ -274,9 +306,11 @@ namespace HSR_SIM_LIB
                         {
 
 
-                            Event shieldBrkEvent = new(this.ParentStep)
+                            Event shieldBrkEvent = new(ParentStep)
                             {
-                                Type = EventType.ShieldBreak, AbilityValue = AbilityValue, TargetUnit = TargetUnit
+                                Type = EventType.ShieldBreak,
+                                AbilityValue = AbilityValue,
+                                TargetUnit = TargetUnit
 
                             };
                             shieldBrkEvent.Val = FighterUtils.CalculateShieldBrokeDmg(shieldBrkEvent);
@@ -287,11 +321,15 @@ namespace HSR_SIM_LIB
                         else if (res.ResType == ResourceType.HP)
                         {
 
-                            Event defeatEvent = new(this.ParentStep)
+                            Event defeatEvent = new(ParentStep)
                             {
-                                Type = EventType.Defeat, AbilityValue = AbilityValue, TargetUnit = TargetUnit
+                                Type = EventType.Defeat,
+                                AbilityValue = AbilityValue,
+                                TargetUnit = TargetUnit
 
                             };
+                            //remove all buffs and debuffs
+                            defeatEvent.Mods.AddRange(TargetUnit.Mods);
                             ParentStep.Events.Add(defeatEvent);
                             defeatEvent.ProcEvent(false);
 

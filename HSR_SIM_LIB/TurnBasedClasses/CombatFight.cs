@@ -1,4 +1,4 @@
-﻿namespace HSR_SIM_LIB
+﻿namespace HSR_SIM_LIB.TurnBasedClasses
 {
     internal class CombatFight
     {
@@ -14,6 +14,6 @@
             ReferenceFight = refFight;
         }
 
-     
+
     }
 }

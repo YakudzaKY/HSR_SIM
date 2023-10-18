@@ -4,8 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HSR_SIM_LIB.Fighters.LightCones;
-using static HSR_SIM_LIB.CallBacks;
+using HSR_SIM_LIB.Fighters.Relics;
+using HSR_SIM_LIB.UnitStuff;
+using static HSR_SIM_LIB.Utils.CallBacks;
 using static HSR_SIM_LIB.Fighters.FighterUtils;
+using HSR_SIM_LIB.TurnBasedClasses;
+using HSR_SIM_LIB.Skills;
 
 namespace HSR_SIM_LIB.Fighters
 {
@@ -19,7 +23,49 @@ namespace HSR_SIM_LIB.Fighters
         public List<Unit.ElementEnm> Weaknesses { get; set; } = null;
         public List<Resist> Resists { get; set; } = new List<Resist>();
         public Unit Parent { get; set; }
-        public ILightCone LightCone { get; set; }
+
+        private ILightCone lightCone = null;
+        public ILightCone LightCone
+        {
+            get =>
+                lightCone ??= ((ILightCone)Activator.CreateInstance(Type.GetType(Parent.LightConeStringPath)!, this,Parent.LightConeInitRank));
+            set => lightCone = value;
+        }
+
+        public List<IRelicSet> relics;
+
+        public List<IRelicSet> Relics
+        {
+            get
+            {
+                if (relics == null)
+                {
+                    relics = new List<IRelicSet>();
+                    foreach (var keyValrelic in Parent.RelicsClasses)
+                    {
+                        IRelicSet relicSet = (IRelicSet)Activator.CreateInstance(Type.GetType(keyValrelic.Key)!, this);
+
+                        relicSet.num = keyValrelic.Value;
+                        relics.Add(relicSet);
+
+                    }
+                }
+
+                return relics;
+            }
+            set
+            {
+
+            }
+        }
+
+
+
+ 
+
+       
+
+        public List<Skill> Skills { get; set; }=new List<Skill>();
 
         //all alive enemies
         public IEnumerable<Unit> GetAoeTargets()
@@ -55,12 +101,12 @@ namespace HSR_SIM_LIB.Fighters
                 //sort by combat then cost. avalable for casting by cost
                 foreach (Ability ability in Abilities
                             .Where(x => x.AbilityType == Ability.AbilityTypeEnm.Technique && x.Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= x.Cost)
-                            .OrderBy(x => x.EnterCombat)
+                            .OrderBy(x => x.Attack)
                             .ThenByDescending(x => x.Cost))
                 {
 
                     //enter combat skills
-                    if (ability.EnterCombat)
+                    if (ability.Attack)
                     {
                         /*
                          *Cast ability if ability not in qeueu
@@ -75,10 +121,10 @@ namespace HSR_SIM_LIB.Fighters
                                                            && GetWeaknessTargets().Any()
                                                            && x.Fighter.Abilities.Any(y =>
                                                                y.AbilityType == Ability.AbilityTypeEnm.Technique
-                                                               && y.EnterCombat)) //or others cant penetrate 
+                                                               && y.Attack)) //or others cant penetrate 
                                 )
                             && !(Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= ability.Cost + 1
-                                    && GetFriends().Any(x => x.Fighter.Abilities.Any(y => y.AbilityType == Ability.AbilityTypeEnm.Technique && !y.EnterCombat && x.ParentTeam.ParentSim.BeforeStartQueue.IndexOf(y) < 0)))// no unused buffers here when 2tp+
+                                    && GetFriends().Any(x => x.Fighter.Abilities.Any(y => y.AbilityType == Ability.AbilityTypeEnm.Technique && !y.Attack && x.ParentTeam.ParentSim.BeforeStartQueue.IndexOf(y) < 0)))// no unused buffers here when 2tp+
                             )
                         {
                             return ability;
@@ -96,7 +142,7 @@ namespace HSR_SIM_LIB.Fighters
                             if (Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= ability.Cost + 1
                                || !GetFriends().Any(x =>GetWeaknessTargets().Any()&& x.Fighter.Abilities.Any(y =>
                                    y.AbilityType == Ability.AbilityTypeEnm.Technique && y.Cost > 0
-                                   && y.EnterCombat))
+                                   && y.Attack))
                                )
                                 return ability;
                         }
@@ -129,12 +175,21 @@ namespace HSR_SIM_LIB.Fighters
 
         public virtual void DefaultFighter_HandleEvent(Event ent)
         {
-            //
+            
             LightCone?.EventHandlerProc.Invoke(ent);
+            foreach (IRelicSet relic in Relics)
+            {
+                relic.EventHandlerProc.Invoke(ent);
+            }
+            
         }
         public virtual  void DefaultFighter_HandleStep(Step step)
         {
             LightCone?.StepHandlerProc.Invoke(step);
+            foreach (IRelicSet relic in Relics)
+            {
+                relic.StepHandlerProc.Invoke(step);
+            }
         }
     }
 }

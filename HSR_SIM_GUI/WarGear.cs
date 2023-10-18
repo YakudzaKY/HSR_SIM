@@ -19,6 +19,7 @@ using System.Security.Policy;
 using System.Xml;
 using System.Xml.Linq;
 using static HSR_SIM_GUI.WarGear;
+using HSR_SIM_LIB.Skills;
 
 namespace HSR_SIM_GUI
 {
@@ -246,7 +247,7 @@ namespace HSR_SIM_GUI
 
             txtLvl.Value = mainCharacter.Level;
             txtRank.Value = mainCharacter.Rank;
-            AvatarBox.Image = new Bitmap(HSR_SIM_LIB.Utils.LoadBitmap("Character\\" + mainCharacter.Name), new Size(AvatarBox.Width, AvatarBox.Height));
+            AvatarBox.Image = new Bitmap(HSR_SIM_LIB.Utils.Utl.LoadBitmap("Character\\" + mainCharacter.Name), new Size(AvatarBox.Width, AvatarBox.Height));
             label1.Text = mainCharacter.Name;
             txtLC.Text = mainCharacter.light_cone.name;
             txtLCRank.Value = mainCharacter.light_cone.rank;
@@ -470,12 +471,12 @@ namespace HSR_SIM_GUI
 
         private string GetWarGearPath()
         {
-            return HSR_SIM_LIB.Utils.DataFolder + "\\WarGear\\";
+            return HSR_SIM_LIB.Utils.Utl.DataFolder + "\\WarGear\\";
 
         }
         private string GetProfilePath()
         {
-            return HSR_SIM_LIB.Utils.DataFolder + "\\Profile\\";
+            return HSR_SIM_LIB.Utils.Utl.DataFolder + "\\Profile\\";
 
         }
 
@@ -525,28 +526,28 @@ namespace HSR_SIM_GUI
             xLc.SetAttributeValue("name", character.light_cone.name);
             unit.Add(xLc);
 
-            XElement skills = new XElement("Skills");
+   
             foreach (Skill skl in character.skills)
             {
                 XElement skill = new XElement("Skill");
                 skill.SetAttributeValue("name", skl.name);
                 skill.SetAttributeValue("level", skl.level.ToString());
                 skill.SetAttributeValue("max_level", skl.max_level.ToString());
-                skills.Add(skill);
+                unit.Add(skill);
 
             }
-            unit.Add(skills);
+            
 
-            XElement sets = new XElement("RelicSets");
+      
             foreach (GearSet gearSet in character.relic_sets)
             {
-                XElement set = new XElement("Set");
+                XElement set = new XElement("RelicSet");
                 set.SetAttributeValue("name", gearSet.name);
                 set.SetAttributeValue("num", gearSet.num.ToString());
-                sets.Add(set);
+                unit.Add(set);
 
             }
-            unit.Add(sets);
+            
 
 
             unit.Save(savePath);
@@ -613,27 +614,23 @@ namespace HSR_SIM_GUI
                         }
                     }
 
-                    if (xnode.Name == "Skills")
+                    if (xnode.Name == "Skill")
                     {
-                        foreach (XmlElement xmlSkill in xnode)
-                        {
+
                             Skill skl = new Skill();
-                            skl.name = xmlSkill.Attributes.GetNamedItem("name")?.Value.ToString(); ;
-                            skl.level = int.Parse(xmlSkill.Attributes.GetNamedItem("level")?.Value.ToString());
-                            skl.max_level = int.Parse(xmlSkill.Attributes.GetNamedItem("max_level")?.Value.ToString());
+                            skl.name = xnode.Attributes.GetNamedItem("name")?.Value.ToString(); ;
+                            skl.level = int.Parse(xnode.Attributes.GetNamedItem("level")?.Value.ToString());
+                            skl.max_level = int.Parse(xnode.Attributes.GetNamedItem("max_level")?.Value.ToString());
                             character.skills.Add(skl);
-                        }
+                        
                     }
 
-                    if (xnode.Name == "RelicSets")
+                    if (xnode.Name == "RelicSet")
                     {
-                        foreach (XmlElement xmlSet in xnode)
-                        {
                             GearSet gs = new GearSet();
-                            gs.name = xmlSet.Attributes.GetNamedItem("name")?.Value;
-                            gs.num = int.Parse(xmlSet.Attributes.GetNamedItem("num")?.Value);
+                            gs.name = xnode.Attributes.GetNamedItem("name")?.Value;
+                            gs.num = int.Parse(xnode.Attributes.GetNamedItem("num")?.Value);
                             character.relic_sets.Add(gs);
-                        }
                     }
 
 

@@ -1,4 +1,6 @@
-﻿namespace HSR_SIM_LIB.Fighters.Character
+﻿using HSR_SIM_LIB.UnitStuff;
+
+namespace HSR_SIM_LIB.Fighters.Character
 {
     public class Jingliu:DefaultFighter
     {

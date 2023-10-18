@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using Ini;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Windows.Forms.Design;
-
+using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_GUI
 {
@@ -49,7 +49,7 @@ namespace HSR_SIM_GUI
             static extern bool ShouldSystemUseDarkMode();
 
             if (ShouldSystemUseDarkMode())
-                ApplyTheme(form, Utils.Zcolor(30, 30, 30), Utils.Zcolor(45, 45, 48), Utils.Zcolor(104, 104, 104), Utils.Zcolor(51, 51, 51), Color.Black, HSR_SIM_LIB.Constant.clrDefault);
+                ApplyTheme(form, Utils.Zcolor(30, 30, 30), Utils.Zcolor(45, 45, 48), Utils.Zcolor(104, 104, 104), Utils.Zcolor(51, 51, 51), Color.Black, Constant.clrDefault);
 
             else
                 ApplyTheme(form, Color.White, Utils.Zcolor(240, 240, 240), Utils.Zcolor(181, 181, 181), Utils.Zcolor(110, 110, 110), Color.White, Color.Black);

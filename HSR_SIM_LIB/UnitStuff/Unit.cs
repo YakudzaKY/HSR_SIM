@@ -8,13 +8,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using HSR_SIM_LIB.Fighters;
-using static HSR_SIM_LIB.Constant;
-using static HSR_SIM_LIB.Utils;
-using static HSR_SIM_LIB.Resource;
-using static HSR_SIM_LIB.Ability;
-using static HSR_SIM_LIB.Unit;
+using static HSR_SIM_LIB.Utils.Constant;
+using static HSR_SIM_LIB.UnitStuff.Resource;
+using static HSR_SIM_LIB.Skills.Ability;
+using static HSR_SIM_LIB.UnitStuff.Unit;
+using HSR_SIM_LIB.TurnBasedClasses;
+using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.Utils;
 
-namespace HSR_SIM_LIB
+namespace HSR_SIM_LIB.UnitStuff
 {
     /// <summary>
     /// Unit class. Stats skills etc
@@ -47,7 +49,7 @@ namespace HSR_SIM_LIB
         public Bitmap Portrait
         {
             get =>
-                portrait ??= new Bitmap(LoadBitmap(UnitType.ToString() + "\\" + Name), PortraitSize);
+                portrait ??= new Bitmap(Utl.LoadBitmap(UnitType.ToString() + "\\" + Name), PortraitSize);
             set => portrait = value;
         }
         public List<Mod> Mods { get; set; } = new List<Mod>();
@@ -73,8 +75,11 @@ namespace HSR_SIM_LIB
 
         public List<DamageBoostRec> BaseDamageBoost
         {
-            get { return 
-                baseDamageBoost = baseDamageBoost ?? new List<DamageBoostRec>(); }
+            get
+            {
+                return
+                baseDamageBoost = baseDamageBoost ?? new List<DamageBoostRec>();
+            }
             set => baseDamageBoost = value;
         }
 
@@ -103,8 +108,8 @@ namespace HSR_SIM_LIB
         /// </summary>
         public Resource GetRes(ResourceType rt)
         {
-            if (!Resources.Any(x=>x.ResType==rt))
-                Resources.Add(new Resource(){ResType = rt,ResVal = 0});
+            if (!Resources.Any(x => x.ResType == rt))
+                Resources.Add(new Resource() { ResType = rt, ResVal = 0 });
             return Resources.First(resource => resource.ResType == rt);
         }
 
@@ -127,10 +132,10 @@ namespace HSR_SIM_LIB
             double res = 0;
             if (Fighter.Resists.Any(x => x.ResistType == elem))
             {
-                res += Fighter.Resists.First(x => x.ResistType == elem).ResistVal ;
+                res += Fighter.Resists.First(x => x.ResistType == elem).ResistVal;
             }
 
-            res += GetModsByType(Mod.ModifierType.ElementalResist,elem);
+            res += GetModsByType(Mod.ModifierType.ElementalResist, elem);
             return res;
         }
         public double DotBoost()//todo calc
@@ -145,25 +150,25 @@ namespace HSR_SIM_LIB
         public DamageBoostRec GetElemBoost(ElementEnm elem)
         {
             if (BaseDamageBoost.All(x => x.ElemType != elem))
-                BaseDamageBoost.Add(new DamageBoostRec(){ElemType = elem,Value = 0});
+                BaseDamageBoost.Add(new DamageBoostRec() { ElemType = elem, Value = 0 });
             return BaseDamageBoost.First(dmg => dmg.ElemType == elem);
         }
         public double GetElemBoostValue(ElementEnm elem)
         {
-            return GetElemBoost(elem).Value +GetModsByType(Mod.ModifierType.ElementalBoost,elem);
+            return GetElemBoost(elem).Value + GetModsByType(Mod.ModifierType.ElementalBoost, elem);
         }
 
         /// <summary>
         /// Get total stat by Mods by type
         /// </summary>
         /// <returns></returns>
-        public double GetModsByType(Mod.ModifierType modType, Unit.ElementEnm? elem=null)
+        public double GetModsByType(Mod.ModifierType modType, ElementEnm? elem = null)
         {
             double res = 0;
-            if (Mods!=null)
-                foreach (Mod mod in Mods.Where(x=>x.Modifier==modType&&x.Element==elem))
+            if (Mods != null)
+                foreach (Mod mod in Mods.Where(x => x.Modifier == modType && x.Element == elem))
                 {
-                    res += mod.Value*mod.Stack??0;
+                    res += mod.Value * mod.Stack ?? 0;
                 }
 
             return res;
@@ -196,9 +201,11 @@ namespace HSR_SIM_LIB
         /// <param name="mod"></param>
         public void ApplyMod(Mod mod)
         {
-            Mod newMod=null;
-            //find existing
-            if (Mods.Any(x => x.RefMod ==(mod.RefMod ?? mod)))
+            Mod newMod = null;
+            //find existing by ref, or by UNIQUE tag
+            if (Mods.Any(x => x.RefMod == (mod.RefMod ?? mod) 
+                              &&(String.IsNullOrEmpty(mod.UniqueStr)||String.Equals(x.UniqueStr,mod.UniqueStr)
+                              )))
             {
                 newMod = Mods.First(x => x.RefMod == (mod.RefMod ?? mod));
             }
@@ -206,15 +213,15 @@ namespace HSR_SIM_LIB
             {
                 //or add new
                 newMod = (Mod)mod.Clone();
-                newMod.RefMod = (mod.RefMod ?? mod);
+                newMod.RefMod = mod.RefMod ?? mod;
                 Mods.Add(newMod);
             }
 
             //reset duration
-            newMod.DurationLeft=newMod.BaseDuration;
+            newMod.DurationLeft = newMod.BaseDuration;
             //add stack
-            newMod.Stack = Math.Max(newMod.MaxStack,newMod.Stack+1);
-            
+            newMod.Stack = Math.Min(newMod.MaxStack, newMod.Stack + 1);
+
         }
         /// <summary>
         /// remove mod by ref
@@ -222,7 +229,7 @@ namespace HSR_SIM_LIB
         /// <param name="mod"></param>
         public void RemoveMod(Mod mod)
         {
-            if (Mods.Any(x => x.RefMod ==(mod.RefMod ?? mod)))
+            if (Mods.Any(x => x.RefMod == (mod.RefMod ?? mod)))
             {
                 Mods.Remove(Mods.First(x => x.RefMod == (mod.RefMod ?? mod)));
             }
@@ -266,7 +273,7 @@ namespace HSR_SIM_LIB
 
                 }
             }
-   
+
         }
         /// <summary>
         /// Get Friends List
@@ -274,8 +281,17 @@ namespace HSR_SIM_LIB
         /// <returns></returns>
         public List<Unit> Friends => ParentTeam.Units;
 
-        public string FighterClassName { get; set; }
+    
         public int Rank { get; set; }
+
+        /// <summary>
+        /// Init strings for class load after copying the object
+        /// </summary>
+        public string LightConeStringPath { get; set; }
+        public int LightConeInitRank { get; set; }
+
+        public List<KeyValuePair<string,int>> RelicsClasses { get; set; }=new List<KeyValuePair<string,int>>();
+        public string FighterClassName { get; set; }
 
         public IEnumerable<CloneClass> GetTargets(TargetTypeEnm targetType)
         {
@@ -315,12 +331,12 @@ namespace HSR_SIM_LIB
         public double GetDamageReduction()
         {
             double res = 1;
- 
-            if (Mods!=null)
-                foreach (Mod mod in Mods.Where(x=>x.Modifier==Mod.ModifierType.DamageReduction))
+
+            if (Mods != null)
+                foreach (Mod mod in Mods.Where(x => x.Modifier == Mod.ModifierType.DamageReduction))
                 {
                     for (int i = 0; i < mod.Stack; i++)
-                        res *= (1-mod.Value??0);
+                        res *= 1 - mod.Value ?? 0;
                 }
 
             return res;
@@ -332,10 +348,16 @@ namespace HSR_SIM_LIB
         /// <returns></returns>
         public double GetBrokenMultiplier()
         {
-            if (GetRes(ResourceType.Toughness).ResVal>0 )
-                return 0.9; 
-            else 
+            if (GetRes(ResourceType.Toughness).ResVal > 0)
+                return 0.9;
+            else
                 return 1;
+        }
+
+        public double GetAbilityTypeMultiplier(Ability entAbilityValue)
+        {
+            //todo gain all what can do bonuses(ally relics etc). may be start aura when stat >X
+            throw new NotImplementedException();
         }
     }
 

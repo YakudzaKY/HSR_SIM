@@ -5,16 +5,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using static HSR_SIM_LIB.Ability;
-using static HSR_SIM_LIB.Event;
-using static HSR_SIM_LIB.Resource;
-using static HSR_SIM_LIB.Step;
-using static HSR_SIM_LIB.Unit;
-using static HSR_SIM_LIB.Team;
+using static HSR_SIM_LIB.Skills.Ability;
+using static HSR_SIM_LIB.TurnBasedClasses.Event;
+using static HSR_SIM_LIB.UnitStuff.Resource;
+using static HSR_SIM_LIB.TurnBasedClasses.Step;
+using static HSR_SIM_LIB.UnitStuff.Unit;
+using static HSR_SIM_LIB.UnitStuff.Team;
 using System.Xml.Linq;
 using HSR_SIM_LIB.Fighters;
+using HSR_SIM_LIB.UnitStuff;
+using HSR_SIM_LIB.Skills;
 
-namespace HSR_SIM_LIB
+namespace HSR_SIM_LIB.TurnBasedClasses
 {/// <summary>
 /// Combat simulation class
 /// </summary>
@@ -43,7 +45,7 @@ namespace HSR_SIM_LIB
                 IEnumerable<Unit> units = new List<Unit>();
                 foreach (Team team in Teams)
                 {
-                    units=units.Concat(team.Units);
+                    units = units.Concat(team.Units);
                 }
                 return units;
 
@@ -159,12 +161,12 @@ namespace HSR_SIM_LIB
         /// </summary>
         public void Prepare()
         {
-            Team team ;
+            Team team;
 
             //main team
             team = new Team(this);
             team.BindUnits(GetCombatUnits(CurrentScenario.Party));
-            team.TeamType = Team.TeamTypeEnm.UnitPack;
+            team.TeamType = TeamTypeEnm.UnitPack;
             team.controledTeam = true;
             Teams.Add(team);
 
@@ -172,20 +174,20 @@ namespace HSR_SIM_LIB
             //Special
             team = new Team(this);
             team.BindUnits(GetCombatUnits(CurrentScenario.SpecialUnits));
-            team.TeamType = Team.TeamTypeEnm.Special;
+            team.TeamType = TeamTypeEnm.Special;
             Teams.Add(team);
 
             //enemy team
             team = new Team(this)
             {
-                TeamType = Team.TeamTypeEnm.UnitPack
+                TeamType = TeamTypeEnm.UnitPack
             };
             Teams.Add(team);
 
 
         }
 
-       
+
 
         /// <summary>
         /// Do next step by logic priority
@@ -243,9 +245,9 @@ namespace HSR_SIM_LIB
                 //call handlers
                 foreach (Unit unit in CurrentStep.Parent.PartyTeam.Units)
                     unit.Fighter.StepHandlerProc.Invoke(CurrentStep);
-                if (CurrentStep.Parent?.HostileTeam?.Units !=null)
-                foreach (Unit unit in CurrentStep.Parent.HostileTeam.Units)
-                    unit.Fighter.StepHandlerProc.Invoke(CurrentStep);
+                if (CurrentStep.Parent?.HostileTeam?.Units != null)
+                    foreach (Unit unit in CurrentStep.Parent.HostileTeam.Units)
+                        unit.Fighter.StepHandlerProc.Invoke(CurrentStep);
             }
 
             CurrentStep.ProcEvents();

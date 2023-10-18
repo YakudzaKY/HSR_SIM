@@ -4,7 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using static HSR_SIM_LIB.Ability;
+using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.TurnBasedClasses;
+using HSR_SIM_LIB.UnitStuff;
+using static HSR_SIM_LIB.Skills.Ability;
 
 
 namespace HSR_SIM_LIB.Fighters.Character
@@ -53,11 +56,12 @@ namespace HSR_SIM_LIB.Fighters.Character
                                             , Element = Element
                                             , CalculateToughnessShred = DefaultFighter.CalculateOpeningThg
                                             , TargetType = TargetTypeEnm.Hostiles
-                                            , EnterCombat=true
+                                            , Attack=true
             };
             //dmg events
-            ability.Events.Add(new Event(null) { OnStepType = Step.StepTypeEnm.ExecuteStartQueue, Type = Event.EventType.ResourceDrain, ResType = Resource.ResourceType.HP, TargetUnit = Parent, CanSetToZero = false, CalculateValue = CalculateKarmaSelfDmg, AbilityValue = ability });
-            ability.Events.Add(new Event(null) { OnStepType = Step.StepTypeEnm.ExecuteStartQueue, Type = Event.EventType.DirectDamage, CalculateValue = CalculateKarmaDmg, CalculateTargets = GetAoeTargets, AbilityValue = ability });
+            ability.Events.Add(new Event(null) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.ResourceDrain, ResType = Resource.ResourceType.HP, TargetUnit = Parent, CanSetToZero = false, CalculateValue = CalculateKarmaSelfDmg, AbilityValue = ability });
+            ability.Events.Add(new Event(null) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.DirectDamage, CalculateValue = CalculateKarmaDmg, CalculateTargets = GetAoeTargets, AbilityValue = ability });
+
             Abilities.Add(ability);
             //=====================
 

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace HSR_SIM_LIB
+namespace HSR_SIM_LIB.TurnBasedClasses
 {
     public class Fight
     {

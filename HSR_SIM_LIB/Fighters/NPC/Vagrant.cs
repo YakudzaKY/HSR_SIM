@@ -1,4 +1,6 @@
-﻿namespace HSR_SIM_LIB.Fighters.NPC
+﻿using HSR_SIM_LIB.UnitStuff;
+
+namespace HSR_SIM_LIB.Fighters.NPC
 {
     public class Vagrant: DefaultNPCFighter
     {

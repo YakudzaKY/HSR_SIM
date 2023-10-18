@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.TurnBasedClasses;
+using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Fighters.Character
 {
@@ -19,7 +22,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             //buff apply
 
             Event eventBuff = new(null)
-                { OnStepType = Step.StepTypeEnm.ExecuteStartQueue, Type = Event.EventType.Mod, AbilityValue = ability };
+                { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.Mod, AbilityValue = ability };
             eventBuff.Mods.Add(new Mod(null){Type=Mod.ModType.Buff,Modifier = Mod.ModifierType.AtkPrc,Value = 0.15,BaseDuration= 2,Dispellable = true,CalculateTargets = GetFriends});
             ability.Events.Add(eventBuff);
 
