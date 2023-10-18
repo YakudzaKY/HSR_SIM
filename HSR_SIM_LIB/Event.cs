@@ -10,7 +10,6 @@ using HSR_SIM_LIB.Fighters;
 using static HSR_SIM_LIB.Step;
 using static HSR_SIM_LIB.Event;
 using static HSR_SIM_LIB.Resource;
-using static HSR_SIM_LIB.Trigger;
 
 namespace HSR_SIM_LIB
 {
@@ -28,7 +27,7 @@ namespace HSR_SIM_LIB
         private Resource.ResourceType resType;
         private double? val;//Theoretical value
         private double? realVal;//Real hit value(cant exceed)
-        
+
         public bool CanSetToZero { get; init; } = true;
         public List<Unit> StartingUnits { get; set; }
         public List<Mod> Mods { get; set; } = new List<Mod>();
@@ -42,15 +41,8 @@ namespace HSR_SIM_LIB
         public bool IsCrit { get; set; }
         public Resource.ResourceType ResType { get => resType; set => resType = value; }
         public Step ParentStep { get; set; } = null;
-
-        private List<Trigger> triggers = null;
+        public bool TriggersHandled { get; set; } = false;
         private double? realBarrierVal;
-
-        public List<Trigger> Triggers
-        {
-            get { return triggers ??= new List<Trigger>(); }
-            set => triggers = value;
-        }
 
 
         public enum EventType
@@ -68,7 +60,8 @@ namespace HSR_SIM_LIB
             DirectDamage,
             CombatStartSkillDeQueue,
             DoTDamage,
-            DoTPlace
+            DoTPlace,
+            FinishCombat
         }
 
         public Event(Step parent)
@@ -134,6 +127,14 @@ namespace HSR_SIM_LIB
                     ParentStep.Parent.BeforeStartQueue.Add(ParentStep.ActorAbility);
             else if (Type == EventType.EnterCombat)//entering combat
                 ParentStep.Parent.DoEnterCombat = !revert;
+            else if (Type == EventType.FinishCombat) //Finish combat
+            {
+              
+                //todo: reset all passives and counters for characters
+                //also reset for gear and light cones
+                //
+                throw new NotImplementedException();
+            }
             else if (Type == EventType.StartCombat)//Loading combat
             {
                 if (!revert)
@@ -158,6 +159,7 @@ namespace HSR_SIM_LIB
             {
                 if (!revert)
                 {
+                    //TODO reset start wave passives
                     ParentStep.Parent.CurrentFight.CurrentWaveCnt += 1;
                     ParentStep.Parent.CurrentFight.CurrentWave = ParentStep.Parent.CurrentFight.ReferenceFight.Waves[ParentStep.Parent.CurrentFight.CurrentWaveCnt - 1];
                     StartingUnits ??= SimCls.GetCombatUnits(ParentStep.Parent.CurrentFight.CurrentWave.Units);
@@ -211,7 +213,7 @@ namespace HSR_SIM_LIB
                         RealVal -= 1;
                     }
                 }
-                SetResByEvent(ResType,(double)-(revert ? -RealVal : RealVal), revert);
+                SetResByEvent(ResType,(double)-(revert ? -RealVal : RealVal));
             }
             else if (Type == EventType.Defeat) //got defeated
             {
@@ -233,11 +235,23 @@ namespace HSR_SIM_LIB
                             (double)Val - (double)RealBarrierVal);
                 }
 
-                SetResByEvent(ResourceType.Barrier,(double)-(revert ? -RealBarrierVal : RealBarrierVal),revert);
-                SetResByEvent(ResourceType.HP,(double)-(revert ? -RealVal : RealVal), revert);
+                SetResByEvent(ResourceType.Barrier,(double)-(revert ? -RealBarrierVal : RealBarrierVal));
+                SetResByEvent(ResourceType.HP,(double)-(revert ? -RealVal : RealVal));
             }
             else
                 throw new NotImplementedException();
+            //call handlers
+            if (!TriggersHandled)
+            {
+                TriggersHandled = true;
+                foreach (Unit unit in ParentStep.Parent.PartyTeam.Units)
+                    unit.Fighter.EventHandlerProc.Invoke(this);
+                if (ParentStep.Parent?.HostileTeam?.Units !=null)
+                foreach (Unit unit in ParentStep.Parent.HostileTeam.Units)
+                    unit.Fighter.EventHandlerProc.Invoke(this);
+            }
+
+        
         }
 
         /// <summary>
@@ -245,50 +259,51 @@ namespace HSR_SIM_LIB
         /// </summary>
         /// <param name="resourceType"></param>
         /// <param name="chgVal"></param>
-        private void SetResByEvent(Resource.ResourceType resourceType,double chgVal,bool revert)
+        private void SetResByEvent(Resource.ResourceType resourceType,double chgVal)
         {
             Resource res = TargetUnit.GetRes(resourceType);
-            if (chgVal != 0) {
-                res.ResVal+=chgVal;
+            if (chgVal != 0)
+            {
+                res.ResVal += chgVal;
                 //set to zero
-                if (res.ResVal == 0)
+                if (!TriggersHandled)
                 {
-                    if (res.ResType ==ResourceType.Toughness)
+                    if (res.ResVal == 0)
                     {
-                        if (!revert&& Triggers.All(x => x.TrType != TriggerType.ShieldBreakTrigger))
+                        if (res.ResType == ResourceType.Toughness)
                         {
-                            Triggers.Add(new Trigger() { TrType = Trigger.TriggerType.ShieldBreakTrigger });
+
+
                             Event shieldBrkEvent = new(this.ParentStep)
                             {
                                 Type = EventType.ShieldBreak, AbilityValue = AbilityValue, TargetUnit = TargetUnit
-                              
+
                             };
                             shieldBrkEvent.Val = FighterUtils.CalculateShieldBrokeDmg(shieldBrkEvent);
                             ParentStep.Events.Add(shieldBrkEvent);
-                            shieldBrkEvent.ProcEvent(revert);
+                            shieldBrkEvent.ProcEvent(false);
+
                         }
-                    }
-                    else if (res.ResType ==ResourceType.HP)
-                    {
-                        if (!revert&& Triggers.All(x => x.TrType != TriggerType.Defeated))
+                        else if (res.ResType == ResourceType.HP)
                         {
-                            Triggers.Add(new Trigger() { TrType = Trigger.TriggerType.Defeated });
+
                             Event defeatEvent = new(this.ParentStep)
                             {
                                 Type = EventType.Defeat, AbilityValue = AbilityValue, TargetUnit = TargetUnit
-                              
+
                             };
                             ParentStep.Events.Add(defeatEvent);
-                            defeatEvent.ProcEvent(revert);
+                            defeatEvent.ProcEvent(false);
+
                         }
+
                     }
 
+
                 }
-
-
             }
-            
-            
+
+
         }
     }
 

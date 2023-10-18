@@ -18,9 +18,17 @@ namespace HSR_SIM_LIB
         public ModType Type { get; init; }
         public Unit TargetUnit { get; set; }
         public ModifierType Modifier { get; init; }
-        public double? Value { get; set; } 
-        public int? Duration { get; init; } 
+        public double? Value { get; set; }
+        public int Stack { get; set; } = 0;
+        public int MaxStack { get; set; } = 1; 
+        public int? BaseDuration { get; set; } 
+        public int? DurationLeft { get; set; }
+
+        public Mod RefMod { get; set; }
+
         public bool? Dispellable { get; init; }
+
+        public Unit.ElementEnm? Element{get; init; }
 
 
         public enum ModType
@@ -31,9 +39,37 @@ namespace HSR_SIM_LIB
 
         public enum ModifierType
         {
-            AtkPrc
+            AtkPrc,
+            Atk,
+            DefPrc,
+            Def,
+            MaxHpPrc,
+            MaxHp,
+            BreakDmgPrc,
+            BreakDmg,
+            SpeedPrc,
+            Speed,
+            CritPrc,
+            CritDmg,
+            EffectResPrc,
+            EffectRes,
+            EffectHitPrc,
+            EffectHit,
+            ElementalBoost,
+            AllDamageBoost,
+            ElementalPenetration,
+            DoTBoost,
+            DamageReduction,
+            AllDamageVulnerability,
+            ElementalVulnerability,
+            DoTVulnerability,
+            ElementalResist
         }
 
+        public Mod(Mod reference)
+        {
+            RefMod = reference;
+        }
         public string GetDescription()
         {
 
@@ -44,7 +80,7 @@ namespace HSR_SIM_LIB
                 ,this.TargetUnit.Name
                 ,this.Modifier.ToString()
                 ,this.Value.ToString()
-                ,this.Duration.ToString()
+                ,this.BaseDuration.ToString()
                 ,this.Dispellable.ToString()
                 );
         }

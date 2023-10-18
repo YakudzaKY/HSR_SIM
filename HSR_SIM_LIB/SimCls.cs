@@ -196,9 +196,7 @@ namespace HSR_SIM_LIB
         {
             bool res = true;//Total search res 
             string nullReplacer = "%mandatory%";
-#pragma warning disable IDE0090 // Используйте "new(...)".
             Dictionary<String, bool?> orGroupsRes = new Dictionary<String, bool?>();
-#pragma warning restore IDE0090 // Используйте "new(...)".
             foreach (Condition condition in essence.ExecuteWhen)
             {
                 bool condRes = true;
@@ -471,10 +469,24 @@ namespace HSR_SIM_LIB
 
             CurrentStep = newStep;
             Steps.Add(CurrentStep);
-            newStep.ProcEvents();
 
 
-            return newStep;
+            if (!CurrentStep.TriggersHandled)
+            {
+                CurrentStep.TriggersHandled = true;
+                //call handlers
+                foreach (Unit unit in CurrentStep.Parent.PartyTeam.Units)
+                    unit.Fighter.StepHandlerProc.Invoke(CurrentStep);
+                if (CurrentStep.Parent?.HostileTeam?.Units !=null)
+                foreach (Unit unit in CurrentStep.Parent.HostileTeam.Units)
+                    unit.Fighter.StepHandlerProc.Invoke(CurrentStep);
+            }
+
+            CurrentStep.ProcEvents();
+
+
+
+            return CurrentStep;
 
         }
 

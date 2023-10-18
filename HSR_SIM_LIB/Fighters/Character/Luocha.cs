@@ -7,6 +7,7 @@ namespace HSR_SIM_LIB.Fighters.Character
 {
     public class Luocha:DefaultFighter
     {
+        public  override FighterUtils.PathType? Path { get; set; } = FighterUtils.PathType.Abundance;
         public Luocha(Unit parent) : base(parent)
         {
             //Elemenet

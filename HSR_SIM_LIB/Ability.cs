@@ -18,7 +18,9 @@ namespace HSR_SIM_LIB
         public AbilityTypeEnm AbilityType { get; set; }
 
         public Unit Parent { get; set; }
-
+        public delegate double? DCalculateToughnessShred(Event ent);
+        public DCalculateToughnessShred CalculateToughnessShred { get; init; }
+        public double? ToughnessShred;
         public string Name { get; internal set; }
         public List<Event> Events { get; set; } = new List<Event>();
         public short Cost { get; set; } = 0;

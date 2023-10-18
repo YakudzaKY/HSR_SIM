@@ -37,7 +37,7 @@ namespace HSR_SIM_GUI
             }
             else if (String.Equals(kv.Key, Constant.MsgDebug))
             {
-                if (dbg!=null&&!dbg.IsDisposed)
+                if (dbg != null && !dbg.IsDisposed)
                 {
                     dbg.dbgText.AddLine(kv.Value);
                     LogWindow.ScrollToCaret();
@@ -61,7 +61,7 @@ namespace HSR_SIM_GUI
         public Main()
         {
 
-            
+
             CallBackStr callBackStr = new(WorkerCallBackString);
             CallBackRender callBackRender = new(WorkerCallBackImages);
             InitializeComponent();
@@ -159,8 +159,8 @@ namespace HSR_SIM_GUI
 
         private void button5_Click(object sender, EventArgs e)
         {
-            if (dbg ==null || dbg.IsDisposed)
-                dbg= new();
+            if (dbg == null || dbg.IsDisposed)
+                dbg = new();
             dbg.Show();
         }
     }

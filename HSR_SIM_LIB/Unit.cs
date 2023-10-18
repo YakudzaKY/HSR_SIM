@@ -12,6 +12,7 @@ using static HSR_SIM_LIB.Constant;
 using static HSR_SIM_LIB.Utils;
 using static HSR_SIM_LIB.Resource;
 using static HSR_SIM_LIB.Ability;
+using static HSR_SIM_LIB.Unit;
 
 namespace HSR_SIM_LIB
 {
@@ -27,14 +28,13 @@ namespace HSR_SIM_LIB
         UnitStats stats = null;
         public bool IsAlive = true;//TODO учесть сброс всех бафов и триггеров когда сдыхает, чтоб доты не аффектились бафами
 
-        public record damageBoostRec//TODO load from Wargear
+        public record DamageBoostRec
         {
             public ElementEnm ElemType;
             public double Value;
-
         }
 
-        private List<damageBoostRec> baseDamageBoost;//Elemental damage boost list
+        private List<DamageBoostRec> baseDamageBoost;//Elemental damage boost list
 
         private IFighter fighter = null;
         public IFighter Fighter
@@ -71,10 +71,10 @@ namespace HSR_SIM_LIB
         }
 
 
-        public List<damageBoostRec> BaseDamageBoost
+        public List<DamageBoostRec> BaseDamageBoost
         {
             get { return 
-                baseDamageBoost = baseDamageBoost ?? new List<damageBoostRec>(); }
+                baseDamageBoost = baseDamageBoost ?? new List<DamageBoostRec>(); }
             set => baseDamageBoost = value;
         }
 
@@ -92,7 +92,7 @@ namespace HSR_SIM_LIB
         /// </summary>
         public void InitToCombat()
         {
-            Stats.MaxHp = Stats.BaseMaxHp;
+
             GetRes(ResourceType.HP).ResVal = Stats.MaxHp;
             GetRes(ResourceType.Toughness).ResVal = Stats.MaxToughness;
             Fighter = null;
@@ -108,16 +108,14 @@ namespace HSR_SIM_LIB
             return Resources.First(resource => resource.ResType == rt);
         }
 
-        public double AllDmgBoost()//todo calc
+        public double AllDmgBoost()
         {
-            double res = 0;
-            return res;
+            return GetModsByType(Mod.ModifierType.AllDamageBoost);
         }
 
         public double ResistsPenetration(ElementEnm elem)//todo calc
         {
-            double res = 0;
-            return res;
+            return GetModsByType(Mod.ModifierType.ElementalPenetration, elem);
         }
         /// <summary>
         /// https://honkai-star-rail.fandom.com/wiki/Damage_RES
@@ -131,25 +129,44 @@ namespace HSR_SIM_LIB
             {
                 res += Fighter.Resists.First(x => x.ResistType == elem).ResistVal ;
             }
+
+            res += GetModsByType(Mod.ModifierType.ElementalResist,elem);
             return res;
         }
         public double DotBoost()//todo calc
         {
-            double res = 0;
-            return res;
+            return GetModsByType(Mod.ModifierType.DoTBoost);
         }
         /// <summary>
-        /// Get elem 
+        /// Get elem  boost
         /// </summary>
         /// <param name="elem"></param>
         /// <returns></returns>
-        public double GetElemBoost(ElementEnm elem)
+        public DamageBoostRec GetElemBoost(ElementEnm elem)
         {
-            if (!BaseDamageBoost.Any(x=>x.ElemType==elem))
-                BaseDamageBoost.Add(new damageBoostRec(){ElemType = elem,Value = 0});
-            double calcedDamageBoost = BaseDamageBoost.First(dmg => dmg.ElemType == elem).Value;
-            //todo skills and Light cones and item sets
-            return calcedDamageBoost;
+            if (BaseDamageBoost.All(x => x.ElemType != elem))
+                BaseDamageBoost.Add(new DamageBoostRec(){ElemType = elem,Value = 0});
+            return BaseDamageBoost.First(dmg => dmg.ElemType == elem);
+        }
+        public double GetElemBoostValue(ElementEnm elem)
+        {
+            return GetElemBoost(elem).Value +GetModsByType(Mod.ModifierType.ElementalBoost,elem);
+        }
+
+        /// <summary>
+        /// Get total stat by Mods by type
+        /// </summary>
+        /// <returns></returns>
+        public double GetModsByType(Mod.ModifierType modType, Unit.ElementEnm? elem=null)
+        {
+            double res = 0;
+            if (Mods!=null)
+                foreach (Mod mod in Mods.Where(x=>x.Modifier==modType&&x.Element==elem))
+                {
+                    res += mod.Value*mod.Stack??0;
+                }
+
+            return res;
         }
 
         public enum ElementEnm
@@ -164,6 +181,7 @@ namespace HSR_SIM_LIB
 
         }
 
+
         public enum TypeEnm
         {
             Special,
@@ -171,14 +189,43 @@ namespace HSR_SIM_LIB
             Character
 
         }
-
+        /// <summary>
+        /// Search mod by ref. and add stack or reset duration.
+        /// If mod have no ref then search by itself
+        /// </summary>
+        /// <param name="mod"></param>
         public void ApplyMod(Mod mod)
         {
-            Mods.Add(mod);
+            Mod newMod=null;
+            //find existing
+            if (Mods.Any(x => x.RefMod ==(mod.RefMod ?? mod)))
+            {
+                newMod = Mods.First(x => x.RefMod == (mod.RefMod ?? mod));
+            }
+            else
+            {
+                //or add new
+                newMod = (Mod)mod.Clone();
+                newMod.RefMod = (mod.RefMod ?? mod);
+                Mods.Add(newMod);
+            }
+
+            //reset duration
+            newMod.DurationLeft=newMod.BaseDuration;
+            //add stack
+            newMod.Stack = Math.Max(newMod.MaxStack,newMod.Stack+1);
+            
         }
+        /// <summary>
+        /// remove mod by ref
+        /// </summary>
+        /// <param name="mod"></param>
         public void RemoveMod(Mod mod)
         {
-            Mods.Remove(mod);
+            if (Mods.Any(x => x.RefMod ==(mod.RefMod ?? mod)))
+            {
+                Mods.Remove(Mods.First(x => x.RefMod == (mod.RefMod ?? mod)));
+            }
         }
 
         /// <summary>
@@ -219,18 +266,13 @@ namespace HSR_SIM_LIB
 
                 }
             }
-            set => throw new NotImplementedException();
+   
         }
         /// <summary>
         /// Get Friends List
         /// </summary>
         /// <returns></returns>
-        public List<Unit> Friends
-        {
-            get => ParentTeam.Units;
-
-            set => throw new NotImplementedException();
-        }
+        public List<Unit> Friends => ParentTeam.Units;
 
         public string FighterClassName { get; set; }
         public int Rank { get; set; }
@@ -249,11 +291,21 @@ namespace HSR_SIM_LIB
         /// </summary>
         /// <param name="attackElem"></param>
         /// <returns></returns>
-        public double GetVulnerability(ElementEnm attackElem)
+        public double GetElemVulnerability(ElementEnm attackElem)
         {
-            //todo all vulnerability + elem vulnerability + dot vulnerability
-            double res = 0;
-            return res;
+            return GetModsByType(Mod.ModifierType.ElementalVulnerability, attackElem);
+
+        }
+
+        public double GetAllDamageVulnerability()
+        {
+            return GetModsByType(Mod.ModifierType.AllDamageVulnerability);
+
+        }
+
+        public double GetDoteVulnerability()
+        {
+            return GetModsByType(Mod.ModifierType.DoTVulnerability);
 
         }
         /// <summary>
@@ -262,17 +314,17 @@ namespace HSR_SIM_LIB
         /// <returns></returns>
         public double GetDamageReduction()
         {
-            double res = (1-0);
-            /*
-             *foreach ....
-             *
-             * if res=0 then res = (1- damageReduction1)
-             * else
-             * res= res*(1- damageReduction2)*....
-             * ...
-             *
-             */
+            double res = 1;
+ 
+            if (Mods!=null)
+                foreach (Mod mod in Mods.Where(x=>x.Modifier==Mod.ModifierType.DamageReduction))
+                {
+                    for (int i = 0; i < mod.Stack; i++)
+                        res *= (1-mod.Value??0);
+                }
+
             return res;
+
         }
         /// <summary>
         /// https://honkai-star-rail.fandom.com/wiki/Toughness#Weakness_Break

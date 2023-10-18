@@ -8,6 +8,7 @@ namespace HSR_SIM_LIB.Fighters.Character
 {
     public class Bronya:DefaultFighter
     {
+        public  override FighterUtils.PathType? Path { get; set; } = FighterUtils.PathType.Harmony;
         public Bronya(Unit parent) : base(parent)
         {
             //Elemenet
@@ -20,7 +21,7 @@ namespace HSR_SIM_LIB.Fighters.Character
 
             Event eventBuff = new(null)
                 { OnStepType = Step.StepTypeEnm.ExecuteStartQueue, Type = Event.EventType.Mod, AbilityValue = ability };
-            eventBuff.Mods.Add(new Mod(){Type=Mod.ModType.Buff,Modifier = Mod.ModifierType.AtkPrc,Value = 15,Duration=2,Dispellable = true,CalculateTargets = GetFriends});
+            eventBuff.Mods.Add(new Mod(null){Type=Mod.ModType.Buff,Modifier = Mod.ModifierType.AtkPrc,Value = 0.15,BaseDuration= 2,Dispellable = true,CalculateTargets = GetFriends});
             ability.Events.Add(eventBuff);
             //Dequeue
             ability.Events.Add(new Event(null) { OnStepType = Step.StepTypeEnm.ExecuteStartQueue, Type = Event.EventType.CombatStartSkillDeQueue});

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HSR_SIM_LIB.Fighters.LightCones;
 using static HSR_SIM_LIB.CallBacks;
 using static HSR_SIM_LIB.Fighters.FighterUtils;
 
@@ -13,10 +14,12 @@ namespace HSR_SIM_LIB.Fighters
     /// </summary>
     public class DefaultFighter : IFighter
     {
+        public virtual PathType? Path { get; set; } = null;
         public Unit.ElementEnm Element { get; set; }
         public List<Unit.ElementEnm> Weaknesses { get; set; } = null;
         public List<Resist> Resists { get; set; } = new List<Resist>();
         public Unit Parent { get; set; }
+        public ILightCone LightCone { get; set; }
 
         //all alive enemies
         public IEnumerable<Unit> GetAoeTargets(Event ent)
@@ -42,6 +45,10 @@ namespace HSR_SIM_LIB.Fighters
             return Parent.Friends.Where(x => x.IsAlive);
         }
 
+        public static double? CalculateOpeningThg(Event ent)
+        {
+            return ent.TargetUnit.GetRes(Resource.ResourceType.Toughness).ResVal;
+        }
 
         //Try to choose some good ability to cast
         public virtual Ability ChooseAbilityToCast(Step step)
@@ -112,19 +119,26 @@ namespace HSR_SIM_LIB.Fighters
 
 
         public IFighter.EventHandler EventHandlerProc { get; set; }
+        public IFighter.StepHandler StepHandlerProc { get; set; }
         public List<Ability> Abilities { get; set; } = new List<Ability>();
 
         //Blade constructor
         public DefaultFighter(Unit parent)
         {
             Parent = parent;
-            EventHandlerProc += new IFighter.EventHandler(DefaultFighter_HandleEvent);
+            EventHandlerProc += DefaultFighter_HandleEvent;
+            StepHandlerProc += DefaultFighter_HandleStep;
 
         }
 
-        private void DefaultFighter_HandleEvent(Event ent)
+        public virtual void DefaultFighter_HandleEvent(Event ent)
         {
-            throw new NotImplementedException();
+            //
+            LightCone?.EventHandlerProc.Invoke(ent);
+        }
+        public virtual  void DefaultFighter_HandleStep(Step step)
+        {
+            LightCone?.StepHandlerProc.Invoke(step);
         }
     }
 }

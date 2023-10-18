@@ -173,7 +173,7 @@ namespace HSR_SIM_GUI
             button4.Name = "button4";
             button4.Size = new System.Drawing.Size(120, 30);
             button4.TabIndex = 12;
-            button4.Text = "Open Wargear";
+            button4.Text = "Wargear Import";
             button4.UseVisualStyleBackColor = true;
             button4.Click += Button4_Click;
             // 

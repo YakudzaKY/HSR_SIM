@@ -117,6 +117,7 @@ namespace HSR_SIM_LIB
                 lvl=SafeToIntNull(xnode.Attributes.GetNamedItem("level")?.Value?.Trim());
                 if (lvl == null || lvl == searchLvl)
                 {
+                    //base stats
                     unitStats.BaseMaxHp = SafeToDouble(xnode.Attributes.GetNamedItem("hp")?.Value.Trim());
                     unitStats.BaseAttack = SafeToDouble(xnode.Attributes.GetNamedItem("atk")?.Value.Trim());
                     unitStats.BaseMaxEnergy = SafeToInt(xnode.Attributes.GetNamedItem("energy")?.Value.Trim());
@@ -124,13 +125,42 @@ namespace HSR_SIM_LIB
                     unitStats.MaxToughness = SafeToInt(xnode.Attributes.GetNamedItem("tgh")?.Value.Trim());
                     unitStats.BaseCritChance = SafeToDouble(xnode.Attributes.GetNamedItem("crit_rate")?.Value.Trim());
                     unitStats.BaseCritDmg = SafeToDouble(xnode.Attributes.GetNamedItem("crit_dmg")?.Value.Trim());
-                    unitStats.BaseDef = SafeToDoubleNull(xnode.Attributes.GetNamedItem("def")?.Value.Trim());
+                    unitStats.BaseDef = SafeToDouble(xnode.Attributes.GetNamedItem("def")?.Value.Trim());
                     unitStats.BaseBreakDmg= SafeToDouble(xnode.Attributes.GetNamedItem("break_dmg")?.Value.Trim());
+                    unitStats.BaseEffectRes= SafeToDouble(xnode.Attributes.GetNamedItem("effect_res")?.Value.Trim());
+                    unitStats.BaseEffectHit= SafeToDouble(xnode.Attributes.GetNamedItem("effect_hit")?.Value.Trim());
                     if (xnode.Attributes.GetNamedItem("baseActionValue") is not null)
                     {
                         unitStats.BaseActionValue =
                             SafeToInt(xnode.Attributes.GetNamedItem("baseActionValue")?.Value.Trim());
                     }
+
+                    //PRC stats
+                    unitStats.MaxHpPrc = SafeToDouble(xnode.Attributes.GetNamedItem("hp_prc")?.Value.Trim());
+                    unitStats.AttackPrc = SafeToDouble(xnode.Attributes.GetNamedItem("atk_prc")?.Value.Trim());
+                    unitStats.CritDmgPrc = SafeToDouble(xnode.Attributes.GetNamedItem("crit_dmg_prc")?.Value.Trim());
+                    unitStats.BreakDmgPrc = SafeToDouble(xnode.Attributes.GetNamedItem("break_dmg_prc")?.Value.Trim());
+                    unitStats.SpeedPrc = SafeToDouble(xnode.Attributes.GetNamedItem("spd_prc")?.Value.Trim());
+                    unitStats.DefPrc = SafeToDouble(xnode.Attributes.GetNamedItem("def_prc")?.Value.Trim());
+                    unitStats.CritRatePrc = SafeToDouble(xnode.Attributes.GetNamedItem("crit_rate_prc")?.Value.Trim());
+                    unitStats.EffectHitPrc = SafeToDouble(xnode.Attributes.GetNamedItem("effect_hit_prc")?.Value.Trim());
+                    unitStats.EffectResPrc = SafeToDouble(xnode.Attributes.GetNamedItem("effect_res_prc")?.Value.Trim());
+
+                    
+
+                    //fix stats
+                    unitStats.MaxHpFix = SafeToDouble(xnode.Attributes.GetNamedItem("hp_fix")?.Value.Trim());
+                    unitStats.AttackFix = SafeToDouble(xnode.Attributes.GetNamedItem("atk_fix")?.Value.Trim());
+                    unitStats.SpeedFix = SafeToDouble(xnode.Attributes.GetNamedItem("spd_fix")?.Value.Trim());
+                    unitStats.EffectHitFix = SafeToDouble(xnode.Attributes.GetNamedItem("effect_hit_fix")?.Value.Trim());
+                    unitStats.EffectResFix = SafeToDouble(xnode.Attributes.GetNamedItem("effect_res_fix")?.Value.Trim());
+
+                    //weapon damage by element???
+                    foreach (ElementEnm elmn in (ElementEnm[]) Enum.GetValues(typeof(ElementEnm)))
+                    {
+                        unit.GetElemBoost(elmn).Value = SafeToDouble(xnode.Attributes.GetNamedItem(elmn.ToString().ToLower()+"_dmg_prc")?.Value.Trim());
+                    }
+                    
                 }
             }
 

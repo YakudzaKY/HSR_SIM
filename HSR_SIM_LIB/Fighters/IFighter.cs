@@ -10,11 +10,14 @@ namespace HSR_SIM_LIB.Fighters
     /// </summary>
     public interface IFighter
     {
+        public FighterUtils.PathType? Path { get; set; }
         public Unit.ElementEnm Element { get; set; }
         public List<Unit.ElementEnm> Weaknesses { get; set; }
         public List<Resist> Resists { get; set; }
         public delegate void EventHandler(Event ent);
+        public delegate void StepHandler(Step step);
         public EventHandler EventHandlerProc{ get; set; }
+        public StepHandler StepHandlerProc{ get; set; }
         //ability list
         public List<Ability> Abilities { get; set; }
         public Unit Parent{ get; set; }

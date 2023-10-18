@@ -48,11 +48,24 @@
             chAutoSave = new System.Windows.Forms.CheckBox();
             label6 = new System.Windows.Forms.Label();
             button1 = new System.Windows.Forms.Button();
+            LightCone = new System.Windows.Forms.Label();
+            txtLC = new System.Windows.Forms.TextBox();
+            label7 = new System.Windows.Forms.Label();
+            dgSets = new System.Windows.Forms.DataGridView();
+            dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            txtLCRank = new System.Windows.Forms.NumericUpDown();
+            label8 = new System.Windows.Forms.Label();
+            txtLcLevel = new System.Windows.Forms.NumericUpDown();
+            label9 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)AvatarBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dgStats).BeginInit();
             ((System.ComponentModel.ISupportInitialize)txtLvl).BeginInit();
             ((System.ComponentModel.ISupportInitialize)txtRank).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dgSkills).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)dgSets).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)txtLCRank).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)txtLcLevel).BeginInit();
             SuspendLayout();
             // 
             // ImportAPI
@@ -84,7 +97,7 @@
             dgStats.Name = "dgStats";
             dgStats.RowHeadersVisible = false;
             dgStats.RowTemplate.Height = 25;
-            dgStats.Size = new System.Drawing.Size(213, 251);
+            dgStats.Size = new System.Drawing.Size(255, 251);
             dgStats.TabIndex = 3;
             dgStats.CellContentClick += dgStats_CellContentClick;
             dgStats.CellEndEdit += dgStats_CellEndEdit;
@@ -148,14 +161,14 @@
             label4.AutoSize = true;
             label4.Location = new System.Drawing.Point(118, 71);
             label4.Name = "label4";
-            label4.Size = new System.Drawing.Size(52, 15);
+            label4.Size = new System.Drawing.Size(55, 15);
             label4.TabIndex = 9;
-            label4.Text = "Eidolons";
+            label4.Text = "Eidolons:";
             // 
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new System.Drawing.Point(252, 121);
+            label5.Location = new System.Drawing.Point(706, 121);
             label5.Name = "label5";
             label5.Size = new System.Drawing.Size(33, 15);
             label5.TabIndex = 10;
@@ -167,7 +180,7 @@
             dgSkills.AllowUserToDeleteRows = false;
             dgSkills.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgSkills.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { dataGridViewTextBoxColumn1, dataGridViewTextBoxColumn2, Column1 });
-            dgSkills.Location = new System.Drawing.Point(252, 139);
+            dgSkills.Location = new System.Drawing.Point(706, 139);
             dgSkills.Name = "dgSkills";
             dgSkills.RowHeadersVisible = false;
             dgSkills.RowTemplate.Height = 25;
@@ -230,11 +243,104 @@
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 
+            // LightCone
+            // 
+            LightCone.AutoSize = true;
+            LightCone.Location = new System.Drawing.Point(217, 19);
+            LightCone.Name = "LightCone";
+            LightCone.Size = new System.Drawing.Size(68, 15);
+            LightCone.TabIndex = 18;
+            LightCone.Text = "Light Cone:";
+            // 
+            // txtLC
+            // 
+            txtLC.Location = new System.Drawing.Point(217, 36);
+            txtLC.Name = "txtLC";
+            txtLC.ReadOnly = true;
+            txtLC.Size = new System.Drawing.Size(105, 23);
+            txtLC.TabIndex = 19;
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new System.Drawing.Point(291, 121);
+            label7.Name = "label7";
+            label7.Size = new System.Drawing.Size(31, 15);
+            label7.TabIndex = 20;
+            label7.Text = "Sets:";
+            // 
+            // dgSets
+            // 
+            dgSets.AllowUserToAddRows = false;
+            dgSets.AllowUserToDeleteRows = false;
+            dgSets.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgSets.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { dataGridViewTextBoxColumn3, dataGridViewTextBoxColumn4 });
+            dgSets.Location = new System.Drawing.Point(297, 139);
+            dgSets.Name = "dgSets";
+            dgSets.RowHeadersVisible = false;
+            dgSets.RowTemplate.Height = 25;
+            dgSets.Size = new System.Drawing.Size(286, 251);
+            dgSets.TabIndex = 21;
+            dgSets.CellEndEdit += dgSets_CellEndEdit;
+            // 
+            // dataGridViewTextBoxColumn3
+            // 
+            dataGridViewTextBoxColumn3.HeaderText = "Set";
+            dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
+            dataGridViewTextBoxColumn3.ReadOnly = true;
+            // 
+            // dataGridViewTextBoxColumn4
+            // 
+            dataGridViewTextBoxColumn4.HeaderText = "Num";
+            dataGridViewTextBoxColumn4.Name = "dataGridViewTextBoxColumn4";
+            // 
+            // txtLCRank
+            // 
+            txtLCRank.Location = new System.Drawing.Point(343, 36);
+            txtLCRank.Name = "txtLCRank";
+            txtLCRank.Size = new System.Drawing.Size(37, 23);
+            txtLCRank.TabIndex = 22;
+            txtLCRank.ValueChanged += txtLCRank_ValueChanged;
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new System.Drawing.Point(386, 39);
+            label8.Name = "label8";
+            label8.Size = new System.Drawing.Size(37, 15);
+            label8.TabIndex = 24;
+            label8.Text = "Level:";
+            // 
+            // txtLcLevel
+            // 
+            txtLcLevel.Location = new System.Drawing.Point(429, 36);
+            txtLcLevel.Name = "txtLcLevel";
+            txtLcLevel.Size = new System.Drawing.Size(44, 23);
+            txtLcLevel.TabIndex = 23;
+            txtLcLevel.ValueChanged += txtLcLevel_ValueChanged;
+            // 
+            // label9
+            // 
+            label9.AutoSize = true;
+            label9.Location = new System.Drawing.Point(327, 39);
+            label9.Name = "label9";
+            label9.Size = new System.Drawing.Size(15, 15);
+            label9.TabIndex = 25;
+            label9.Text = "C";
+            // 
             // WarGear
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(1087, 450);
+            Controls.Add(label9);
+            Controls.Add(label8);
+            Controls.Add(txtLcLevel);
+            Controls.Add(txtLCRank);
+            Controls.Add(dgSets);
+            Controls.Add(label7);
+            Controls.Add(txtLC);
+            Controls.Add(LightCone);
             Controls.Add(button1);
             Controls.Add(label6);
             Controls.Add(chAutoSave);
@@ -251,13 +357,16 @@
             Controls.Add(dgStats);
             Controls.Add(ImportAPI);
             Name = "WarGear";
-            Text = "WarGear editor";
+            Text = "WarGear import";
             Load += WarGear_Load;
             ((System.ComponentModel.ISupportInitialize)AvatarBox).EndInit();
             ((System.ComponentModel.ISupportInitialize)dgStats).EndInit();
             ((System.ComponentModel.ISupportInitialize)txtLvl).EndInit();
             ((System.ComponentModel.ISupportInitialize)txtRank).EndInit();
             ((System.ComponentModel.ISupportInitialize)dgSkills).EndInit();
+            ((System.ComponentModel.ISupportInitialize)dgSets).EndInit();
+            ((System.ComponentModel.ISupportInitialize)txtLCRank).EndInit();
+            ((System.ComponentModel.ISupportInitialize)txtLcLevel).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -284,5 +393,16 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
+        private System.Windows.Forms.DataGridView dgAdditions;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label LightCone;
+        private System.Windows.Forms.TextBox txtLC;
+        private System.Windows.Forms.DataGridView dgSets;
+        private System.Windows.Forms.NumericUpDown txtLCRank;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.NumericUpDown txtLcLevel;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn4;
     }
 }

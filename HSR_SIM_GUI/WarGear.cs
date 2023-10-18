@@ -159,6 +159,7 @@ namespace HSR_SIM_GUI
         {
             public string field;
             public double value;
+            public bool percent;
 
         }
 
@@ -168,6 +169,29 @@ namespace HSR_SIM_GUI
             public int level;
             public int max_level;
 
+        }
+
+        public class Gear
+        {
+            public string name;
+            public Attribute main_affix;
+            public List<Attribute> sub_affix;
+        }
+        public class LCone
+        {
+            public string name;
+            public int rank;
+            public int level;
+            public int promotion;
+
+            public List<Attribute> attributes;
+            public List<Attribute> properties;
+        }
+        public class GearSet
+        {
+            public string name;
+            public int num;
+            public List<Attribute> properties;
         }
         public class Character
         {
@@ -180,7 +204,13 @@ namespace HSR_SIM_GUI
                 get;
                 set;
             }
+
+            public LCone light_cone;
             public List<Attribute> attributes;
+            public List<Attribute> properties;
+            public List<GearSet> relic_sets;
+            public List<Gear> relics;
+
             public List<Skill> skills;
         }
         public class ApiData
@@ -189,6 +219,24 @@ namespace HSR_SIM_GUI
             public List<Character> characters;
         }
 
+        private void FillAttributes(DataGridView view, List<Attribute> attributes)
+        {
+            view.Rows.Clear();
+            if (attributes is null)
+                return;
+            if (attributes.Count <= 0)
+                return;
+
+
+            view.Rows.Add(attributes.Count);
+            foreach (Attribute attr in attributes)
+            {
+
+                view.Rows[attributes.IndexOf(attr)].Cells[0].Value = attr.field;
+                view.Rows[attributes.IndexOf(attr)].Cells[1].Value = attr.value.ToString();
+            }
+
+        }
         /// <summary>
         /// Load character from object
         /// </summary>
@@ -200,24 +248,31 @@ namespace HSR_SIM_GUI
             txtRank.Value = mainCharacter.Rank;
             AvatarBox.Image = new Bitmap(HSR_SIM_LIB.Utils.LoadBitmap("Character\\" + mainCharacter.Name), new Size(AvatarBox.Width, AvatarBox.Height));
             label1.Text = mainCharacter.Name;
+            txtLC.Text = mainCharacter.light_cone.name;
+            txtLCRank.Value = mainCharacter.light_cone.rank;
+            txtLcLevel.Value = mainCharacter.light_cone.level;
 
-            //stats
-            while (dgStats.Rows.Count > 0)
-            {
-                dgStats.Rows.RemoveAt(0);
-            }
-            dgStats.Rows.Add(mainCharacter.attributes.Count);
-            foreach (Attribute attr in mainCharacter.attributes)
-            {
+            FillAttributes(dgStats, mainCharacter.attributes);
 
-                dgStats.Rows[mainCharacter.attributes.IndexOf(attr)].Cells[0].Value = attr.field;
-                dgStats.Rows[mainCharacter.attributes.IndexOf(attr)].Cells[1].Value = attr.value.ToString();
+            dgSets.Rows.Clear();
+            if (mainCharacter.relic_sets is { Count: > 0 })
+            {
+                dgSets.Rows.Add(mainCharacter.relic_sets.Count);
+                foreach (GearSet ger in mainCharacter.relic_sets)
+                {
+                    dgSets.Rows[mainCharacter.relic_sets.IndexOf(ger)].Cells[0].Value = ger.name;
+                    dgSets.Rows[mainCharacter.relic_sets.IndexOf(ger)].Cells[1].Value = ger.num.ToString();
+                }
             }
+
+
+
+
+
+
+
             //skills
-            while (dgSkills.Rows.Count > 0)
-            {
-                dgSkills.Rows.RemoveAt(0);
-            }
+            dgSkills.Rows.Clear();
             if (mainCharacter.skills.Count > 0)
                 dgSkills.Rows.Add(mainCharacter.skills.Count);
             foreach (Skill skl in mainCharacter.skills)
@@ -229,8 +284,47 @@ namespace HSR_SIM_GUI
             }
 
 
+
         }
 
+
+        private void ConcatAndRenameAttrib(List<Attribute> lst_out, List<Attribute> lst_in)
+        {
+            foreach (Attribute a in lst_in)
+            {
+                a.field += a.percent ? "_prc" : "_fix";
+            }
+
+            if (lst_in == lst_out)
+                return;
+            foreach (Attribute a in lst_in)
+            {
+                if (lst_out.Any(x => x.field == a.field))
+                {
+                    lst_out.First(x => x.field == a.field).value += a.value;
+                }
+                else
+                {
+                    lst_out.Add(new Attribute() { field = a.field, percent = a.percent, value = a.value });
+                }
+            }
+        }
+
+        private void ConcatOneAttrib(List<Attribute> lst_out, Attribute a)
+        {
+            a.field += a.percent ? "_prc" : "_fix";
+
+
+            if (lst_out.Any(x => x.field == a.field))
+            {
+                lst_out.First(x => x.field == a.field).value += a.value;
+            }
+            else
+            {
+                lst_out.Add(new Attribute() { field = a.field, percent = a.percent, value = a.value });
+            }
+
+        }
         /// <summary>
         /// import from json API
         /// </summary>
@@ -255,6 +349,29 @@ namespace HSR_SIM_GUI
 
 
                     ApiData data = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiData>(result);
+
+                    //add _prc to attribute names and concatinate all attributes
+                    foreach (Character character in data.characters)
+                    {
+                        //concatinate and renaming stats
+                        ConcatAndRenameAttrib(character.attributes, character.properties);
+                        //delete low num sets
+                        List<GearSet> filtredSet=new List<GearSet>();
+                        foreach (GearSet set in  character.relic_sets)
+                        {
+                            if (filtredSet.All(x => x.name != set.name))
+                            {
+                                filtredSet.Add(set);
+                            }
+                            else
+                            {
+                                GearSet fndgs = filtredSet.First(x => x.name == set.name);
+                                fndgs.num = Math.Max(fndgs.num, set.num);
+                            }
+                        }
+                        character.relic_sets=filtredSet;
+                    }
+
                     int index = 0;
                     waitDialog.Close();
                     waitDialog.Dispose();
@@ -400,6 +517,14 @@ namespace HSR_SIM_GUI
                 stat.SetAttributeValue(attr.field, attr.value);
 
             }
+            unit.Add(stat);
+
+            XElement xLc = new XElement("LightCone");
+            xLc.SetAttributeValue("rank", character.light_cone.rank.ToString());
+            xLc.SetAttributeValue("level", character.light_cone.level.ToString());
+            xLc.SetAttributeValue("name", character.light_cone.name);
+            unit.Add(xLc);
+
             XElement skills = new XElement("Skills");
             foreach (Skill skl in character.skills)
             {
@@ -410,8 +535,20 @@ namespace HSR_SIM_GUI
                 skills.Add(skill);
 
             }
-            unit.Add(stat);
             unit.Add(skills);
+
+            XElement sets = new XElement("RelicSets");
+            foreach (GearSet gearSet in character.relic_sets)
+            {
+                XElement set = new XElement("Set");
+                set.SetAttributeValue("name", gearSet.name);
+                set.SetAttributeValue("num", gearSet.num.ToString());
+                sets.Add(set);
+
+            }
+            unit.Add(sets);
+
+
             unit.Save(savePath);
 
         }
@@ -445,14 +582,26 @@ namespace HSR_SIM_GUI
             XmlElement xRoot = xDoc.DocumentElement;
             if (xRoot != null)
             {
+
                 character.Level = int.Parse(xRoot.Attributes.GetNamedItem("level")?.Value.ToString() ?? "0");
                 character.Name = xRoot.Attributes.GetNamedItem("name")?.Value.ToString();
                 character.Rank = int.Parse(xRoot.Attributes.GetNamedItem("rank")?.Value.ToString() ?? "0");
                 character.attributes = new List<Attribute>();
                 character.skills = new List<Skill>();
+                character.relic_sets = new List<GearSet>();
                 //parse all items
                 foreach (XmlElement xnode in xRoot)
                 {
+                    if (xnode.Name == "LightCone")
+                    {
+
+                        character.light_cone = new LCone();
+                        character.light_cone.level = int.Parse(xnode.Attributes.GetNamedItem("level")?.Value.ToString() ?? "0");
+                        character.light_cone.name = xnode.Attributes.GetNamedItem("name")?.Value.ToString();
+                        character.light_cone.rank = int.Parse(xnode.Attributes.GetNamedItem("rank")?.Value.ToString() ?? "0");
+
+                    }
+
                     if (xnode.Name == "Stats")
                     {
                         foreach (XmlAttribute xmlattr in xnode.Attributes)
@@ -476,6 +625,18 @@ namespace HSR_SIM_GUI
                         }
                     }
 
+                    if (xnode.Name == "RelicSets")
+                    {
+                        foreach (XmlElement xmlSet in xnode)
+                        {
+                            GearSet gs = new GearSet();
+                            gs.name = xmlSet.Attributes.GetNamedItem("name")?.Value;
+                            gs.num = int.Parse(xmlSet.Attributes.GetNamedItem("num")?.Value);
+                            character.relic_sets.Add(gs);
+                        }
+                    }
+
+
                 }
 
 
@@ -494,6 +655,32 @@ namespace HSR_SIM_GUI
             {
                 mainCharacter.skills.First(x => x.name == skillName).level = lvl;
                 mainCharacter.skills.First(x => x.name == skillName).max_level = max_lvl;
+            }
+        }
+
+        private void label8_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtLCRank_ValueChanged(object sender, EventArgs e)
+        {
+            mainCharacter.light_cone.rank = (int)((NumericUpDown)sender).Value;
+        }
+
+        private void txtLcLevel_ValueChanged(object sender, EventArgs e)
+        {
+            mainCharacter.light_cone.level = (int)((NumericUpDown)sender).Value;
+        }
+
+        private void dgSets_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            int rw = e.RowIndex;
+            string setName = ((DataGridView)sender).Rows[e.RowIndex].Cells[0].Value?.ToString();
+            int num = int.Parse(((DataGridView)sender).Rows[e.RowIndex].Cells[1].Value.ToString());
+            if (setName != null)
+            {
+                mainCharacter.relic_sets.First(x => x.name == setName).num = num;
             }
         }
     }

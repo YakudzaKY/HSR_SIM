@@ -45,7 +45,6 @@ namespace HSR_SIM_LIB
                     magickImages.Write(ms, MagickFormat.Png);
                 }
                 bitmap?.Dispose();
-                magickImages.Dispose();
                 bitmap = new(ms)
                 {
                     Tag = ms

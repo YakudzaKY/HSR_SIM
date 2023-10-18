@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Unit name="Blade" level="80" rank="2">
-  <Stats hp="26280.36" atk="1125.4319999999998" def="815.85" spd="97" crit_rate="0.05" crit_dmg="0.5" break_dmg="100000" />
+  <Stats hp="2628.36" atk="1125.4319999999998" def="815.85" spd="97" crit_rate="0.05" crit_dmg="0.5" hp_prc="1.5217600156739444" crit_rate_prc="0.6586400066688699" effect_res_prc="0.186400001309814" hp_fix="705.6000000101048" crit_dmg_prc="1.010880015324806" break_dmg_prc="0.18144000414758898" atk_fix="390.90379201457836" atk_prc="0.22464000340551402" spd_fix="26.200000003911555" effect_hit_prc="0.241920003667478" wind_dmg_prc="0.38880301429889397" def_prc="0.09179999982006799" />
+  <LightCone rank="1" level="80" name="The Unreachable Side" />
   <Skills>
     <Skill name="Shard Sword" level="6" max_level="9" />
     <Skill name="Hellscape" level="10" max_level="15" />
@@ -10,4 +11,8 @@
     <Skill name="Karma Wind" level="1" max_level="1" />
     <Skill name="Forest of Swords" level="6" max_level="9" />
   </Skills>
+  <RelicSets>
+    <Set name="Longevous Disciple" num="4" />
+    <Set name="Inert Salsotto" num="2" />
+  </RelicSets>
 </Unit>

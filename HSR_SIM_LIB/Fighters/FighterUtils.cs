@@ -62,7 +62,7 @@ namespace HSR_SIM_LIB.Fighters
             double breakEffect = 1 + attacker.Stats.BreakDmg;
             double defMultiplier=1-(defender.Stats.Def/(defender.Stats.Def+200+(10*attacker.Level)));
             double resPen = 1-(defender.GetResists(attackElem)-attacker.ResistsPenetration(attackElem));
-            double vulnMult = 1 + defender.GetVulnerability(attackElem);
+            double vulnMult = 1 + defender.GetElemVulnerability(attackElem)+ defender.GetAllDamageVulnerability();
             double brokenMultiplier  =  defender.GetBrokenMultiplier();
             double totalDmg = baseDmg * breakEffect  * defMultiplier * resPen * vulnMult * brokenMultiplier;
             ent.ParentStep.Parent.Parent?.LogDebug($"baseDmg({baseDmg:f}) ; breakEffect({breakEffect:f})");
@@ -89,6 +89,7 @@ namespace HSR_SIM_LIB.Fighters
             //crit multiplier
             double critMultiplier =1;
             double dotMultiplier=0;
+            double dotVulnerability=0;
             if (ent.Type == Event.EventType.DirectDamage  )
             {
                 ent.IsCrit = new MersenneTwister().NextDouble()<=attacker.Stats.CritChance;
@@ -98,11 +99,12 @@ namespace HSR_SIM_LIB.Fighters
             else
             {
                 dotMultiplier = attacker.DotBoost();
+                dotVulnerability = defender.GetDoteVulnerability();
             }
             
            
             double damageBoost = 1 
-                                 + attacker.GetElemBoost(attackElem)
+                                 + attacker.GetElemBoostValue(attackElem)
                                  + attacker.AllDmgBoost()
                                  + dotMultiplier
                                  ;
@@ -110,7 +112,7 @@ namespace HSR_SIM_LIB.Fighters
 
             double resPen = 1-(defender.GetResists(attackElem)-attacker.ResistsPenetration(attackElem));
 
-            double vulnMult = 1 + defender.GetVulnerability(attackElem);
+            double vulnMult = 1 + defender.GetElemVulnerability(attackElem)+ defender.GetAllDamageVulnerability()+dotVulnerability;
 
             double dmgReduction = defender.GetDamageReduction();
 
@@ -216,6 +218,18 @@ namespace HSR_SIM_LIB.Fighters
                 ,{80,3767.5533 }
 
             };
+        }
+
+        public enum PathType
+        {
+            Destruction,
+            Hunt,
+            Erudition,
+            Harmony,
+            Nihility,
+            Preservation,
+            Abundance
+                
         }
     }
 }

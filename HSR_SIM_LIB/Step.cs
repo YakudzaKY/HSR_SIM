@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using HSR_SIM_LIB.Fighters;
 using static HSR_SIM_LIB.Event;
 using static HSR_SIM_LIB.Resource;
-using static HSR_SIM_LIB.Trigger;
 
 namespace HSR_SIM_LIB
 {
@@ -25,7 +24,7 @@ namespace HSR_SIM_LIB
         public Unit Actor { get => actor; set => actor = value; }
         public Ability ActorAbility { get => actorAbility; set => actorAbility = value; }
         public List<Event> Events { get => events; set => events = value; }
-
+        public bool TriggersHandled { get; set; } = false;
         private List<Event> events = new();
 
         /// <summary>
@@ -125,6 +124,7 @@ namespace HSR_SIM_LIB
                         unitEnt.ParentStep = this;
                         unitEnt.TargetUnit = unit;
                         Events.Add(unitEnt);
+                        
                     }
                 else
                 {
@@ -146,6 +146,7 @@ namespace HSR_SIM_LIB
                     foreach (Unit unit in mod.CalculateTargets(ent))
                     {
                         Mod newMod = (Mod)mod.Clone();
+                        newMod.RefMod = (mod.RefMod ?? mod);
                         newMod.TargetUnit = unit;
                         newMods.Add(newMod);
                     }
