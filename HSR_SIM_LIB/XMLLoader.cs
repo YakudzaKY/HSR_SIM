@@ -10,7 +10,6 @@ using System.Xml.Linq;
 using HSR_SIM_LIB;
 using HSR_SIM_LIB.Fighters;
 using static HSR_SIM_LIB.Ability;
-using static HSR_SIM_LIB.Check;
 using static HSR_SIM_LIB.Resource;
 using static HSR_SIM_LIB.Unit;
 

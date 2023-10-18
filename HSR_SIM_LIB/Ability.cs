@@ -11,7 +11,7 @@ namespace HSR_SIM_LIB
 {/// <summary>
 /// Ability class
 /// </summary>
-    public class Ability: CheckEssence
+    public class Ability: CloneClass
     {
         public ElementEnm? Element { get; set; }
 

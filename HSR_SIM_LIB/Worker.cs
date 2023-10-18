@@ -21,7 +21,6 @@ using System.Net.Mail;
 using static HSR_SIM_LIB.Event;
 using static HSR_SIM_LIB.Resource;
 using System.Resources;
-using static HSR_SIM_LIB.Check;
 using System.Drawing;
 
 namespace HSR_SIM_LIB

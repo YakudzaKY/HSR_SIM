@@ -16,7 +16,7 @@ namespace HSR_SIM_LIB
     /// <summary>
     /// Events. Situation changed when event was proceded
     /// </summary>
-    public class Event : CheckEssence
+    public class Event : CloneClass
     {
         public delegate double? CalculateValuePrc(Event ent);
         public delegate IEnumerable<Unit> CalculateTargetPrc(Event ent);

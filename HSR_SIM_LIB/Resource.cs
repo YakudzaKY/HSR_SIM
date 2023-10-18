@@ -9,7 +9,7 @@ namespace HSR_SIM_LIB
     /// <summary>
     /// Class for resources. It can be party (like SP) or character HP
     /// </summary>
-    public class Resource: CheckEssence
+    public class Resource: CloneClass
     {
         public ResourceType ResType { get; set; }
 

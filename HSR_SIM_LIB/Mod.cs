@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static HSR_SIM_LIB.Event;
 
 namespace HSR_SIM_LIB
 {
-    public class Mod :CheckEssence
+    public class Mod :CloneClass
     {
         public delegate double? CalculateValuePrc(Event ent);
         public delegate IEnumerable<Unit> CalculateTargetPrc(Event ent);

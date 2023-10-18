@@ -19,7 +19,7 @@ namespace HSR_SIM_LIB
     /// <summary>
     /// Unit class. Stats skills etc
     /// </summary>
-    public class Unit : CheckEssence
+    public class Unit : CloneClass
     {
         public Team ParentTeam { get; set; } = null;
         string name = string.Empty;
@@ -277,7 +277,7 @@ namespace HSR_SIM_LIB
         public string FighterClassName { get; set; }
         public int Rank { get; set; }
 
-        public IEnumerable<CheckEssence> GetTargets(TargetTypeEnm targetType)
+        public IEnumerable<CloneClass> GetTargets(TargetTypeEnm targetType)
         {
             if (targetType == TargetTypeEnm.Party)
                 return Friends;
