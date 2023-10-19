@@ -79,7 +79,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         /// <summary>
         /// Proc all events in step. No random here or smart thinking. Do it on DoSomething...
         /// </summary>
-        public void ProcEvents(bool revert = false)
+        public void ProcEvents(bool revert = false,bool replay=false)
         {
             //for all events saved in step
             List<Event> events = new();
@@ -94,7 +94,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 ent.ProcEvent(revert);
 
             events.Clear();
-            Events = proceedEvents;
+            if (!replay)
+                Events = proceedEvents;
         }
 
 
@@ -162,7 +163,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         }
 
 
-                        Events.Add(new Event(null)
+                        Events.Add(new Event(null,null)
                         {
                             ParentStep = this,
                             Type = EventType.ResourceDrain,
@@ -212,7 +213,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
             if (ability.AbilityType == Ability.AbilityTypeEnm.Technique)
             {
-                Events.Add(new Event(this)
+                Events.Add(new Event(this,null)
                 {
                     Type = EventType.CombatStartSkillDeQueue,
                     ParentStep = this,
@@ -237,7 +238,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             StepType = StepTypeEnm.ExecuteTechnique;
             if (ability.AbilityType == Ability.AbilityTypeEnm.Technique)
             {
-                Events.Add(new Event(this)
+                Events.Add(new Event(this, null)
                 {
                     Type = EventType.CombatStartSkillQueue,
                     ParentStep = this,
@@ -245,7 +246,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
                 });
                 if (ability.Attack)
-                    Events.Add(new Event(this)
+                    Events.Add(new Event(this,null)
                     {
                         Type = EventType.EnterCombat,
                         ParentStep = this,
@@ -267,10 +268,10 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
             if (ability.CostType == ResourceType.TP || ability.CostType == ResourceType.SP)
             {
-                Events.Add(new Event(this) { Type = EventType.PartyResourceDrain, ResType = ability.CostType, Val = ability.Cost });
+                Events.Add(new Event(this,null) { Type = EventType.PartyResourceDrain, ResType = ability.CostType, Val = ability.Cost });
             }
             else if (ability.CostType != ResourceType.nil)
-                Events.Add(new Event(this) { Type = EventType.ResourceDrain, ResType = ability.CostType, Val = ability.Cost });
+                Events.Add(new Event(this,null) { Type = EventType.ResourceDrain, ResType = ability.CostType, Val = ability.Cost });
 
             Actor = ability.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
             ActorAbility = ability;//WAT ABILITY is casting
@@ -285,7 +286,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         {
             if (Parent.CurrentFight == null)
             {
-                Events.Add(new Event(this) { Type = EventType.StartCombat });
+                Events.Add(new Event(this, null) { Type = EventType.StartCombat });
                 StepType = StepTypeEnm.StartCombat;
             }
 

@@ -11,8 +11,10 @@ namespace HSR_SIM_LIB.Fighters.LightCones
     /// <summary>
     /// Light cone/relics interface
     /// </summary>
-    public interface ILightCone
+    public interface ILightCone:ICloneable
     {
+        public List<ConditionMod> ConditionMods { get; set; }
+        public List<PassiveMod> PassiveMods { get; set; }
         public delegate void EventHandler(Event ent);
         public delegate void StepHandler(Step step);
         public int Rank { get; set; }

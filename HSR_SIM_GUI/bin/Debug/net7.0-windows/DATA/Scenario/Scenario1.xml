@@ -5,9 +5,9 @@
 	<Fights>
 		<Fight name="First fight">		
 			<Wave>			
-				<Unit template="NPC\Vagrant"  level="80"/>
+				<Unit template="NPC\Vagrant"  level="74"/>
 				<Unit template="NPC\Automaton Beetle"  level="80"/>
-				<Unit template="NPC\Vagrant"  level="80"/>
+				<Unit template="NPC\Vagrant"  level="74"/>
 			</Wave>		
 		</Fight>
 		<Fight name="Second fight">		

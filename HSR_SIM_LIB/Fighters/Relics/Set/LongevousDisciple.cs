@@ -13,12 +13,12 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
     {
         private Mod uniqueBuff = null;
 
-        public LongevousDisciple(IFighter parent) : base(parent)
+        public LongevousDisciple(IFighter parent,int num) : base(parent,num)
         {
             uniqueBuff = new Mod(null)
             {
                 Type = Mod.ModType.Buff, BaseDuration = 2, MaxStack = 2, TargetUnit = Parent.Parent,
-                Modifier = Mod.ModifierType.CritPrc, Value = 0.08
+                Modifiers= new (){Mod.ModifierType.CritPrc}, Value = 0.08
             };
         }
 
@@ -28,13 +28,12 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
             if (num >= 4)
             {
                 if (( ent.Type == Event.EventType.ResourceDrain
-                      &&ent.AbilityValue?.Parent != Parent.Parent
                       &&ent.AbilityValue?.Parent.ParentTeam==Parent.Parent.ParentTeam
                       && ent.TargetUnit == Parent.Parent
                       && ent.ResType == Resource.ResourceType.HP && ent.RealVal != 0)
                     || (ent.TargetUnit == Parent.Parent && ent.Type == Event.EventType.DirectDamage))
                 {
-                    Event newEvent = new Event(ent.ParentStep)
+                    Event newEvent = new Event(ent.ParentStep, this)
                     {
                         Type = Event.EventType.Mod
                     };

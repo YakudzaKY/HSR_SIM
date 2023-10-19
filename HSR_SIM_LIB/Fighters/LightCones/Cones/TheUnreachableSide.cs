@@ -23,7 +23,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
                 ent.ResType == Resource.ResourceType.HP && ent.RealVal != 0)
                 || (ent.TargetUnit == Parent.Parent && ent.Type == Event.EventType.DirectDamage))
             {
-                Event newEvent = new Event(ent.ParentStep)
+                Event newEvent = new Event(ent.ParentStep,this)
                 {
                     Type = Event.EventType.Mod
                 };
@@ -39,7 +39,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
         {
             if (step.StepType == Step.StepTypeEnm.ExecuteAbility&&step.Actor == Parent.Parent && step.ActorAbility.Attack)
             {
-                Event newEvent = new Event(step)
+                Event newEvent = new Event(step, this)
                 {
                     Type = Event.EventType.RemoveMod
                 };
@@ -55,7 +55,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
             uniqueBuff = new Mod(null)
             {
                 Type = Mod.ModType.Buff, BaseDuration = null, MaxStack = 1, TargetUnit = Parent.Parent,
-                Modifier = Mod.ModifierType.AllDamageBoost, Value = modifiers[rank]
+                Modifiers =new List<Mod.ModifierType>(){ Mod.ModifierType.AllDamageBoost}  , Value = modifiers[rank]
             };
         }
     }

@@ -12,15 +12,16 @@ namespace HSR_SIM_LIB.Skills
 
         public CalculateValuePrc CalculateValue { get; init; }
         public CalculateTargetPrc CalculateTargets { get; init; }
-
         public ModType Type { get; init; }
         public Unit TargetUnit { get; set; }
-        public ModifierType Modifier { get; init; }
+        public string CustomIconName { get; set; }
+        public List<ModifierType> Modifiers { get; init; }=new List<ModifierType>();
         public double? Value { get; set; }
-        public int Stack { get; set; } = 0;
+        public int Stack { get; set; } = 1;   
         public int MaxStack { get; set; } = 1;
         public int? BaseDuration { get; set; }
         public int? DurationLeft { get; set; }
+        public List<Ability.AbilityTypeEnm> AbilityTypes { get; set; } = new List<Ability.AbilityTypeEnm>();//for ability type amplification
         public string UniqueStr { get; set; }
 
         public Mod RefMod { get; set; }
@@ -36,6 +37,7 @@ namespace HSR_SIM_LIB.Skills
             Debuff
         }
 
+        
         public enum ModifierType
         {
             AtkPrc,
@@ -61,7 +63,9 @@ namespace HSR_SIM_LIB.Skills
             AllDamageVulnerability,
             ElementalVulnerability,
             DoTVulnerability,
-            ElementalResist
+            ElementalResist,
+            AbilityTypeBoost,
+            IncomeHealingPrc
         }
 
         public Mod(Mod reference)
@@ -71,12 +75,16 @@ namespace HSR_SIM_LIB.Skills
         public string GetDescription()
         {
 
-
+            string modsStr="";
+            foreach (var mod in Modifiers)
+            {
+                modsStr += mod.ToString()+"; ";
+            }
 
             return string.Format(">> {0:s} {1:s} for {2:s} val= {3:D} duration={4:D} dispellable={5:s}",
                 Type.ToString()
                 , TargetUnit.Name
-                , Modifier.ToString()
+                , modsStr
                 , Value.ToString()
                 , BaseDuration.ToString()
                 , Dispellable.ToString()

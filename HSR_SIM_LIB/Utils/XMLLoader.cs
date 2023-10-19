@@ -242,25 +242,25 @@ namespace HSR_SIM_LIB.Utils
 
             if (unit.Fighter is DefaultFighter)
             {
-                DefaultFighter fighter= unit.Fighter as DefaultFighter;
+                DefaultFighter fighter = unit.Fighter as DefaultFighter;
                 foreach (XmlElement xmlLcone in xRoot.SelectNodes("LightCone"))
                 {
-                    unit.LightConeStringPath =$"HSR_SIM_LIB.Fighters.LightCones.Cones.{xmlLcone.Attributes.GetNamedItem("name").Value.Trim().Replace(" ","")}";
-                    unit.LightConeInitRank=int.Parse(xmlLcone.Attributes.GetNamedItem("rank").Value.Trim());
+                    unit.LightConeStringPath = $"HSR_SIM_LIB.Fighters.LightCones.Cones.{xmlLcone.Attributes.GetNamedItem("name").Value.Trim().Replace(" ", "").Replace("-", "").Replace(":", "")}";
+                    unit.LightConeInitRank = int.Parse(xmlLcone.Attributes.GetNamedItem("rank").Value.Trim());
                 }
 
                 foreach (XmlElement xmlRelic in xRoot.SelectNodes("RelicSet"))
                 {
                     KeyValuePair<string, int> newRec = new KeyValuePair<string, int>(
-                        $"HSR_SIM_LIB.Fighters.Relics.Set.{xmlRelic.Attributes.GetNamedItem("name").Value.Trim().Replace(" ", "")}",
+                        $"HSR_SIM_LIB.Fighters.Relics.Set.{xmlRelic.Attributes.GetNamedItem("name").Value.Trim().Replace(" ", "").Replace("-", "").Replace(":", "")}",
                         int.Parse(xmlRelic.Attributes.GetNamedItem("num").Value.Trim()));
                     unit.RelicsClasses.Add(newRec);
                 }
 
                 foreach (XmlElement xmlSkill in xRoot.SelectNodes("Skill"))
                 {
-                    
-                    Skill skill = new Skill(){Name=xmlSkill.Attributes.GetNamedItem("name").Value.Trim(),Level = int.Parse(xmlSkill.Attributes.GetNamedItem("level").Value)};
+
+                    Skill skill = new Skill() { Name = xmlSkill.Attributes.GetNamedItem("name").Value.Trim(), Level = int.Parse(xmlSkill.Attributes.GetNamedItem("level").Value) };
                     fighter.Skills.Add(skill);
 
                 }

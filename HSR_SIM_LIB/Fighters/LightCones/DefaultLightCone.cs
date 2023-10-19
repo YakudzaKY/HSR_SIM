@@ -6,6 +6,8 @@ namespace HSR_SIM_LIB.Fighters.LightCones
 {
     internal class DefaultLightCone:ILightCone
     {
+        public List<ConditionMod> ConditionMods { get; set; }=new List<ConditionMod>();
+        public List<PassiveMod> PassiveMods { get; set; } = new List<PassiveMod>();
         public int Rank { get; set; }
         public ILightCone.EventHandler EventHandlerProc { get; set; }
         public ILightCone.StepHandler StepHandlerProc { get; set; }
@@ -31,6 +33,11 @@ namespace HSR_SIM_LIB.Fighters.LightCones
         {
             
             
+        }
+
+        public object Clone()
+        {
+            return this.MemberwiseClone();
         }
     }
 }

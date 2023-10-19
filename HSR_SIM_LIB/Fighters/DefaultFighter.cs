@@ -18,11 +18,23 @@ namespace HSR_SIM_LIB.Fighters
     /// </summary>
     public class DefaultFighter : IFighter
     {
+        public List<ConditionMod> ConditionMods { get; set; }=new List<ConditionMod>();
+        public List<PassiveMod> PassiveMods { get; set; }= new List<PassiveMod>();
         public virtual PathType? Path { get; set; } = null;
         public Unit.ElementEnm Element { get; set; }
         public List<Unit.ElementEnm> Weaknesses { get; set; } = null;
         public List<Resist> Resists { get; set; } = new List<Resist>();
         public Unit Parent { get; set; }
+
+        public ATracesEnm Atraces { get; set; }
+        [Flags]
+        public enum ATracesEnm
+        {
+            A2=1,
+            A4=2, 
+            A6=4
+
+        }
 
         private ILightCone lightCone = null;
         public ILightCone LightCone
@@ -43,9 +55,7 @@ namespace HSR_SIM_LIB.Fighters
                     relics = new List<IRelicSet>();
                     foreach (var keyValrelic in Parent.RelicsClasses)
                     {
-                        IRelicSet relicSet = (IRelicSet)Activator.CreateInstance(Type.GetType(keyValrelic.Key)!, this);
-
-                        relicSet.num = keyValrelic.Value;
+                        IRelicSet relicSet = (IRelicSet)Activator.CreateInstance(Type.GetType(keyValrelic.Key)!, this,keyValrelic.Value);
                         relics.Add(relicSet);
 
                     }
@@ -170,6 +180,8 @@ namespace HSR_SIM_LIB.Fighters
             Parent = parent;
             EventHandlerProc += DefaultFighter_HandleEvent;
             StepHandlerProc += DefaultFighter_HandleStep;
+            //no way to get ascend traces from api :/
+            Atraces = (ATracesEnm.A2 | ATracesEnm.A4 |ATracesEnm.A6);
 
         }
 
@@ -190,6 +202,11 @@ namespace HSR_SIM_LIB.Fighters
             {
                 relic.StepHandlerProc.Invoke(step);
             }
+        }
+
+        public object Clone()
+        {
+            return this.MemberwiseClone();
         }
     }
 }

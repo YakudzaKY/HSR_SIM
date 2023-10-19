@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using HSR_SIM_LIB.Fighters;
+using HSR_SIM_LIB.Fighters.LightCones;
 using static HSR_SIM_LIB.Utils.Constant;
 using static HSR_SIM_LIB.UnitStuff.Resource;
 using static HSR_SIM_LIB.Skills.Ability;
@@ -15,6 +16,8 @@ using static HSR_SIM_LIB.UnitStuff.Unit;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Utils;
+using HSR_SIM_LIB.Fighters.Relics;
+using static HSR_SIM_LIB.Skills.Mod;
 
 namespace HSR_SIM_LIB.UnitStuff
 {
@@ -162,14 +165,63 @@ namespace HSR_SIM_LIB.UnitStuff
         /// Get total stat by Mods by type
         /// </summary>
         /// <returns></returns>
-        public double GetModsByType(Mod.ModifierType modType, ElementEnm? elem = null)
+        public double GetModsByType(Mod.ModifierType modType, ElementEnm? elem = null, AbilityTypeEnm? entAbilityValue = null)
         {
             double res = 0;
             if (Mods != null)
-                foreach (Mod mod in Mods.Where(x => x.Modifier == modType && x.Element == elem))
+                foreach (Mod mod in Mods.Where(x => x.Modifiers.Any(y => y == modType) && x.Element == elem && (x.AbilityTypes.Any(y => y == entAbilityValue)||entAbilityValue==null)))
                 {
-                    res += mod.Value * mod.Stack ?? 0;
+                    res += mod.Value * mod.Stack ?? 1;
                 }
+            //apply mod from Gear
+            foreach (PassiveMod pmode in GetConditionMods().Where(x => x.Mod.Modifiers.Any(y => y == modType) && x.Mod.Element == elem &&( x.Mod.AbilityTypes.Any(y => y == entAbilityValue)||entAbilityValue==null)))
+            {
+                res += pmode.Mod.Value * pmode.Mod.Stack ?? 1;
+            }
+
+            return res;
+        }
+
+        /// <summary>
+        /// search avalable for unit condition mods(planars self or ally)
+        /// </summary>
+        /// <returns></returns>
+        public List<PassiveMod> GetConditionMods()
+        {
+            List<PassiveMod> res = new();
+            if (ParentTeam == null)
+                return res;
+
+
+
+            foreach (Unit unit in ParentTeam.Units.Where(x => x.IsAlive))
+            {
+                //TODO ADD PASIVE MODS
+                if (unit.fighter.ConditionMods.Concat(unit.fighter.PassiveMods).Any())
+                    res.AddRange(from cmod in unit.fighter.ConditionMods.Concat(unit.fighter.PassiveMods)
+                                 where (cmod.Target == this || cmod.Target == this.ParentTeam) && (!(cmod is ConditionMod mod)|| mod.Truly)
+                                 select cmod);
+                if (unit.Fighter is DefaultFighter)
+                {
+                    var unitFighter = (DefaultFighter)unit.Fighter;
+                    //LC
+                   
+                    res.AddRange(from cmod in unitFighter.LightCone.ConditionMods.Concat( unitFighter.LightCone.PassiveMods)
+                                     where (cmod.Target == this || cmod.Target == this.ParentTeam)  && (!(cmod is ConditionMod mod)|| mod.Truly)
+                                     select cmod);
+                    //GEAR
+                    foreach (IRelicSet relic in unitFighter.Relics)
+                    {
+                        res.AddRange(from cmod in relic.ConditionMods.Concat(relic.PassiveMods)
+                                     where (cmod.Target == this || cmod.Target == this.ParentTeam)  && (!(cmod is ConditionMod mod)|| mod.Truly)
+                                     select cmod);
+                    }
+
+                }
+
+            }
+
+
 
             return res;
         }
@@ -203,11 +255,13 @@ namespace HSR_SIM_LIB.UnitStuff
         {
             Mod newMod = null;
             //find existing by ref, or by UNIQUE tag
-            if (Mods.Any(x => x.RefMod == (mod.RefMod ?? mod) 
-                              &&(String.IsNullOrEmpty(mod.UniqueStr)||String.Equals(x.UniqueStr,mod.UniqueStr)
+            if (Mods.Any(x => x.RefMod == (mod.RefMod ?? mod)
+                              && (String.IsNullOrEmpty(mod.UniqueStr) || String.Equals(x.UniqueStr, mod.UniqueStr)
                               )))
             {
                 newMod = Mods.First(x => x.RefMod == (mod.RefMod ?? mod));
+                //add stack
+                newMod.Stack = Math.Min(newMod.MaxStack, newMod.Stack+1);
             }
             else
             {
@@ -215,12 +269,12 @@ namespace HSR_SIM_LIB.UnitStuff
                 newMod = (Mod)mod.Clone();
                 newMod.RefMod = mod.RefMod ?? mod;
                 Mods.Add(newMod);
+
             }
 
             //reset duration
             newMod.DurationLeft = newMod.BaseDuration;
-            //add stack
-            newMod.Stack = Math.Min(newMod.MaxStack, newMod.Stack + 1);
+         
 
         }
         /// <summary>
@@ -281,7 +335,7 @@ namespace HSR_SIM_LIB.UnitStuff
         /// <returns></returns>
         public List<Unit> Friends => ParentTeam.Units;
 
-    
+
         public int Rank { get; set; }
 
         /// <summary>
@@ -290,7 +344,7 @@ namespace HSR_SIM_LIB.UnitStuff
         public string LightConeStringPath { get; set; }
         public int LightConeInitRank { get; set; }
 
-        public List<KeyValuePair<string,int>> RelicsClasses { get; set; }=new List<KeyValuePair<string,int>>();
+        public List<KeyValuePair<string, int>> RelicsClasses { get; set; } = new List<KeyValuePair<string, int>>();
         public string FighterClassName { get; set; }
 
         public IEnumerable<CloneClass> GetTargets(TargetTypeEnm targetType)
@@ -332,13 +386,19 @@ namespace HSR_SIM_LIB.UnitStuff
         {
             double res = 1;
 
+            //MODS
             if (Mods != null)
-                foreach (Mod mod in Mods.Where(x => x.Modifier == Mod.ModifierType.DamageReduction))
+                foreach (Mod mod in Mods.Where(x => x.Modifiers.Any(x => x == Mod.ModifierType.DamageReduction)))
                 {
                     for (int i = 0; i < mod.Stack; i++)
                         res *= 1 - mod.Value ?? 0;
                 }
-
+            //Condition
+            foreach (PassiveMod pmod in GetConditionMods().Where(x => x.Mod.Modifiers.Any(x => x == Mod.ModifierType.DamageReduction)))
+            {
+                for (int i = 0; i < pmod.Mod.Stack; i++)
+                    res *= 1 - pmod.Mod.Value ?? 0;
+            }
             return res;
 
         }
@@ -356,8 +416,7 @@ namespace HSR_SIM_LIB.UnitStuff
 
         public double GetAbilityTypeMultiplier(Ability entAbilityValue)
         {
-            //todo gain all what can do bonuses(ally relics etc). may be start aura when stat >X
-            throw new NotImplementedException();
+            return 1 + GetModsByType(Mod.ModifierType.AbilityTypeBoost, null, entAbilityValue.AbilityType);
         }
     }
 

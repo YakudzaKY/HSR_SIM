@@ -85,7 +85,7 @@ namespace HSR_SIM_LIB
                     //revert first
                     replay = true;
                     LogStepDescription(sim.CurrentStep, true);
-                    sim.CurrentStep.ProcEvents(true);
+                    sim.CurrentStep.ProcEvents(true,true);
                     stepndx -= 1;
                     sim.CurrentStep = sim.steps[stepndx];
 
@@ -102,7 +102,7 @@ namespace HSR_SIM_LIB
                     {
                         replay = true;
                         sim.CurrentStep = sim.steps[stepndx];
-                        sim.steps[stepndx].ProcEvents();
+                        sim.steps[stepndx].ProcEvents(false,true);
                         LogStepDescription(sim.steps[stepndx]);
                     }
                     else

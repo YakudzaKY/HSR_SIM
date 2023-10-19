@@ -15,7 +15,8 @@ namespace HSR_SIM_LIB.Fighters
     /// </summary>
     public class DefaultNPCFighter : IFighter
     {
- 
+        public List<ConditionMod> ConditionMods { get; set; }=new List<ConditionMod>();
+        public List<PassiveMod> PassiveMods { get; set; }= new List<PassiveMod>();
         public PathType? Path { get; set; } = null;
         public Unit.ElementEnm Element { get; set; }
         public List<Unit.ElementEnm> Weaknesses { get; set; } = new List<Unit.ElementEnm>();
@@ -59,5 +60,9 @@ namespace HSR_SIM_LIB.Fighters
            
         }
 
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
     }
 }

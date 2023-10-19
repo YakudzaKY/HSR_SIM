@@ -20,7 +20,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 {/// <summary>
 /// Combat simulation class
 /// </summary>
-    public class SimCls
+    public class SimCls:ICloneable
     {
         Scenario currentScenario;
 
@@ -222,7 +222,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 else
                 {
                     newStep.StepType = StepTypeEnm.StartWave;
-                    newStep.Events.Add(new Event(newStep) { Type = EventType.StartWave });
+                    newStep.Events.Add(new Event(newStep,this) { Type = EventType.StartWave });
                 }
 
             }
@@ -250,7 +250,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         unit.Fighter.StepHandlerProc.Invoke(CurrentStep);
             }
 
-            CurrentStep.ProcEvents();
+            CurrentStep.ProcEvents(false,false);
 
 
 
@@ -258,7 +258,10 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
         }
 
-
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
     }
 
 }

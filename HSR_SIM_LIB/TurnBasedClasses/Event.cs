@@ -33,6 +33,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         public bool CanSetToZero { get; init; } = true;
         public List<Unit> StartingUnits { get; set; }
         public List<Mod> Mods { get; set; } = new List<Mod>();
+        public ICloneable Source { get; }
         public Unit TargetUnit { get; set; }
         public StepTypeEnm OnStepType { get; init; }
         public EventType Type { get => type; set => type = value; }
@@ -68,9 +69,10 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             RemoveMod
         }
 
-        public Event(Step parent)
+        public Event(Step parent, ICloneable source)
         {
             ParentStep = parent;
+            Source = source;
         }
 
         public string GetDescription()
@@ -93,9 +95,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             else if (Type == EventType.EnterCombat)
                 res = "entering the combat...";
             else if (Type == EventType.Mod)
-                res = "Apply modifications";
+                res = "Apply modifications. Source: "+Source?.GetType()?.ToString().Split(".").Last();
             else if (Type == EventType.RemoveMod)
-                res = "Remove modifications";
+                res = "Remove modifications. Source: "+Source?.GetType()?.ToString().Split(".").Last();
             else if (Type == EventType.StartWave)
                 res = "next wave";
             else if (Type == EventType.DirectDamage)
@@ -306,7 +308,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         {
 
 
-                            Event shieldBrkEvent = new(ParentStep)
+                            Event shieldBrkEvent = new(ParentStep,this.Source)
                             {
                                 Type = EventType.ShieldBreak,
                                 AbilityValue = AbilityValue,
@@ -321,7 +323,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         else if (res.ResType == ResourceType.HP)
                         {
 
-                            Event defeatEvent = new(ParentStep)
+                            Event defeatEvent = new(ParentStep,this.Source)
                             {
                                 Type = EventType.Defeat,
                                 AbilityValue = AbilityValue,

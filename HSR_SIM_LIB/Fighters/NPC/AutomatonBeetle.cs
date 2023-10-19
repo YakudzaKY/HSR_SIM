@@ -17,9 +17,9 @@ namespace HSR_SIM_LIB.Fighters.NPC
             Weaknesses.Add(Unit.ElementEnm.Wind);
             Weaknesses.Add(Unit.ElementEnm.Lightning);
             Weaknesses.Add(Unit.ElementEnm.Imaginary);
-            Resists.Add(new Resist(){ResistType=Unit.ElementEnm.Physical,ResistVal=0.20});
             Resists.Add(new Resist(){ResistType=Unit.ElementEnm.Lightning,ResistVal=0.20});
-            Resists.Add(new Resist(){ResistType=Unit.ElementEnm.Wind,ResistVal=0.20});
+            Resists.Add(new Resist(){ResistType=Unit.ElementEnm.Physical,ResistVal=0.20});
+            Resists.Add(new Resist(){ResistType=Unit.ElementEnm.Ice,ResistVal=0.20});
             Resists.Add(new Resist(){ResistType=Unit.ElementEnm.Quantum,ResistVal=0.20});
 
         }

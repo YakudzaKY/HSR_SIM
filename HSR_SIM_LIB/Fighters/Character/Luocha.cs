@@ -14,7 +14,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             Ability ability;
             //Karma Wind
             ability = new Ability(Parent) { AbilityType = Ability.AbilityTypeEnm.Technique, Name = "Test", Cost = 0, CostType = Resource.ResourceType.TP, Element =Element,Attack = true};
-            ability.Events.Add(new Event(null) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.CombatStartSkillQueue });
+            ability.Events.Add(new Event(null,this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.CombatStartSkillQueue });
             Abilities.Add(ability);
         }
     }

@@ -8,7 +8,7 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
 {
     public class PasserbyofWanderingCloud:DefaultRelicSet
     {
-        public PasserbyofWanderingCloud(IFighter parent) : base(parent)
+        public PasserbyofWanderingCloud(IFighter parent,int num) : base(parent,num)
         {
         }
     }

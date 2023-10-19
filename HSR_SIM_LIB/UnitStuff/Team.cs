@@ -10,7 +10,7 @@ using static HSR_SIM_LIB.UnitStuff.Resource;
 
 namespace HSR_SIM_LIB.UnitStuff
 {
-    public class Team
+    public class Team:CloneClass
     {
         private List<Resource> resources;
         public SimCls ParentSim { get; set; }

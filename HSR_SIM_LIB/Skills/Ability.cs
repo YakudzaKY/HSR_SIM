@@ -39,11 +39,11 @@ namespace HSR_SIM_LIB.Skills
         public enum AbilityTypeEnm
         {
             Basic,
-            Skill,
+            Ability,
             Ultimate,
-            Talent,
+            FolowUpAttack,
             Technique,
-            Trigger//Add priority Hight Medium Low . Ultimate can use before low. Blade shuhu medium, Locha heal - hight. Kafka-hight, Locha aura - low
+            FollowUpAction//Add priority Hight Medium Low . Ultimate can use before low. Blade shuhu medium, Locha heal - hight. Kafka-hight, Locha aura - low
         }
 
         public enum TargetTypeEnm

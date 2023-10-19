@@ -8,7 +8,7 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
 {
     internal class GeniusofBrilliantStars : DefaultRelicSet
     {
-        public GeniusofBrilliantStars(IFighter parent) : base(parent)
+        public GeniusofBrilliantStars(IFighter parent,int num) : base(parent,num)
         {
         }
     }

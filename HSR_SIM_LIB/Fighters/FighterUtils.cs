@@ -111,6 +111,7 @@ namespace HSR_SIM_LIB.Fighters
                                  + attacker.AllDmgBoost()
                                  + dotMultiplier
                                  ;
+            double abilityTypeMultiplier = attacker.GetAbilityTypeMultiplier(ent.AbilityValue);
             double defMultiplier=1-(defender.Stats.Def/(defender.Stats.Def+200+(10*attacker.Level)));
 
             double resPen = 1-(defender.GetResists(attackElem)-attacker.ResistsPenetration(attackElem));
@@ -120,16 +121,17 @@ namespace HSR_SIM_LIB.Fighters
             double dmgReduction = defender.GetDamageReduction();
 
             double brokenMultiplier  =  defender.GetBrokenMultiplier();
-            double abilityTypeMultiplier = defender.GetAbilityTypeMultiplier(ent.AbilityValue);
+            
 
 
             double totalDmg = baseDmg *abilityTypeMultiplier* critMultiplier * damageBoost * defMultiplier * resPen * vulnMult *
                               dmgReduction * brokenMultiplier;
             ent.ParentStep.Parent.Parent?.LogDebug("=======================");
+            ent.ParentStep.Parent.Parent?.LogDebug($"baseDmg={baseDmg:f}");
             ent.ParentStep.Parent.Parent?.LogDebug($"{attacker.Name:s} ({attacker.ParentTeam.Units.IndexOf(attacker)+1:d}) Damaging {defender.Name} ({defender.ParentTeam.Units.IndexOf(defender)+1:d})");
             ent.ParentStep.Parent.Parent?.LogDebug($"damageBoost({damageBoost:f}) = 1+ GetElemBoost({attacker.GetElemBoost(attackElem):f})  +AllDmgBoost({attacker.AllDmgBoost():f}) + dotMultiplier({dotMultiplier:f})");
             ent.ParentStep.Parent.Parent?.LogDebug($"defMultiplier({defMultiplier:f}) = 1-(defender.Stats.Def({defender.Stats.Def:f})/(defender.Stats.Def({defender.Stats.Def:f})+200+(10*attacker.Level({attacker.Level:d}))))");
-            ent.ParentStep.Parent.Parent?.LogDebug($"resPen= {resPen:f} ; vulnMult= {vulnMult:f} ; dmgReduction= {dmgReduction:f} ; brokenMultiplier= {brokenMultiplier:f} ; abilityTypeMultiplier {abilityTypeMultiplier:f}" );
+            ent.ParentStep.Parent.Parent?.LogDebug($"resPen= {resPen:f} ; vulnMult= {vulnMult:f} ; critMultiplier={critMultiplier:f} ; dmgReduction= {dmgReduction:f} ; brokenMultiplier= {brokenMultiplier:f} ; abilityTypeMultiplier {abilityTypeMultiplier:f}" );
             ent.ParentStep.Parent.Parent?.LogDebug($"TOTAL DAMAGE= {totalDmg:f}");
             return totalDmg;
         }

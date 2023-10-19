@@ -21,12 +21,29 @@ namespace HSR_SIM_LIB.Fighters.Character
             ability = new Ability(Parent) { AbilityType = Ability.AbilityTypeEnm.Technique, Name = "Banner of Command", Cost = 1, CostType = Resource.ResourceType.TP, Element = Element };
             //buff apply
 
-            Event eventBuff = new(null)
+            Event eventBuff = new(null, this)
                 { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.Mod, AbilityValue = ability };
-            eventBuff.Mods.Add(new Mod(null){Type=Mod.ModType.Buff,Modifier = Mod.ModifierType.AtkPrc,Value = 0.15,BaseDuration= 2,Dispellable = true,CalculateTargets = GetFriends});
+            eventBuff.Mods.Add(new Mod(null){Type=Mod.ModType.Buff,Modifiers = new List<Mod.ModifierType>(){Mod.ModifierType.AtkPrc} ,Value = 0.15,BaseDuration= 2,Dispellable = true,CalculateTargets = GetFriends});
             ability.Events.Add(eventBuff);
 
             Abilities.Add(ability);
+
+            //=====================
+            //Ascended Traces
+            //=====================
+
+            if (Atraces.HasFlag(ATracesEnm.A6))
+            {
+                PassiveMods.Add(new PassiveMod(Parent)
+                {
+                    Mod = new Mod(null)
+                    { Modifiers =  new List<Mod.ModifierType>() { Mod.ModifierType.AllDamageBoost }, 
+                        Value = 0.10 },
+                    Target = Parent.ParentTeam
+                   
+                });
+            }
+
 
         }
     }
