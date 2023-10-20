@@ -108,7 +108,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             {
                 ConditionMods.Add(new ConditionMod(Parent)
                 {
-                    Mod=new Mod(null){Modifiers = new List<Mod.ModifierType>(){Mod.ModifierType.IncomeHealingPrc},Value = 0.20,CustomIconName = "Traces\\A2"}
+                    Mod=new Mod(null){Effects = new List<Effect>(){ new Effect(){ EffType = Effect.EffectType.IncomeHealingPrc,Value = 0.20}},CustomIconName = "Traces\\A2"}
                     , Target=Parent
                     ,Condition= new ConditionMod.ConditionRec(){CondtionParam = ConditionMod.ConditionCheckParam.HPPrc,CondtionExpression = ConditionMod.ConditionCheckExpression.EqualOrLess,Value = 0.5}
                     
@@ -119,8 +119,8 @@ namespace HSR_SIM_LIB.Fighters.Character
                 PassiveMods.Add(new PassiveMod(Parent)
                 {
                     Mod = new Mod(null)
-                    { Modifiers =  new List<Mod.ModifierType>() { Mod.ModifierType.AbilityTypeBoost }, 
-                        AbilityTypes = new List<Ability.AbilityTypeEnm>(){ Ability.AbilityTypeEnm.FolowUpAttack}, Value = 0.20 },
+                    { Effects =  new List<Effect>() { new Effect(){ EffType = Effect.EffectType.AbilityTypeBoost, Value = 0.20, AbilityTypes = new List<Ability.AbilityTypeEnm>(){ Ability.AbilityTypeEnm.FolowUpAttack} }, 
+                       } },
                     Target = Parent
                    
                 });

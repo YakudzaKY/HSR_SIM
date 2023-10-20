@@ -244,12 +244,12 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             //TODO предусмотреть если Actor сдох-то просто заканчивает ход. скипаект
 
             
-            //TODO ON MOVE START STEP - procs DotS debuffs(dmg) hots Set Action value
+            //TODO ON MOVE START STEP - procs DotS  hots Set Action value
             //TODO ON MOVE START STEP  TRIGGERS (if second ability allowed or need heal by follow up attacks) Loucha heals 
             //TODO ON MOVE PROGRESS  STEP (if second ability allowed or need heal by follow up attacks) Loucha heals , kafka folow up
             //TODO ON MOVE PROGRESS TRIGGERS  TRIGGERS (if second ability allowed or need heal by follow up attacks) Loucha heals
             //TODO BEFORE MOVE END TRIGGERS- crio girl ultimate may be
-            //TODO ON MOVE END - dispell buffs who ended. ALSO RESET AV()!!!!
+            //TODO ON MOVE END -  ALSO RESET AV()!!!!dispell buffs who ended .  also dispell debuffs(with dmg)
 
 
 

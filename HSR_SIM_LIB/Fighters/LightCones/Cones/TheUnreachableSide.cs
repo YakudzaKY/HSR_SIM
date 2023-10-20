@@ -57,7 +57,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
             uniqueBuff = new Mod(null)
             {
                 Type = Mod.ModType.Buff, BaseDuration = null, MaxStack = 1, 
-                Modifiers =new List<Mod.ModifierType>(){ Mod.ModifierType.AllDamageBoost}  , Value = modifiers[rank]
+                Effects = new List<Effect>(){ new Effect() {EffType = Effect.EffectType.AllDamageBoost, Value = modifiers[rank]}}  
             };
         }
     }

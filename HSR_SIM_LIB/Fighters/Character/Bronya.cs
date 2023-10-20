@@ -23,7 +23,7 @@ namespace HSR_SIM_LIB.Fighters.Character
 
             Event eventBuff = new(null, this)
                 { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.Mod, AbilityValue = ability,CalculateTargets = GetFriends};
-            eventBuff.Mods.Add(new Mod(null){Type=Mod.ModType.Buff,Modifiers = new List<Mod.ModifierType>(){Mod.ModifierType.AtkPrc} ,Value = 0.15,BaseDuration= 2,Dispellable = true});
+            eventBuff.Mods.Add(new Mod(null){Type=Mod.ModType.Buff,Effects = new List<Effect>(){new Effect() { EffType=Effect.EffectType.AtkPrc,Value = 0.15}} ,BaseDuration= 2,Dispellable = true});
             ability.Events.Add(eventBuff);
 
             Abilities.Add(ability);
@@ -37,8 +37,7 @@ namespace HSR_SIM_LIB.Fighters.Character
                 PassiveMods.Add(new PassiveMod(Parent)
                 {
                     Mod = new Mod(null)
-                    { Modifiers =  new List<Mod.ModifierType>() { Mod.ModifierType.AllDamageBoost }, 
-                        Value = 0.10 },
+                    { Effects =  new List<Effect>() { new Effect(){ EffType = Effect.EffectType.AllDamageBoost, Value = 0.10 }} },
                     Target = Parent.ParentTeam
                    
                 });

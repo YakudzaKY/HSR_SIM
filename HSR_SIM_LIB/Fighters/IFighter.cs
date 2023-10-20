@@ -18,6 +18,7 @@ namespace HSR_SIM_LIB.Fighters
         public Unit.ElementEnm Element { get; set; }
         public List<Unit.ElementEnm> Weaknesses { get; set; }
         public List<Resist> Resists { get; set; }
+        public List<DebuffResist> DebuffResists { get; set; } 
         public delegate void EventHandler(Event ent);
         public delegate void StepHandler(Step step);
         public EventHandler EventHandlerProc{ get; set; }

@@ -18,6 +18,8 @@ using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Utils;
 using HSR_SIM_LIB.Fighters.Relics;
 using static HSR_SIM_LIB.Skills.Mod;
+using static HSR_SIM_LIB.Skills.Effect;
+
 
 namespace HSR_SIM_LIB.UnitStuff
 {
@@ -118,19 +120,19 @@ namespace HSR_SIM_LIB.UnitStuff
 
         public double AllDmgBoost()
         {
-            return GetModsByType(Mod.ModifierType.AllDamageBoost);
+            return GetModsByType(EffectType.AllDamageBoost);
         }
 
         public double ResistsPenetration(ElementEnm elem)//todo calc
         {
-            return GetModsByType(Mod.ModifierType.ElementalPenetration, elem);
+            return GetModsByType(EffectType.ElementalPenetration, elem);
         }
         /// <summary>
         /// https://honkai-star-rail.fandom.com/wiki/Damage_RES
         /// </summary>
         /// <param name="elem"></param>
         /// <returns></returns>
-        public double GetResists(ElementEnm elem)//todo self res+ buffs+debuffs
+        public double GetResists(ElementEnm elem)
         {
             double res = 0;
             if (Fighter.Resists.Any(x => x.ResistType == elem))
@@ -138,12 +140,24 @@ namespace HSR_SIM_LIB.UnitStuff
                 res += Fighter.Resists.First(x => x.ResistType == elem).ResistVal;
             }
 
-            res += GetModsByType(Mod.ModifierType.ElementalResist, elem);
+            res += GetModsByType(EffectType.ElementalResist, elem);
+            return res;
+        }
+
+        public double GetDebuffResists(EffectType debuff)
+        {
+            double res = 0;
+            if (Fighter.DebuffResists.Any(x => x.Debuff == debuff))
+            {
+                res += Fighter.DebuffResists.First(x => x.Debuff == debuff).ResistVal;
+            }
+
+            res += GetModsByType(EffectType.ElementalResist, debuff:debuff);
             return res;
         }
         public double DotBoost()//todo calc
         {
-            return GetModsByType(Mod.ModifierType.DoTBoost);
+            return GetModsByType(EffectType.DoTBoost);
         }
         /// <summary>
         /// Get elem  boost
@@ -158,25 +172,34 @@ namespace HSR_SIM_LIB.UnitStuff
         }
         public double GetElemBoostValue(ElementEnm elem)
         {
-            return GetElemBoost(elem).Value + GetModsByType(Mod.ModifierType.ElementalBoost, elem);
+            return GetElemBoost(elem).Value + GetModsByType(EffectType.ElementalBoost, elem);
         }
 
         /// <summary>
         /// Get total stat by Mods by type
         /// </summary>
         /// <returns></returns>
-        public double GetModsByType(Mod.ModifierType modType, ElementEnm? elem = null, AbilityTypeEnm? entAbilityValue = null)
+        public double GetModsByType(EffectType modType, ElementEnm? elem = null, AbilityTypeEnm? entAbilityValue = null,EffectType? debuff=null)
         {
             double res = 0;
             if (Mods != null)
-                foreach (Mod mod in Mods.Where(x => x.Modifiers.Any(y => y == modType) && x.Element == elem && (x.AbilityTypes.Any(y => y == entAbilityValue)||entAbilityValue==null)))
+                foreach (Mod mod in Mods)
                 {
-                    res += mod.Value * mod.Stack ?? 1;
+                    foreach (Effect effect in mod.Effects.Where(y => y.EffType == modType&&y.Element == elem && (y.AbilityTypes.Any(y => y == entAbilityValue)||entAbilityValue==null)))
+                    {
+                        res += (double)effect.Value * (effect.StackAffectValue?mod.Stack:1);
+                    }
+
                 }
             //apply mod from Gear
-            foreach (PassiveMod pmode in GetConditionMods().Where(x => x.Mod.Modifiers.Any(y => y == modType) && x.Mod.Element == elem &&( x.Mod.AbilityTypes.Any(y => y == entAbilityValue)||entAbilityValue==null)))
+            foreach (PassiveMod pmode in GetConditionMods())
             {
-                res += pmode.Mod.Value * pmode.Mod.Stack ?? 1;
+                foreach (Effect effect in pmode.Mod.Effects.Where(y =>
+                             y.EffType == modType && y.Element == elem &&
+                             (y.AbilityTypes.Any(y => y == entAbilityValue) || entAbilityValue == null)))
+                {
+                    res += (double)effect.Value * (effect.StackAffectValue?pmode.Mod.Stack:1);
+                }
             }
 
             return res;
@@ -363,19 +386,19 @@ namespace HSR_SIM_LIB.UnitStuff
         /// <returns></returns>
         public double GetElemVulnerability(ElementEnm attackElem)
         {
-            return GetModsByType(Mod.ModifierType.ElementalVulnerability, attackElem);
+            return GetModsByType(EffectType.ElementalVulnerability, attackElem);
 
         }
 
         public double GetAllDamageVulnerability()
         {
-            return GetModsByType(Mod.ModifierType.AllDamageVulnerability);
+            return GetModsByType(EffectType.AllDamageVulnerability);
 
         }
 
         public double GetDoteVulnerability()
         {
-            return GetModsByType(Mod.ModifierType.DoTVulnerability);
+            return GetModsByType(EffectType.DoTVulnerability);
 
         }
         /// <summary>
@@ -388,16 +411,22 @@ namespace HSR_SIM_LIB.UnitStuff
 
             //MODS
             if (Mods != null)
-                foreach (Mod mod in Mods.Where(x => x.Modifiers.Any(x => x == Mod.ModifierType.DamageReduction)))
+                foreach (Mod mod in Mods)
                 {
-                    for (int i = 0; i < mod.Stack; i++)
-                        res *= 1 - mod.Value ?? 0;
+                    foreach (Effect effect in mod.Effects.Where(x => x.EffType == EffectType.DamageReduction))
+                    {
+                        for (int i = 0; i < mod.Stack; i++)
+                            res *= 1 - effect.Value ?? 0;
+                    }
                 }
             //Condition
-            foreach (PassiveMod pmod in GetConditionMods().Where(x => x.Mod.Modifiers.Any(x => x == Mod.ModifierType.DamageReduction)))
+            foreach (PassiveMod pmod in GetConditionMods())
             {
-                for (int i = 0; i < pmod.Mod.Stack; i++)
-                    res *= 1 - pmod.Mod.Value ?? 0;
+                foreach (Effect effect in pmod.Mod.Effects.Where(x => x.EffType == EffectType.DamageReduction))
+                {
+                    for (int i = 0; i < pmod.Mod.Stack; i++)
+                        res *= 1 - effect.Value ?? 0;
+                }
             }
             return res;
 
@@ -416,7 +445,7 @@ namespace HSR_SIM_LIB.UnitStuff
 
         public double GetAbilityTypeMultiplier(Ability entAbilityValue)
         {
-            return 1 + GetModsByType(Mod.ModifierType.AbilityTypeBoost, null, entAbilityValue.AbilityType);
+            return 1 + GetModsByType(EffectType.AbilityTypeBoost, null, entAbilityValue.AbilityType);
         }
     }
 

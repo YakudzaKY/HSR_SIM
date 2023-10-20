@@ -362,7 +362,7 @@ namespace HSR_SIM_LIB.Utils
                 {
                     var buffPoint = new Point(portraitPoint.X + PortraitSize.Width,
                         portraitPoint.Y + j * ElemSizeMini.Height);
-                    gfx.DrawImage(new Bitmap(Utl.LoadBitmap(buff.CustomIconName??buff.Modifiers.First().ToString()), ElemSizeMini), buffPoint);
+                    gfx.DrawImage(new Bitmap(Utl.LoadBitmap(buff.CustomIconName??buff.Effects.First().EffType.ToString()), ElemSizeMini), buffPoint);
                     gfx.DrawRectangle(new Pen(buff.Type == Mod.ModType.Buff ? Color.Aquamarine : Color.Brown, 1), buffPoint.X, buffPoint.Y, ElemSizeMini.Width, ElemSizeMini.Height);
 
                     //duration
@@ -392,7 +392,7 @@ namespace HSR_SIM_LIB.Utils
                 {
                     var buffPoint = new Point(portraitPoint.X+ (j * ElemSizeMini.Width),
                         portraitPoint.Y + PortraitSize.Height - ElemSizeMini.Width);
-                    gfx.DrawImage(new Bitmap(Utl.LoadBitmap(buff.Mod.CustomIconName??buff.Mod.Modifiers.First().ToString()), ElemSizeMini), buffPoint);
+                    gfx.DrawImage(new Bitmap(Utl.LoadBitmap(buff.Mod.CustomIconName??buff.Mod.Effects.First().EffType.ToString()), ElemSizeMini), buffPoint);
                     gfx.DrawRectangle(new Pen(  Color.Blue , 1), buffPoint.X, buffPoint.Y, ElemSizeMini.Width, ElemSizeMini.Height);
 
                     

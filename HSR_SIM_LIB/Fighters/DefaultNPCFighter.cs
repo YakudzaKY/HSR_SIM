@@ -21,6 +21,7 @@ namespace HSR_SIM_LIB.Fighters
         public Unit.ElementEnm Element { get; set; }
         public List<Unit.ElementEnm> Weaknesses { get; set; } = new List<Unit.ElementEnm>();
         public List<Resist> Resists { get; set; } = new List<Resist>();
+        public List<DebuffResist> DebuffResists { get; set; } = new List<DebuffResist>();
         public Unit Parent { get; set; }
         public IEnumerable<Unit> GetAoeTargets()
         {

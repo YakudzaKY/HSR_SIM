@@ -12,6 +12,7 @@ using static HSR_SIM_LIB.TurnBasedClasses.Event;
 using static HSR_SIM_LIB.UnitStuff.Resource;
 using HSR_SIM_LIB.UnitStuff;
 using HSR_SIM_LIB.Skills;
+using static HSR_SIM_LIB.Skills.Effect;
 
 namespace HSR_SIM_LIB.TurnBasedClasses
 {
@@ -66,7 +67,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             DoTPlace,
             FinishCombat,
             Attack,
-            RemoveMod
+            RemoveMod,
+            DebufResisted
         }
 
         public Event(Step parent, ICloneable source)
@@ -95,7 +97,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             else if (Type == EventType.EnterCombat)
                 res = "entering the combat...";
             else if (Type == EventType.Mod)
-                res = $"Apply modifications on {TargetUnit.Name}. Source: {Source?.GetType()?.ToString().Split(".").Last():s}" ;
+                res = $"Apply modifications on {TargetUnit.Name}. Source: {Source?.GetType()?.ToString().Split(".").Last():s}";
+            else if (Type == EventType.DebufResisted)
+                res = $"{TargetUnit.Name} debuff resisted: {Mods.First().Effects.First()}";
             else if (Type == EventType.RemoveMod)
                 res = $"Remove modifications on {TargetUnit.Name}. Source: {Source?.GetType()?.ToString().Split(".").Last():s}";
             else if (Type == EventType.StartWave)
@@ -215,8 +219,12 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 foreach (var mod in Mods.Where(mod => TargetUnit.IsAlive))
                 {
                     //calc value first
-                    if (mod.CalculateValue != null && mod.Value == null)
-                        mod.Value = mod.CalculateValue(this);
+                    foreach (Effect modEffect in mod.Effects)
+                    {
+                        if (modEffect.CalculateValue != null && modEffect.Value == null)
+                            modEffect.Value = modEffect.CalculateValue(this);
+                    }
+                   
 
                     if (!revert)
                         TargetUnit.ApplyMod(mod);
@@ -299,6 +307,47 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         }
 
         /// <summary>
+        /// attempt to apply debuff
+        /// </summary>
+        /// <param name="modType"></param>
+        /// <param name="effects"></param>
+        /// <param name="baseDuration"></param>
+        /// <param name="maxStack"></param>
+        private void TryDebuff(Mod.ModType modType, List<Effect> effects, int baseDuration, int maxStack = 1)
+        {
+            //add Dots and debuffs
+            Event dotEvent = new(ParentStep, this.Source)
+            {
+                Type = EventType.Mod,
+                AbilityValue = AbilityValue,
+                TargetUnit = TargetUnit,
+                BaseChance = 1.5
+            };
+            dotEvent.Mods.Add(new Mod(null) { Type = modType, BaseDuration = baseDuration, Effects = effects, MaxStack = maxStack, });
+
+            if (FighterUtils.CalculateDebuffResisted(dotEvent))
+            {
+                ParentStep.Events.Add(dotEvent);
+                dotEvent.ProcEvent(false);
+            }
+            else
+            {
+                //add Dots and debuffs
+                Event failEvent = new(ParentStep, this.Source)
+                {
+                    Type = EventType.DebufResisted,
+                    AbilityValue = AbilityValue,
+                    TargetUnit = TargetUnit
+
+                };
+                ParentStep.Events.Add(failEvent);
+                failEvent.ProcEvent(false);
+            }
+        }
+        //Base Chance to apply debuff 
+        public double BaseChance { get; set; }
+
+        /// <summary>
         /// Set resource and do some new events
         /// </summary>
         /// <param name="resourceType"></param>
@@ -328,43 +377,44 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                             shieldBrkEvent.Val = FighterUtils.CalculateShieldBrokeDmg(shieldBrkEvent);
                             ParentStep.Events.Add(shieldBrkEvent);
                             shieldBrkEvent.ProcEvent(false);
-                            //add Dots and debuffs
-                            Event dotEvent = new(ParentStep, this.Source)
-                            {
-                                Type = EventType.Mod,
-                                AbilityValue = AbilityValue,
-                                TargetUnit = TargetUnit
 
-                            };
-                            switch (ParentStep.ActorAbility.Element??ParentStep.Actor.Fighter.Element)
+                            Event delayAV = new Event(ParentStep, this.Source) { Type = EventType.ModActionValue, Val = -TargetUnit.Stats.ActionValue * 0.25 };
+                            ParentStep.Events.Add(delayAV);
+                            delayAV.ProcEvent(false);
+
+                            switch (ParentStep.ActorAbility.Element ?? ParentStep.Actor.Fighter.Element)
                             {
                                 case Unit.ElementEnm.Physical:
-                                    dotEvent.Mods.Add(new Mod(null) {Type=Mod.ModType.Dot ,CalculateValue = FighterUtils.CalculateShieldBrokeDmg} );
+                                    TryDebuff(Mod.ModType.Dot, new List<Effect>() { new Effect() { EffType = EffectType.Bleed, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } }, 2);
                                     break;
                                 case Unit.ElementEnm.Fire:
-                                   
+                                    TryDebuff(Mod.ModType.Dot, new List<Effect>() { new Effect() { EffType = EffectType.Burn, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } }, 2);
                                     break;
                                 case Unit.ElementEnm.Ice:
-                                    
+                                    TryDebuff(Mod.ModType.Debuff, new List<Effect>() { new Effect() { EffType = EffectType.Frozen, CalculateValue = FighterUtils.CalculateShieldBrokeDmg }}, 1);
                                     break;
                                 case Unit.ElementEnm.Lightning:
-                                  
+                                    TryDebuff(Mod.ModType.Dot, new List<Effect>() { new Effect() { EffType = EffectType.Shock, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } }, 2);
                                     break;
                                 case Unit.ElementEnm.Wind:
-                                 
+                                    TryDebuff(Mod.ModType.Dot, new List<Effect>() { new Effect() { EffType = EffectType.WindShear, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } }, 2);
                                     break;
                                 case Unit.ElementEnm.Quantum:
-                                   
+                                    TryDebuff(Mod.ModType.Debuff, new List<Effect>() { 
+                                        new Effect(){EffType=EffectType.Entanglement,CalculateValue = FighterUtils.CalculateShieldBrokeDmg}
+                                        ,new Effect(){EffType=EffectType.Delay,CalculateValue = FighterUtils.CalculateShieldBrokeDmg ,StackAffectValue = false}
+                                    }, 1,5);
                                     break;
                                 case Unit.ElementEnm.Imaginary:
-                                   
+                                    TryDebuff(Mod.ModType.Debuff, new List<Effect>() {   
+                                        new Effect(){EffType=EffectType.Imprisonment,CalculateValue = FighterUtils.CalculateShieldBrokeDmg}
+                                        ,new Effect(){EffType=EffectType.Delay,CalculateValue = FighterUtils.CalculateShieldBrokeDmg} }, 1, 1);
                                     break;
                                 default:
                                     throw new NotImplementedException();
                                     break;
                             }
-                            ParentStep.Events.Add(dotEvent);
-                            dotEvent.ProcEvent(false);
+
                         }
                         else if (res.ResType == ResourceType.HP)
                         {
