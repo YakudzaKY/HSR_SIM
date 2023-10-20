@@ -56,7 +56,8 @@ namespace HSR_SIM_LIB.Skills
             WindShear,
             Dominated,
             Outrage,
-            CrowControl
+            CrowControl,
+            ReduceSpdPrc
         }
     }
 }

@@ -182,36 +182,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 }
 
             }
-
-
-            //update mods
-            /*foreach (Event ent in Events.Where(x => x.Type == EventType.Mod))
-            {
-
-                List<Mod> newMods = new();
-
-                //calculated mods
-                foreach (Mod mod in ent.Mods.Where(x => x.CalculateTargets != null))
-                {
-                    foreach (Unit unit in mod.CalculateTargets())
-                    {
-                        Mod newMod = (Mod)mod.Clone();
-                        newMod.RefMod = mod.RefMod ?? mod;
-                        newMod.TargetUnit = unit;
-                        newMods.Add(newMod);
-                    }
-                }
-
-                IEnumerable<Mod> oldList = ent.Mods.Where(x => x.CalculateTargets == null);
-
-                //non calculated mods
-                if (oldList.Any())
-                {
-                    newMods = (List<Mod>)newMods.Concat(oldList);
-                }
-
-                ent.Mods = newMods;
-            }*/
+            
+         
 
             if (ability.AbilityType == Ability.AbilityTypeEnm.Technique)
             {

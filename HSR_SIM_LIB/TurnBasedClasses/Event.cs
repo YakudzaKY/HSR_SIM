@@ -34,6 +34,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         public bool CanSetToZero { get; init; } = true;
         public List<Unit> StartingUnits { get; set; }
         public List<Mod> Mods { get; set; } = new List<Mod>();
+        //public Mod Buff { get; set; }
         public ICloneable Source { get; }
         public Unit TargetUnit { get; set; }
         public StepTypeEnm OnStepType { get; init; }
@@ -408,7 +409,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                                 case Unit.ElementEnm.Imaginary:
                                     TryDebuff(Mod.ModType.Debuff, new List<Effect>() {   
                                         new Effect(){EffType=EffectType.Imprisonment,CalculateValue = FighterUtils.CalculateShieldBrokeDmg}
-                                        ,new Effect(){EffType=EffectType.Delay,CalculateValue = FighterUtils.CalculateShieldBrokeDmg} }, 1, 1);
+                                        ,new Effect(){EffType=EffectType.Delay,CalculateValue = FighterUtils.CalculateShieldBrokeDmg}
+                                        ,new Effect(){EffType=EffectType.ReduceSpdPrc,Value = 0.1} 
+                                    }, 1, 1);
                                     break;
                                 default:
                                     throw new NotImplementedException();

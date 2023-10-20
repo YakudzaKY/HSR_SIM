@@ -80,7 +80,7 @@ namespace HSR_SIM_LIB.UnitStuff
 
         public double ActionValue { get; set; } = 0;
         public double BaseSpeed { get; internal set; }
-        public double Speed => BaseSpeed * (1 + Parent.GetModsByType(EffectType.SpeedPrc) + SpeedPrc) + Parent.GetModsByType(EffectType.Speed) + SpeedFix;
+        public double Speed => BaseSpeed * (1 + Parent.GetModsByType(EffectType.SpeedPrc) -Parent.GetModsByType(EffectType.ReduceSpdPrc) + SpeedPrc) + Parent.GetModsByType(EffectType.Speed) + SpeedFix;
         public double SpeedFix { get; set; }
 
         public double SpeedPrc { get; set; }
