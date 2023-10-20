@@ -28,7 +28,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
                     Type = Event.EventType.Mod
                     ,TargetUnit =  Parent.Parent
                 };
-                newEvent.Mods.Add(uniqueBuff);
+                newEvent.Modification=uniqueBuff;
                 newEvent.ProcEvent(false);
                 ent.ParentStep.Events.Add(newEvent);
             }
@@ -45,7 +45,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
                     Type = Event.EventType.RemoveMod
                     ,TargetUnit =  Parent.Parent
                 };
-                newEvent.Mods.Add(uniqueBuff);
+                newEvent.Modification=uniqueBuff;
                 newEvent.ProcEvent(false);
                 step.Events.Add(newEvent);
             }

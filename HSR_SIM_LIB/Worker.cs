@@ -85,7 +85,7 @@ namespace HSR_SIM_LIB
                     //revert first
                     replay = true;
                     LogStepDescription(sim.CurrentStep, true);
-                    sim.CurrentStep.ProcEvents(true,true);
+                    sim.CurrentStep.ProcEvents(true, true);
                     stepndx -= 1;
                     sim.CurrentStep = sim.steps[stepndx];
 
@@ -95,14 +95,14 @@ namespace HSR_SIM_LIB
             }
             else//go forward
             {
-                for (int i = 0; i < stepcount||stepcount==-1; i++)
+                for (int i = 0; i < stepcount || stepcount == -1; i++)
                 {
                     stepndx += 1;
                     if (sim?.steps.Count >= stepndx + 1)
                     {
                         replay = true;
                         sim.CurrentStep = sim.steps[stepndx];
-                        sim.steps[stepndx].ProcEvents(false,true);
+                        sim.steps[stepndx].ProcEvents(false, true);
                         LogStepDescription(sim.steps[stepndx]);
                     }
                     else
@@ -174,12 +174,13 @@ namespace HSR_SIM_LIB
                 else if (replay)
                     OutText = "reproduced: " + OutText;
                 LogText(OutText);
-                foreach (Mod mod in ent.Mods)
+                if (ent.Modification != null)
                 {
-                    OutText = " * " + mod.GetDescription();
+                    OutText = " * " + ent.Modification.GetDescription();
                     LogText(OutText);
-
                 }
+
+
             }
 
         }

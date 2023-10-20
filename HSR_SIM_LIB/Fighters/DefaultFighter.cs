@@ -190,7 +190,7 @@ namespace HSR_SIM_LIB.Fighters
             defOpener = new Ability(Parent) {   AbilityType = Ability.AbilityTypeEnm.Technique
                 , Name = "Default opener"
                 , Element = Element
-                , ToughnessShred = 60
+                , ToughnessShred = 30
                 , TargetType = Ability.TargetTypeEnm.Hostiles
                 , Attack=true
             };

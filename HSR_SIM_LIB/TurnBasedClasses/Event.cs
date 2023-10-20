@@ -33,8 +33,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
         public bool CanSetToZero { get; init; } = true;
         public List<Unit> StartingUnits { get; set; }
-        public List<Mod> Mods { get; set; } = new List<Mod>();
-        //public Mod Buff { get; set; }
+        public List<Mod> RemovedMods { get; set; } 
+        
+        public Mod Modification { get; set; }
         public ICloneable Source { get; }
         public Unit TargetUnit { get; set; }
         public StepTypeEnm OnStepType { get; init; }
@@ -48,6 +49,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         public Step ParentStep { get; set; } = null;
         public bool TriggersHandled { get; set; } = false;
         private double? realBarrierVal;
+
 
 
         public enum EventType
@@ -100,7 +102,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             else if (Type == EventType.Mod)
                 res = $"Apply modifications on {TargetUnit.Name}. Source: {Source?.GetType()?.ToString().Split(".").Last():s}";
             else if (Type == EventType.DebufResisted)
-                res = $"{TargetUnit.Name} debuff resisted: {Mods.First().Effects.First()}";
+                res = $"{TargetUnit.Name} debuff resisted: {Modification.Effects.First().EffType}";
             else if (Type == EventType.RemoveMod)
                 res = $"Remove modifications on {TargetUnit.Name}. Source: {Source?.GetType()?.ToString().Split(".").Last():s}";
             else if (Type == EventType.StartWave)
@@ -112,7 +114,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 res = TargetUnit.Name + " shield broken " +
                       $" overall={val:f} to_hp={RealVal:f}";
             else if (Type == EventType.ModActionValue)
-                res = $"Reduce {TargetUnit?.Name:s} action value on {(int)Val:d}";
+                res = $"Reduce {TargetUnit?.Name:s} action value on {Val:f}";
             else
                 throw new NotImplementedException();
             return res;
@@ -217,34 +219,30 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             }
             else if (Type == EventType.Mod) //Apply mod
             {
-                foreach (var mod in Mods.Where(mod => TargetUnit.IsAlive))
+                if (TargetUnit.IsAlive)
                 {
                     //calc value first
-                    foreach (Effect modEffect in mod.Effects)
+                    foreach (Effect modEffect in Modification.Effects)
                     {
                         if (modEffect.CalculateValue != null && modEffect.Value == null)
                             modEffect.Value = modEffect.CalculateValue(this);
                     }
-                   
+
 
                     if (!revert)
-                        TargetUnit.ApplyMod(mod);
+                        TargetUnit.ApplyMod(Modification);
                     else
-                        TargetUnit.RemoveMod(mod);
+                        TargetUnit.RemoveMod(Modification);
                 }
+
             }
             else if (Type == EventType.RemoveMod) //remove mod
             {
-
-                foreach (var mod in Mods)
-                {
+      
                     if (!revert)
-                        TargetUnit.RemoveMod(mod);
+                        TargetUnit.RemoveMod(Modification);
                     else
-                        TargetUnit.ApplyMod(mod);
-
-
-                }
+                        TargetUnit.ApplyMod(Modification);
 
             }
             else if (Type == EventType.ResourceDrain) //Resource drain
@@ -262,13 +260,17 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             else if (Type == EventType.Defeat) //got defeated
             {
                 TargetUnit.IsAlive = revert;
-                foreach (Mod mod in Mods)
+               
                     if (!revert)
-                        TargetUnit.RemoveMod(mod);
+                        TargetUnit.RemoveMod(Modification);
                     else
-                        TargetUnit.ApplyMod(mod);
+                        TargetUnit.ApplyMod(Modification);
 
 
+            }
+            else if (Type == EventType.DebufResisted) //Debuf resisted :(
+            {
+                //Event handlers handle this event
             }
             else if (Type == EventType.Attack) //Just doing attack
             {
@@ -324,7 +326,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 TargetUnit = TargetUnit,
                 BaseChance = 1.5
             };
-            dotEvent.Mods.Add(new Mod(null) { Type = modType, BaseDuration = baseDuration, Effects = effects, MaxStack = maxStack, });
+            dotEvent.Modification=new Mod(null) { Type = modType, BaseDuration = baseDuration, Effects = effects, MaxStack = maxStack };
 
             if (FighterUtils.CalculateDebuffResisted(dotEvent))
             {
@@ -333,12 +335,13 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             }
             else
             {
-                //add Dots and debuffs
+                //debuff apply failed
                 Event failEvent = new(ParentStep, this.Source)
                 {
                     Type = EventType.DebufResisted,
                     AbilityValue = AbilityValue,
-                    TargetUnit = TargetUnit
+                    TargetUnit = TargetUnit,
+                    Modification = dotEvent.Modification
 
                 };
                 ParentStep.Events.Add(failEvent);
@@ -379,7 +382,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                             ParentStep.Events.Add(shieldBrkEvent);
                             shieldBrkEvent.ProcEvent(false);
 
-                            Event delayAV = new Event(ParentStep, this.Source) { Type = EventType.ModActionValue, Val = -TargetUnit.Stats.ActionValue * 0.25 };
+                            Event delayAV = new Event(ParentStep, this.Source) { Type = EventType.ModActionValue,TargetUnit = TargetUnit, Val = (-TargetUnit.Stats.BaseActionValue * 0.25) };//default delay
+                            //todo вместо этого наложить скрытый баф мб какой на 1 ход. хуй его знате
+                            throw new NotImplementedException();
                             ParentStep.Events.Add(delayAV);
                             delayAV.ProcEvent(false);
 
@@ -430,7 +435,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
                             };
                             //remove all buffs and debuffs
-                            defeatEvent.Mods.AddRange(TargetUnit.Mods);
+                            defeatEvent.RemovedMods.AddRange(TargetUnit.Mods);
                             ParentStep.Events.Add(defeatEvent);
                             defeatEvent.ProcEvent(false);
 

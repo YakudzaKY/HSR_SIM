@@ -256,20 +256,22 @@ namespace HSR_SIM_LIB.Fighters
             Unit attacker = ent.ParentStep.Actor;
             Unit defender = ent.TargetUnit;
 
-            Effect.EffectType mod = ent.Mods.First().Effects.First().EffType;
+            Effect.EffectType mod = ent.Modification.Effects.First().EffType;
+            bool isCC = ent.Modification.CrowdControl;
             double baseChance = ent.BaseChance;
             double effectHitRate = attacker.Stats.EffectHit;
             double effectRes = defender.Stats.EffectRes;
             double debuffRes = defender.GetDebuffResists(mod);
-            double realChance = baseChance  * (1+ effectHitRate)*(1-effectRes)*(1-debuffRes);
             double ccRes = 0;
-            if (mod == Effect.EffectType.CrowControl)
+            if (isCC)
             {
                 ccRes = defender.GetDebuffResists(Effect.EffectType.CrowControl);
             }
+            double realChance = baseChance  * (1+ effectHitRate)*(1-effectRes)*(1-debuffRes)*(1-ccRes);
+
 
             ent.ParentStep.Parent.Parent?.LogDebug("=======================");
-            ent.ParentStep.Parent.Parent?.LogDebug($"realChance {realChance:f} =baseChance {baseChance:f} * (1+ effectHitRate {effectHitRate:f})* (1- effectRes {effectRes:f})  * (1- debuffRes {debuffRes:f})");
+            ent.ParentStep.Parent.Parent?.LogDebug($"Debuff realChance {realChance:f} =baseChance {baseChance:f} * (1+ effectHitRate {effectHitRate:f})* (1- effectRes {effectRes:f})  * (1- debuffRes {debuffRes:f})" +(isCC?$"* (1- ccRes {ccRes:f})":"" ));
 
 
             return (new MersenneTwister().NextDouble()<=realChance);

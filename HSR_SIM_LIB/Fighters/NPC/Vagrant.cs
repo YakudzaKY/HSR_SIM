@@ -19,7 +19,6 @@ namespace HSR_SIM_LIB.Fighters.NPC
             Resists.Add(new Resist(){ResistType=Unit.ElementEnm.Wind,ResistVal=0.20});
             Resists.Add(new Resist(){ResistType=Unit.ElementEnm.Quantum,ResistVal=0.20});
 
-
         }
     }
 }

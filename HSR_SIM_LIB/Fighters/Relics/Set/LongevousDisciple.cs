@@ -38,7 +38,7 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
                         Type = Event.EventType.Mod
                         ,TargetUnit = Parent.Parent
                     };
-                    newEvent.Mods.Add(uniqueBuff);
+                    newEvent.Modification=uniqueBuff;
                     newEvent.ProcEvent(false);
                     ent.ParentStep.Events.Add(newEvent);
                 }

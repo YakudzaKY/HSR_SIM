@@ -405,7 +405,7 @@ namespace HSR_SIM_LIB.Utils
                 if (step.Parent.CurrentFight?.CurrentWave != null)
                 {
                     //AV
-                    DrawText(portraitPoint.X + 5, portraitPoint.Y + (int)(PortraitSize.Height * 0.4), gfx, Math.Floor(unit.Stats.ActionValue).ToString(), new SolidBrush(Color.Violet), new Font("Tahoma", DefaultFontSize), true);
+                    DrawText(portraitPoint.X + 5, portraitPoint.Y + (int)(PortraitSize.Height * 0.4), gfx, Math.Ceiling(unit.Stats.ActionValue).ToString(), new SolidBrush(Color.Violet), new Font("Tahoma", DefaultFontSize), true);
                 }
 
                 if (step.Parent.CurrentFight != null)

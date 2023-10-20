@@ -68,7 +68,7 @@ namespace HSR_SIM_LIB.Skills
             }
 
             return
-                $">> {Type.ToString():s} for {modsStr:s} val= {Effects.ToString():s} duration={BaseDuration.ToString():D} dispellable={Dispellable.ToString():s}";
+                $">> {Type.ToString():s} for {modsStr:s} val= {Effects.First().EffType.ToString():s} duration={BaseDuration.ToString():D} dispellable={Dispellable.ToString():s}";
         }
     }
 }

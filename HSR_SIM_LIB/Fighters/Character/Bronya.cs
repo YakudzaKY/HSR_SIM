@@ -23,7 +23,7 @@ namespace HSR_SIM_LIB.Fighters.Character
 
             Event eventBuff = new(null, this)
                 { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.Mod, AbilityValue = ability,CalculateTargets = GetFriends};
-            eventBuff.Mods.Add(new Mod(null){Type=Mod.ModType.Buff,Effects = new List<Effect>(){new Effect() { EffType=Effect.EffectType.AtkPrc,Value = 0.15}} ,BaseDuration= 2,Dispellable = true});
+            eventBuff.Modification=(new Mod(null){Type=Mod.ModType.Buff,Effects = new List<Effect>(){new Effect() { EffType=Effect.EffectType.AtkPrc,Value = 0.15}} ,BaseDuration= 2,Dispellable = true});
             ability.Events.Add(eventBuff);
 
             Abilities.Add(ability);

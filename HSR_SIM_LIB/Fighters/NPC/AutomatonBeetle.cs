@@ -24,9 +24,6 @@ namespace HSR_SIM_LIB.Fighters.NPC
             Resists.Add(new Resist(){ResistType=Unit.ElementEnm.Ice,ResistVal=0.20});
             Resists.Add(new Resist(){ResistType=Unit.ElementEnm.Quantum,ResistVal=0.20});
 
-            //debuff Resist
-            DebuffResists.Add(new DebuffResist(){Debuff=EffectType.WindShear,ResistVal=0.5});
-            DebuffResists.Add(new DebuffResist(){Debuff=EffectType.CrowControl,ResistVal=0.5});
 
         }
     }
