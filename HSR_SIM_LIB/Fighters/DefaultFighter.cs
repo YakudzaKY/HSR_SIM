@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using HSR_SIM_LIB.Fighters.LightCones;
@@ -10,6 +11,7 @@ using static HSR_SIM_LIB.Utils.CallBacks;
 using static HSR_SIM_LIB.Fighters.FighterUtils;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.Skills;
+using static HSR_SIM_LIB.Fighters.IFighter;
 
 namespace HSR_SIM_LIB.Fighters
 {
@@ -25,7 +27,7 @@ namespace HSR_SIM_LIB.Fighters
         public List<Unit.ElementEnm> Weaknesses { get; set; } = null;
         public List<Resist> Resists { get; set; } = new List<Resist>();
         public Unit Parent { get; set; }
-
+        public  MechDictionary Mechanics;
         public ATracesEnm Atraces { get; set; }
         [Flags]
         public enum ATracesEnm
@@ -97,10 +99,6 @@ namespace HSR_SIM_LIB.Fighters
             return Parent.Friends.Where(x => x.IsAlive);
         }
 
-        public static double? CalculateOpeningThg(Unit target)
-        {
-            return target.GetRes(Resource.ResourceType.Toughness).ResVal;
-        }
 
         //Try to choose some good ability to cast
         public virtual Ability ChooseAbilityToCast(Step step)
@@ -119,7 +117,7 @@ namespace HSR_SIM_LIB.Fighters
                     if (ability.Attack)
                     {
                         /*
-                         *Cast ability if ability not in qeueu
+                         *Cast ability if ability not in queue
                          * and we can penetrate weakness
                          * or others cant do that.
                          * So basic opener through weakness>>  combat technique that not penetrate
@@ -128,7 +126,7 @@ namespace HSR_SIM_LIB.Fighters
                             -1 //check for existing in queue 
                             && (GetWeaknessTargets().Any() //We can penetrate shield 
                                 || !GetFriends().Any(x => x != Parent
-                                                           && GetWeaknessTargets().Any()
+                                                           && ((DefaultFighter)(x.Fighter)).GetWeaknessTargets().Any()
                                                            && x.Fighter.Abilities.Any(y =>
                                                                y.AbilityType == Ability.AbilityTypeEnm.Technique
                                                                && y.Attack)) //or others cant penetrate 
@@ -174,16 +172,33 @@ namespace HSR_SIM_LIB.Fighters
         public IFighter.StepHandler StepHandlerProc { get; set; }
         public List<Ability> Abilities { get; set; } = new List<Ability>();
 
+
         //Blade constructor
         public DefaultFighter(Unit parent)
         {
+            Mechanics = new MechDictionary();
+            Mechanics.Reset();
             Parent = parent;
             EventHandlerProc += DefaultFighter_HandleEvent;
             StepHandlerProc += DefaultFighter_HandleStep;
             //no way to get ascend traces from api :/
             Atraces = (ATracesEnm.A2 | ATracesEnm.A4 |ATracesEnm.A6);
 
+            Ability defOpener;
+            //Default Opener
+            defOpener = new Ability(Parent) {   AbilityType = Ability.AbilityTypeEnm.Technique
+                , Name = "Default opener"
+                , Element = Element
+                , ToughnessShred = 60
+                , TargetType = Ability.TargetTypeEnm.Hostiles
+                , Attack=true
+            };
+
+
+            Abilities.Add(defOpener);
+
         }
+
 
         public virtual void DefaultFighter_HandleEvent(Event ent)
         {

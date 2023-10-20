@@ -4,9 +4,11 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.UnitStuff;
 using HSR_SIM_LIB.Utils.Utils;
+using static HSR_SIM_LIB.TurnBasedClasses.Event;
 using static HSR_SIM_LIB.UnitStuff.Unit;
 
 namespace HSR_SIM_LIB.Fighters
@@ -23,7 +25,7 @@ namespace HSR_SIM_LIB.Fighters
         /// </summary> 
         /// <param name="ent"></param>
         /// <returns></returns>
-        public static double CalculateShieldBrokeDmg( Event ent)
+        public static double? CalculateShieldBrokeDmg( Event ent)
         {
             Unit attacker = ent.ParentStep.Actor;
             Unit defender = ent.TargetUnit;
@@ -31,35 +33,45 @@ namespace HSR_SIM_LIB.Fighters
 
             ent.ParentStep.Parent.Parent?.LogDebug("=======================");
             ent.ParentStep.Parent.Parent?.LogDebug($"{attacker.Name:s} ({attacker.ParentTeam.Units.IndexOf(attacker)+1:d}) Break shield of {defender.Name} ({defender.ParentTeam.Units.IndexOf(defender)+1:d})");
-
-            double maxToughnessMult = 0.5 + defender.Stats.MaxToughness / 120;
             double baseDmg;
-            switch (attackElem)
+            //if this is direct shield break
+            if (ent.Type == (EventType.ShieldBreak))
             {
-                case ElementEnm.Physical:
-                    baseDmg = 2 * _lvlMultiplier[attacker.Level] * maxToughnessMult;
-                    break;
-                case ElementEnm.Fire:
-                    baseDmg = 2 * _lvlMultiplier[attacker.Level] * maxToughnessMult;
-                    break;
-                case ElementEnm.Ice:
-                    baseDmg = 1 * _lvlMultiplier[attacker.Level] * maxToughnessMult;
-                    break;
-                case ElementEnm.Lightning:
-                    baseDmg = 1 * _lvlMultiplier[attacker.Level] * maxToughnessMult;
-                    break;
-                case ElementEnm.Wind:
-                    baseDmg = 1.5 * _lvlMultiplier[attacker.Level] * maxToughnessMult;
-                    break;
-                case ElementEnm.Quantum:
-                    baseDmg = 0.5 * _lvlMultiplier[attacker.Level] * maxToughnessMult;
-                    break;
-                case ElementEnm.Imaginary:
-                    baseDmg = 0.5 * _lvlMultiplier[attacker.Level] * maxToughnessMult;
-                    break;
-                default:
-                    throw new NotImplementedException();
-                    break;
+                double maxToughnessMult = 0.5 + defender.Stats.MaxToughness / 120;
+                
+                switch (attackElem)
+                {
+                    case ElementEnm.Physical:
+                        baseDmg = 2 * _lvlMultiplier[attacker.Level] * maxToughnessMult;
+                        break;
+                    case ElementEnm.Fire:
+                        baseDmg = 2 * _lvlMultiplier[attacker.Level] * maxToughnessMult;
+                        break;
+                    case ElementEnm.Ice:
+                        baseDmg = 1 * _lvlMultiplier[attacker.Level] * maxToughnessMult;
+                        break;
+                    case ElementEnm.Lightning:
+                        baseDmg = 1 * _lvlMultiplier[attacker.Level] * maxToughnessMult;
+                        break;
+                    case ElementEnm.Wind:
+                        baseDmg = 1.5 * _lvlMultiplier[attacker.Level] * maxToughnessMult;
+                        break;
+                    case ElementEnm.Quantum:
+                        baseDmg = 0.5 * _lvlMultiplier[attacker.Level] * maxToughnessMult;
+                        break;
+                    case ElementEnm.Imaginary:
+                        baseDmg = 0.5 * _lvlMultiplier[attacker.Level] * maxToughnessMult;
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                        break;
+                }
+            }
+            else
+            {
+                //shield breake DOT
+                Mod dot;
+                baseDmg = 0;
             }
 
             double breakEffect = 1 + attacker.Stats.BreakDmg;

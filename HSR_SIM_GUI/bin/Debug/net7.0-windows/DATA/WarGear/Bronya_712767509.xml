@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Unit name="Bronya" level="80" rank="0">
-  <Stats hp="2300.2560000000003" atk="1005.4799999999999" def="864.36" spd="99" crit_rate="0.05" crit_dmg="0.5" wind_dmg_prc="0.112" crit_dmg_prc="1.109240015663211" effect_res_prc="0.074560000523925" hp_fix="699.9564390105661" hp_prc="1.1006400162633603" atk_prc="0.233280003536496" def_prc="0.14579999959096202" atk_fix="408.5480450200848" crit_rate_prc="0.025920000392944" effect_hit_prc="0.440640006680049" spd_fix="16.632000003242865" break_dmg_prc="0.12312000291422" def_fix="38.10379200289026" spd_prc="0.06" />
+  <Stats hp="2300.2560000000003" atk="1005.4799999999999" def="864.36" spd="99" crit_rate="0.05" crit_dmg="0.5" wind_dmg_prc="0.16" crit_dmg_prc="1.189240015663211" effect_res_prc="0.134560000523925" hp_fix="699.9564390105661" hp_prc="1.1006400162633603" atk_prc="0.233280003536496" def_prc="0.14579999959096202" atk_fix="408.5480450200848" crit_rate_prc="0.025920000392944" effect_hit_prc="0.440640006680049" spd_fix="16.632000003242865" break_dmg_prc="0.12312000291422" def_fix="38.10379200289026" spd_prc="0.06" />
   <LightCone rank="5" level="80" name="Planetary Rendezvous" />
   <Skill name="Windrider Bullet" level="3" max_level="9" />
   <Skill name="Combat Redeployment" level="8" max_level="15" />

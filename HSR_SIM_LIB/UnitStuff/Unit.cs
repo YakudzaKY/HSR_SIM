@@ -52,7 +52,7 @@ namespace HSR_SIM_LIB.UnitStuff
         public Bitmap Portrait
         {
             get =>
-                portrait ??= new Bitmap(Utl.LoadBitmap(UnitType.ToString() + "\\" + Name), PortraitSize);
+                portrait ??=  GraphicsCls.ResizeBitmap(Utl.LoadBitmap(UnitType.ToString() + "\\" + Name), PortraitSize.Height,PortraitSize.Width);
             set => portrait = value;
         }
         public List<Mod> Mods { get; set; } = new List<Mod>();

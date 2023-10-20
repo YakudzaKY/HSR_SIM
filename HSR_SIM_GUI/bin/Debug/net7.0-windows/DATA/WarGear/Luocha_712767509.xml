@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Unit name="Luocha" level="80" rank="1">
-  <Stats hp="2444.9039999999995" atk="1338.8759999999997" def="760.725" spd="101" crit_rate="0.05" crit_dmg="0.5" atk_prc="1.467808015625932" hp_prc="0.8826880099065672" def_prc="0.28219999950379" hp_fix="508.032000006875" def_fix="175.700818014564" crit_rate_prc="0.113400002242999" atk_fix="469.2282530211378" heal_rate_prc="0.44560600039548803" crit_dmg_prc="0.226800004485994" break_dmg_prc="0.116640002466738" spd_prc="0.06" />
+  <Stats hp="2444.9039999999995" atk="1338.8759999999997" def="760.725" spd="101" crit_rate="0.05" crit_dmg="0.5" atk_prc="1.467808015625932" hp_prc="0.962688009906567" def_prc="0.28219999950379" hp_fix="508.032000006875" def_fix="175.700818014564" crit_rate_prc="0.113400002242999" atk_fix="469.2282530211378" heal_rate_prc="0.44560600039548803" crit_dmg_prc="0.226800004485994" break_dmg_prc="0.116640002466738" spd_prc="0.06" />
   <LightCone rank="1" level="80" name="Echoes of the Coffin" />
   <Skill name="Thorns of the Abyss" level="5" max_level="9" />
   <Skill name="Prayer of Abyss Flower" level="9" max_level="15" />

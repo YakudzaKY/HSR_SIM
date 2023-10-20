@@ -12,6 +12,7 @@ namespace HSR_SIM_LIB.Utils
         public static readonly string MsgLog = "LOG";
         public static readonly string MsgDebug = "DEBUG";
         public static readonly int MaxSp = 5;
+        public static readonly int StartSp = 3;
         public static readonly int MaxTp = 5;
 
 
@@ -31,7 +32,7 @@ namespace HSR_SIM_LIB.Utils
         public static readonly sbyte DefaultFontSize = (sbyte)Math.Round((double)(CombatImgSize.Height / 40));
         public static readonly sbyte DefaultFontSizeSpace = (sbyte)Math.Round((double)(DefaultFontSize * 0.4));
         public static readonly short CenterTextY = (short)Math.Round((double)(CombatImgSize.Height * 0.4));
-        public static readonly sbyte UnitSpaceSize = (sbyte)Math.Round((double)((CombatImgSize.Width - 5 * TotalUnitSize.Width) / 5));
+        public static readonly short UnitSpaceSize = (short)Math.Round((double)((CombatImgSize.Width - 5 * TotalUnitSize.Width) / 5));
         public static readonly sbyte StartQueuefontSize = (sbyte)(DefaultFontSize * 0.90);
         public static readonly sbyte StartQueuefontSizeSpc = (sbyte)Math.Round((double)(StartQueuefontSize / 7.5));
         public static readonly short LeftSideWithSpace = (short)(CombatImgSize.Width / 80);

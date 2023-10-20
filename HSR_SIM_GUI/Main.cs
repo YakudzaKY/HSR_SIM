@@ -28,14 +28,14 @@ namespace HSR_SIM_GUI
         /// For text callback
         /// </summary>
         /// <param name="kv"></param> 
-        public void WorkerCallBackString(KeyValuePair<String, String> kv)
+        public void WorkerCallBackString(KeyValuePair<string, string> kv)
         {
-            if (String.Equals(kv.Key, Constant.MsgLog))
+            if (string.Equals(kv.Key, Constant.MsgLog))
             {
                 Utils.AddLine(LogWindow, kv.Value, 400);
                 LogWindow.ScrollToCaret();
             }
-            else if (String.Equals(kv.Key, Constant.MsgDebug))
+            else if (string.Equals(kv.Key, Constant.MsgDebug))
             {
                 if (dbg != null && !dbg.IsDisposed)
                 {
@@ -163,5 +163,7 @@ namespace HSR_SIM_GUI
                 dbg = new();
             dbg.Show();
         }
+
+
     }
 }

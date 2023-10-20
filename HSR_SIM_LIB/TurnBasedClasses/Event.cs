@@ -95,9 +95,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             else if (Type == EventType.EnterCombat)
                 res = "entering the combat...";
             else if (Type == EventType.Mod)
-                res = "Apply modifications. Source: "+Source?.GetType()?.ToString().Split(".").Last();
+                res = $"Apply modifications on {TargetUnit.Name}. Source: {Source?.GetType()?.ToString().Split(".").Last():s}" ;
             else if (Type == EventType.RemoveMod)
-                res = "Remove modifications. Source: "+Source?.GetType()?.ToString().Split(".").Last();
+                res = $"Remove modifications on {TargetUnit.Name}. Source: {Source?.GetType()?.ToString().Split(".").Last():s}";
             else if (Type == EventType.StartWave)
                 res = "next wave";
             else if (Type == EventType.DirectDamage)
@@ -106,6 +106,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             else if (Type == EventType.ShieldBreak)
                 res = TargetUnit.Name + " shield broken " +
                       $" overall={val:f} to_hp={RealVal:f}";
+            else if (Type == EventType.ModActionValue)
+                res = $"Reduce {TargetUnit?.Name:s} action value on {(int)Val:d}";
             else
                 throw new NotImplementedException();
             return res;
@@ -151,7 +153,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 if (!revert)
                 {
                     ParentStep.Parent.DoEnterCombat = false;
-                    ParentStep.Parent.CurrentFight = new CombatFight(ParentStep.Parent.CurrentScenario.Fights[ParentStep.Parent.CurrentFightStep]);
+                    ParentStep.Parent.CurrentFight = new CombatFight(ParentStep.Parent.CurrentScenario.Fights[ParentStep.Parent.CurrentFightStep], ParentStep.Parent);
                     ParentStep.Parent.CurrentFightStep += 1;
                 }
                 else
@@ -162,9 +164,21 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 }
 
             }
-            else if (Type == EventType.ModActionValue) //Loading wave
+            else if (Type == EventType.ModActionValue) //SetAV
             {
-                throw new NotImplementedException();
+                //if no target - reduce all units
+                if (TargetUnit != null)
+                {
+                    TargetUnit.Stats.ActionValue -= (double)(revert ? -Val : Val);
+                }
+                else
+                {
+
+                    foreach (Unit unit in ParentStep.Parent.CurrentFight.AllAliveUnits)
+                    {
+                        unit.Stats.ActionValue -= (double)(revert ? -Val : Val);
+                    }
+                }
             }
             else if (Type == EventType.StartWave)//Loading wave
             {
@@ -198,21 +212,17 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             }
             else if (Type == EventType.Mod) //Apply mod
             {
-
-                foreach (var mod in Mods)
+                foreach (var mod in Mods.Where(mod => TargetUnit.IsAlive))
                 {
                     //calc value first
                     if (mod.CalculateValue != null && mod.Value == null)
                         mod.Value = mod.CalculateValue(this);
 
                     if (!revert)
-                        mod.TargetUnit.ApplyMod(mod);
+                        TargetUnit.ApplyMod(mod);
                     else
-                        mod.TargetUnit.RemoveMod(mod);
-
-
+                        TargetUnit.RemoveMod(mod);
                 }
-
             }
             else if (Type == EventType.RemoveMod) //remove mod
             {
@@ -220,9 +230,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 foreach (var mod in Mods)
                 {
                     if (!revert)
-                        mod.TargetUnit.RemoveMod(mod);
+                        TargetUnit.RemoveMod(mod);
                     else
-                        mod.TargetUnit.ApplyMod(mod);
+                        TargetUnit.ApplyMod(mod);
 
 
                 }
@@ -253,7 +263,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             }
             else if (Type == EventType.Attack) //Just doing attack
             {
-
+                //Event handlers handle this event
             }
             else if (Type == EventType.DirectDamage || Type == EventType.ShieldBreak) //Direct damage
             {
@@ -273,7 +283,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             }
             else
                 throw new NotImplementedException();
-            
+
             //call handlers
             if (!TriggersHandled)
             {
@@ -308,7 +318,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         {
 
 
-                            Event shieldBrkEvent = new(ParentStep,this.Source)
+                            Event shieldBrkEvent = new(ParentStep, this.Source)
                             {
                                 Type = EventType.ShieldBreak,
                                 AbilityValue = AbilityValue,
@@ -318,12 +328,48 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                             shieldBrkEvent.Val = FighterUtils.CalculateShieldBrokeDmg(shieldBrkEvent);
                             ParentStep.Events.Add(shieldBrkEvent);
                             shieldBrkEvent.ProcEvent(false);
+                            //add Dots and debuffs
+                            Event dotEvent = new(ParentStep, this.Source)
+                            {
+                                Type = EventType.Mod,
+                                AbilityValue = AbilityValue,
+                                TargetUnit = TargetUnit
 
+                            };
+                            switch (ParentStep.ActorAbility.Element??ParentStep.Actor.Fighter.Element)
+                            {
+                                case Unit.ElementEnm.Physical:
+                                    dotEvent.Mods.Add(new Mod(null) {Type=Mod.ModType.Dot ,CalculateValue = FighterUtils.CalculateShieldBrokeDmg} );
+                                    break;
+                                case Unit.ElementEnm.Fire:
+                                   
+                                    break;
+                                case Unit.ElementEnm.Ice:
+                                    
+                                    break;
+                                case Unit.ElementEnm.Lightning:
+                                  
+                                    break;
+                                case Unit.ElementEnm.Wind:
+                                 
+                                    break;
+                                case Unit.ElementEnm.Quantum:
+                                   
+                                    break;
+                                case Unit.ElementEnm.Imaginary:
+                                   
+                                    break;
+                                default:
+                                    throw new NotImplementedException();
+                                    break;
+                            }
+                            ParentStep.Events.Add(dotEvent);
+                            dotEvent.ProcEvent(false);
                         }
                         else if (res.ResType == ResourceType.HP)
                         {
 
-                            Event defeatEvent = new(ParentStep,this.Source)
+                            Event defeatEvent = new(ParentStep, this.Source)
                             {
                                 Type = EventType.Defeat,
                                 AbilityValue = AbilityValue,

@@ -15,14 +15,28 @@ namespace HSR_SIM_LIB.Fighters.Character
     public class Blade : DefaultFighter
     {
         public override FighterUtils.PathType? Path { get; set; } = FighterUtils.PathType.Destruction;
-        private int ShuHuCnt;
+
         private readonly int ShuHuMaxCnt;
+        private Ability shuhuGift;
         public override Ability ChooseAbilityToCast(Step step)
         {
             Ability watAbility = null;
 
             return watAbility ?? base.ChooseAbilityToCast(step);
         }
+
+        public override void DefaultFighter_HandleEvent(Event ent)
+        {
+            //if unit consume hp or got attack then apply buff
+            if (ent.TargetUnit == Parent && ent.Type == Event.EventType.ResourceDrain && ent.ResType == Resource.ResourceType.HP && ent.RealVal > 0)
+            {
+                Mechanics.SetVal(shuhuGift, Math.Min( Mechanics.GetIVal(shuhuGift)+1,ShuHuMaxCnt));
+            }
+          
+           
+            base.DefaultFighter_HandleEvent(ent);
+        }
+
 
 
         public double? CalculateKarmaSelfDmg(Event ent)
@@ -37,7 +51,7 @@ namespace HSR_SIM_LIB.Fighters.Character
 
         public override string GetSpecialText()
         {
-            return $"SH: {ShuHuCnt:d}\\{ShuHuMaxCnt:d}";
+            return $"SH: {Mechanics.GetIVal(shuhuGift):d}\\{ShuHuMaxCnt:d}";
         }
 
         //Blade constructor
@@ -45,6 +59,7 @@ namespace HSR_SIM_LIB.Fighters.Character
         {
             //Elemenet
             Element = Unit.ElementEnm.Wind;
+            Parent.Stats.BaseMaxEnergy = 130;
 
 
             //=====================
@@ -68,8 +83,21 @@ namespace HSR_SIM_LIB.Fighters.Character
 
             Abilities.Add(ability);
 
+
+            shuhuGift = new Ability(Parent) {   AbilityType = Ability.AbilityTypeEnm.FolowUpAttack
+                , Name = "Shuhu's Gift"
+                , Element = Element
+                , ToughnessShred = 30
+                , TargetType = TargetTypeEnm.Hostiles
+                , EnergyGain =10
+                , Attack=true
+            };
+            Abilities.Add(shuhuGift);
+
             //Passive counter
             ShuHuMaxCnt = (parent.Rank == 6) ? 4 : 5;//4 stacks on 6 eidolon 
+            Mechanics.AddVal(shuhuGift,MechDictionary.MechCounterTypeEnm.IntType);
+            
             //=====================
 
 

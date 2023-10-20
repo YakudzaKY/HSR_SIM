@@ -29,6 +29,7 @@ namespace HSR_SIM_LIB.Skills
         public ResourceType CostType { get; set; } = ResourceType.nil;
         public TargetTypeEnm? TargetType { get; set; }
         public bool Attack { get; set; }
+        public int EnergyGain { get; set; }
 
         public Ability(Unit parent)
         {

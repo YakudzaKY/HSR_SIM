@@ -194,7 +194,17 @@ namespace HSR_SIM_LIB.Utils
             g.Dispose();
             return newBitmap;
         }
-
+        public static Bitmap ResizeBitmap(Bitmap b, int nWidth, int nHeight)
+        {
+            Bitmap result = new Bitmap(nWidth, nHeight);
+            using (Graphics g = Graphics.FromImage(result))
+            {
+               // g.InterpolationMode = InterpolationMode.NearestNeighbor;
+                double scMode = (double)nWidth / (double)b.Width;
+                g.DrawImage(b, 0, 0, (int)Math.Round(b.Width*scMode),(int) Math.Round(b.Height*scMode));
+            }
+            return result;
+        }
 
         /// <summary>
         /// draw units in row
@@ -280,7 +290,7 @@ namespace HSR_SIM_LIB.Utils
                     DrawText(portraitPoint.X + 5
                         , portraitPoint.Y + PortraitSize.Height + HealthBarSize.Height
                         , gfx
-                        , string.Format("{0:d}/{1:d}", unit.Stats.CurrentEnergy, unit.Stats.BaseMaxEnergy)
+                        , string.Format("{0:d}/{1:d}", (int)Math.Floor(unit.Stats.CurrentEnergy),(int)Math.Floor( unit.Stats.BaseMaxEnergy))
                         , null
                         , new Font("Tahoma", BarFontSize));
                 }
@@ -311,7 +321,7 @@ namespace HSR_SIM_LIB.Utils
                     gfx.DrawRectangle(new Pen(Color.YellowGreen, 3), portraitPoint.X, portraitPoint.Y, PortraitSize.Width, PortraitSize.Height);
                 }
                 //if target
-                if (step.Events.Any(x => x.TargetUnit == unit || x.Type == Event.EventType.Mod && x.Mods.Any(y => y.TargetUnit == unit)))
+                if (step.Events.Any(x => x.TargetUnit == unit ))
                 {
                     gfx.DrawRectangle(new Pen(Color.BurlyWood, 3), portraitPoint.X + (int)(PortraitSize.Width * 0.05), portraitPoint.Y + (int)(PortraitSize.Height * 0.05), PortraitSize.Width - (int)(PortraitSize.Width * 0.1), PortraitSize.Height - (int)(PortraitSize.Width * 0.1));
                 }

@@ -20,7 +20,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 {/// <summary>
 /// Combat simulation class
 /// </summary>
-    public class SimCls:ICloneable
+    public class SimCls : ICloneable
     {
         Scenario currentScenario;
 
@@ -30,6 +30,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         public Worker Parent { get; set; }
 
         public List<Team> Teams { get; } = new List<Team>();
+    
 
 
         //ForgottenHall Cycles
@@ -222,7 +223,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 else
                 {
                     newStep.StepType = StepTypeEnm.StartWave;
-                    newStep.Events.Add(new Event(newStep,this) { Type = EventType.StartWave });
+                    newStep.Events.Add(new Event(newStep, this) { Type = EventType.StartWave });
                 }
 
             }
@@ -232,11 +233,34 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             {
                 newStep.ExecuteAbilityFromQueue();
             }
+            else if (newStep.StepType == StepTypeEnm.Idle &&currentFight?.Actor ==null)//set who wanna move
+            {
+               
+                newStep.StepType = StepTypeEnm.UnitMoveSelected;
+                CurrentFight.Actor = CurrentFight.AllAliveUnits.First();
+                newStep.Actor = CurrentFight.Actor;
+                newStep.Events.Add(new Event(newStep, this) { Type = EventType.ModActionValue,Val = currentFight.Actor.Stats.ActionValue});
+            }
+            //TODO предусмотреть если Actor сдох-то просто заканчивает ход. скипаект
+
+            
+            //TODO ON MOVE START STEP - procs DotS debuffs(dmg) hots Set Action value
+            //TODO ON MOVE START STEP  TRIGGERS (if second ability allowed or need heal by follow up attacks) Loucha heals 
+            //TODO ON MOVE PROGRESS  STEP (if second ability allowed or need heal by follow up attacks) Loucha heals , kafka folow up
+            //TODO ON MOVE PROGRESS TRIGGERS  TRIGGERS (if second ability allowed or need heal by follow up attacks) Loucha heals
+            //TODO BEFORE MOVE END TRIGGERS- crio girl ultimate may be
+            //TODO ON MOVE END - dispell buffs who ended. ALSO RESET AV()!!!!
+
+
 
             //if we doing somethings then need proced the events
-
             CurrentStep = newStep;
             Steps.Add(CurrentStep);
+
+            //WHO WANNA MOVE STEP
+
+
+
 
 
             if (!CurrentStep.TriggersHandled)
@@ -250,7 +274,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         unit.Fighter.StepHandlerProc.Invoke(CurrentStep);
             }
 
-            CurrentStep.ProcEvents(false,false);
+            CurrentStep.ProcEvents(false, false);
 
 
 

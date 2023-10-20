@@ -57,10 +57,12 @@ namespace HSR_SIM_LIB.UnitStuff
         public double EffectHitFix { get; set; } = 0;
         public double EffectHit => BaseEffectHit * (1 + Parent.GetModsByType(Mod.ModifierType.EffectHitPrc) + EffectHitPrc) + Parent.GetModsByType(Mod.ModifierType.EffectHit) + EffectHitFix;
 
+        public double EnergyRegenPrc => BaseEnergyRes * (1 + Parent.GetModsByType(Mod.ModifierType.EnergyRatePrc) + BaseEnergyResPrc) ;
+        public double BaseEnergyResPrc { get; set; }
 
+        public double BaseEnergyRes { get; set; }
 
-        public int CurrentEnergy { get; set; } = 0;
-        public int BaseMaxEnergy { get; set; } = 0;
+        public double BaseMaxEnergy { get; set; } = 0;
 
         public int MaxToughness { get; set; } = 0;
 
@@ -86,6 +88,12 @@ namespace HSR_SIM_LIB.UnitStuff
 
         public double CritDmg => BaseCritDmg + Parent.GetModsByType(Mod.ModifierType.CritDmg) + CritDmgPrc;
         public double CritDmgPrc { get; set; }
+
+        public double CurrentEnergy
+        {
+            get => Parent.GetRes(Resource.ResourceType.HP).ResVal;
+            set => Parent.GetRes(Resource.ResourceType.HP).ResVal = value;
+        }
 
         public UnitStats(Unit unit)
         {

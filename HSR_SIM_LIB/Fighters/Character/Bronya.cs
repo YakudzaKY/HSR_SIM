@@ -22,8 +22,8 @@ namespace HSR_SIM_LIB.Fighters.Character
             //buff apply
 
             Event eventBuff = new(null, this)
-                { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.Mod, AbilityValue = ability };
-            eventBuff.Mods.Add(new Mod(null){Type=Mod.ModType.Buff,Modifiers = new List<Mod.ModifierType>(){Mod.ModifierType.AtkPrc} ,Value = 0.15,BaseDuration= 2,Dispellable = true,CalculateTargets = GetFriends});
+                { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.Mod, AbilityValue = ability,CalculateTargets = GetFriends};
+            eventBuff.Mods.Add(new Mod(null){Type=Mod.ModType.Buff,Modifiers = new List<Mod.ModifierType>(){Mod.ModifierType.AtkPrc} ,Value = 0.15,BaseDuration= 2,Dispellable = true});
             ability.Events.Add(eventBuff);
 
             Abilities.Add(ability);

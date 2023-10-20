@@ -123,7 +123,6 @@ namespace HSR_SIM_LIB.Utils
                     //base stats
                     unitStats.BaseMaxHp = SafeToDouble(xnode.Attributes.GetNamedItem("hp")?.Value.Trim());
                     unitStats.BaseAttack = SafeToDouble(xnode.Attributes.GetNamedItem("atk")?.Value.Trim());
-                    unitStats.BaseMaxEnergy = SafeToInt(xnode.Attributes.GetNamedItem("energy")?.Value.Trim());
                     unitStats.BaseSpeed = SafeToDouble(xnode.Attributes.GetNamedItem("spd")?.Value.Trim());
                     unitStats.MaxToughness = SafeToInt(xnode.Attributes.GetNamedItem("tgh")?.Value.Trim());
                     unitStats.BaseCritChance = SafeToDouble(xnode.Attributes.GetNamedItem("crit_rate")?.Value.Trim());
@@ -131,6 +130,7 @@ namespace HSR_SIM_LIB.Utils
                     unitStats.BaseDef = SafeToDouble(xnode.Attributes.GetNamedItem("def")?.Value.Trim());
                     unitStats.BaseEffectRes = SafeToDouble(xnode.Attributes.GetNamedItem("effect_res")?.Value.Trim());
                     unitStats.BaseEffectHit = SafeToDouble(xnode.Attributes.GetNamedItem("effect_hit")?.Value.Trim());
+                    unitStats.BaseEnergyRes = SafeToDouble(xnode.Attributes.GetNamedItem("sp_rate")?.Value.Trim());
                     if (xnode.Attributes.GetNamedItem("baseActionValue") is not null)
                     {
                         unitStats.BaseActionValue =
@@ -147,6 +147,7 @@ namespace HSR_SIM_LIB.Utils
                     unitStats.CritRatePrc = SafeToDouble(xnode.Attributes.GetNamedItem("crit_rate_prc")?.Value.Trim());
                     unitStats.EffectHitPrc = SafeToDouble(xnode.Attributes.GetNamedItem("effect_hit_prc")?.Value.Trim());
                     unitStats.EffectResPrc = SafeToDouble(xnode.Attributes.GetNamedItem("effect_res_prc")?.Value.Trim());
+                    unitStats.BaseEnergyResPrc = SafeToDouble(xnode.Attributes.GetNamedItem("sp_rate_prc")?.Value.Trim());
 
 
 

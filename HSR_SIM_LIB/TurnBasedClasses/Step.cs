@@ -51,6 +51,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 res = "Idle step(scenario completed?)";
             else if (StepType == StepTypeEnm.ExecuteAbility)
                 res = "Executed " + Actor.Name + " " + ActorAbility.Name;
+            else if (StepType == StepTypeEnm.UnitMoveSelected)
+                res = $"{Actor.Name:s} move next";
             else
                 throw new NotImplementedException();
             return res;
@@ -70,8 +72,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             , ExecuteTechnique
             , StartCombat//on fight starts
             , StartWave//on wave starts
-            , ExecuteAbility
-            
+            , ExecuteAbility,
+            UnitMoveSelected
         }
 
 
@@ -183,7 +185,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
 
             //update mods
-            foreach (Event ent in Events.Where(x => x.Type == EventType.Mod))
+            /*foreach (Event ent in Events.Where(x => x.Type == EventType.Mod))
             {
 
                 List<Mod> newMods = new();
@@ -209,7 +211,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 }
 
                 ent.Mods = newMods;
-            }
+            }*/
 
             if (ability.AbilityType == Ability.AbilityTypeEnm.Technique)
             {

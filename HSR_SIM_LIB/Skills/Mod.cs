@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.UnitStuff;
 
@@ -7,13 +8,13 @@ namespace HSR_SIM_LIB.Skills
 {
     public class Mod : CloneClass
     {
-        public delegate double? CalculateValuePrc(Event ent);
-        public delegate IEnumerable<Unit> CalculateTargetPrc();
+     
+        //public delegate IEnumerable<Unit> CalculateTargetPrc();
 
-        public CalculateValuePrc CalculateValue { get; init; }
-        public CalculateTargetPrc CalculateTargets { get; init; }
+        public Event.CalculateValuePrc CalculateValue { get; init; }
+       // public CalculateTargetPrc CalculateTargets { get; init; }
         public ModType Type { get; init; }
-        public Unit TargetUnit { get; set; }
+       // public Unit TargetUnit { get; set; }
         public string CustomIconName { get; set; }
         public List<ModifierType> Modifiers { get; init; }=new List<ModifierType>();
         public double? Value { get; set; }
@@ -34,7 +35,8 @@ namespace HSR_SIM_LIB.Skills
         public enum ModType
         {
             Buff,
-            Debuff
+            Debuff,
+            Dot
         }
 
         
@@ -65,7 +67,8 @@ namespace HSR_SIM_LIB.Skills
             DoTVulnerability,
             ElementalResist,
             AbilityTypeBoost,
-            IncomeHealingPrc
+            IncomeHealingPrc,
+            EnergyRatePrc
         }
 
         public Mod(Mod reference)
@@ -81,14 +84,8 @@ namespace HSR_SIM_LIB.Skills
                 modsStr += mod.ToString()+"; ";
             }
 
-            return string.Format(">> {0:s} {1:s} for {2:s} val= {3:D} duration={4:D} dispellable={5:s}",
-                Type.ToString()
-                , TargetUnit.Name
-                , modsStr
-                , Value.ToString()
-                , BaseDuration.ToString()
-                , Dispellable.ToString()
-                );
+            return
+                $">> {Type.ToString():s} for {modsStr:s} val= {Value.ToString():D} duration={BaseDuration.ToString():D} dispellable={Dispellable.ToString():s}";
         }
     }
 }

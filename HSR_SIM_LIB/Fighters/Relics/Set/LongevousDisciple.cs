@@ -17,7 +17,7 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
         {
             uniqueBuff = new Mod(null)
             {
-                Type = Mod.ModType.Buff, BaseDuration = 2, MaxStack = 2, TargetUnit = Parent.Parent,
+                Type = Mod.ModType.Buff, BaseDuration = 2, MaxStack = 2, 
                 Modifiers= new (){Mod.ModifierType.CritPrc}, Value = 0.08
             };
         }
@@ -36,6 +36,7 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
                     Event newEvent = new Event(ent.ParentStep, this)
                     {
                         Type = Event.EventType.Mod
+                        ,TargetUnit = Parent.Parent
                     };
                     newEvent.Mods.Add(uniqueBuff);
                     newEvent.ProcEvent(false);

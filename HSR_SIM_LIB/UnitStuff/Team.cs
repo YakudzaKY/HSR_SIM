@@ -28,7 +28,7 @@ namespace HSR_SIM_LIB.UnitStuff
         {
             ParentSim = parent;
             GetRes(ResourceType.TP).ResVal = Constant.MaxTp;
-            GetRes(ResourceType.SP).ResVal = Constant.MaxTp;
+            GetRes(ResourceType.SP).ResVal = Constant.StartSp;
 
         }
         /// <summary>
