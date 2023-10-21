@@ -33,7 +33,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
         public bool CanSetToZero { get; init; } = true;
         public List<Unit> StartingUnits { get; set; }
-        public List<Mod> RemovedMods { get; set; }=new List<Mod>();
+        public List<Mod> RemovedMods { get; set; } = new List<Mod>();
 
         public Mod Modification { get; set; }
         public ICloneable Source { get; }
@@ -297,9 +297,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         (double)Val);
 
                     var resVal = TargetUnit.GetRes(Resource.ResourceType.HP).ResVal;
-                    if (resVal != null)
-                        RealVal = Math.Min((double)resVal,
-                            (double)Val - (double)RealBarrierVal);
+
+                    RealVal = Math.Min((double)resVal,
+                        (double)Val - (double)RealBarrierVal);
                 }
 
                 SetResByEvent(Resource.ResourceType.Barrier, (double)-(revert ? -RealBarrierVal : RealBarrierVal));
@@ -313,13 +313,13 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             {
                 TriggersHandled = true;
                 ParentStep.Parent.EventHandlerProc?.Invoke(this);
-                            
+
             }
 
 
         }
 
-       
+
 
         /// <summary>
         /// attempt to apply debuff
@@ -331,7 +331,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         /// <param name="maxStack">max stacks</param>
         /// <param name="uniqueStr">Unique buff per battle</param>
         /// <param name="uniqueUnit">Unique buff per unit</param>
-        private void TryDebuff(Mod.ModType modType, List<Effect> effects, int baseDuration, double baseChance, int maxStack = 1, string uniqueStr = "", Unit uniqueUnit=null)
+        private void TryDebuff(Mod.ModType modType, List<Effect> effects, int baseDuration, double baseChance, int maxStack = 1, string uniqueStr = "", Unit uniqueUnit = null)
         {
             //add Dots and debuffs
             Event dotEvent = new(ParentStep, this.Source)
@@ -343,7 +343,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
 
             };
-            dotEvent.Modification = new Mod(null) { Type = modType, BaseDuration = baseDuration, Effects = effects, MaxStack = maxStack, UniqueStr = uniqueStr , UniqueUnit= uniqueUnit};
+            dotEvent.Modification = new Mod(null) { Type = modType, BaseDuration = baseDuration, Effects = effects, MaxStack = maxStack, UniqueStr = uniqueStr, UniqueUnit = uniqueUnit };
 
             if (FighterUtils.CalculateDebuffResisted(dotEvent))
             {
@@ -418,7 +418,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                                     TryDebuff(Mod.ModType.Dot, new List<Effect>() { new Effect() { EffType = EffectType.Shock, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } }, 2, 1.5);
                                     break;
                                 case Unit.ElementEnm.Wind:
-                                    TryDebuff(Mod.ModType.Dot, new List<Effect>() { new Effect() { EffType = EffectType.WindShear, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } }, 2, 1.5, 5, uniqueUnit:ParentStep.Actor);
+                                    TryDebuff(Mod.ModType.Dot, new List<Effect>() { new Effect() { EffType = EffectType.WindShear, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } }, 2, 1.5, 5, uniqueUnit: ParentStep.Actor);
                                     break;
                                 case Unit.ElementEnm.Quantum:
                                     TryDebuff(Mod.ModType.Debuff, new List<Effect>() {

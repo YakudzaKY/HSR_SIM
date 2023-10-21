@@ -118,21 +118,23 @@ namespace HSR_SIM_LIB.UnitStuff
             return Resources.First(resource => resource.ResType == rt);
         }
 
-        public double AllDmgBoost()
+        public double AllDmgBoost(Unit targetForCondition=null)
         {
-            return GetModsByType(EffectType.AllDamageBoost);
+            return GetModsByType(EffectType.AllDamageBoost,targetForCondition:targetForCondition);
         }
 
-        public double ResistsPenetration(ElementEnm elem)//todo calc
+        public double ResistsPenetration(ElementEnm elem,Unit targetForCondition=null)
         {
-            return GetModsByType(EffectType.ElementalPenetration, elem);
+            return GetModsByType(EffectType.ElementalPenetration, elem,targetForCondition:targetForCondition);
         }
+
         /// <summary>
         /// https://honkai-star-rail.fandom.com/wiki/Damage_RES
         /// </summary>
         /// <param name="elem"></param>
+        /// <param name="targetForCondition"></param>
         /// <returns></returns>
-        public double GetResists(ElementEnm elem)
+        public double GetResists(ElementEnm elem,Unit targetForCondition=null)
         {
             double res = 0;
             if (Fighter.Resists.Any(x => x.ResistType == elem))
@@ -140,11 +142,11 @@ namespace HSR_SIM_LIB.UnitStuff
                 res += Fighter.Resists.First(x => x.ResistType == elem).ResistVal;
             }
 
-            res += GetModsByType(EffectType.ElementalResist, elem);
+            res += GetModsByType(EffectType.ElementalResist, elem,targetForCondition:targetForCondition);
             return res;
         }
 
-        public double GetDebuffResists(EffectType debuff)
+        public double GetDebuffResists(EffectType debuff,Unit targetForCondition=null)
         {
             double res = 0;
             if (Fighter.DebuffResists.Any(x => x.Debuff == debuff))
@@ -152,12 +154,17 @@ namespace HSR_SIM_LIB.UnitStuff
                 res += Fighter.DebuffResists.First(x => x.Debuff == debuff).ResistVal;
             }
 
-            res += GetModsByType(EffectType.ElementalResist, debuff:debuff);
+            res += GetModsByType(EffectType.ElementalResist, debuff:debuff,targetForCondition:targetForCondition);
             return res;
         }
-        public double DotBoost()//todo calc
+        public double DotBoost(Unit targetForCondition=null)
         {
-            return GetModsByType(EffectType.DoTBoost);
+            return GetModsByType(EffectType.DoTBoost,targetForCondition: targetForCondition);
+        }
+
+        public double DefIgnore(Unit targetForCondition=null)
+        {
+            return GetModsByType(EffectType.DefIgnore,targetForCondition:targetForCondition);
         }
         /// <summary>
         /// Get elem  boost
@@ -170,16 +177,16 @@ namespace HSR_SIM_LIB.UnitStuff
                 BaseDamageBoost.Add(new DamageBoostRec() { ElemType = elem, Value = 0 });
             return BaseDamageBoost.First(dmg => dmg.ElemType == elem);
         }
-        public double GetElemBoostValue(ElementEnm elem)
+        public double GetElemBoostValue(ElementEnm elem,Unit targetForCondition=null)
         {
-            return GetElemBoost(elem).Value + GetModsByType(EffectType.ElementalBoost, elem);
+            return GetElemBoost(elem).Value + GetModsByType(EffectType.ElementalBoost, elem,targetForCondition:targetForCondition);
         }
 
         /// <summary>
         /// Get total stat by Mods by type
         /// </summary>
         /// <returns></returns>
-        public double GetModsByType(EffectType modType, ElementEnm? elem = null, AbilityTypeEnm? entAbilityValue = null,EffectType? debuff=null)
+        public double GetModsByType(EffectType modType, ElementEnm? elem = null, AbilityTypeEnm? entAbilityValue = null,EffectType? debuff=null,Unit targetForCondition=null)
         {
             double res = 0;
             if (Mods != null)
@@ -192,7 +199,7 @@ namespace HSR_SIM_LIB.UnitStuff
 
                 }
             //apply mod from Gear
-            foreach (PassiveMod pmode in GetConditionMods())
+            foreach (PassiveMod pmode in GetConditionMods(targetForCondition))
             {
                 foreach (Effect effect in pmode.Mod.Effects.Where(y =>
                              y.EffType == modType && y.Element == elem &&
@@ -209,7 +216,7 @@ namespace HSR_SIM_LIB.UnitStuff
         /// search avalable for unit condition mods(planars self or ally)
         /// </summary>
         /// <returns></returns>
-        public List<PassiveMod> GetConditionMods()
+        public List<PassiveMod> GetConditionMods(Unit targetForCondition=null)
         {
             List<PassiveMod> res = new();
             if (ParentTeam == null)
@@ -219,10 +226,9 @@ namespace HSR_SIM_LIB.UnitStuff
 
             foreach (Unit unit in ParentTeam.Units.Where(x => x.IsAlive))
             {
-                //TODO ADD PASIVE MODS
                 if (unit.fighter.ConditionMods.Concat(unit.fighter.PassiveMods).Any())
                     res.AddRange(from cmod in unit.fighter.ConditionMods.Concat(unit.fighter.PassiveMods)
-                                 where (cmod.Target == this || cmod.Target == this.ParentTeam) && (!(cmod is ConditionMod mod)|| mod.Truly)
+                                 where (cmod.Target == this || cmod.Target == this.ParentTeam) && (!(cmod is ConditionMod mod)|| mod.Truly(targetForCondition))
                                  select cmod);
                 if (unit.Fighter is DefaultFighter)
                 {
@@ -230,13 +236,13 @@ namespace HSR_SIM_LIB.UnitStuff
                     //LC
                    
                     res.AddRange(from cmod in unitFighter.LightCone.ConditionMods.Concat( unitFighter.LightCone.PassiveMods)
-                                     where (cmod.Target == this || cmod.Target == this.ParentTeam)  && (!(cmod is ConditionMod mod)|| mod.Truly)
+                                     where (cmod.Target == this || cmod.Target == this.ParentTeam)  && (!(cmod is ConditionMod mod)|| mod.Truly(targetForCondition))
                                      select cmod);
                     //GEAR
                     foreach (IRelicSet relic in unitFighter.Relics)
                     {
                         res.AddRange(from cmod in relic.ConditionMods.Concat(relic.PassiveMods)
-                                     where (cmod.Target == this || cmod.Target == this.ParentTeam)  && (!(cmod is ConditionMod mod)|| mod.Truly)
+                                     where (cmod.Target == this || cmod.Target == this.ParentTeam)  && (!(cmod is ConditionMod mod)|| mod.Truly(targetForCondition))
                                      select cmod);
                     }
 
@@ -380,33 +386,35 @@ namespace HSR_SIM_LIB.UnitStuff
 
             throw new NotImplementedException();
         }
+
         /// <summary>
         /// https://honkai-star-rail.fandom.com/wiki/Vulnerability
         /// </summary>
         /// <param name="attackElem"></param>
+        /// <param name="targetForCondition"></param>
         /// <returns></returns>
-        public double GetElemVulnerability(ElementEnm attackElem)
+        public double GetElemVulnerability(ElementEnm attackElem,Unit targetForCondition=null)
         {
-            return GetModsByType(EffectType.ElementalVulnerability, attackElem);
+            return GetModsByType(EffectType.ElementalVulnerability, attackElem, targetForCondition: targetForCondition);
 
         }
 
-        public double GetAllDamageVulnerability()
+        public double GetAllDamageVulnerability(Unit targetForCondition=null)
         {
-            return GetModsByType(EffectType.AllDamageVulnerability);
+            return GetModsByType(EffectType.AllDamageVulnerability, targetForCondition: targetForCondition);
 
         }
 
-        public double GetDoteVulnerability()
+        public double GetDotVulnerability(Unit targetForCondition=null)
         {
-            return GetModsByType(EffectType.DoTVulnerability);
+            return GetModsByType(EffectType.DoTVulnerability,targetForCondition:targetForCondition);
 
         }
         /// <summary>
         /// https://honkai-star-rail.fandom.com/wiki/DMG_Reduction
         /// </summary>
         /// <returns></returns>
-        public double GetDamageReduction()
+        public double GetDamageReduction(Unit targetForCondition=null)
         {
             double res = 1;
 
@@ -421,7 +429,7 @@ namespace HSR_SIM_LIB.UnitStuff
                     }
                 }
             //Condition
-            foreach (PassiveMod pmod in GetConditionMods())
+            foreach (PassiveMod pmod in GetConditionMods(targetForCondition))
             {
                 foreach (Effect effect in pmod.Mod.Effects.Where(x => x.EffType == EffectType.DamageReduction))
                 {
@@ -444,9 +452,9 @@ namespace HSR_SIM_LIB.UnitStuff
                 return 1;
         }
 
-        public double GetAbilityTypeMultiplier(Ability entAbilityValue)
+        public double GetAbilityTypeMultiplier(Ability entAbilityValue,Unit targetForCondition=null)
         {
-            return 1 + GetModsByType(EffectType.AbilityTypeBoost, null, entAbilityValue.AbilityType);
+            return 1 + GetModsByType(EffectType.AbilityTypeBoost, null, entAbilityValue.AbilityType,targetForCondition:targetForCondition);
         }
     }
 

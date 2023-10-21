@@ -58,7 +58,8 @@ namespace HSR_SIM_LIB.Skills
             Outrage,
             CrowControl,
             ReduceSpdPrc,
-            Advance
+            Advance,
+            DefIgnore
         }
     }
 }

@@ -11,8 +11,8 @@ namespace HSR_SIM_LIB.Fighters.Relics
 {
     public class DefaultRelicSet:IRelicSet
     {
-        public List<PassiveMod> PassiveMods { get; set; }=new List<PassiveMod>();
-        public List<ConditionMod> ConditionMods { get; set; }=new List<ConditionMod>();
+        public List<PassiveMod> PassiveMods { get; set; }=new List<PassiveMod>();// 100% uptime
+        public List<ConditionMod> ConditionMods { get; set; }=new List<ConditionMod>();//when conditions are ok on character
         public int num { get; set; }
         public IRelicSet.EventHandler EventHandlerProc { get; set; }
         public IRelicSet.StepHandler StepHandlerProc { get; set; }
