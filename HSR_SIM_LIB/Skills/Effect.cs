@@ -57,7 +57,8 @@ namespace HSR_SIM_LIB.Skills
             Dominated,
             Outrage,
             CrowControl,
-            ReduceSpdPrc
+            ReduceSpdPrc,
+            Advance
         }
     }
 }

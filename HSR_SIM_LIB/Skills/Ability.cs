@@ -14,7 +14,12 @@ namespace HSR_SIM_LIB.Skills
 /// Ability class
 /// </summary>
     public class Ability : CloneClass
-    {
+    {        
+        
+
+        public Event.CalculateValuePrc CalculateValue { get; init; }
+        public Event.CalculateTargetPrc CalculateTargets { get; init; }
+
         public ElementEnm? Element { get; set; }
 
         public AbilityTypeEnm AbilityType { get; set; }
@@ -30,6 +35,7 @@ namespace HSR_SIM_LIB.Skills
         public TargetTypeEnm? TargetType { get; set; }
         public bool Attack { get; set; }
         public int EnergyGain { get; set; }
+        public bool IgnoreWeakness { get; set; }
 
         public Ability(Unit parent)
         {

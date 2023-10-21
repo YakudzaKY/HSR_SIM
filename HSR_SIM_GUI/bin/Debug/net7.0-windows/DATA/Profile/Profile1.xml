@@ -1,7 +1,0 @@
-<Profile>
-	<Party>
-		<Unit template="Blade" wargear="Blade_712767509"/><!--Add mod traces LC and gear-->
-		<Unit template="Bronya"/>	
-		<Unit template="Luocha"/>	
-	</Party>
-</Profile>

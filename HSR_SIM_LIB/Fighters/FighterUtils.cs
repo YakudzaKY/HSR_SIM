@@ -37,7 +37,7 @@ namespace HSR_SIM_LIB.Fighters
             //if this is direct shield break
             if (ent.Type == (EventType.ShieldBreak))
             {
-                double maxToughnessMult = 0.5 + defender.Stats.MaxToughness / 120;
+                double maxToughnessMult = 0.5 + (double)defender.Stats.MaxToughness / 120;
                 
                 switch (attackElem)
                 {
@@ -78,7 +78,7 @@ namespace HSR_SIM_LIB.Fighters
             double defMultiplier=1-(defender.Stats.Def/(defender.Stats.Def+200+(10*attacker.Level)));
             double resPen = 1-(defender.GetResists(attackElem)-attacker.ResistsPenetration(attackElem));
             double vulnMult = 1 + defender.GetElemVulnerability(attackElem)+ defender.GetAllDamageVulnerability();
-            double brokenMultiplier  =  defender.GetBrokenMultiplier();
+            double brokenMultiplier =  defender.GetBrokenMultiplier();
             double totalDmg = baseDmg * breakEffect  * defMultiplier * resPen * vulnMult * brokenMultiplier;
             ent.ParentStep.Parent.Parent?.LogDebug($"baseDmg({baseDmg:f}) ; breakEffect({breakEffect:f})");
             ent.ParentStep.Parent.Parent?.LogDebug($"defMultiplier({defMultiplier:f}) = 1-(defender.Stats.Def({defender.Stats.Def:f})/(defender.Stats.Def({defender.Stats.Def:f})+200+(10*attacker.Level({attacker.Level:d}))))");
@@ -132,7 +132,7 @@ namespace HSR_SIM_LIB.Fighters
 
             double dmgReduction = defender.GetDamageReduction();
 
-            double brokenMultiplier  =  defender.GetBrokenMultiplier();
+            double brokenMultiplier = defender.GetBrokenMultiplier();
             
 
 

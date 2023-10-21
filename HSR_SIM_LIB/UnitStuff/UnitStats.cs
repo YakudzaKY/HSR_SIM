@@ -48,15 +48,13 @@ namespace HSR_SIM_LIB.UnitStuff
 
         public double MaxHpPrc { get; set; } = 0;
 
-        public double BaseEffectRes { get; set; } = 0;
+        public double BaseEffectRes { get; set; } = 0;//always 0 ?
         public double EffectResPrc { get; set; } = 0;
-        public double EffectResFix { get; set; } = 0;
-        public double EffectRes => BaseEffectRes * (1 + Parent.GetModsByType(EffectType.EffectResPrc) + EffectResPrc) + Parent.GetModsByType(EffectType.EffectRes) + EffectResFix;
+        public double EffectRes =>   Parent.GetModsByType(EffectType.EffectResPrc) + EffectResPrc+BaseEffectRes + Parent.GetModsByType(EffectType.EffectRes) ;
 
-        public double BaseEffectHit { get; set; } = 0;
+        public double BaseEffectHit { get; set; } = 0;//always 0 ?
         public double EffectHitPrc { get; set; } = 0;
-        public double EffectHitFix { get; set; } = 0;
-        public double EffectHit => BaseEffectHit * (1 + Parent.GetModsByType(EffectType.EffectHitPrc) + EffectHitPrc) + Parent.GetModsByType(EffectType.EffectHit) + EffectHitFix;
+        public double EffectHit =>   Parent.GetModsByType(EffectType.EffectHitPrc) + EffectHitPrc + BaseEffectHit + Parent.GetModsByType(EffectType.EffectHit) ;
 
         public double EnergyRegenPrc => BaseEnergyRes * (1 + Parent.GetModsByType(EffectType.EnergyRatePrc) + BaseEnergyResPrc) ;
         public double BaseEnergyResPrc { get; set; }
@@ -74,16 +72,27 @@ namespace HSR_SIM_LIB.UnitStuff
             set => baseActionValue = value;
         }
 
-        public double BaseCritChance { get; set; } = 0;
-        public double CritChance => BaseCritChance + Parent.GetModsByType(EffectType.CritPrc) + CritRatePrc;
-        public double CritRatePrc { get; set; }
+        public double PerformedActionValue { get; set; } = 0;
 
-        public double ActionValue { get; set; } = 0;
+        public double ActionValue
+        {
+            get
+            {
+                return BaseActionValue*(1- Parent.GetModsByType(EffectType.Advance) + Parent.GetModsByType(EffectType.Delay)) - PerformedActionValue;
+            }
+
+        } 
         public double BaseSpeed { get; internal set; }
         public double Speed => BaseSpeed * (1 + Parent.GetModsByType(EffectType.SpeedPrc) -Parent.GetModsByType(EffectType.ReduceSpdPrc) + SpeedPrc) + Parent.GetModsByType(EffectType.Speed) + SpeedFix;
         public double SpeedFix { get; set; }
 
         public double SpeedPrc { get; set; }
+
+        public double BaseCritChance { get; set; } = 0;
+        public double CritChance => BaseCritChance + Parent.GetModsByType(EffectType.CritPrc) + CritRatePrc;
+        public double CritRatePrc { get; set; }
+
+
 
         public double BaseCritDmg { get; set; }
 
@@ -103,7 +112,7 @@ namespace HSR_SIM_LIB.UnitStuff
 
         public void ResetAV()
         {
-            ActionValue = BaseActionValue;
+            PerformedActionValue = 0;
         }
     }
 }

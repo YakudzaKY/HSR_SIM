@@ -125,12 +125,15 @@ namespace HSR_SIM_LIB.Fighters
                          */
                         if (Parent.ParentTeam.ParentSim.BeforeStartQueue.IndexOf(ability) ==
                             -1 //check for existing in queue 
-                            && (GetWeaknessTargets().Any() //We can penetrate shield 
+                            && ((GetWeaknessTargets().Any() || ability.IgnoreWeakness) //We can penetrate shield 
                                 || !GetFriends().Any(x => x != Parent
-                                                           && ((DefaultFighter)(x.Fighter)).GetWeaknessTargets().Any()
+                                                           && ((((DefaultFighter)(x.Fighter)).GetWeaknessTargets().Any()
                                                            && x.Fighter.Abilities.Any(y =>
                                                                y.AbilityType == Ability.AbilityTypeEnm.Technique
-                                                               && y.Attack)) //or others cant penetrate 
+                                                               && y.Attack))||(x.Fighter.Abilities.Any(y =>
+                                                               y.AbilityType == Ability.AbilityTypeEnm.Technique
+                                                               && y.Attack&&y.IgnoreWeakness)))
+                                                           ) //or others cant penetrate  or otherc can ignore weaknesss
                                 )
                             && !(Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= ability.Cost + 1
                                     && GetFriends().Any(x => x.Fighter.Abilities.Any(y => y.AbilityType == Ability.AbilityTypeEnm.Technique && !y.Attack && x.ParentTeam.ParentSim.BeforeStartQueue.IndexOf(y) < 0)))// no unused buffers here when 2tp+
@@ -191,7 +194,7 @@ namespace HSR_SIM_LIB.Fighters
                 , Name = "Default opener"
                 , Element = Element
                 , ToughnessShred = 30
-                , TargetType = Ability.TargetTypeEnm.Hostiles
+                , CalculateTargets = GetAoeTargets
                 , Attack=true
             };
 

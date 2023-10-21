@@ -40,8 +40,7 @@ namespace HSR_SIM_LIB.Skills
         public Mod RefMod { get; set; }
 
         public bool Dispellable { get; init; }
-
-
+        public Unit UniqueUnit { get; set; }
 
 
         public enum ModType
@@ -64,11 +63,11 @@ namespace HSR_SIM_LIB.Skills
             string modsStr = "";
             foreach (var eff in Effects)
             {
-                modsStr += eff.EffType.ToString() + "; ";
+                modsStr += $"{eff.EffType.ToString():s} val= {eff.Value:f} ; ";
             }
 
             return
-                $">> {Type.ToString():s} for {modsStr:s} val= {Effects.First().EffType.ToString():s} duration={BaseDuration.ToString():D} dispellable={Dispellable.ToString():s}";
+                $">> {Type.ToString():s} for {modsStr:s} duration={BaseDuration.ToString():D} dispellable={Dispellable.ToString():s}";
         }
     }
 }

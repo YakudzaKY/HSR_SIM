@@ -74,12 +74,12 @@ namespace HSR_SIM_LIB.Fighters.Character
                                             , CostType = Resource.ResourceType.TP
                                             , Element = Element
                                             , ToughnessShred = 60
-                                            , TargetType = TargetTypeEnm.Hostiles
                                             , Attack=true
+                                            , CalculateTargets = GetAoeTargets
             };
             //dmg events
             ability.Events.Add(new Event(null, this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.ResourceDrain, ResType = Resource.ResourceType.HP, TargetUnit = Parent, CanSetToZero = false, CalculateValue = CalculateKarmaSelfDmg, AbilityValue = ability });
-            ability.Events.Add(new Event(null, this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.DirectDamage, CalculateValue = CalculateKarmaDmg, CalculateTargets = GetAoeTargets, AbilityValue = ability });
+            ability.Events.Add(new Event(null, this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.DirectDamage, CalculateValue = CalculateKarmaDmg, CalculateTargets = ability.CalculateTargets, AbilityValue = ability });
 
             Abilities.Add(ability);
 

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Fighters.Character
@@ -10,8 +12,73 @@ namespace HSR_SIM_LIB.Fighters.Character
     public class SilverWolf:DefaultFighter
     {
         public  override FighterUtils.PathType? Path { get; set; } = FighterUtils.PathType.Nihility;
+
+
+
+        public override void DefaultFighter_HandleEvent(Event ent)
+        {
+            //if unit consume hp or got attack then apply buff
+            if ( Parent.Rank>=2&& Parent.IsAlive&& ent.Type == Event.EventType.UnitEnteringBattle )
+            {
+                //if enemy enter combat need debuff
+                if (Parent.Enemies.Any(x => x == ent.TargetUnit))
+                {
+                    Event newEvent = new Event(ent.ParentStep, this)
+                    {
+                        Type = Event.EventType.Mod
+                        ,TargetUnit = ent.TargetUnit
+                    };
+                    newEvent.Modification= new Mod(null)
+                    {
+                        Type = Mod.ModType.Debuff, 
+                        Effects= new (){new (){EffType = Effect.EffectType.EffectResPrc, Value = -0.20}}
+                    };
+                    
+                    ent.ParentStep.AddEvent(newEvent,true);
+                }
+            }
+          
+           
+            base.DefaultFighter_HandleEvent(ent);
+        }
+
+
+        public double? CalculateFQPDmg(Event ent)
+        {
+            return FighterUtils.CalculateBasicDmg(Parent.Stats.Attack* 0.8, ent);
+        }
         public SilverWolf(Unit parent) : base(parent)
         {
+            //Elemenet
+            Element = Unit.ElementEnm.Quantum;
+            Parent.Stats.BaseMaxEnergy = 110;
+
+
+            //=====================
+            //Abilities
+            //=====================
+
+            Ability ability;
+            //Force Quit Program
+            ability = new Ability(Parent) {   AbilityType = Ability.AbilityTypeEnm.Technique
+                , Name = "Force Quit Program"
+                , Cost = 1
+                , CostType = Resource.ResourceType.TP
+                , Element = Element
+                , ToughnessShred = 60
+                , CalculateTargets = GetAoeTargets
+                , Attack=true
+                , IgnoreWeakness=true
+            };
+            //dmg events
+            ability.Events.Add(new Event(null, this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.DirectDamage, CalculateValue = CalculateFQPDmg, CalculateTargets = ability.CalculateTargets, AbilityValue = ability });
+
+            Abilities.Add(ability);
+
+
+          
         }
+
+
     }
 }

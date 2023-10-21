@@ -155,9 +155,7 @@ namespace HSR_SIM_LIB.Utils
                     unitStats.MaxHpFix = SafeToDouble(xnode.Attributes.GetNamedItem("hp_fix")?.Value.Trim());
                     unitStats.AttackFix = SafeToDouble(xnode.Attributes.GetNamedItem("atk_fix")?.Value.Trim());
                     unitStats.SpeedFix = SafeToDouble(xnode.Attributes.GetNamedItem("spd_fix")?.Value.Trim());
-                    unitStats.EffectHitFix = SafeToDouble(xnode.Attributes.GetNamedItem("effect_hit_fix")?.Value.Trim());
-                    unitStats.EffectResFix = SafeToDouble(xnode.Attributes.GetNamedItem("effect_res_fix")?.Value.Trim());
-
+   
                     //weapon damage by element???
                     foreach (ElementEnm elmn in (ElementEnm[])Enum.GetValues(typeof(ElementEnm)))
                     {
@@ -203,8 +201,8 @@ namespace HSR_SIM_LIB.Utils
                 unit.FighterClassName =
                     $"HSR_SIM_LIB.Fighters.{words[0]}.{words[1].Replace(" ", "")}";
                 unit.UnitType = (TypeEnm)Enum.Parse(typeof(TypeEnm), words[0], true);
-                unit.Level = int.Parse(unitNode.Attributes.GetNamedItem("level")?.Value?.Trim() ?? "1");
-                unit.Rank = int.Parse(unitNode.Attributes.GetNamedItem("rank")?.Value?.Trim() ?? "0");
+                unit.Level = int.Parse(unitNode.Attributes.GetNamedItem("level")?.Value?.Trim() ?? "1");//will be overwriten by wargear if possible
+                unit.Rank = int.Parse(unitNode.Attributes.GetNamedItem("rank")?.Value?.Trim() ?? "0");//will be overwriten by wargear if possible
                 string unitFile = Utl.DataFolder + "UnitTemplates\\" + unitCode + ".xml";
                 unit.Name = Path.GetFileNameWithoutExtension(unitFile);
                 //override by wargear
@@ -235,8 +233,11 @@ namespace HSR_SIM_LIB.Utils
             XmlElement xRoot = unitDoc.DocumentElement;
             string unitCode = xRoot.Attributes.GetNamedItem("name").Value.Trim();
             string newLevel = xRoot.Attributes.GetNamedItem("level")?.Value.Trim();
+            string newRank = xRoot.Attributes.GetNamedItem("rank")?.Value.Trim();
             if (!string.IsNullOrEmpty(newLevel))
                 unit.Level = SafeToInt(newLevel);
+            if (!string.IsNullOrEmpty(newRank))
+                unit.Rank = SafeToInt(newRank);
             if (unitCode != unit.Name)
                 throw new Exception(string.Format("Looking wargear for {0:s} but loaded for {1:s}", unit.Name, unitCode));
             unit.Stats = ExctractStats(xRoot, unit.Level, unit);

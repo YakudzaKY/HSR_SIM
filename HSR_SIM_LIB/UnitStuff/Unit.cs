@@ -279,8 +279,9 @@ namespace HSR_SIM_LIB.UnitStuff
             Mod newMod = null;
             //find existing by ref, or by UNIQUE tag
             if (Mods.Any(x => x.RefMod == (mod.RefMod ?? mod)
-                              && (String.IsNullOrEmpty(mod.UniqueStr) || String.Equals(x.UniqueStr, mod.UniqueStr)
-                              )))
+                              && (String.IsNullOrEmpty(mod.UniqueStr) || String.Equals(x.UniqueStr, mod.UniqueStr))
+                              && (mod.UniqueUnit==null || x.UniqueUnit==mod.UniqueUnit )
+                              ))
             {
                 newMod = Mods.First(x => x.RefMod == (mod.RefMod ?? mod));
                 //add stack

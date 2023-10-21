@@ -69,13 +69,13 @@ namespace HSR_SIM_LIB.Utils
                 DrawStartQueue(gfx, new Point(LeftSideWithSpace, TopSideForQueue), sim.BeforeStartQueue);
                 //step
                 DrawCenterText(gfx, sim.CurrentStep.GetDescription());
-                //events
+                /*//events
                 short i = 2;
                 foreach (Event ent in sim.CurrentStep.Events)
                 {
-                    DrawText((int)(CombatImgSize.Width / 3.5), CenterTextY + i * DefaultFontSize, gfx, ent.GetDescription(), new SolidBrush(clrDefault), new("Tahoma", (int)(DefaultFontSize * 0.6), FontStyle.Bold));
+                    DrawText((int)(CombatImgSize.Width / 3.5), CenterTextY + i * DefaultFontSize, gfx, ent.GetDescription(), new SolidBrush(clrDefault), new("Tahoma", (int)(DefaultFontSize * 0.6), FontStyle.Bold),true);
                     i++;
-                }
+                }*/
                 DrawText(PartyResourceX, PartyResourceY - 3 * (int)(DefaultFontSize * 1.2), gfx, string.Format("Fight: {0:d}/{1:d}",
                         sim.CurrentFightStep, sim.CurrentScenario.Fights.Count));
                 if (sim.CurrentFight != null)

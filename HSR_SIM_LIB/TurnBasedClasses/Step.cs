@@ -51,8 +51,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 res = "Idle step(scenario completed?)";
             else if (StepType == StepTypeEnm.ExecuteAbility)
                 res = "Executed " + Actor.Name + " " + ActorAbility.Name;
-            else if (StepType == StepTypeEnm.UnitMoveSelected)
-                res = $"{Actor.Name:s} move next";
+            else if (StepType == StepTypeEnm.UnitTurnSelected)
+                res = $"{Actor.Name:s} turn next";
             else
                 throw new NotImplementedException();
             return res;
@@ -73,7 +73,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             , StartCombat//on fight starts
             , StartWave//on wave starts
             , ExecuteAbility,
-            UnitMoveSelected
+            UnitTurnSelected
         }
 
 
@@ -81,12 +81,12 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         /// <summary>
         /// Proc all events in step. No random here or smart thinking. Do it on DoSomething...
         /// </summary>
-        public void ProcEvents(bool revert = false,bool replay=false)
+        public void ProcEvents(bool revert = false, bool replay = false)
         {
             //for all events saved in step
             List<Event> events = new();
             proceedEvents = new List<Event>();
-            
+
             events.AddRange(Events);
             //rollback changes from the end of list
             if (revert)
@@ -127,7 +127,19 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             ActorAbility = ability;//WAT ABILITY is casting
 
 
-
+            //tougness shred
+            if (ability.ToughnessShred != 0 || ability.CalculateToughnessShred != null)
+            {
+                if (ability.CalculateTargets != null)
+                    foreach (Unit unit in ability.CalculateTargets())
+                    {
+                        UnitThgShred(unit, ability);
+                    }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+            }
             foreach (Event ent in ability.Events.Where(x => x.OnStepType == StepType))
             {
                 if (ent.CalculateTargets != null)
@@ -147,47 +159,13 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 }
 
             }
-            //tougness shred
-            if (ability.ToughnessShred != 0 || ability.CalculateToughnessShred != null)
-            {
-                if (ability.TargetType == Ability.TargetTypeEnm.Hostiles)
-                {
-                    foreach (Unit unit in ((DefaultFighter)ability.Parent.Fighter).GetWeaknessTargets())
-                    {
-                        double? shredVal = 0;
-                        if (ability.CalculateToughnessShred != null)
-                        {
-                            shredVal = ability.CalculateToughnessShred(unit);
-                        }
-                        else
-                        {
-                            shredVal = ability.ToughnessShred;
-                        }
 
 
-                        Events.Add(new Event(null,null)
-                        {
-                            ParentStep = this,
-                            Type = EventType.ResourceDrain,
-                            TargetUnit = unit,
-                            ResType = ResourceType.Toughness,
-                            Val = shredVal,
-                            AbilityValue = ability
-                        });
-                    }
-                }
-                else
-                {
-                    throw new NotImplementedException();
-                }
 
-            }
-            
-         
 
             if (ability.AbilityType == Ability.AbilityTypeEnm.Technique)
             {
-                Events.Add(new Event(this,null)
+                Events.Add(new Event(this, null)
                 {
                     Type = EventType.CombatStartSkillDeQueue,
                     ParentStep = this,
@@ -196,6 +174,31 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 });
             }
         }
+
+        private void UnitThgShred(Unit unit, Ability ability)
+        {
+            double? shredVal = 0;
+            if (ability.CalculateToughnessShred != null)
+            {
+                shredVal = ability.CalculateToughnessShred(unit);
+            }
+            else
+            {
+                shredVal = ability.ToughnessShred;
+            }
+
+            if (unit.Fighter.Weaknesses.Any(x=>x==( ability.Element ?? ability.Parent.Fighter.Element)) || ability.IgnoreWeakness)
+                Events.Add(new Event(null, null)
+                {
+                    ParentStep = this,
+                    Type = EventType.ResourceDrain,
+                    TargetUnit = unit,
+                    ResType = ResourceType.Toughness,
+                    Val = shredVal,
+                    AbilityValue = ability
+                });
+        }
+
         //Cast all techniques before fights starts
         public void ExecuteAbilityFromQueue()
         {
@@ -220,7 +223,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
                 });
                 if (ability.Attack)
-                    Events.Add(new Event(this,null)
+                    Events.Add(new Event(this, null)
                     {
                         Type = EventType.EnterCombat,
                         ParentStep = this,
@@ -242,10 +245,10 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
             if (ability.CostType == ResourceType.TP || ability.CostType == ResourceType.SP)
             {
-                Events.Add(new Event(this,null) { Type = EventType.PartyResourceDrain, ResType = ability.CostType, Val = ability.Cost });
+                Events.Add(new Event(this, null) { Type = EventType.PartyResourceDrain, ResType = ability.CostType, Val = ability.Cost });
             }
             else if (ability.CostType != ResourceType.nil)
-                Events.Add(new Event(this,null) { Type = EventType.ResourceDrain, ResType = ability.CostType, Val = ability.Cost });
+                Events.Add(new Event(this, null) { Type = EventType.ResourceDrain, ResType = ability.CostType, Val = ability.Cost });
 
             Actor = ability.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
             ActorAbility = ability;//WAT ABILITY is casting
@@ -264,6 +267,19 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 StepType = StepTypeEnm.StartCombat;
             }
 
+        }
+
+        /// <summary>
+        /// Add event to step events
+        /// </summary>
+        /// <param name="ent">event</param>
+        /// <param name="doProceed">Proceed event</param>
+        /// <param name="revert">is revert ?</param>
+        public void AddEvent(Event ent,bool doProceed=false,bool revert =false)
+        {
+            if (doProceed)
+                ent.ProcEvent(revert);
+            this.Events.Add(ent);
         }
     }
 }

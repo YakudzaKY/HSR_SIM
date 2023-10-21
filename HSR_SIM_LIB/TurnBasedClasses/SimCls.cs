@@ -26,11 +26,15 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
         Step currentStep = null;
         int currentFightStep = 0;
+        public delegate void EventHandler(Event ent);
+        public delegate void StepHandler(Step step);
+        public IFighter.EventHandler EventHandlerProc { get; set; }
+        public IFighter.StepHandler StepHandlerProc { get; set; }
 
         public Worker Parent { get; set; }
 
         public List<Team> Teams { get; } = new List<Team>();
-    
+
 
 
         //ForgottenHall Cycles
@@ -111,6 +115,33 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             }
         }
 
+
+        public virtual void HandleEvent(Event ent)
+        {
+            if (ent.Type == EventType.StartWave)
+                foreach (Unit unit in AllUnits)
+                {
+                    ent.ParentStep.AddEvent(new Event(ent.ParentStep, this) { TargetUnit = unit, Type = EventType.UnitEnteringBattle },true);
+                }
+            //next handlers 
+            foreach (Unit unit in PartyTeam.Units)
+                unit.Fighter.EventHandlerProc.Invoke(ent);
+            if (HostileTeam?.Units != null)
+                foreach (Unit unit in HostileTeam.Units)
+                    unit.Fighter.EventHandlerProc.Invoke(ent);
+
+        }
+        public virtual void HandleStep(Step step)
+        {
+      
+            foreach (Unit unit in CurrentStep.Parent.PartyTeam.Units)
+                unit.Fighter.StepHandlerProc.Invoke(CurrentStep);
+            if (CurrentStep.Parent?.HostileTeam?.Units != null)
+                foreach (Unit unit in CurrentStep.Parent.HostileTeam.Units)
+                    unit.Fighter.StepHandlerProc.Invoke(CurrentStep);
+        }
+
+
         public Team SpecialTeam
         {
             get
@@ -128,7 +159,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         /// </summary>
         public SimCls()
         {
-
+            EventHandlerProc += HandleEvent;
+            StepHandlerProc += HandleStep;
         }
 
 
@@ -233,17 +265,17 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             {
                 newStep.ExecuteAbilityFromQueue();
             }
-            else if (newStep.StepType == StepTypeEnm.Idle &&currentFight?.Actor ==null)//set who wanna move
+            else if (newStep.StepType == StepTypeEnm.Idle && currentFight?.Actor == null)//set who wanna move
             {
-               
-                newStep.StepType = StepTypeEnm.UnitMoveSelected;
+
+                newStep.StepType = StepTypeEnm.UnitTurnSelected;
                 CurrentFight.Actor = CurrentFight.AllAliveUnits.First();
                 newStep.Actor = CurrentFight.Actor;
-                newStep.Events.Add(new Event(newStep, this) { Type = EventType.ModActionValue,Val = currentFight.Actor.Stats.ActionValue});
+                newStep.Events.Add(new Event(newStep, this) { Type = EventType.ModActionValue, Val = currentFight.Actor.Stats.ActionValue });
             }
             //TODO предусмотреть если Actor сдох-то просто заканчивает ход. скипаект
 
-            
+
             //TODO ON MOVE START STEP - procs DotS  hots Set Action value
             //TODO ON MOVE START STEP  TRIGGERS (if second ability allowed or need heal by follow up attacks) Loucha heals 
             //TODO ON MOVE PROGRESS  STEP (if second ability allowed or need heal by follow up attacks) Loucha heals , kafka folow up
@@ -266,12 +298,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             if (!CurrentStep.TriggersHandled)
             {
                 CurrentStep.TriggersHandled = true;
-                //call handlers
-                foreach (Unit unit in CurrentStep.Parent.PartyTeam.Units)
-                    unit.Fighter.StepHandlerProc.Invoke(CurrentStep);
-                if (CurrentStep.Parent?.HostileTeam?.Units != null)
-                    foreach (Unit unit in CurrentStep.Parent.HostileTeam.Units)
-                        unit.Fighter.StepHandlerProc.Invoke(CurrentStep);
+                this.StepHandlerProc?.Invoke(CurrentStep);
             }
 
             CurrentStep.ProcEvents(false, false);
