@@ -12,79 +12,32 @@ namespace HSR_SIM_LIB.Fighters
     /// </summary>
     public class MechDictionary
     {
-        public record RMechCounter
-        {
-            public MechCounterTypeEnm Type;
-            public int IntValue;
-            public double DoubleValue;
-            public string StringValue;
-
-        }
+ 
 
         //reset values in mich dictionary
         public void Reset()
         {
-            foreach (KeyValuePair<Ability, RMechCounter> item in values)
+            foreach (var item in Values)
             {
-                if (item.Value.Type == MechCounterTypeEnm.StringType)
-                {
-                    item.Value.StringValue = "";
-                }
-                else
-                    throw new Exception("Unknown type: "+item.Value.Type.ToString());
+               
+                
+                Values[item.Key] = 0;
+              
             }
         }
 
-        public enum MechCounterTypeEnm
-        {
-            IntType,
-            DoubleType,
-            StringType
-        }
 
 
-        private Dictionary<Ability, RMechCounter> values;
 
-        public MechDictionary()
-        {
-            values=new Dictionary<Ability, RMechCounter>();
-        }
+        public Dictionary<Ability, double> Values { get; }= new Dictionary<Ability, double>();
+
+    
         
-        public void AddVal(Ability ability,MechCounterTypeEnm type)
+        public void AddVal(Ability ability)
         {
-             values.Add(ability,new RMechCounter(){Type = type});
+             Values.Add(ability,0);
         }
 
-        //get value by type
-        public double GetDVal(Ability ability)
-        {
-            return values[ability].DoubleValue;
-        }
-
-        public int GetIVal(Ability ability)
-        {
-            return values[ability].IntValue;
-        }
-
-        public string GetSVal(Ability ability)
-        {
-            return values[ability].StringValue;
-        }
-
-        public void SetVal(Ability ability,string value)
-        {
-            values[ability].StringValue=value;
-        }
-
-        public void SetVal(Ability ability, double value)
-        {
-            values[ability].DoubleValue = value;
-        }
-
-        public void SetVal(Ability ability,int value)
-        {
-            values[ability].IntValue=value;
-        }
-
+        
     }
 }

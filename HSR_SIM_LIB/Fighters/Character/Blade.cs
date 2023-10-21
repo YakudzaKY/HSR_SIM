@@ -16,7 +16,7 @@ namespace HSR_SIM_LIB.Fighters.Character
     {
         public override FighterUtils.PathType? Path { get; set; } = FighterUtils.PathType.Destruction;
 
-        private readonly int ShuHuMaxCnt;
+        private readonly double ShuHuMaxCnt;
         private Ability shuhuGift;
         public override Ability ChooseAbilityToCast(Step step)
         {
@@ -30,9 +30,8 @@ namespace HSR_SIM_LIB.Fighters.Character
             //if unit consume hp or got attack then apply buff
             if (ent.TargetUnit == Parent && ent.Type == Event.EventType.ResourceDrain && ent.ResType == Resource.ResourceType.HP && ent.RealVal > 0)
             {
-                Mechanics.SetVal(shuhuGift, Math.Min( Mechanics.GetIVal(shuhuGift)+1,ShuHuMaxCnt));
+                Mechanics.Values[shuhuGift] =  Math.Min( (double) Mechanics.Values[shuhuGift] +1,  (double)  ShuHuMaxCnt);
             }
-          
            
             base.DefaultFighter_HandleEvent(ent);
         }
@@ -51,7 +50,7 @@ namespace HSR_SIM_LIB.Fighters.Character
 
         public override string GetSpecialText()
         {
-            return $"SH: {Mechanics.GetIVal(shuhuGift):d}\\{ShuHuMaxCnt:d}";
+            return $"SH: {(int)Mechanics.Values[shuhuGift]:d}\\{(int)ShuHuMaxCnt:d}";
         }
 
         //Blade constructor
@@ -96,7 +95,7 @@ namespace HSR_SIM_LIB.Fighters.Character
 
             //Passive counter
             ShuHuMaxCnt = (parent.Rank == 6) ? 4 : 5;//4 stacks on 6 eidolon 
-            Mechanics.AddVal(shuhuGift,MechDictionary.MechCounterTypeEnm.IntType);
+            Mechanics.AddVal(shuhuGift);
             
             //=====================
 

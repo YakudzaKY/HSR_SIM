@@ -1,8 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Profile>
   <Party>
- 
+    <Unit template="Character\Blade" wargear="Blade_712767509" />
     <Unit template="Character\Silver Wolf" wargear="Silver Wolf_712767509" />
-
+    <Unit template="Character\Bronya" wargear="Bronya_712767509" />
+    <Unit template="Character\Luocha" wargear="Luocha_712767509" />
   </Party>
 </Profile>

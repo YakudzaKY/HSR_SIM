@@ -7,15 +7,40 @@ namespace HSR_SIM_LIB.Fighters.Character
     public class Luocha:DefaultFighter
     {
         public  override FighterUtils.PathType? Path { get; set; } = FighterUtils.PathType.Abundance;
+        private Ability cycleOfLife;
+        private readonly double cycleOfLifeMaxCnt = 2;
+        public override string GetSpecialText()
+        {
+            return $"CoL: {(int)Mechanics.Values[cycleOfLife]:d}\\{(int)cycleOfLifeMaxCnt:d}";
+        }
         public Luocha(Unit parent) : base(parent)
         {
             //Elemenet
             Element = Unit.ElementEnm.Imaginary;
             Ability ability;
-            //Karma Wind
-            ability = new Ability(Parent) { AbilityType = Ability.AbilityTypeEnm.Technique, Name = "Test", Cost = 0, CostType = Resource.ResourceType.TP, Element =Element,Attack = true};
-            ability.Events.Add(new Event(null,this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.CombatStartSkillQueue });
+            
+
+            //=====================
+            //Abilities
+            //=====================
+            //Cycle of life
+            cycleOfLife = new Ability(Parent) {   AbilityType = Ability.AbilityTypeEnm.FollowUpAction
+                , Name = "Cycle of life"
+                , Element = Element
+            };
+            Mechanics.AddVal(cycleOfLife);
+            Abilities.Add(cycleOfLife);
+
+            //Mercy of a Fool
+            ability = new Ability(Parent) {   AbilityType = Ability.AbilityTypeEnm.Technique
+                , Name = "Mercy of a Fool"
+                , Cost = 1
+                , CostType = Resource.ResourceType.TP
+                , Element = Element
+            };
+            ability.Events.Add(new Event(null, this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, TargetUnit = Parent,Type = Event.EventType.MechanicValChg, Val = 2, CalculateTargets = ability.CalculateTargets, AbilityValue = cycleOfLife });
             Abilities.Add(ability);
+
         }
     }
 }

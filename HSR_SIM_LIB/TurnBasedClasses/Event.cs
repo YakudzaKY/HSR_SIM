@@ -67,12 +67,12 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             DirectDamage,// direct damage dealed
             CombatStartSkillDeQueue,// delete skill from queue(when techniqe skill executed in battle)
             DoTDamage,// Damage by DoTs(when turn started)
-            DoTPlace,//Apply Dot??? TODO delete this
             FinishCombat,//Combat was finished
             Attack,// Unit made the attack. Good for triggers
             RemoveMod,// dispell buff or dot
-            DebufResisted,//Notify that debuff got resisted
-            UnitEnteringBattle// unit enter on the battlefield
+            DebuffResisted,//Notify that debuff got resisted
+            UnitEnteringBattle,// unit enter on the battlefield
+            MechanicValChg//Add value to character mechanic counter
         }
 
         public Event(Step parent, ICloneable source)
@@ -102,7 +102,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 res = "entering the combat...";
             else if (Type == EventType.Mod)
                 res = $"Apply modifications on {TargetUnit.Name}. Source: {Source?.GetType()?.ToString().Split(".").Last():s}";
-            else if (Type == EventType.DebufResisted)
+            else if (Type == EventType.DebuffResisted)
                 res = $"{TargetUnit.Name} debuff resisted: {Modification.Effects.First().EffType}";
             else if (Type == EventType.RemoveMod)
                 res = $"Remove modifications on {TargetUnit.Name}. Source: {Source?.GetType()?.ToString().Split(".").Last():s}";
@@ -118,6 +118,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 res = $"Reduce {TargetUnit?.Name:s} action value on {Val:f}";
             else if (Type == EventType.UnitEnteringBattle)
                 res = $"{TargetUnit?.Name:s} joined the battle";
+            else if (Type == EventType.MechanicValChg)
+                res = $"{TargetUnit?.Name:s} mechanic counter change on  {Val:f}";
             else
                 throw new NotImplementedException();
             return res;
@@ -189,6 +191,11 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         unit.Stats.PerformedActionValue += (double)(revert ? -Val : Val);
                     }
                 }
+            }
+            else if (Type == EventType.MechanicValChg) //SetAV
+            {
+             
+                ((DefaultFighter)TargetUnit.Fighter).Mechanics.Values[AbilityValue] += (double)(revert ? -Val : Val)  ;
             }
             else if (Type == EventType.StartWave)//Loading wave
             {
@@ -277,7 +284,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
 
             }
-            else if (Type == EventType.DebufResisted) //Debuf resisted :(
+            else if (Type == EventType.DebuffResisted) //Debuf resisted :(
             {
                 //Event handlers handle this event
             }
@@ -355,7 +362,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 //debuff apply failed
                 Event failEvent = new(ParentStep, this.Source)
                 {
-                    Type = EventType.DebufResisted,
+                    Type = EventType.DebuffResisted,
                     AbilityValue = AbilityValue,
                     TargetUnit = TargetUnit,
                     Modification = dotEvent.Modification

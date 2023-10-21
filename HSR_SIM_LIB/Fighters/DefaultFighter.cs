@@ -231,6 +231,10 @@ namespace HSR_SIM_LIB.Fighters
         }
         public virtual void DefaultFighter_HandleStep(Step step)
         {
+            if (step.StepType==Step.StepTypeEnm.StartCombat )
+            {
+                Mechanics.Reset();
+            }
             LightCone?.StepHandlerProc.Invoke(step);
             foreach (IRelicSet relic in Relics)
             {
