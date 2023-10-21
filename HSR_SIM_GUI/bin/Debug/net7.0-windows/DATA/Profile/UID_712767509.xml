@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Profile>
-  <Party>    
-
+  <Party>
+ 
     <Unit template="Character\Silver Wolf" wargear="Silver Wolf_712767509" />
 
   </Party>

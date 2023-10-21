@@ -20,30 +20,38 @@ namespace HSR_SIM_LIB.Fighters
     /// </summary>
     public class DefaultFighter : IFighter
     {
-        public List<ConditionMod> ConditionMods { get; set; }=new List<ConditionMod>();
-        public List<PassiveMod> PassiveMods { get; set; }= new List<PassiveMod>();
+        public List<ConditionMod> ConditionMods { get; set; } = new List<ConditionMod>();
+        public List<PassiveMod> PassiveMods { get; set; } = new List<PassiveMod>();
         public virtual PathType? Path { get; set; } = null;
         public Unit.ElementEnm Element { get; set; }
         public List<Unit.ElementEnm> Weaknesses { get; set; } = null;
         public List<DebuffResist> DebuffResists { get; set; }
         public List<Resist> Resists { get; set; } = new List<Resist>();
         public Unit Parent { get; set; }
-        public  MechDictionary Mechanics;
+        public MechDictionary Mechanics;
         public ATracesEnm Atraces { get; set; }
         [Flags]
         public enum ATracesEnm
         {
-            A2=1,
-            A4=2, 
-            A6=4
+            A2 = 1,
+            A4 = 2,
+            A6 = 4
 
         }
 
         private ILightCone lightCone = null;
+
         public ILightCone LightCone
         {
-            get =>
-                lightCone ??= ((ILightCone)Activator.CreateInstance(Type.GetType(Parent.LightConeStringPath)!, this,Parent.LightConeInitRank));
+            get
+            {
+                if (!String.IsNullOrEmpty(Parent.LightConeStringPath))
+                    lightCone ??=
+                ((ILightCone)Activator.CreateInstance(Type.GetType(Parent.LightConeStringPath)!, this, Parent.
+                LightConeInitRank));
+                return lightCone;
+            }
+
             set => lightCone = value;
         }
 
@@ -58,7 +66,7 @@ namespace HSR_SIM_LIB.Fighters
                     relics = new List<IRelicSet>();
                     foreach (var keyValrelic in Parent.RelicsClasses)
                     {
-                        IRelicSet relicSet = (IRelicSet)Activator.CreateInstance(Type.GetType(keyValrelic.Key)!, this,keyValrelic.Value);
+                        IRelicSet relicSet = (IRelicSet)Activator.CreateInstance(Type.GetType(keyValrelic.Key)!, this, keyValrelic.Value);
                         relics.Add(relicSet);
 
                     }
@@ -74,11 +82,11 @@ namespace HSR_SIM_LIB.Fighters
 
 
 
- 
 
-       
 
-        public List<Skill> Skills { get; set; }=new List<Skill>();
+
+
+        public List<Skill> Skills { get; set; } = new List<Skill>();
 
         //all alive enemies
         public IEnumerable<Unit> GetAoeTargets()
@@ -90,7 +98,7 @@ namespace HSR_SIM_LIB.Fighters
         public IEnumerable<Unit> GetWeaknessTargets()
         {
             return Parent.Enemies.Where(x => x.IsAlive
-                                             && x.GetRes(Resource.ResourceType.Barrier).ResVal==0
+                                             && x.GetRes(Resource.ResourceType.Barrier).ResVal == 0
                                              && x.Fighter.Weaknesses.Any(x => x == Parent.Fighter.Element));
         }
 
@@ -130,9 +138,9 @@ namespace HSR_SIM_LIB.Fighters
                                                            && ((((DefaultFighter)(x.Fighter)).GetWeaknessTargets().Any()
                                                            && x.Fighter.Abilities.Any(y =>
                                                                y.AbilityType == Ability.AbilityTypeEnm.Technique
-                                                               && y.Attack))||(x.Fighter.Abilities.Any(y =>
+                                                               && y.Attack)) || (x.Fighter.Abilities.Any(y =>
                                                                y.AbilityType == Ability.AbilityTypeEnm.Technique
-                                                               && y.Attack&&y.IgnoreWeakness)))
+                                                               && y.Attack && y.IgnoreWeakness)))
                                                            ) //or others cant penetrate  or otherc can ignore weaknesss
                                 )
                             && !(Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= ability.Cost + 1
@@ -141,7 +149,7 @@ namespace HSR_SIM_LIB.Fighters
                         {
                             return ability;
                         }
-                    
+
                     }
                     else
                     {
@@ -152,7 +160,7 @@ namespace HSR_SIM_LIB.Fighters
                              we have NOT friend who can penetrate weakness through  cost=1 ability
                             */
                             if (Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= ability.Cost + 1
-                               || !GetFriends().Any(x =>GetWeaknessTargets().Any()&& x.Fighter.Abilities.Any(y =>
+                               || !GetFriends().Any(x => GetWeaknessTargets().Any() && x.Fighter.Abilities.Any(y =>
                                    y.AbilityType == Ability.AbilityTypeEnm.Technique && y.Cost > 0
                                    && y.Attack))
                                )
@@ -186,16 +194,23 @@ namespace HSR_SIM_LIB.Fighters
             EventHandlerProc += DefaultFighter_HandleEvent;
             StepHandlerProc += DefaultFighter_HandleStep;
             //no way to get ascend traces from api :/
-            Atraces = (ATracesEnm.A2 | ATracesEnm.A4 |ATracesEnm.A6);
+            Atraces = (ATracesEnm.A2 | ATracesEnm.A4 | ATracesEnm.A6);
 
             Ability defOpener;
             //Default Opener
-            defOpener = new Ability(Parent) {   AbilityType = Ability.AbilityTypeEnm.Technique
-                , Name = "Default opener"
-                , Element = Element
-                , ToughnessShred = 30
-                , CalculateTargets = GetAoeTargets
-                , Attack=true
+            defOpener = new Ability(Parent)
+            {
+                AbilityType = Ability.AbilityTypeEnm.Technique
+                ,
+                Name = "Default opener"
+                ,
+                Element = Element
+                ,
+                ToughnessShred = 30
+                ,
+                CalculateTargets = GetAoeTargets
+                ,
+                Attack = true
             };
 
 
@@ -206,15 +221,15 @@ namespace HSR_SIM_LIB.Fighters
 
         public virtual void DefaultFighter_HandleEvent(Event ent)
         {
-            
+
             LightCone?.EventHandlerProc.Invoke(ent);
             foreach (IRelicSet relic in Relics)
             {
                 relic.EventHandlerProc.Invoke(ent);
             }
-            
+
         }
-        public virtual  void DefaultFighter_HandleStep(Step step)
+        public virtual void DefaultFighter_HandleStep(Step step)
         {
             LightCone?.StepHandlerProc.Invoke(step);
             foreach (IRelicSet relic in Relics)

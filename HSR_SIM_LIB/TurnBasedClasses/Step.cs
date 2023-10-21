@@ -127,19 +127,6 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             ActorAbility = ability;//WAT ABILITY is casting
 
 
-            //tougness shred
-            if (ability.ToughnessShred != 0 || ability.CalculateToughnessShred != null)
-            {
-                if (ability.CalculateTargets != null)
-                    foreach (Unit unit in ability.CalculateTargets())
-                    {
-                        UnitThgShred(unit, ability);
-                    }
-                else
-                {
-                    throw new NotImplementedException();
-                }
-            }
             foreach (Event ent in ability.Events.Where(x => x.OnStepType == StepType))
             {
                 if (ent.CalculateTargets != null)
@@ -148,6 +135,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         Event unitEnt = (Event)ent.Clone();
                         unitEnt.ParentStep = this;
                         unitEnt.TargetUnit = unit;
+                        // shred toughness 
+                        if ((unitEnt.Type==EventType.DirectDamage) &&  (ability.ToughnessShred != 0 || ability.CalculateToughnessShred != null))
+                            UnitThgShred(unit, ability);
                         Events.Add(unitEnt);
 
                     }
@@ -155,6 +145,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 {
                     Event unitEnt = (Event)ent.Clone();
                     unitEnt.ParentStep = this;
+                    if ((unitEnt.Type==EventType.DirectDamage) &&  (ability.ToughnessShred != 0 || ability.CalculateToughnessShred != null))
+                        UnitThgShred(ent.TargetUnit, ability);
                     Events.Add(unitEnt);
                 }
 

@@ -19,6 +19,7 @@ using HSR_SIM_LIB.Utils;
 using HSR_SIM_LIB.Fighters.Relics;
 using static HSR_SIM_LIB.Skills.Mod;
 using static HSR_SIM_LIB.Skills.Effect;
+using System.Reflection.Emit;
 
 
 namespace HSR_SIM_LIB.UnitStuff
@@ -54,7 +55,7 @@ namespace HSR_SIM_LIB.UnitStuff
         public Bitmap Portrait
         {
             get =>
-                portrait ??=  GraphicsCls.ResizeBitmap(Utl.LoadBitmap(UnitType.ToString() + "\\" + Name), PortraitSize.Height,PortraitSize.Width);
+                portrait ??= GraphicsCls.ResizeBitmap(Utl.LoadBitmap(UnitType.ToString() + "\\" + Name), PortraitSize.Height, PortraitSize.Width);
             set => portrait = value;
         }
         public List<Mod> Mods { get; set; } = new List<Mod>();
@@ -118,14 +119,14 @@ namespace HSR_SIM_LIB.UnitStuff
             return Resources.First(resource => resource.ResType == rt);
         }
 
-        public double AllDmgBoost(Unit targetForCondition=null)
+        public double AllDmgBoost(Event ent = null)
         {
-            return GetModsByType(EffectType.AllDamageBoost,targetForCondition:targetForCondition);
+            return GetModsByType(EffectType.AllDamageBoost, ent: ent);
         }
 
-        public double ResistsPenetration(ElementEnm elem,Unit targetForCondition=null)
+        public double ResistsPenetration(ElementEnm elem, Event ent = null)
         {
-            return GetModsByType(EffectType.ElementalPenetration, elem,targetForCondition:targetForCondition);
+            return GetModsByType(EffectType.ElementalPenetration, elem, ent: ent);
         }
 
         /// <summary>
@@ -134,7 +135,7 @@ namespace HSR_SIM_LIB.UnitStuff
         /// <param name="elem"></param>
         /// <param name="targetForCondition"></param>
         /// <returns></returns>
-        public double GetResists(ElementEnm elem,Unit targetForCondition=null)
+        public double GetResists(ElementEnm elem, Event ent = null)
         {
             double res = 0;
             if (Fighter.Resists.Any(x => x.ResistType == elem))
@@ -142,11 +143,11 @@ namespace HSR_SIM_LIB.UnitStuff
                 res += Fighter.Resists.First(x => x.ResistType == elem).ResistVal;
             }
 
-            res += GetModsByType(EffectType.ElementalResist, elem,targetForCondition:targetForCondition);
+            res += GetModsByType(EffectType.ElementalResist, elem, ent: ent);
             return res;
         }
 
-        public double GetDebuffResists(EffectType debuff,Unit targetForCondition=null)
+        public double GetDebuffResists(EffectType debuff, Event ent = null)
         {
             double res = 0;
             if (Fighter.DebuffResists.Any(x => x.Debuff == debuff))
@@ -154,17 +155,17 @@ namespace HSR_SIM_LIB.UnitStuff
                 res += Fighter.DebuffResists.First(x => x.Debuff == debuff).ResistVal;
             }
 
-            res += GetModsByType(EffectType.ElementalResist, debuff:debuff,targetForCondition:targetForCondition);
+            res += GetModsByType(EffectType.ElementalResist, debuff: debuff, ent: ent);
             return res;
         }
-        public double DotBoost(Unit targetForCondition=null)
+        public double DotBoost(Event ent = null)
         {
-            return GetModsByType(EffectType.DoTBoost,targetForCondition: targetForCondition);
+            return GetModsByType(EffectType.DoTBoost, ent: ent);
         }
 
-        public double DefIgnore(Unit targetForCondition=null)
+        public double DefIgnore(Event ent = null)
         {
-            return GetModsByType(EffectType.DefIgnore,targetForCondition:targetForCondition);
+            return GetModsByType(EffectType.DefIgnore, ent: ent);
         }
         /// <summary>
         /// Get elem  boost
@@ -177,46 +178,60 @@ namespace HSR_SIM_LIB.UnitStuff
                 BaseDamageBoost.Add(new DamageBoostRec() { ElemType = elem, Value = 0 });
             return BaseDamageBoost.First(dmg => dmg.ElemType == elem);
         }
-        public double GetElemBoostValue(ElementEnm elem,Unit targetForCondition=null)
+        public double GetElemBoostValue(ElementEnm elem, Event ent = null)
         {
-            return GetElemBoost(elem).Value + GetModsByType(EffectType.ElementalBoost, elem,targetForCondition:targetForCondition);
+            return GetElemBoost(elem).Value + GetModsByType(EffectType.ElementalBoost, elem, ent: ent);
         }
 
         /// <summary>
         /// Get total stat by Mods by type
         /// </summary>
         /// <returns></returns>
-        public double GetModsByType(EffectType modType, ElementEnm? elem = null, AbilityTypeEnm? entAbilityValue = null,EffectType? debuff=null,Unit targetForCondition=null)
+        public double GetModsByType(EffectType modType, ElementEnm? elem = null, AbilityTypeEnm? entAbilityValue = null,
+            EffectType? debuff = null, Event ent = null)
         {
             double res = 0;
-            if (Mods != null)
-                foreach (Mod mod in Mods)
+            List<Mod> conditionsToCheck = new List<Mod>();
+            //get all mods to check
+            conditionsToCheck.AddRange(Mods);
+            foreach (PassiveMod pmode in GetConditionMods(ent?.TargetUnit))
+                conditionsToCheck.Add(pmode.Mod);
+
+
+            foreach (Mod mod in conditionsToCheck)
+            {
+                foreach (Effect effect in mod.Effects.Where(y => y.EffType == modType
+                                                                 && y.Element == elem
+                                                                 && (y.AbilityTypes.Any(y => y == entAbilityValue) ||
+                                                                     entAbilityValue == null)
+                         )
+                        )
                 {
-                    foreach (Effect effect in mod.Effects.Where(y => y.EffType == modType&&y.Element == elem && (y.AbilityTypes.Any(y => y == entAbilityValue)||entAbilityValue==null)))
+                    double finalValue;
+                    if (effect.CalculateValue != null)
                     {
-                        res += (double)effect.Value * (effect.StackAffectValue?mod.Stack:1);
+                        finalValue = (double)effect.CalculateValue(ent);
+                    }
+                    else
+                    {
+                        finalValue = (double)effect.Value;
                     }
 
+                    res += finalValue * (effect.StackAffectValue ? mod.Stack : 1);
                 }
-            //apply mod from Gear
-            foreach (PassiveMod pmode in GetConditionMods(targetForCondition))
-            {
-                foreach (Effect effect in pmode.Mod.Effects.Where(y =>
-                             y.EffType == modType && y.Element == elem &&
-                             (y.AbilityTypes.Any(y => y == entAbilityValue) || entAbilityValue == null)))
-                {
-                    res += (double)effect.Value * (effect.StackAffectValue?pmode.Mod.Stack:1);
-                }
+
+
             }
 
             return res;
+
         }
 
         /// <summary>
         /// search avalable for unit condition mods(planars self or ally)
         /// </summary>
         /// <returns></returns>
-        public List<PassiveMod> GetConditionMods(Unit targetForCondition=null)
+        public List<PassiveMod> GetConditionMods(Unit targetForCondition = null)
         {
             List<PassiveMod> res = new();
             if (ParentTeam == null)
@@ -228,21 +243,22 @@ namespace HSR_SIM_LIB.UnitStuff
             {
                 if (unit.fighter.ConditionMods.Concat(unit.fighter.PassiveMods).Any())
                     res.AddRange(from cmod in unit.fighter.ConditionMods.Concat(unit.fighter.PassiveMods)
-                                 where (cmod.Target == this || cmod.Target == this.ParentTeam) && (!(cmod is ConditionMod mod)|| mod.Truly(targetForCondition))
+                                 where (cmod.Target == this || cmod.Target == this.ParentTeam) && (!(cmod is ConditionMod mod) || mod.Truly(targetForCondition))
                                  select cmod);
                 if (unit.Fighter is DefaultFighter)
                 {
                     var unitFighter = (DefaultFighter)unit.Fighter;
                     //LC
-                   
-                    res.AddRange(from cmod in unitFighter.LightCone.ConditionMods.Concat( unitFighter.LightCone.PassiveMods)
-                                     where (cmod.Target == this || cmod.Target == this.ParentTeam)  && (!(cmod is ConditionMod mod)|| mod.Truly(targetForCondition))
+
+                    if (unitFighter.LightCone != null)
+                        res.AddRange(from cmod in unitFighter.LightCone.ConditionMods.Concat(unitFighter.LightCone.PassiveMods)
+                                     where (cmod.Target == this || cmod.Target == this.ParentTeam) && (!(cmod is ConditionMod mod) || mod.Truly(targetForCondition))
                                      select cmod);
                     //GEAR
                     foreach (IRelicSet relic in unitFighter.Relics)
                     {
                         res.AddRange(from cmod in relic.ConditionMods.Concat(relic.PassiveMods)
-                                     where (cmod.Target == this || cmod.Target == this.ParentTeam)  && (!(cmod is ConditionMod mod)|| mod.Truly(targetForCondition))
+                                     where (cmod.Target == this || cmod.Target == this.ParentTeam) && (!(cmod is ConditionMod mod) || mod.Truly(targetForCondition))
                                      select cmod);
                     }
 
@@ -286,12 +302,12 @@ namespace HSR_SIM_LIB.UnitStuff
             //find existing by ref, or by UNIQUE tag
             if (Mods.Any(x => x.RefMod == (mod.RefMod ?? mod)
                               && (String.IsNullOrEmpty(mod.UniqueStr) || String.Equals(x.UniqueStr, mod.UniqueStr))
-                              && (mod.UniqueUnit==null || x.UniqueUnit==mod.UniqueUnit )
+                              && (mod.UniqueUnit == null || x.UniqueUnit == mod.UniqueUnit)
                               ))
             {
                 newMod = Mods.First(x => x.RefMod == (mod.RefMod ?? mod));
                 //add stack
-                newMod.Stack = Math.Min(newMod.MaxStack, newMod.Stack+1);
+                newMod.Stack = Math.Min(newMod.MaxStack, newMod.Stack + 1);
             }
             else
             {
@@ -304,7 +320,7 @@ namespace HSR_SIM_LIB.UnitStuff
 
             //reset duration
             newMod.DurationLeft = newMod.BaseDuration;
-         
+
 
         }
         /// <summary>
@@ -393,28 +409,28 @@ namespace HSR_SIM_LIB.UnitStuff
         /// <param name="attackElem"></param>
         /// <param name="targetForCondition"></param>
         /// <returns></returns>
-        public double GetElemVulnerability(ElementEnm attackElem,Unit targetForCondition=null)
+        public double GetElemVulnerability(ElementEnm attackElem, Event ent = null)
         {
-            return GetModsByType(EffectType.ElementalVulnerability, attackElem, targetForCondition: targetForCondition);
+            return GetModsByType(EffectType.ElementalVulnerability, attackElem, ent: ent);
 
         }
 
-        public double GetAllDamageVulnerability(Unit targetForCondition=null)
+        public double GetAllDamageVulnerability(Event ent = null)
         {
-            return GetModsByType(EffectType.AllDamageVulnerability, targetForCondition: targetForCondition);
+            return GetModsByType(EffectType.AllDamageVulnerability, ent: ent);
 
         }
 
-        public double GetDotVulnerability(Unit targetForCondition=null)
+        public double GetDotVulnerability(Event ent = null)
         {
-            return GetModsByType(EffectType.DoTVulnerability,targetForCondition:targetForCondition);
+            return GetModsByType(EffectType.DoTVulnerability, ent: ent);
 
         }
         /// <summary>
         /// https://honkai-star-rail.fandom.com/wiki/DMG_Reduction
         /// </summary>
         /// <returns></returns>
-        public double GetDamageReduction(Unit targetForCondition=null)
+        public double GetDamageReduction(Unit targetForCondition = null)
         {
             double res = 1;
 
@@ -452,9 +468,9 @@ namespace HSR_SIM_LIB.UnitStuff
                 return 1;
         }
 
-        public double GetAbilityTypeMultiplier(Ability entAbilityValue,Unit targetForCondition=null)
+        public double GetAbilityTypeMultiplier(Ability entAbilityValue, Event ent = null)
         {
-            return 1 + GetModsByType(EffectType.AbilityTypeBoost, null, entAbilityValue.AbilityType,targetForCondition:targetForCondition);
+            return 1 + GetModsByType(EffectType.AbilityTypeBoost, null, entAbilityValue.AbilityType, ent: ent);
         }
     }
 

@@ -12,7 +12,7 @@ namespace HSR_SIM_LIB.Skills
     {
 
         public ConditionRec Condition { get; set; }
-        public  bool IsTargetCheck{ get; set; }
+  
 
 
         private bool CheckExpression(double targetVal)
@@ -61,7 +61,7 @@ namespace HSR_SIM_LIB.Skills
                     break;
                 default:
                     throw new NotImplementedException();
-                    break;
+                    
             }
             return res;
 

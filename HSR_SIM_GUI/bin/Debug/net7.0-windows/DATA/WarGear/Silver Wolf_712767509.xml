@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Unit name="Silver Wolf" level="80" rank="6">
-  <Stats hp="2000.376" atk="1116.612" def="791.595" spd="107" crit_rate="0.05" crit_dmg="0.5" atk_prc="0.8804800098016932" 
-  effect_hit_prc="0.778720003012571" quantum_dmg_prc="0.568803014298894" hp_fix="705.6000000101048" def_prc="0.39959999872371194" 
-  spd_fix="27.332000005757436" crit_dmg_prc="0.544320012442767" break_dmg_prc="0.272160004824399" atk_fix="386.67003801302053" 
-  def_fix="76.20758400578052" crit_rate_prc="0.6372800035588421" effect_res_prc="0.086400001309814" />
+  <Stats hp="2000.376" atk="1116.612" def="791.595" spd="107" crit_rate="0.05" crit_dmg="0.5" atk_prc="0.8804800098016932" effect_hit_prc="0.778720003012571" quantum_dmg_prc="0.568803014298894" hp_fix="705.6000000101048" def_prc="0.39959999872371194" spd_fix="27.332000005757436" crit_dmg_prc="0.544320012442767" break_dmg_prc="0.272160004824399" atk_fix="386.67003801302053" def_fix="76.20758400578052" crit_rate_prc="0.6372800035588421" effect_res_prc="0.086400001309814" />
   <LightCone rank="5" level="80" name="Before the Tutorial Mission Starts" />
   <Skill name="System Warning" level="7" max_level="9" />
   <Skill name="Allow Changes?" level="12" max_level="15" />

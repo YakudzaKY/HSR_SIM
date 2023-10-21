@@ -520,13 +520,15 @@ namespace HSR_SIM_GUI
             }
             unit.Add(stat);
 
-            XElement xLc = new XElement("LightCone");
-            xLc.SetAttributeValue("rank", character.light_cone.rank.ToString());
-            xLc.SetAttributeValue("level", character.light_cone.level.ToString());
-            xLc.SetAttributeValue("name", character.light_cone.name);
-            unit.Add(xLc);
+            if (character.light_cone != null)
+            {
+                XElement xLc = new XElement("LightCone");
+                xLc.SetAttributeValue("rank", character.light_cone.rank.ToString());
+                xLc.SetAttributeValue("level", character.light_cone.level.ToString());
+                xLc.SetAttributeValue("name", character.light_cone.name);
+                unit.Add(xLc);
+            }
 
-   
             foreach (Skill skl in character.skills)
             {
                 XElement skill = new XElement("Skill");

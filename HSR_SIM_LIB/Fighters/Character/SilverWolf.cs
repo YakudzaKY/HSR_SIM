@@ -47,6 +47,23 @@ namespace HSR_SIM_LIB.Fighters.Character
         {
             return FighterUtils.CalculateBasicDmg(Parent.Stats.Attack* 0.8, ent);
         }
+
+        //get 0.2 AllDmg per debuff  on enemy Team
+        public double? CalculateE6(Event ent)
+        {
+            double maxDebufs = 5;
+            double debufs = 0;
+        
+            
+                debufs += ent.TargetUnit.Mods.Count(x => x.Type == Mod.ModType.Debuff||x.Type == Mod.ModType.Dot);
+                if (debufs > maxDebufs)
+                {
+                    debufs = maxDebufs;
+                  
+                }
+
+            return debufs*0.2;
+        }
         public SilverWolf(Unit parent) : base(parent)
         {
             //Elemenet
@@ -65,16 +82,27 @@ namespace HSR_SIM_LIB.Fighters.Character
                 , Cost = 1
                 , CostType = Resource.ResourceType.TP
                 , Element = Element
-                , ToughnessShred = 60
                 , CalculateTargets = GetAoeTargets
                 , Attack=true
                 , IgnoreWeakness=true
             };
             //dmg events
             ability.Events.Add(new Event(null, this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.DirectDamage, CalculateValue = CalculateFQPDmg, CalculateTargets = ability.CalculateTargets, AbilityValue = ability });
-
+            ability.Events.Add(new Event(null, this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.ResourceDrain,ResType = Resource.ResourceType.Toughness, Val = 60, CalculateTargets = ability.CalculateTargets, AbilityValue = ability });
+            //долбоебизм чистой воды, у волка почему то эта абилка в начале наносит урон, затем сносит щит. Обычно по другому
             Abilities.Add(ability);
 
+            if (Parent.Rank >= 6)
+            {
+                PassiveMods.Add(new PassiveMod(Parent)
+                {
+                    Mod = new Mod(null)
+                        { Effects = new List<Effect>() { new Effect() { EffType = Effect.EffectType.AllDamageBoost, CalculateValue = CalculateE6 } } },
+                    Target = Parent,
+                    IsTargetCheck = true
+
+                });
+            }
 
           
         }

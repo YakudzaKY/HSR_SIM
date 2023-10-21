@@ -435,7 +435,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                                     break;
                                 default:
                                     throw new NotImplementedException();
-                                    break;
+                                   
                             }
 
                         }
