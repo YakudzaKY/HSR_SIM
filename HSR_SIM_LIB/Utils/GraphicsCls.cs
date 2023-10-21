@@ -363,7 +363,7 @@ namespace HSR_SIM_LIB.Utils
                     var buffPoint = new Point(portraitPoint.X + PortraitSize.Width,
                         portraitPoint.Y + j * ElemSizeMini.Height);
                     gfx.DrawImage(new Bitmap(Utl.LoadBitmap(buff.CustomIconName??buff.Effects.First().EffType.ToString()), ElemSizeMini), buffPoint);
-                    gfx.DrawRectangle(new Pen(buff.Type == Mod.ModType.Buff ? Color.Aquamarine : Color.Brown, 1), buffPoint.X, buffPoint.Y, ElemSizeMini.Width, ElemSizeMini.Height);
+                    gfx.DrawRectangle(new Pen(buff.Type == Mod.ModType.Buff ? Color.Aquamarine : buff.Type == Mod.ModType.Debuff?Color.Brown:Color.Violet, 1), buffPoint.X, buffPoint.Y, ElemSizeMini.Width, ElemSizeMini.Height);
 
                     //duration
                     DrawText(buffPoint.X
@@ -404,8 +404,25 @@ namespace HSR_SIM_LIB.Utils
 
                 if (step.Parent.CurrentFight?.CurrentWave != null)
                 {
+                    Color fntColor;
+                    if (step.Events.Any(x => x.Type == Event.EventType.ModActionValue && x.Val < 0&&x.TargetUnit==unit))
+                    {
+                        fntColor = Color.Red;
+                    }
+                    else if (step.Events.Any(x => x.Type == Event.EventType.ModActionValue && x.Val > 0&&x.TargetUnit==unit))
+                    {
+                        fntColor = Color.GreenYellow;
+                    }
+                    else
+                    {
+                        fntColor = Color.Violet;
+                    }
+                        
+
+                        
+
                     //AV
-                    DrawText(portraitPoint.X + 5, portraitPoint.Y + (int)(PortraitSize.Height * 0.4), gfx, Math.Ceiling(unit.Stats.ActionValue).ToString(), new SolidBrush(Color.Violet), new Font("Tahoma", DefaultFontSize), true);
+                    DrawText(portraitPoint.X + 5, portraitPoint.Y + (int)(PortraitSize.Height * 0.4), gfx, Math.Ceiling(unit.Stats.ActionValue).ToString(), new SolidBrush(fntColor), new Font("Tahoma", DefaultFontSize), true);
                 }
 
                 if (step.Parent.CurrentFight != null)

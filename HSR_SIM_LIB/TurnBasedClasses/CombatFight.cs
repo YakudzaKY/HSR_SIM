@@ -20,7 +20,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             get
             {
                 return Parent?.PartyTeam.Units.Where(x => x.IsAlive)
-                    .Concat(Parent.HostileTeam.Units.Where(x => x.IsAlive)).OrderBy(x => x.Stats.ActionValue);
+                    .Concat(Parent.HostileTeam.Units.Where(x => x.IsAlive)).Concat(Parent.SpecialTeam.Units).OrderBy(x => x.Stats.ActionValue);
 
             }
 
