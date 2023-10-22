@@ -247,8 +247,10 @@ namespace HSR_SIM_LIB.Utils
                 }
                  
                 //name
-                DrawText(portraitPoint.X + 3, portraitPoint.Y + 3, gfx, string.Format("{0:s}({1:d})", unit.Name, unit.Level), null, new Font("Tahoma", 12, FontStyle.Bold), true);
-
+                DrawText(portraitPoint.X + 3, portraitPoint.Y + 3, gfx, string.Format("{0:s}({1:d})", unit.Name, unit.Level), null, new Font("Tahoma", txtNameSize, FontStyle.Bold), true);
+                //aggro
+                if (unit.Stats.Aggro>0) 
+                    DrawText(portraitPoint.X + 3, portraitPoint.Y + txtNameSize*2, gfx, $"aggro: {(int)Math.Round(unit.Stats.Aggro):d} ({(int)Math.Round((unit.Stats.Aggro/unit.ParentTeam.TeamAggro)*100):d}%)", new SolidBrush(Color.Coral), new Font("Tahoma", BarFontSize, FontStyle.Bold), true);
                 //elements
                 gfx.DrawImage(new Bitmap(Utl.LoadBitmap(unit.Fighter.Element.ToString()), ElemSizeMini), new Point(portraitPoint.X + PortraitSize.Width - ElemSizeMini.Width, portraitPoint.Y));
                 //weaknesses

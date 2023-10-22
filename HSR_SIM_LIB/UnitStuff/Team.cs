@@ -55,6 +55,16 @@ namespace HSR_SIM_LIB.UnitStuff
 
         }
 
+        public double TeamAggro {
+            get
+            {
+                double res=0;
+                foreach (Unit unit in units.Where(x=>x.IsAlive))
+                    res += unit.Stats.Aggro;
+                return res;
+            }
+        }
+   
         /// <summary>
         /// Party have res to cast ability
         /// if res not found then false

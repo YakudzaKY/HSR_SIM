@@ -8,7 +8,7 @@
 				<Unit template="NPC\Vagrant"  level="74"/>
 				<Unit template="NPC\Automaton Beetle"  level="74"/>
 				<Unit template="NPC\Mara Struck Soldier"  level="77"/>
-				<!--<Unit template="NPC\AutomatonGrizzlyComplete"  level="90"/>-->
+				<!--<Unit template="NPC\AutomatonGrizzlyComplete"  level="74"/>-->
 			</Wave>		
 		</Fight>
 		<Fight name="Second fight">		

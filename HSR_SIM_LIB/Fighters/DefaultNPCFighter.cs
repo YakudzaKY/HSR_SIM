@@ -42,7 +42,7 @@ namespace HSR_SIM_LIB.Fighters
             return null;
         }
 
-        public double Cost
+        public virtual double Cost
         {
             get => Parent.Stats.Attack/(Parent.Fighter.Abilities.Count(x=>x.TargetType==Ability.TargetTypeEnm.Friend)+1);
         }

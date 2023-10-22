@@ -46,6 +46,7 @@ namespace HSR_SIM_LIB.Utils
         public static readonly Color clrDefault = Color.FromArgb(220, 220, 170);
         public static readonly short fHCycleAvFirst = 150;
         public static readonly short fHCycleAvNext = 150;
+        public static readonly short txtNameSize = 12;
 
 
 

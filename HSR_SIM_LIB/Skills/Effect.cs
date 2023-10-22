@@ -59,7 +59,9 @@ namespace HSR_SIM_LIB.Skills
             CrowControl,
             ReduceSpdPrc,
             Advance,
-            DefIgnore
+            DefIgnore,
+            BaseAgrroPrc,
+            AgrroPrc
         }
     }
 }

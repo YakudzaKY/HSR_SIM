@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using static HSR_SIM_LIB.Skills.Effect;
+using static HSR_SIM_LIB.UnitStuff.Unit;
 
 namespace HSR_SIM_LIB.UnitStuff
 {/// <summary>
@@ -21,7 +23,36 @@ namespace HSR_SIM_LIB.UnitStuff
 
         public double BaseAttack { get; set; } = 0;
 
-
+        //base aggro chance by https://honkai-star-rail.fandom.com/wiki/Aggro?so=search
+        public double BaseAggro
+        {
+            get
+            {
+                if (!Parent.IsAlive)
+                    return 0;
+                switch (Parent.Fighter.Path)
+                {
+                    case FighterUtils.PathType.Hunt:
+                        return 3;
+                    case FighterUtils.PathType.Erudition:
+                        return 3;
+                    case FighterUtils.PathType.Harmony:
+                        return 4;
+                    case FighterUtils.PathType.Nihility:
+                        return 4;
+                    case FighterUtils.PathType.Abundance:
+                        return 4;
+                    case FighterUtils.PathType.Destruction:
+                        return 5;
+                    case FighterUtils.PathType.Preservation:
+                        return 6;
+                    default:
+                        return 0;
+                }
+            
+            }
+        }
+        public double Aggro => BaseAggro * (1 + Parent.GetModsByType(EffectType.BaseAgrroPrc) ) * (1+Parent.GetModsByType(EffectType.AgrroPrc));
         public double Attack => BaseAttack * (1 + Parent.GetModsByType(EffectType.AtkPrc) + AttackPrc) + Parent.GetModsByType(EffectType.Atk) + AttackFix;
         public double AttackFix { get; set; }
 
