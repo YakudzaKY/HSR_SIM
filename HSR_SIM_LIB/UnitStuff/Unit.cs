@@ -393,12 +393,12 @@ namespace HSR_SIM_LIB.UnitStuff
         public List<KeyValuePair<string, int>> RelicsClasses { get; set; } = new List<KeyValuePair<string, int>>();
         public string FighterClassName { get; set; }
 
-        public IEnumerable<CloneClass> GetTargets(TargetTypeEnm targetType)
+        public IEnumerable<Unit> GetTargetsForUnit(TargetTypeEnm? targetType)
         {
-            if (targetType == TargetTypeEnm.Party)
-                return Friends;
-            else if (targetType == TargetTypeEnm.Hostiles)
-                return Enemies;
+            if (targetType == TargetTypeEnm.Friend)
+                return Friends.Where(x=>x.IsAlive);
+            else if (targetType == TargetTypeEnm.Enemy)
+                return Enemies.Where(x=>x.IsAlive);
 
             throw new NotImplementedException();
         }

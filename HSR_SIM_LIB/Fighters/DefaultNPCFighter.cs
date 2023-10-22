@@ -27,6 +27,11 @@ namespace HSR_SIM_LIB.Fighters
         {
             return Parent.Enemies.Where(x => x.IsAlive);
         }
+
+        public IEnumerable<Unit> GetAoeFriends()
+        {
+            return Parent.Friends.Where(x => x.IsAlive);
+        }
         public Ability ChooseAbilityToCast(Step step)
         {
             throw new NotImplementedException();
@@ -37,6 +42,34 @@ namespace HSR_SIM_LIB.Fighters
             return null;
         }
 
+        public double Cost
+        {
+            get => Parent.Stats.Attack/(Parent.Fighter.Abilities.Count(x=>x.TargetType==Ability.TargetTypeEnm.Friend)+1);
+        }
+
+
+
+        public UnitRole? Role
+        {
+            get
+            {
+                //special units have no role
+                if (Parent.ParentTeam == Parent.ParentTeam.ParentSim.SpecialTeam)
+                    return null;
+                var unitsToSearch = Parent.ParentTeam.Units.Where(x => x.IsAlive).OrderByDescending(x => x.Fighter.Cost)
+                    .ThenByDescending(x => x.Stats.Attack * x.Stats.CritChance * x.Stats.CritDmg).ToList();
+                if (Parent == unitsToSearch.First())
+                    return UnitRole.MainDPS;
+ 
+                if (Parent == unitsToSearch.ElementAt(1))
+                {
+                    return UnitRole.SecondDPS;
+                }
+                else
+                    return UnitRole.Support;
+
+            }
+        }
 
         public IFighter.EventHandler EventHandlerProc { get; set; }
         public IFighter.StepHandler StepHandlerProc { get; set; }

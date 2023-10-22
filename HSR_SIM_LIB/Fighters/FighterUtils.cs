@@ -253,6 +253,16 @@ namespace HSR_SIM_LIB.Fighters
                 
         }
 
+        public enum UnitRole
+        {
+            MainDPS,
+            SecondDPS,
+            ThirdDPS,
+            Support,
+            Healer,
+           
+        }
+
         //debuff is resisted?
         public static bool CalculateDebuffResisted(Event ent)
         {

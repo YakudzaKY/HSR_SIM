@@ -37,6 +37,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
         public Mod Modification { get; set; }
         public ICloneable Source { get; }
+        public Ability.TargetTypeEnm? TargetType { get; set; }
+
+        public Ability.AbilityCurrentTargetEnm? CurentTargetType { get; set; } 
         public Unit TargetUnit { get; set; }
         public StepTypeEnm OnStepType { get; init; }
         public EventType Type { get => type; set => type = value; }

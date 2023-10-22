@@ -6,6 +6,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.UnitStuff;
 using static System.Net.Mime.MediaTypeNames;
@@ -238,6 +239,13 @@ namespace HSR_SIM_LIB.Utils
                     Bitmap btm = new Bitmap(Utl.LoadBitmap("defeat"), PortraitSize);
                     gfx.DrawImage(btm, portraitPoint);
                 }
+                //Role
+                FighterUtils.UnitRole? unitRole = unit.Fighter.Role;
+                if (unitRole != null)
+                {
+                    gfx.DrawImage(new Bitmap(Utl.LoadBitmap("role"+unitRole.ToString()), ElemSizeMini), new Point(portraitPoint.X + PortraitSize.Width - ElemSizeMini.Width, portraitPoint.Y+ PortraitSize.Height - ElemSizeMini.Height));
+                }
+                 
                 //name
                 DrawText(portraitPoint.X + 3, portraitPoint.Y + 3, gfx, string.Format("{0:s}({1:d})", unit.Name, unit.Level), null, new Font("Tahoma", 12, FontStyle.Bold), true);
 

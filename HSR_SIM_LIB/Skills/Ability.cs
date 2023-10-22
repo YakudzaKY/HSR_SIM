@@ -17,8 +17,8 @@ namespace HSR_SIM_LIB.Skills
     {        
         
 
-        public Event.CalculateValuePrc CalculateValue { get; init; }
-        public Event.CalculateTargetPrc CalculateTargets { get; init; }
+        //public Event.CalculateValuePrc CalculateValue { get; init; }
+        //public Event.CalculateTargetPrc CalculateTargets { get; init; }
 
         public ElementEnm? Element { get; set; }
 
@@ -32,10 +32,13 @@ namespace HSR_SIM_LIB.Skills
         public List<Event> Events { get; set; } = new List<Event>();
         public short Cost { get; set; } = 0;
         public ResourceType CostType { get; set; } = ResourceType.nil;
-        public TargetTypeEnm? TargetType { get; set; }
+        public TargetTypeEnm TargetType { get; set; } = TargetTypeEnm.Enemy;
+        public AdjacentTargetsEnm AdjacentTargets { get; set; } = AdjacentTargetsEnm.None;
+
         public bool Attack { get; set; }
         public int EnergyGain { get; set; }
         public bool IgnoreWeakness { get; set; }
+        public int Cooldown { get; set; }
 
         public Ability(Unit parent)
         {
@@ -56,10 +59,73 @@ namespace HSR_SIM_LIB.Skills
         public enum TargetTypeEnm
         {
             Self,
-            Target,
-            Hostiles,
-            Party,
-            Blast
+            Friend,
+            Enemy,
+
+        }
+
+        public enum AbilityCurrentTargetEnm
+        {
+            AbilityAdjacent,
+            AbilityMain
+        }
+
+        public enum AdjacentTargetsEnm
+        {
+            Random,
+            None,
+            Blast,
+            One,
+            All
+        }
+
+        //get targets by event from ability
+        public IEnumerable<Unit> GetTargets(Unit target, TargetTypeEnm? eventTargetType,
+            AbilityCurrentTargetEnm? currTargetType)
+        {
+            IEnumerable<Unit> res = null;
+
+            if (eventTargetType==null)
+                eventTargetType=TargetType;
+            if (currTargetType == null)
+            {
+                if (AdjacentTargets == AdjacentTargetsEnm.All)
+                {
+                    currTargetType = AbilityCurrentTargetEnm.AbilityAdjacent;
+                }
+                else
+                {
+                    currTargetType = AbilityCurrentTargetEnm.AbilityMain;
+                }
+            }
+
+            if (eventTargetType == TargetTypeEnm.Self)
+            {
+                if (currTargetType == AbilityCurrentTargetEnm.AbilityMain)
+                {
+                    res=  new[]{Parent};
+                }
+                else 
+                    throw new NotImplementedException();
+            }
+            else 
+            {
+                if (currTargetType == AbilityCurrentTargetEnm.AbilityMain)
+                {
+                    res = new[] { target };
+                }
+                else if (currTargetType == AbilityCurrentTargetEnm.AbilityAdjacent)
+                {
+                    if (AdjacentTargets==AdjacentTargetsEnm.All)
+                     res =Parent.GetTargetsForUnit(eventTargetType);
+                    else
+                        throw new NotImplementedException();
+                }
+                else 
+                    throw new NotImplementedException();
+            }
+  
+            return res;
         }
     }
 }

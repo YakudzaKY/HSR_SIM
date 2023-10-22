@@ -38,7 +38,7 @@ namespace HSR_SIM_LIB.Fighters.Character
                 , CostType = Resource.ResourceType.TP
                 , Element = Element
             };
-            ability.Events.Add(new Event(null, this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, TargetUnit = Parent,Type = Event.EventType.MechanicValChg, Val = 2, CalculateTargets = ability.CalculateTargets, AbilityValue = cycleOfLife });
+            ability.Events.Add(new Event(null, this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, TargetUnit = Parent,Type = Event.EventType.MechanicValChg, Val = 2, AbilityValue = cycleOfLife });
             Abilities.Add(ability);
 
         }

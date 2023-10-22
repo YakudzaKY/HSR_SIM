@@ -74,11 +74,12 @@ namespace HSR_SIM_LIB.Fighters.Character
                                             , Element = Element
                                             , ToughnessShred = 60
                                             , Attack=true
-                                            , CalculateTargets = GetAoeTargets
+                                            , TargetType = Ability.TargetTypeEnm.Enemy
+                                            , AdjacentTargets = AdjacentTargetsEnm.All
             };
             //dmg events
-            ability.Events.Add(new Event(null, this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.ResourceDrain, ResType = Resource.ResourceType.HP, TargetUnit = Parent, CanSetToZero = false, CalculateValue = CalculateKarmaSelfDmg, AbilityValue = ability });
-            ability.Events.Add(new Event(null, this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.DirectDamage, CalculateValue = CalculateKarmaDmg, CalculateTargets = ability.CalculateTargets, AbilityValue = ability });
+            ability.Events.Add(new Event(null, this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.ResourceDrain, ResType = Resource.ResourceType.HP, TargetType =TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateKarmaSelfDmg, AbilityValue = ability ,CurentTargetType=AbilityCurrentTargetEnm.AbilityMain});
+            ability.Events.Add(new Event(null, this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.DirectDamage, CalculateValue = CalculateKarmaDmg, AbilityValue = ability });
 
             Abilities.Add(ability);
 
@@ -87,7 +88,8 @@ namespace HSR_SIM_LIB.Fighters.Character
                 , Name = "Shuhu's Gift"
                 , Element = Element
                 , ToughnessShred = 30
-                , TargetType = TargetTypeEnm.Hostiles
+                , TargetType = TargetTypeEnm.Enemy
+                , AdjacentTargets = AdjacentTargetsEnm.All
                 , EnergyGain =10
                 , Attack=true
             };

@@ -82,13 +82,13 @@ namespace HSR_SIM_LIB.Fighters.Character
                 , Cost = 1
                 , CostType = Resource.ResourceType.TP
                 , Element = Element
-                , CalculateTargets = GetAoeTargets
+                , AdjacentTargets = Ability.AdjacentTargetsEnm.All
                 , Attack=true
                 , IgnoreWeakness=true
             };
             //dmg events
-            ability.Events.Add(new Event(null, this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.DirectDamage, CalculateValue = CalculateFQPDmg, CalculateTargets = ability.CalculateTargets, AbilityValue = ability });
-            ability.Events.Add(new Event(null, this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.ResourceDrain,ResType = Resource.ResourceType.Toughness, Val = 60, CalculateTargets = ability.CalculateTargets, AbilityValue = ability });
+            ability.Events.Add(new Event(null, this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.DirectDamage, CalculateValue = CalculateFQPDmg,  AbilityValue = ability });
+            ability.Events.Add(new Event(null, this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.ResourceDrain,ResType = Resource.ResourceType.Toughness, Val = 60, AbilityValue = ability });
             //долбоебизм чистой воды, у волка почему то эта абилка в начале наносит урон, затем сносит щит. Обычно по другому
             Abilities.Add(ability);
 

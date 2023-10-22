@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -105,7 +106,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         public void TechniqueWork(Team whosTeam)
         {
             Ability someThingToCast = null;
-            foreach (Unit unit in whosTeam.Units.Where(partyMember => partyMember.IsAlive))
+            foreach (Unit unit in whosTeam.Units.Where(partyMember => partyMember.IsAlive).OrderBy(x=>x.Fighter.Role))
             {
                 someThingToCast = unit.Fighter.ChooseAbilityToCast(this);
                 if (someThingToCast != null)
@@ -121,7 +122,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         /// Execute one ability
         /// </summary>
         /// <param name="ability"></param>
-        public void ExecuteAbility(Ability ability)
+        public void ExecuteAbility(Ability ability,Unit target =null)
         {
             Actor = ability.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
             ActorAbility = ability;//WAT ABILITY is casting
@@ -129,20 +130,26 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
             foreach (Event ent in ability.Events.Where(x => x.OnStepType == StepType))
             {
-                if (ent.CalculateTargets != null)
-                    foreach (Unit unit in ent.CalculateTargets())
+                if (ent.CalculateTargets != null || ent.TargetUnit == null) //need set targets
+                {
+                    IEnumerable<Unit> targetsUnits =
+                        (ent.CalculateTargets != null) ? ent.CalculateTargets() : ability.GetTargets(target,ent.TargetType,ent.CurentTargetType);
+                    foreach (Unit unit in targetsUnits)
                     {
                         Event unitEnt = (Event)ent.Clone();
                         unitEnt.ParentStep = this;
                         unitEnt.TargetUnit = unit;
                         // shred toughness 
-                        if ((unitEnt.Type==EventType.DirectDamage) &&  (ability.ToughnessShred != 0 || ability.CalculateToughnessShred != null))
+                        if ((unitEnt.Type == EventType.DirectDamage) &&
+                            (ability.ToughnessShred != 0 || ability.CalculateToughnessShred != null))
                             UnitThgShred(unit, ability);
                         Events.Add(unitEnt);
 
                     }
+                }
                 else
                 {
+
                     Event unitEnt = (Event)ent.Clone();
                     unitEnt.ParentStep = this;
                     if ((unitEnt.Type==EventType.DirectDamage) &&  (ability.ToughnessShred != 0 || ability.CalculateToughnessShred != null))

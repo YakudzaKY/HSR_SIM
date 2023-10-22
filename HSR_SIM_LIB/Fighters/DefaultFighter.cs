@@ -91,7 +91,7 @@ namespace HSR_SIM_LIB.Fighters
         //all alive enemies
         public IEnumerable<Unit> GetAoeTargets()
         {
-            return Parent.Enemies.Where(x => x.IsAlive);
+            return Parent.Enemies?.Where(x => x.IsAlive);
         }
 
         //enemies with weakness to ability and without shield
@@ -108,6 +108,69 @@ namespace HSR_SIM_LIB.Fighters
             return Parent.Friends.Where(x => x.IsAlive);
         }
 
+        
+        public double Cost
+        {
+            get
+            {
+                int totalCost=0;
+                switch (Path)
+                {
+                    case PathType.Hunt:
+                        totalCost = 7 * (GetAoeTargets()?.Count()==1?2:1);//x2 if 1 target on battlefield
+                        break;
+                    case PathType.Destruction:
+                        totalCost = 6 * (GetAoeTargets()?.Count()>=2?2:1);//x2 if 2+ targets on battlefield
+                        break;
+                    case PathType.Erudition:
+                        totalCost = 5 * (GetAoeTargets()?.Count()>=3?3:1);//x3 if 3+ targets on battlefield
+                        break;
+                    case PathType.Nihility:
+                        totalCost = 4;
+                        break;
+                    case PathType.Harmony:
+                        totalCost = 3;
+                        break;
+                    case PathType.Preservation:
+                        totalCost = 2;
+                        break;
+                    case PathType.Abundance:
+                        totalCost = 1;
+                        break;
+                    default:
+                        totalCost = 1;
+                        break;
+
+                }
+                return totalCost;
+
+            }
+        }
+
+        public UnitRole? Role {
+            get
+            {
+
+                var unitsToSearch = Parent.ParentTeam.Units.Where(x=>x.IsAlive).OrderByDescending(x => x.Fighter.Cost).ThenByDescending(x=>x.Stats.Attack*x.Stats.CritChance*x.Stats.CritDmg).ToList();
+                if (Parent == unitsToSearch.First())
+                    return UnitRole.MainDPS;
+                //if second on list then second dps
+                else if (new List<PathType?>() { PathType.Hunt, PathType.Destruction,PathType.Erudition, PathType.Nihility }.Contains(Path)&&Parent==unitsToSearch.ElementAt(1) )
+                {
+                    return UnitRole.SecondDPS;
+                }
+                else if (new List<PathType?>() { PathType.Hunt, PathType.Destruction,PathType.Erudition}.Contains(Path)&&Parent==unitsToSearch.ElementAt(2) )
+                {
+                    return UnitRole.ThirdDPS;
+                }
+                //healer here
+                else if (Path == PathType.Abundance)
+                    return UnitRole.Healer;
+                else
+                    return UnitRole.Support;
+
+            }
+        } 
 
         //Try to choose some good ability to cast
         public virtual Ability ChooseAbilityToCast(Step step)
@@ -208,7 +271,7 @@ namespace HSR_SIM_LIB.Fighters
                 ,
                 ToughnessShred = 30
                 ,
-                CalculateTargets = GetAoeTargets
+                AdjacentTargets = Ability.AdjacentTargetsEnm.All
                 ,
                 Attack = true
             };
