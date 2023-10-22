@@ -17,6 +17,10 @@ namespace HSR_SIM_LIB.Fighters.Relics
         public IRelicSet.EventHandler EventHandlerProc { get; set; }
         public IRelicSet.StepHandler StepHandlerProc { get; set; }
         public List<Ability> Abilities { get; set; }
+        public void Reset()
+        {
+            
+        }
 
         public DefaultRelicSet(IFighter parent,int num)
         {
@@ -43,5 +47,6 @@ namespace HSR_SIM_LIB.Fighters.Relics
         {
             return this.MemberwiseClone();
         }
+
     }
 }

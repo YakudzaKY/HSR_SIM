@@ -11,10 +11,10 @@ using static HSR_SIM_LIB.UnitStuff.Resource;
 using static HSR_SIM_LIB.TurnBasedClasses.Step;
 using static HSR_SIM_LIB.UnitStuff.Unit;
 using static HSR_SIM_LIB.UnitStuff.Team;
-using System.Xml.Linq;
 using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.UnitStuff;
 using HSR_SIM_LIB.Skills;
+using static HSR_SIM_LIB.TurnBasedClasses.CombatFight;
 
 namespace HSR_SIM_LIB.TurnBasedClasses
 {/// <summary>
@@ -265,14 +265,55 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             {
                 newStep.ExecuteAbilityFromQueue();
             }
-            else if (newStep.StepType == StepTypeEnm.Idle && currentFight?.Actor == null)//set who wanna move
+            else if (newStep.StepType == StepTypeEnm.Idle && currentFight.Turn == null )//set who wanna move
             {
-
-                newStep.StepType = StepTypeEnm.UnitTurnSelected;
-                CurrentFight.Actor = CurrentFight.AllAliveUnits.First();
-                newStep.Actor = CurrentFight.Actor;
-                newStep.Events.Add(new Event(newStep, this) { Type = EventType.ModActionValue, Val = currentFight.Actor.Stats.ActionValue });
+                if (!newStep.FollowUpActions())
+                {
+                    newStep.StepType = StepTypeEnm.UnitTurnSelected;
+                    //get first by AV unit
+                    CurrentFight.Turn = new CombatFight.TurnR();
+                    CurrentFight.Turn.Actor = CurrentFight.AllAliveUnits.OrderBy(x => x.Stats.ActionValue).First();
+                    CurrentFight.Turn.TurnStage =newStep.StepType;
+                    newStep.Actor = CurrentFight.Turn.Actor;
+                    newStep.Events.Add(new Event(newStep, this)
+                        { Type = EventType.ModActionValue, Val = currentFight.Turn.Actor.Stats.ActionValue });
+                }
             }
+            else if (newStep.StepType == StepTypeEnm.Idle && currentFight.Turn.TurnStage == StepTypeEnm.UnitTurnSelected )//try follow up actions before target do something
+            {
+              
+                if (!newStep.FollowUpActions())
+                {
+                    
+                    newStep.StepType = StepTypeEnm.UnitTurnStarted;
+                    newStep.Actor = CurrentFight.Turn.Actor;
+                    CurrentFight.Turn.TurnStage =  newStep.StepType;
+                    //DO PROCS //proc debuff
+                }
+
+         
+            }
+            else if (newStep.StepType == StepTypeEnm.Idle && currentFight.Turn.TurnStage == StepTypeEnm.UnitTurnStarted  )//try follow up actions before target do something
+            {
+                if (!newStep.FollowUpActions())
+                {
+                    if (!newStep.Actions())
+                    {
+                        
+                        newStep.StepType = StepTypeEnm.UnitTurnEnded;
+                        newStep.Actor = CurrentFight.Turn.Actor;
+                        newStep.Events.Add(new Event(newStep, this)
+                            { Type = EventType.ResetAV, TargetUnit = CurrentFight.Turn.Actor});
+                        //do remove finish buffs
+                        CurrentFight.Turn = null;
+      
+                            
+                        
+                    }
+                    
+                }
+            }
+
             //TODO предусмотреть если Actor сдох-то просто заканчивает ход. скипаект
 
 

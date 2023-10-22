@@ -71,6 +71,11 @@ namespace HSR_SIM_LIB.Fighters
             }
         }
 
+        public void Reset()
+        {
+            
+        }
+
         public IFighter.EventHandler EventHandlerProc { get; set; }
         public IFighter.StepHandler StepHandlerProc { get; set; }
         public List<Ability> Abilities { get; set; } = new List<Ability>();

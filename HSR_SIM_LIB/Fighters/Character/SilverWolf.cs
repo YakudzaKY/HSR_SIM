@@ -28,7 +28,7 @@ namespace HSR_SIM_LIB.Fighters.Character
                         Type = Event.EventType.Mod
                         ,TargetUnit = ent.TargetUnit
                     };
-                    newEvent.Modification= new Mod(null)
+                    newEvent.Modification= new Mod()
                     {
                         Type = Mod.ModType.Debuff, 
                         Effects= new (){new (){EffType = Effect.EffectType.EffectResPrc, Value = -0.20}}
@@ -38,7 +38,8 @@ namespace HSR_SIM_LIB.Fighters.Character
                 }
             }
           
-           
+            //TODO handle enemy break shield by any of party members(A6?)
+
             base.DefaultFighter_HandleEvent(ent);
         }
 
@@ -88,15 +89,16 @@ namespace HSR_SIM_LIB.Fighters.Character
             };
             //dmg events
             ability.Events.Add(new Event(null, this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.DirectDamage, CalculateValue = CalculateFQPDmg,  AbilityValue = ability });
+            //shield break in this case going after skill dmg
             ability.Events.Add(new Event(null, this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.ResourceDrain,ResType = Resource.ResourceType.Toughness, Val = 60, AbilityValue = ability });
-            //долбоебизм чистой воды, у волка почему то эта абилка в начале наносит урон, затем сносит щит. Обычно по другому
+      
             Abilities.Add(ability);
 
             if (Parent.Rank >= 6)
             {
                 PassiveMods.Add(new PassiveMod(Parent)
                 {
-                    Mod = new Mod(null)
+                    Mod = new Mod()
                         { Effects = new List<Effect>() { new Effect() { EffType = Effect.EffectType.AllDamageBoost, CalculateValue = CalculateE6 } } },
                     Target = Parent,
                     IsTargetCheck = true

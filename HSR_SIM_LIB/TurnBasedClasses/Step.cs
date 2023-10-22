@@ -54,6 +54,10 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 res = "Executed " + Actor.Name + " " + ActorAbility.Name;
             else if (StepType == StepTypeEnm.UnitTurnSelected)
                 res = $"{Actor.Name:s} turn next";
+            else if (StepType == StepTypeEnm.UnitTurnStarted)
+                res = $"{Actor.Name:s} turn start";
+            else if (StepType == StepTypeEnm.UnitTurnEnded)
+                res = $"{Actor.Name:s} finish the turn";
             else
                 throw new NotImplementedException();
             return res;
@@ -74,7 +78,12 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             , StartCombat//on fight starts
             , StartWave//on wave starts
             , ExecuteAbility,
-            UnitTurnSelected
+            UnitTurnSelected,
+            UnitTurnStarted,
+            UnitTurnEnded,
+            UnitAction,
+            UnitFollowUpAction,
+            FinishCombat
         }
 
 
@@ -279,6 +288,19 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             if (doProceed)
                 ent.ProcEvent(revert);
             this.Events.Add(ent);
+        }
+
+        /// <summary>
+        /// Do some folow up actions and unltimates
+        /// </summary>
+        public bool FollowUpActions()
+        {
+            return false;
+        }
+
+        public bool Actions()
+        {
+            return false;
         }
     }
 }

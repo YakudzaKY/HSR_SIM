@@ -21,9 +21,11 @@ namespace HSR_SIM_GUI
 {
     public partial class Main : Form
     {
+        private bool busy = false;
         readonly Worker wrk;
         private DebugWindow dbg;
-
+        private CallBacks.CallBackStr callBackStr;
+        private CallBacks.CallBackRender callBackRender;
         /// <summary>
         /// For text callback
         /// </summary>
@@ -33,14 +35,16 @@ namespace HSR_SIM_GUI
             if (string.Equals(kv.Key, Constant.MsgLog))
             {
                 Utils.AddLine(LogWindow, kv.Value, 400);
-                LogWindow.ScrollToCaret();
+                if (!busy)
+                    LogWindow.ScrollToCaret();
             }
             else if (string.Equals(kv.Key, Constant.MsgDebug))
             {
                 if (dbg != null && !dbg.IsDisposed)
                 {
                     dbg.dbgText.AddLine(kv.Value);
-                    LogWindow.ScrollToCaret();
+                    if (!busy)
+                        LogWindow.ScrollToCaret();
                 }
             }
         }
@@ -62,8 +66,8 @@ namespace HSR_SIM_GUI
         {
 
 
-            CallBacks.CallBackStr callBackStr = new(WorkerCallBackString);
-            CallBacks.CallBackRender callBackRender = new(WorkerCallBackImages);
+            callBackStr = new(WorkerCallBackString);
+            callBackRender = new(WorkerCallBackImages);
             InitializeComponent();
             wrk = new Worker();
             wrk.CbLog += callBackStr;
@@ -137,15 +141,26 @@ namespace HSR_SIM_GUI
 
         private void Button2_Click_1(object sender, EventArgs e)
         {
-
-            wrk.MoveStep(false, -1);
+            busy = true;
+            wrk.CbRend -= callBackRender;
+            wrk.MoveStep(false, 100);
+            wrk.CbRend += callBackRender;
+            busy = false;
+            LogWindow.ScrollToCaret();
+            wrk.DrawCombat();
 
 
         }
 
         private void Button3_Click_1(object sender, EventArgs e)
         {
+            busy = true;
+            wrk.CbRend -= callBackRender;
             wrk.MoveStep(true, -1);
+            wrk.CbRend += callBackRender;
+            busy = false;
+            LogWindow.ScrollToCaret();
+            wrk.DrawCombat();
         }
 
         private void Button4_Click(object sender, EventArgs e)

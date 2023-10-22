@@ -298,28 +298,29 @@ namespace HSR_SIM_LIB.UnitStuff
         /// <param name="mod"></param>
         public void ApplyMod(Mod mod)
         {
-            Mod newMod = null;
+            Mod srchMod = Mods.FirstOrDefault(x => (x.RefMod == (mod.RefMod ?? mod)
+                                                   && (mod.UniqueUnit == null || x.UniqueUnit == mod.UniqueUnit))
+                                                  || ( (!String.IsNullOrEmpty(mod.UniqueStr) &&String.Equals(x.UniqueStr, mod.UniqueStr))));
+          
+
+            
             //find existing by ref, or by UNIQUE tag
-            if (Mods.Any(x => x.RefMod == (mod.RefMod ?? mod)
-                              && (String.IsNullOrEmpty(mod.UniqueStr) || String.Equals(x.UniqueStr, mod.UniqueStr))
-                              && (mod.UniqueUnit == null || x.UniqueUnit == mod.UniqueUnit)
-                              ))
+            if (srchMod!=null)
             {
-                newMod = Mods.First(x => x.RefMod == (mod.RefMod ?? mod));
                 //add stack
-                newMod.Stack = Math.Min(newMod.MaxStack, newMod.Stack + 1);
+                srchMod.Stack = Math.Min(srchMod.MaxStack, srchMod.Stack + 1);
             }
             else
             {
                 //or add new
-                newMod = (Mod)mod.Clone();
-                newMod.RefMod = mod.RefMod ?? mod;
-                Mods.Add(newMod);
+                srchMod = (Mod)mod.Clone();
+                srchMod.RefMod = mod.RefMod ?? mod;
+                Mods.Add(srchMod);
 
             }
 
             //reset duration
-            newMod.DurationLeft = newMod.BaseDuration;
+            srchMod.DurationLeft = srchMod.BaseDuration;
 
 
         }

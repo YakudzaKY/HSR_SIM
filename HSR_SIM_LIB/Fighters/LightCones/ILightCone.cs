@@ -23,6 +23,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones
         public EventHandler EventHandlerProc{ get; set; }
         public StepHandler StepHandlerProc{ get; set; }
         public List<Ability> Abilities { get; set; }
-        
+        public void Reset();
+
     }
 }

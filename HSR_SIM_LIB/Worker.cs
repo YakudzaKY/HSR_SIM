@@ -191,7 +191,7 @@ namespace HSR_SIM_LIB
         /// <summary>
         /// Draw combat in client
         /// </summary>
-        private void DrawCombat()
+        public void DrawCombat()
         {
             if (CbRend != null)
             {
@@ -229,5 +229,7 @@ namespace HSR_SIM_LIB
             CompleteSuccess = false;
             LogText("lib loaded");
         }
+
+
     }
 }

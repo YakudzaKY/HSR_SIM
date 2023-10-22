@@ -247,6 +247,15 @@ namespace HSR_SIM_LIB.Fighters
         public IFighter.StepHandler StepHandlerProc { get; set; }
         public List<Ability> Abilities { get; set; } = new List<Ability>();
 
+        public virtual void Reset()
+        {
+            Mechanics.Reset();
+            LightCone?.Reset();
+            foreach (var relic in Relics)
+            {
+                relic.Reset();
+            }
+        }
 
         //Blade constructor
         public DefaultFighter(Unit parent)
@@ -294,9 +303,9 @@ namespace HSR_SIM_LIB.Fighters
         }
         public virtual void DefaultFighter_HandleStep(Step step)
         {
-            if (step.StepType==Step.StepTypeEnm.StartCombat )
+            if (step.StepType==Step.StepTypeEnm.StartCombat ||step.StepType==Step.StepTypeEnm.FinishCombat  )
             {
-                Mechanics.Reset();
+               Reset();
             }
             LightCone?.StepHandlerProc.Invoke(step);
             foreach (IRelicSet relic in Relics)

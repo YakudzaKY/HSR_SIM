@@ -30,6 +30,7 @@ namespace HSR_SIM_LIB.Fighters
         public string GetSpecialText();//text for different triggers counters etc
         public double Cost { get;  }//unit cost in the squad
         public FighterUtils.UnitRole? Role { get;  }
+        public void Reset();
 
     }
 }

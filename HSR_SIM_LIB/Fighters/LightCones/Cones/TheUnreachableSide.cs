@@ -54,7 +54,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
 
         public TheUnreachableSide(IFighter parent, int rank) : base(parent, rank)
         {
-            uniqueBuff = new Mod(null)
+            uniqueBuff = new Mod()
             {
                 Type = Mod.ModType.Buff, BaseDuration = null, MaxStack = 1, 
                 Effects = new List<Effect>(){ new Effect() {EffType = Effect.EffectType.AllDamageBoost, Value = modifiers[rank]}}  

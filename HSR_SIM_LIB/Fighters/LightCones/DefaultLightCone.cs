@@ -12,6 +12,10 @@ namespace HSR_SIM_LIB.Fighters.LightCones
         public ILightCone.EventHandler EventHandlerProc { get; set; }
         public ILightCone.StepHandler StepHandlerProc { get; set; }
         public List<Ability> Abilities { get; set; }
+        public void Reset()
+        {
+            
+        }
 
         public DefaultLightCone(IFighter parent,int rank)
         {

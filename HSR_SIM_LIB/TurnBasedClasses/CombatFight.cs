@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using HSR_SIM_LIB.UnitStuff;
+using static HSR_SIM_LIB.TurnBasedClasses.Step;
 
 namespace HSR_SIM_LIB.TurnBasedClasses
 {
@@ -13,14 +14,23 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         public short CurrentWaveCnt { get => currentWaveCnt; set => currentWaveCnt = value; }
         public Fight ReferenceFight { get => referenceFight; set => referenceFight = value; }
         internal Wave CurrentWave { get => currentWave; set => currentWave = value; }
-        public Unit Actor { get; set; } = null;
+
+        public TurnR Turn { get; set; } = null;
+
+        public record TurnR
+        {
+            public Unit Actor { get; set; } = null;
+            public StepTypeEnm? TurnStage { get; set; }= null;
+        }
+
+
 
         public IEnumerable<Unit> AllAliveUnits
         {
             get
             {
                 return Parent?.PartyTeam.Units.Where(x => x.IsAlive)
-                    .Concat(Parent.HostileTeam.Units.Where(x => x.IsAlive)).Concat(Parent.SpecialTeam.Units).OrderBy(x => x.Stats.ActionValue);
+                    .Concat(Parent.HostileTeam.Units.Where(x => x.IsAlive)).Concat(Parent.SpecialTeam.Units);
 
             }
 

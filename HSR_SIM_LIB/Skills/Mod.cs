@@ -53,7 +53,7 @@ namespace HSR_SIM_LIB.Skills
 
 
 
-        public Mod(Mod reference)
+        public Mod(Mod reference=null)
         {
             RefMod = reference;
         }

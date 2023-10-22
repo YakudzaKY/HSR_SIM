@@ -15,7 +15,7 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
 
         public LongevousDisciple(IFighter parent,int num) : base(parent,num)
         {
-            uniqueBuff = new Mod(null)
+            uniqueBuff = new Mod()
             {
                 Type = Mod.ModType.Buff, BaseDuration = 2, MaxStack = 2, 
                 Effects= new (){new (){EffType = Effect.EffectType.CritPrc, Value = 0.08}}

@@ -19,5 +19,6 @@ namespace HSR_SIM_LIB.Fighters.Relics
         public EventHandler EventHandlerProc{ get; set; }
         public StepHandler StepHandlerProc{ get; set; }
         public List<Ability> Abilities { get; set; }
+        public void Reset();
     }
 }

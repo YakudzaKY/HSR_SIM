@@ -13,7 +13,7 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
         {
             return new ConditionMod(Parent.Parent)
             {
-                Mod = new Mod(null)
+                Mod = new Mod()
                 {
                     Effects = new List<Effect>() { new Effect() { EffType = Effect.EffectType.AbilityTypeBoost, Value = 0.15, AbilityTypes = new List<Ability.AbilityTypeEnm>() { Ability.AbilityTypeEnm.Ultimate, Ability.AbilityTypeEnm.FolowUpAttack } } },
                     CustomIconName = "gear\\" + GetType().ToString().Split('.').Last()

@@ -152,7 +152,7 @@ namespace HSR_SIM_GUI
             button2.Name = "button2";
             button2.Size = new System.Drawing.Size(120, 21);
             button2.TabIndex = 10;
-            button2.Text = "To finish";
+            button2.Text = "Next100";
             button2.UseVisualStyleBackColor = true;
             button2.Click += Button2_Click_1;
             // 

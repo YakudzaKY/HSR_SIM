@@ -14,7 +14,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
         {
             PassiveMods.Add(new PassiveMod(Parent.Parent)
             {
-                Mod = new Mod(null)
+                Mod = new Mod()
                 { Effects =  new () { new(){EffType = Effect.EffectType.ElementalBoost, Element = parent.Element  , Value = modifiers[rank]}  } },
                 Target = Parent.Parent.ParentTeam
                    

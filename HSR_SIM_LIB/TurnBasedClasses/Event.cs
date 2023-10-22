@@ -13,6 +13,8 @@ using static HSR_SIM_LIB.TurnBasedClasses.Event;
 using HSR_SIM_LIB.UnitStuff;
 using HSR_SIM_LIB.Skills;
 using static HSR_SIM_LIB.Skills.Effect;
+using System.Runtime.Intrinsics.X86;
+using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_LIB.TurnBasedClasses
 {
@@ -39,7 +41,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         public ICloneable Source { get; }
         public Ability.TargetTypeEnm? TargetType { get; set; }
 
-        public Ability.AbilityCurrentTargetEnm? CurentTargetType { get; set; } 
+        public Ability.AbilityCurrentTargetEnm? CurentTargetType { get; set; }
         public Unit TargetUnit { get; set; }
         public StepTypeEnm OnStepType { get; init; }
         public EventType Type { get => type; set => type = value; }
@@ -76,6 +78,10 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             DebuffResisted,//Notify that debuff got resisted
             UnitEnteringBattle,// unit enter on the battlefield
             MechanicValChg//Add value to character mechanic counter
+            ,
+            ResetAV//reset action value
+            ,
+            PartyResourceGain
         }
 
         public Event(Step parent, ICloneable source)
@@ -123,6 +129,10 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 res = $"{TargetUnit?.Name:s} joined the battle";
             else if (Type == EventType.MechanicValChg)
                 res = $"{TargetUnit?.Name:s} mechanic counter change on  {Val:f}";
+            else if (Type == EventType.ResetAV)
+                res = $"{TargetUnit?.Name:s} reset action value";
+            else if (Type == EventType.PartyResourceGain)
+                res = $"Party res gain :  {Val:f} {ResType} by {TargetUnit.Name}";
             else
                 throw new NotImplementedException();
             return res;
@@ -142,6 +152,21 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             if (Type == EventType.PartyResourceDrain)//SP or technical points
             {
                 ParentStep.Actor.ParentTeam.GetRes(ResType).ResVal -= (double)(revert ? -Val : Val);
+            }
+            else if (Type == EventType.PartyResourceGain)//SP or technical points
+            {
+                double CurrentResVal = TargetUnit.ParentTeam.GetRes(ResType).ResVal;
+                if (ResType == Resource.ResourceType.SP)
+                {
+                    if (CurrentResVal + Val > Constant.MaxSp)
+                        Val = Constant.MaxSp - CurrentResVal;
+                }
+                if (ResType == Resource.ResourceType.TP)
+                {
+                    if (Val + CurrentResVal > Constant.MaxTp)
+                        Val = Constant.MaxTp - CurrentResVal;
+                }
+                TargetUnit.ParentTeam.GetRes(ResType).ResVal += (double)(revert ? -Val : Val);
             }
             else if (Type == EventType.CombatStartSkillQueue)//party buffs or opening
                 if (!revert)
@@ -197,8 +222,12 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             }
             else if (Type == EventType.MechanicValChg) //SetAV
             {
-             
-                ((DefaultFighter)TargetUnit.Fighter).Mechanics.Values[AbilityValue] += (double)(revert ? -Val : Val)  ;
+
+                ((DefaultFighter)TargetUnit.Fighter).Mechanics.Values[AbilityValue] += (double)(revert ? -Val : Val);
+            }
+            else if (Type == EventType.ResetAV) //Loading wave
+            {
+                TargetUnit.Stats.ResetAV();
             }
             else if (Type == EventType.StartWave)//Loading wave
             {
@@ -353,7 +382,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
 
             };
-            dotEvent.Modification = new Mod(null) { Type = modType, BaseDuration = baseDuration, Effects = effects, MaxStack = maxStack, UniqueStr = uniqueStr, UniqueUnit = uniqueUnit };
+            dotEvent.Modification = new Mod() { Type = modType, BaseDuration = baseDuration, Effects = effects, MaxStack = maxStack, UniqueStr = uniqueStr, UniqueUnit = uniqueUnit };
 
             if (FighterUtils.CalculateDebuffResisted(dotEvent))
             {
@@ -445,7 +474,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                                     break;
                                 default:
                                     throw new NotImplementedException();
-                                   
+
                             }
 
                         }
