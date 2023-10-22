@@ -50,7 +50,7 @@ namespace HSR_SIM_LIB.Fighters.Character
 
         public override string GetSpecialText()
         {
-            return $"SH: {(int)Mechanics.Values[shuhuGift]:d}\\{(int)ShuHuMaxCnt:d}";
+            return $"SG: {(int)Mechanics.Values[shuhuGift]:d}\\{(int)ShuHuMaxCnt:d}";
         }
 
         //Blade constructor
