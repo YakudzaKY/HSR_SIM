@@ -44,25 +44,16 @@ namespace HSR_SIM_LIB.Skills
                     break;
             }
 
-            bool res;
-            switch (Condition.CondtionParam)
+            bool res = Condition.CondtionParam switch
             {
-                case ConditionCheckParam.SPD:
-                    res = CheckExpression(chkUnit.Stats.Speed);
-                    break;
-                case ConditionCheckParam.CritRate:
-                    res = CheckExpression(chkUnit.Stats.CritRatePrc);
-                    break;
-                case ConditionCheckParam.HPPrc:
-                    res = chkUnit.Stats.MaxHp != 0 && CheckExpression(chkUnit.GetRes(Resource.ResourceType.HP).ResVal / chkUnit.Stats.MaxHp);
-                    break;
-                case ConditionCheckParam.Weakness:
-                    res = chkUnit.Fighter.Weaknesses.Any(x=>x==Condition.ElemValue);
-                    break;
-                default:
-                    throw new NotImplementedException();
-                    
-            }
+                ConditionCheckParam.SPD => CheckExpression(chkUnit.Stats.Speed),
+                ConditionCheckParam.CritRate => CheckExpression(chkUnit.Stats.CritRatePrc),
+                ConditionCheckParam.HPPrc => chkUnit.Stats.MaxHp != 0 &&
+                                             CheckExpression(chkUnit.GetRes(Resource.ResourceType.HP).ResVal /
+                                                             chkUnit.Stats.MaxHp),
+                ConditionCheckParam.Weakness => chkUnit.Fighter.Weaknesses.Any(x => x == Condition.ElemValue),
+                _ => throw new NotImplementedException()
+            };
             return res;
 
         }

@@ -197,7 +197,7 @@ namespace HSR_SIM_LIB.Utils
         }
         public static Bitmap ResizeBitmap(Bitmap b, int nWidth, int nHeight)
         {
-            Bitmap result = new Bitmap(nWidth, nHeight);
+            Bitmap result = new (nWidth, nHeight);
             using (Graphics g = Graphics.FromImage(result))
             {
                // g.InterpolationMode = InterpolationMode.NearestNeighbor;
@@ -236,7 +236,7 @@ namespace HSR_SIM_LIB.Utils
                 //defeat flag
                 if (step.Events.Any(x => x.Type == Event.EventType.Defeat && x.TargetUnit == unit))
                 {
-                    Bitmap btm = new Bitmap(Utl.LoadBitmap("defeat"), PortraitSize);
+                    Bitmap btm = new (Utl.LoadBitmap("defeat"), PortraitSize);
                     gfx.DrawImage(btm, portraitPoint);
                 }
                 //Role

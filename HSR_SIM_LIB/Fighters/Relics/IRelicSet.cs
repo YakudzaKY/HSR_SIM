@@ -14,7 +14,7 @@ namespace HSR_SIM_LIB.Fighters.Relics
         public delegate void StepHandler(Step step);
         public List<PassiveMod> PassiveMods { get; set; }
         public List<ConditionMod> ConditionMods { get; set; }
-        public int num { get; set; }
+        public int Num { get; set; }
 
         public EventHandler EventHandlerProc{ get; set; }
         public StepHandler StepHandlerProc{ get; set; }

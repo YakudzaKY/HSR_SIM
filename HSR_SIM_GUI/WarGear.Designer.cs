@@ -99,8 +99,8 @@
             dgStats.RowTemplate.Height = 25;
             dgStats.Size = new System.Drawing.Size(255, 251);
             dgStats.TabIndex = 3;
-            dgStats.CellContentClick += dgStats_CellContentClick;
-            dgStats.CellEndEdit += dgStats_CellEndEdit;
+            dgStats.CellContentClick += DgStats_CellContentClick;
+            dgStats.CellEndEdit += DgStats_CellEndEdit;
             // 
             // propClmn
             // 
@@ -127,7 +127,7 @@
             txtLvl.Name = "txtLvl";
             txtLvl.Size = new System.Drawing.Size(78, 23);
             txtLvl.TabIndex = 5;
-            txtLvl.ValueChanged += txtLvl_ValueChanged;
+            txtLvl.ValueChanged += TxtLvl_ValueChanged;
             // 
             // label2
             // 
@@ -154,7 +154,7 @@
             txtRank.Name = "txtRank";
             txtRank.Size = new System.Drawing.Size(78, 23);
             txtRank.TabIndex = 8;
-            txtRank.ValueChanged += txtRank_ValueChanged;
+            txtRank.ValueChanged += TxtRank_ValueChanged;
             // 
             // label4
             // 
@@ -186,7 +186,7 @@
             dgSkills.RowTemplate.Height = 25;
             dgSkills.Size = new System.Drawing.Size(353, 251);
             dgSkills.TabIndex = 11;
-            dgSkills.CellEndEdit += dgSkills_CellEndEdit;
+            dgSkills.CellEndEdit += DgSkills_CellEndEdit;
             // 
             // dataGridViewTextBoxColumn1
             // 
@@ -241,7 +241,7 @@
             button1.TabIndex = 15;
             button1.Text = "Open XML";
             button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            button1.Click += Button1_Click;
             // 
             // LightCone
             // 
@@ -281,7 +281,7 @@
             dgSets.RowTemplate.Height = 25;
             dgSets.Size = new System.Drawing.Size(286, 251);
             dgSets.TabIndex = 21;
-            dgSets.CellEndEdit += dgSets_CellEndEdit;
+            dgSets.CellEndEdit += DgSets_CellEndEdit;
             // 
             // dataGridViewTextBoxColumn3
             // 
@@ -300,7 +300,7 @@
             txtLCRank.Name = "txtLCRank";
             txtLCRank.Size = new System.Drawing.Size(37, 23);
             txtLCRank.TabIndex = 22;
-            txtLCRank.ValueChanged += txtLCRank_ValueChanged;
+            txtLCRank.ValueChanged += TxtLCRank_ValueChanged;
             // 
             // label8
             // 
@@ -317,7 +317,7 @@
             txtLcLevel.Name = "txtLcLevel";
             txtLcLevel.Size = new System.Drawing.Size(44, 23);
             txtLcLevel.TabIndex = 23;
-            txtLcLevel.ValueChanged += txtLcLevel_ValueChanged;
+            txtLcLevel.ValueChanged += TxtLcLevel_ValueChanged;
             // 
             // label9
             // 
@@ -393,7 +393,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
-        private System.Windows.Forms.DataGridView dgAdditions;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label LightCone;
         private System.Windows.Forms.TextBox txtLC;

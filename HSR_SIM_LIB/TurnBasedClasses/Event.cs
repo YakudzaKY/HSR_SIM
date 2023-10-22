@@ -378,11 +378,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 Type = EventType.Mod,
                 AbilityValue = AbilityValue,
                 TargetUnit = TargetUnit,
-                BaseChance = baseChance
-
-
+                BaseChance = baseChance,
+                Modification = new Mod() { Type = modType, BaseDuration = baseDuration, Effects = effects, MaxStack = maxStack, UniqueStr = uniqueStr, UniqueUnit = uniqueUnit }
             };
-            dotEvent.Modification = new Mod() { Type = modType, BaseDuration = baseDuration, Effects = effects, MaxStack = maxStack, UniqueStr = uniqueStr, UniqueUnit = uniqueUnit };
 
             if (FighterUtils.CalculateDebuffResisted(dotEvent))
             {
@@ -438,7 +436,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                             ParentStep.Events.Add(shieldBrkEvent);
                             shieldBrkEvent.ProcEvent(false);
 
-                            Event delayAV = new Event(ParentStep, this.Source) { Type = EventType.ModActionValue, TargetUnit = TargetUnit, Val = -TargetUnit.Stats.BaseActionValue * 0.25 };//default delay
+                            Event delayAV = new (ParentStep, this.Source) { Type = EventType.ModActionValue, TargetUnit = TargetUnit, Val = -TargetUnit.Stats.BaseActionValue * 0.25 };//default delay
                             ParentStep.Events.Add(delayAV);
                             delayAV.ProcEvent(false);
                             //TODO https://honkai-star-rail.fandom.com/wiki/Toughness need implement additional effects

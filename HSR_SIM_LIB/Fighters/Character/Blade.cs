@@ -17,7 +17,7 @@ namespace HSR_SIM_LIB.Fighters.Character
         public override FighterUtils.PathType? Path { get; set; } = FighterUtils.PathType.Destruction;
 
         private readonly double ShuHuMaxCnt;
-        private Ability shuhuGift;
+        private readonly Ability shuhuGift;
         public override Ability ChooseAbilityToCast(Step step)
         {
             Ability watAbility = null;

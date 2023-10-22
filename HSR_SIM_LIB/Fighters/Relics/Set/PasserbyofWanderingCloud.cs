@@ -13,11 +13,11 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
         public override  void DefaultRelicSet_HandleStep(Step step)
         {
             
-            if (num >= 4)
+            if (Num >= 4)
             {
                 if (step.StepType==Step.StepTypeEnm.StartCombat)
                 {
-                    Event newEvent = new Event(step, this)
+                    Event newEvent = new (step, this)
                     {
                         Type = Event.EventType.PartyResourceGain
                         ,ResType = Resource.ResourceType.SP

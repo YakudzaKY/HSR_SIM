@@ -12,8 +12,8 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
     internal class TheUnreachableSide : DefaultLightCone
     {
 
-        private readonly Dictionary<int, double> modifiers = new Dictionary<int, double>() { { 1, 0.24 }, { 2, 0.28 }, { 3, 0.32 }, { 4, 0.36 }, { 5, 0.40 } };
-        private Mod uniqueBuff = null;
+        private readonly Dictionary<int, double> modifiers = new () { { 1, 0.24 }, { 2, 0.28 }, { 3, 0.32 }, { 4, 0.36 }, { 5, 0.40 } };
+        private readonly Mod uniqueBuff = null;
 
         //add buff when attacked or loose hp
         public override void DefaultLightCone_HandleEvent(Event ent)
@@ -23,12 +23,12 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
                 ent.ResType == Resource.ResourceType.HP && ent.RealVal != 0)
                 || (ent.TargetUnit == Parent.Parent && ent.Type == Event.EventType.DirectDamage))
             {
-                Event newEvent = new Event(ent.ParentStep,this)
+                Event newEvent = new (ent.ParentStep,this)
                 {
                     Type = Event.EventType.Mod
-                    ,TargetUnit =  Parent.Parent
+                    ,TargetUnit =  Parent.Parent,
+                    Modification = uniqueBuff
                 };
-                newEvent.Modification=uniqueBuff;
                 newEvent.ProcEvent(false);
                 ent.ParentStep.Events.Add(newEvent);
             }
@@ -40,12 +40,12 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
         {
             if (step.StepType == Step.StepTypeEnm.ExecuteAbility&&step.Actor == Parent.Parent && step.ActorAbility.Attack)
             {
-                Event newEvent = new Event(step, this)
+                Event newEvent = new (step, this)
                 {
                     Type = Event.EventType.RemoveMod
-                    ,TargetUnit =  Parent.Parent
+                    ,TargetUnit =  Parent.Parent,
+                    Modification = uniqueBuff
                 };
-                newEvent.Modification=uniqueBuff;
                 newEvent.ProcEvent(false);
                 step.Events.Add(newEvent);
             }

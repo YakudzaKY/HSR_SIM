@@ -30,26 +30,17 @@ namespace HSR_SIM_LIB.UnitStuff
             {
                 if (!Parent.IsAlive)
                     return 0;
-                switch (Parent.Fighter.Path)
+                return Parent.Fighter.Path switch
                 {
-                    case FighterUtils.PathType.Hunt:
-                        return 3;
-                    case FighterUtils.PathType.Erudition:
-                        return 3;
-                    case FighterUtils.PathType.Harmony:
-                        return 4;
-                    case FighterUtils.PathType.Nihility:
-                        return 4;
-                    case FighterUtils.PathType.Abundance:
-                        return 4;
-                    case FighterUtils.PathType.Destruction:
-                        return 5;
-                    case FighterUtils.PathType.Preservation:
-                        return 6;
-                    default:
-                        return 0;
-                }
-            
+                    FighterUtils.PathType.Hunt => 3,
+                    FighterUtils.PathType.Erudition => 3,
+                    FighterUtils.PathType.Harmony => 4,
+                    FighterUtils.PathType.Nihility => 4,
+                    FighterUtils.PathType.Abundance => 4,
+                    FighterUtils.PathType.Destruction => 5,
+                    FighterUtils.PathType.Preservation => 6,
+                    _ => (double)0,
+                };
             }
         }
         public double Aggro => BaseAggro * (1 + Parent.GetModsByType(EffectType.BaseAgrroPrc) ) * (1+Parent.GetModsByType(EffectType.AgrroPrc));
@@ -63,8 +54,7 @@ namespace HSR_SIM_LIB.UnitStuff
         {
             get
             {
-                if (baseDef == null)
-                    baseDef = 200 + 10 * Parent.Level;
+                baseDef ??= 200 + 10 * Parent.Level;
                 return baseDef ?? 0;
             }
             set => baseDef = value;

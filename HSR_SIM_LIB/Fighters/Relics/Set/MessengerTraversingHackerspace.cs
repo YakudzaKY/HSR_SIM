@@ -13,7 +13,7 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
     {
         public override  void DefaultRelicSet_HandleStep(Step step)
         {
-            if (num >= 4)
+            if (Num >= 4)
             {
                 if (step.StepType==Step.StepTypeEnm.UnitFollowUpAction &&step.Actor==Parent.Parent)
                 {
@@ -29,17 +29,15 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
                                 AbilityValue = step.ActorAbility,
                                 ParentStep = step,
                                 TargetUnit = unit,
-                                
-
+                                Modification = (new Mod()
+                                {
+                                    UniqueStr=this.GetType().ToString(),
+                                    Type = Mod.ModType.Buff,
+                                    Effects = new List<Effect>()
+                                        { new Effect() { EffType = Effect.EffectType.SpeedPrc, Value = 0.12 }  },
+                                    BaseDuration = 1, Dispellable = true
+                                })
                             };
-                            eventBuff.Modification = (new Mod()
-                            {
-                                UniqueStr=this.GetType().ToString(),
-                                Type = Mod.ModType.Buff,
-                                Effects = new List<Effect>()
-                                    { new Effect() { EffType = Effect.EffectType.SpeedPrc, Value = 0.12 }  },
-                                BaseDuration = 1, Dispellable = true
-                            });
                             step.Events.Add(eventBuff);
                         }
                     }

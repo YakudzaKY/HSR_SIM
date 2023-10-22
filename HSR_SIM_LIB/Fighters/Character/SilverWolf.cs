@@ -23,17 +23,17 @@ namespace HSR_SIM_LIB.Fighters.Character
                 //if enemy enter combat need debuff
                 if (Parent.Enemies.Any(x => x == ent.TargetUnit))
                 {
-                    Event newEvent = new Event(ent.ParentStep, this)
+                    Event newEvent = new(ent.ParentStep, this)
                     {
                         Type = Event.EventType.Mod
-                        ,TargetUnit = ent.TargetUnit
+                        ,TargetUnit = ent.TargetUnit,
+                        Modification = new Mod()
+                        {
+                            Type = Mod.ModType.Debuff, 
+                            Effects= new (){new (){EffType = Effect.EffectType.EffectResPrc, Value = -0.20}}
+                        }
                     };
-                    newEvent.Modification= new Mod()
-                    {
-                        Type = Mod.ModType.Debuff, 
-                        Effects= new (){new (){EffType = Effect.EffectType.EffectResPrc, Value = -0.20}}
-                    };
-                    
+
                     ent.ParentStep.AddEvent(newEvent,true);
                 }
             }
@@ -44,13 +44,13 @@ namespace HSR_SIM_LIB.Fighters.Character
         }
 
 
-        public double? CalculateFQPDmg(Event ent)
+        public double? CalculateFqpDmg(Event ent)
         {
             return FighterUtils.CalculateBasicDmg(Parent.Stats.Attack* 0.8, ent);
         }
 
         //get 0.2 AllDmg per debuff  on enemy Team
-        public double? CalculateE6(Event ent)
+        public static double? CalculateE6(Event ent)
         {
             double maxDebufs = 5;
             double debufs = 0;
@@ -88,7 +88,7 @@ namespace HSR_SIM_LIB.Fighters.Character
                 , IgnoreWeakness=true
             };
             //dmg events
-            ability.Events.Add(new Event(null, this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.DirectDamage, CalculateValue = CalculateFQPDmg,  AbilityValue = ability });
+            ability.Events.Add(new Event(null, this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.DirectDamage, CalculateValue = CalculateFqpDmg,  AbilityValue = ability });
             //shield break in this case going after skill dmg
             ability.Events.Add(new Event(null, this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.ResourceDrain,ResType = Resource.ResourceType.Toughness, Val = 60, AbilityValue = ability });
       

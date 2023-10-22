@@ -113,37 +113,22 @@ namespace HSR_SIM_LIB.Fighters
         {
             get
             {
-                int totalCost=0;
-                switch (Path)
+                int totalCost = Path switch
                 {
-                    case PathType.Hunt:
-                        totalCost = 7 * (GetAoeTargets()?.Count()==1?2:1);//x2 if 1 target on battlefield
-                        break;
-                    case PathType.Destruction:
-                        totalCost = 6 * (GetAoeTargets()?.Count()>=2?2:1);//x2 if 2+ targets on battlefield
-                        break;
-                    case PathType.Erudition:
-                        totalCost = 5 * (GetAoeTargets()?.Count()>=3?3:1);//x3 if 3+ targets on battlefield
-                        break;
-                    case PathType.Nihility:
-                        totalCost = 4;
-                        break;
-                    case PathType.Harmony:
-                        totalCost = 3;
-                        break;
-                    case PathType.Preservation:
-                        totalCost = 2;
-                        break;
-                    case PathType.Abundance:
-                        totalCost = 1;
-                        break;
-                    default:
-                        totalCost = 1;
-                        break;
-
-                }
+                    PathType.Hunt => 7 * (GetAoeTargets()?.Count() == 1 ? 2 : 1) //x2 if 1 target on battlefield
+                    ,
+                    PathType.Destruction =>
+                        6 * (GetAoeTargets()?.Count() >= 2 ? 2 : 1) //x2 if 2+ targets on battlefield
+                    ,
+                    PathType.Erudition => 5 * (GetAoeTargets()?.Count() >= 3 ? 3 : 1) //x3 if 3+ targets on battlefield
+                    ,
+                    PathType.Nihility => 4,
+                    PathType.Harmony => 3,
+                    PathType.Preservation => 2,
+                    PathType.Abundance => 1,
+                    _ => 1
+                };
                 return totalCost;
-
             }
         }
 

@@ -18,7 +18,7 @@ namespace HSR_SIM_LIB.Fighters
     /// </summary>
     public static class FighterUtils
     {
-        private static Dictionary<int, double> _lvlMultiplier;
+        private static readonly Dictionary<int, double> lvlMultiplier;
         /// <summary>
         /// Calc dmg when shield broken
         /// https://honkai-star-rail.fandom.com/wiki/Toughness#Weakness_Break
@@ -38,38 +38,23 @@ namespace HSR_SIM_LIB.Fighters
             if (ent.Type == (EventType.ShieldBreak))
             {
                 double maxToughnessMult = 0.5 + (double)defender.Stats.MaxToughness / 120;
-                
-                switch (attackElem)
+
+                baseDmg = attackElem switch
                 {
-                    case ElementEnm.Physical:
-                        baseDmg = 2 * _lvlMultiplier[attacker.Level] * maxToughnessMult;
-                        break;
-                    case ElementEnm.Fire:
-                        baseDmg = 2 * _lvlMultiplier[attacker.Level] * maxToughnessMult;
-                        break;
-                    case ElementEnm.Ice:
-                        baseDmg = 1 * _lvlMultiplier[attacker.Level] * maxToughnessMult;
-                        break;
-                    case ElementEnm.Lightning:
-                        baseDmg = 1 * _lvlMultiplier[attacker.Level] * maxToughnessMult;
-                        break;
-                    case ElementEnm.Wind:
-                        baseDmg = 1.5 * _lvlMultiplier[attacker.Level] * maxToughnessMult;
-                        break;
-                    case ElementEnm.Quantum:
-                        baseDmg = 0.5 * _lvlMultiplier[attacker.Level] * maxToughnessMult;
-                        break;
-                    case ElementEnm.Imaginary:
-                        baseDmg = 0.5 * _lvlMultiplier[attacker.Level] * maxToughnessMult;
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
+                    ElementEnm.Physical => 2 * lvlMultiplier[attacker.Level] * maxToughnessMult,
+                    ElementEnm.Fire => 2 * lvlMultiplier[attacker.Level] * maxToughnessMult,
+                    ElementEnm.Ice => 1 * lvlMultiplier[attacker.Level] * maxToughnessMult,
+                    ElementEnm.Lightning => 1 * lvlMultiplier[attacker.Level] * maxToughnessMult,
+                    ElementEnm.Wind => 1.5 * lvlMultiplier[attacker.Level] * maxToughnessMult,
+                    ElementEnm.Quantum => 0.5 * lvlMultiplier[attacker.Level] * maxToughnessMult,
+                    ElementEnm.Imaginary => 0.5 * lvlMultiplier[attacker.Level] * maxToughnessMult,
+                    _ => throw new NotImplementedException()
+                };
             }
             else
             {
                 //shield breake DOT
-                Mod dot;
+                //Mod dot;
                 baseDmg = 0;
             }
 
@@ -98,10 +83,10 @@ namespace HSR_SIM_LIB.Fighters
         /// <returns></returns>
         public static double CalculateBasicDmg(double baseDmg,Event ent)
         {
-            Unit attacker = ent.ParentStep.Actor;
-            Unit defender = ent.TargetUnit;
+            var attacker = ent.ParentStep.Actor;
+            var defender = ent.TargetUnit;
 
-            Unit.ElementEnm attackElem=ent.ParentStep.ActorAbility.Element??attacker.Fighter.Element;
+            var attackElem=ent.ParentStep.ActorAbility.Element??attacker.Fighter.Element;
 
             //crit multiplier
             double critMultiplier =1;
@@ -155,7 +140,7 @@ namespace HSR_SIM_LIB.Fighters
         /// </summary>
         static FighterUtils()
         {
-            _lvlMultiplier = new ()
+            lvlMultiplier = new ()
             {
                 {1,54.0000 }
                 ,{2,58.0000 }

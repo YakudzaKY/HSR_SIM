@@ -186,7 +186,7 @@ namespace HSR_SIM_GUI
             button5.TabIndex = 13;
             button5.Text = "Open Debug window";
             button5.UseVisualStyleBackColor = true;
-            button5.Click += button5_Click;
+            button5.Click += Button5_Click;
             // 
             // Main
             // 

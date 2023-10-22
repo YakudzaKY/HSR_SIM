@@ -74,7 +74,7 @@ namespace HSR_SIM_LIB.UnitStuff
 
         public List<Resource> Resources
         {
-            get => resources = resources ?? new List<Resource>();
+            get => resources ??= new List<Resource>();
             set => resources = value;
         }
 
@@ -84,7 +84,7 @@ namespace HSR_SIM_LIB.UnitStuff
             get
             {
                 return
-                baseDamageBoost = baseDamageBoost ?? new List<DamageBoostRec>();
+                baseDamageBoost ??= new List<DamageBoostRec>();
             }
             set => baseDamageBoost = value;
         }
@@ -155,7 +155,7 @@ namespace HSR_SIM_LIB.UnitStuff
                 res += Fighter.DebuffResists.First(x => x.Debuff == debuff).ResistVal;
             }
 
-            res += GetModsByType(EffectType.ElementalResist, debuff: debuff, ent: ent);
+            res += GetModsByType(EffectType.ElementalResist, ent: ent);
             return res;
         }
         public double DotBoost(Event ent = null)
@@ -187,11 +187,10 @@ namespace HSR_SIM_LIB.UnitStuff
         /// Get total stat by Mods by type
         /// </summary>
         /// <returns></returns>
-        public double GetModsByType(EffectType modType, ElementEnm? elem = null, AbilityTypeEnm? entAbilityValue = null,
-            EffectType? debuff = null, Event ent = null)
+        public double GetModsByType(EffectType modType, ElementEnm? elem = null, AbilityTypeEnm? entAbilityValue = null, Event ent = null)
         {
             double res = 0;
-            List<Mod> conditionsToCheck = new List<Mod>();
+            List<Mod> conditionsToCheck = new ();
             //get all mods to check
             conditionsToCheck.AddRange(Mods);
             foreach (PassiveMod pmode in GetConditionMods(ent?.TargetUnit))
@@ -243,22 +242,21 @@ namespace HSR_SIM_LIB.UnitStuff
             {
                 if (unit.fighter.ConditionMods.Concat(unit.fighter.PassiveMods).Any())
                     res.AddRange(from cmod in unit.fighter.ConditionMods.Concat(unit.fighter.PassiveMods)
-                                 where (cmod.Target == this || cmod.Target == this.ParentTeam) && (!(cmod is ConditionMod mod) || mod.Truly(targetForCondition))
+                                 where (cmod.Target == this || cmod.Target == this.ParentTeam) && (cmod is not ConditionMod mod || mod.Truly(targetForCondition))
                                  select cmod);
-                if (unit.Fighter is DefaultFighter)
+                if (unit.Fighter is DefaultFighter unitFighter)
                 {
-                    var unitFighter = (DefaultFighter)unit.Fighter;
                     //LC
 
                     if (unitFighter.LightCone != null)
                         res.AddRange(from cmod in unitFighter.LightCone.ConditionMods.Concat(unitFighter.LightCone.PassiveMods)
-                                     where (cmod.Target == this || cmod.Target == this.ParentTeam) && (!(cmod is ConditionMod mod) || mod.Truly(targetForCondition))
+                                     where (cmod.Target == this || cmod.Target == this.ParentTeam) && (cmod is not ConditionMod mod || mod.Truly(targetForCondition))
                                      select cmod);
                     //GEAR
                     foreach (IRelicSet relic in unitFighter.Relics)
                     {
                         res.AddRange(from cmod in relic.ConditionMods.Concat(relic.PassiveMods)
-                                     where (cmod.Target == this || cmod.Target == this.ParentTeam) && (!(cmod is ConditionMod mod) || mod.Truly(targetForCondition))
+                                     where (cmod.Target == this || cmod.Target == this.ParentTeam) && (cmod is not ConditionMod mod || mod.Truly(targetForCondition))
                                      select cmod);
                     }
 

@@ -175,12 +175,7 @@ namespace HSR_SIM_LIB.Utils
             return 0;
         }
 
-        private static double? SafeToDoubleNull(string pStr)
-        {
-            if (!string.IsNullOrEmpty(pStr))
-                return double.Parse(pStr.Replace(".", ","));
-            return null;
-        }
+
 
 
         /// <summary>
@@ -253,7 +248,7 @@ namespace HSR_SIM_LIB.Utils
 
                 foreach (XmlElement xmlRelic in xRoot.SelectNodes("RelicSet"))
                 {
-                    KeyValuePair<string, int> newRec = new KeyValuePair<string, int>(
+                    KeyValuePair<string, int> newRec = new (
                         $"HSR_SIM_LIB.Fighters.Relics.Set.{xmlRelic.Attributes.GetNamedItem("name").Value.Trim().Replace(" ", "").Replace("-", "").Replace(":", "")}",
                         int.Parse(xmlRelic.Attributes.GetNamedItem("num").Value.Trim()));
                     unit.RelicsClasses.Add(newRec);
@@ -262,7 +257,7 @@ namespace HSR_SIM_LIB.Utils
                 foreach (XmlElement xmlSkill in xRoot.SelectNodes("Skill"))
                 {
 
-                    Skill skill = new Skill() { Name = xmlSkill.Attributes.GetNamedItem("name").Value.Trim(), Level = int.Parse(xmlSkill.Attributes.GetNamedItem("level").Value) };
+                    Skill skill = new() { Name = xmlSkill.Attributes.GetNamedItem("name").Value.Trim(), Level = int.Parse(xmlSkill.Attributes.GetNamedItem("level").Value) };
                     fighter.Skills.Add(skill);
 
                 }

@@ -11,7 +11,7 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
 {
     internal class LongevousDisciple : DefaultRelicSet
     {
-        private Mod uniqueBuff = null;
+        private readonly Mod uniqueBuff = null;
 
         public LongevousDisciple(IFighter parent,int num) : base(parent,num)
         {
@@ -25,7 +25,7 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
         public override  void DefaultRelicSet_HandleEvent(Event ent)
         {
             //if friend unit consume our hp or got attack then apply buff
-            if (num >= 4)
+            if (Num >= 4)
             {
                 if (( ent.Type == Event.EventType.ResourceDrain
                       &&ent.AbilityValue?.Parent.ParentTeam==Parent.Parent.ParentTeam
@@ -33,12 +33,12 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
                       && ent.ResType == Resource.ResourceType.HP && ent.RealVal != 0)
                     || (ent.TargetUnit == Parent.Parent && ent.Type == Event.EventType.DirectDamage))
                 {
-                    Event newEvent = new Event(ent.ParentStep, this)
+                    Event newEvent = new (ent.ParentStep, this)
                     {
                         Type = Event.EventType.Mod
-                        ,TargetUnit = Parent.Parent
+                        ,TargetUnit = Parent.Parent,
+                        Modification = uniqueBuff
                     };
-                    newEvent.Modification=uniqueBuff;
                     newEvent.ProcEvent(false);
                     ent.ParentStep.Events.Add(newEvent);
                 }

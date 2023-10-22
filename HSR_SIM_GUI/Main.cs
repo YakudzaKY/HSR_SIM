@@ -24,8 +24,8 @@ namespace HSR_SIM_GUI
         private bool busy = false;
         readonly Worker wrk;
         private DebugWindow dbg;
-        private CallBacks.CallBackStr callBackStr;
-        private CallBacks.CallBackRender callBackRender;
+        private readonly CallBacks.CallBackStr callBackStr;
+        private readonly CallBacks.CallBackRender callBackRender;
         /// <summary>
         /// For text callback
         /// </summary>
@@ -172,7 +172,7 @@ namespace HSR_SIM_GUI
             wg.Show();
         }
 
-        private void button5_Click(object sender, EventArgs e)
+        private void Button5_Click(object sender, EventArgs e)
         {
             if (dbg == null || dbg.IsDisposed)
                 dbg = new();

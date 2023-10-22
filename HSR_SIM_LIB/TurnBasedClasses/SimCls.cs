@@ -72,7 +72,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
 
 
-        private List<Ability> beforeStartQueue = new List<Ability>();
+        private List<Ability> beforeStartQueue = new ();
         public List<Ability> BeforeStartQueue { get => beforeStartQueue; set => beforeStartQueue = value; }
 
         private Fight nextFight;
@@ -271,9 +271,11 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 {
                     newStep.StepType = StepTypeEnm.UnitTurnSelected;
                     //get first by AV unit
-                    CurrentFight.Turn = new CombatFight.TurnR();
-                    CurrentFight.Turn.Actor = CurrentFight.AllAliveUnits.OrderBy(x => x.Stats.ActionValue).First();
-                    CurrentFight.Turn.TurnStage =newStep.StepType;
+                    CurrentFight.Turn = new CombatFight.TurnR
+                    {
+                        Actor = CurrentFight.AllAliveUnits.OrderBy(x => x.Stats.ActionValue).First(),
+                        TurnStage = newStep.StepType
+                    };
                     newStep.Actor = CurrentFight.Turn.Actor;
                     newStep.Events.Add(new Event(newStep, this)
                         { Type = EventType.ModActionValue, Val = currentFight.Turn.Actor.Stats.ActionValue });
