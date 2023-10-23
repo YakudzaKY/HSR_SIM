@@ -15,6 +15,7 @@ using HSR_SIM_LIB.Skills;
 using static HSR_SIM_LIB.Skills.Effect;
 using System.Runtime.Intrinsics.X86;
 using HSR_SIM_LIB.Utils;
+using static HSR_SIM_LIB.Skills.Mod;
 
 namespace HSR_SIM_LIB.TurnBasedClasses
 {
@@ -445,7 +446,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         /// <param name="maxStack">max stacks</param>
         /// <param name="uniqueStr">Unique buff per battle</param>
         /// <param name="uniqueUnit">Unique buff per unit</param>
-        private void TryDebuff(Mod.ModType modType, List<Effect> effects, int baseDuration, double baseChance, int maxStack = 1, string uniqueStr = "", Unit uniqueUnit = null)
+        private void TryDebuff(Mod mod, double baseChance)
         {
             //add Dots and debuffs
             Event dotEvent = new(ParentStep, this.Source,SourceUnit)
@@ -454,7 +455,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 AbilityValue = AbilityValue,
                 TargetUnit = TargetUnit,
                 BaseChance = baseChance,
-                Modification = new Mod(SourceUnit) { DoNotClone= true ,Type = modType, BaseDuration = baseDuration, Effects = effects, MaxStack = maxStack, UniqueStr = uniqueStr, UniqueUnit = uniqueUnit }
+                Modification = mod
             };
 
 
@@ -522,32 +523,33 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                             switch (this.AbilityValue.Element?? SourceUnit.Fighter.Element)
                             {
                                 case Unit.ElementEnm.Physical:
-                                    TryDebuff(Mod.ModType.Dot, new List<Effect>() { new Effect() { EffType = EffectType.Bleed, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } }, 2, 1.5);
+                                    TryDebuff(new Mod(SourceUnit) { DoNotClone= true ,Type = Mod.ModType.Dot, BaseDuration = 2, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Bleed, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
                                     break;
                                 case Unit.ElementEnm.Fire:
-                                    TryDebuff(Mod.ModType.Dot, new List<Effect>() { new Effect() { EffType = EffectType.Burn, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } }, 2, 1.5);
+                                    TryDebuff(new Mod(SourceUnit) { DoNotClone= true ,Type = Mod.ModType.Dot, BaseDuration = 2, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Burn, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
                                     break;
                                 case Unit.ElementEnm.Ice:
-                                    TryDebuff(Mod.ModType.Debuff, new List<Effect>() { new Effect() { EffType = EffectType.Freeze, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } }, 1, 1.5);
+                                    TryDebuff(new Mod(SourceUnit) { DoNotClone= true ,Type = Mod.ModType.Debuff, BaseDuration = 1, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Freeze, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
                                     break;
                                 case Unit.ElementEnm.Lightning:
-                                    TryDebuff(Mod.ModType.Dot, new List<Effect>() { new Effect() { EffType = EffectType.Shock, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } }, 2, 1.5);
+                                    TryDebuff(new Mod(SourceUnit) { DoNotClone= true ,Type = Mod.ModType.Dot, BaseDuration = 2, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Shock, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
                                     break;
                                 case Unit.ElementEnm.Wind:
-                                    TryDebuff(Mod.ModType.Dot, new List<Effect>() { new Effect() { EffType = EffectType.WindShear, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } }, 2, 1.5, 5, uniqueUnit: SourceUnit);
+                                    TryDebuff(new Mod(SourceUnit) { DoNotClone= true ,Type = Mod.ModType.Dot, BaseDuration = 2, MaxStack = 5,Effects = new List<Effect>() { new Effect() { EffType = EffectType.WindShear, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
                                     break;
                                 case Unit.ElementEnm.Quantum:
-                                    TryDebuff(Mod.ModType.Debuff, new List<Effect>() {
+                                    TryDebuff(new Mod(SourceUnit) { DoNotClone= true ,Type = Mod.ModType.Debuff, BaseDuration = 1, MaxStack = 5,Effects = new List<Effect>() {
                                         new Effect(){EffType=EffectType.Entanglement,CalculateValue = FighterUtils.CalculateShieldBrokeDmg}
                                         ,new Effect(){EffType=EffectType.Delay,Value = 0.20*(1+SourceUnit.Stats.BreakDmg) ,StackAffectValue = false}
-                                    }, 1, 1.5, 5);
+                                    } }, 1.5);
+                                 
                                     break;
                                 case Unit.ElementEnm.Imaginary:
-                                    TryDebuff(Mod.ModType.Debuff, new List<Effect>() {
-                                        new Effect(){EffType=EffectType.Imprisonment,CalculateValue = FighterUtils.CalculateShieldBrokeDmg}
-                                        ,new Effect(){EffType=EffectType.Delay,Value = 0.30*(1+SourceUnit.Stats.BreakDmg)}
-                                        ,new Effect(){EffType=EffectType.ReduceSpdPrc,Value = 0.1}
-                                    }, 1, 1.5, 1);
+                                    TryDebuff(new Mod(SourceUnit) { DoNotClone= true ,Type = Mod.ModType.Debuff, BaseDuration = 1,Effects = new List<Effect>() {
+                                            new Effect(){EffType=EffectType.Imprisonment,CalculateValue = FighterUtils.CalculateShieldBrokeDmg}
+                                            ,new Effect(){EffType=EffectType.Delay,Value = 0.30*(1+SourceUnit.Stats.BreakDmg)}
+                                            ,new Effect(){EffType=EffectType.ReduceSpdPrc,Value = 0.1}
+                                        }}, 1.5);
                                     break;
                                 default:
                                     throw new NotImplementedException();
