@@ -19,25 +19,33 @@ namespace HSR_SIM_LIB.Fighters
     public static class FighterUtils
     {
         private static readonly Dictionary<int, double> lvlMultiplier;
+
         /// <summary>
         /// Calc dmg when shield broken
         /// https://honkai-star-rail.fandom.com/wiki/Toughness#Weakness_Break
         /// </summary> 
         /// <param name="ent"></param>
+        /// <param name="caster"></param>
         /// <returns></returns>
-        public static double? CalculateShieldBrokeDmg( Event ent)
+        public static double? CalculateShieldBrokeDmg(Event ent)
         {
-            Unit attacker = ent.ParentStep.Actor;
+            if (ent.Type == EventType.ShieldBreak && ent.Type != EventType.DoTDamage)
+            {
+                return 0;
+            }
+
+            Unit attacker = ent.SourceUnit;
             Unit defender = ent.TargetUnit;
-            Unit.ElementEnm attackElem=ent.ParentStep.ActorAbility.Element??attacker.Fighter.Element;
+            Unit.ElementEnm attackElem = ent.AbilityValue?.Element ?? attacker.Fighter.Element;
 
             ent.ParentStep.Parent.Parent?.LogDebug("=======================");
-            ent.ParentStep.Parent.Parent?.LogDebug($"{attacker.Name:s} ({attacker.ParentTeam.Units.IndexOf(attacker)+1:d}) Break shield of {defender.Name} ({defender.ParentTeam.Units.IndexOf(defender)+1:d})");
+            ent.ParentStep.Parent.Parent?.LogDebug($"{attacker.Name:s} ({attacker.ParentTeam.Units.IndexOf(attacker) + 1:d}) Break shield of {defender.Name} ({defender.ParentTeam.Units.IndexOf(defender) + 1:d})");
             double baseDmg;
+            double maxToughnessMult = 0.5 + (double)defender.Stats.MaxToughness / 120;
             //if this is direct shield break
             if (ent.Type == (EventType.ShieldBreak))
             {
-                double maxToughnessMult = 0.5 + (double)defender.Stats.MaxToughness / 120;
+                
 
                 baseDmg = attackElem switch
                 {
@@ -51,25 +59,47 @@ namespace HSR_SIM_LIB.Fighters
                     _ => throw new NotImplementedException()
                 };
             }
+            else if (ent.Type == (EventType.DoTDamage))
+            {
+
+                if (ent.Modification.Effects.Any(x => x.EffType == Effect.EffectType.Bleed))
+                {
+                    bool eliteFlag = defender.Fighter is DefaultNPCBossFIghter;
+                    baseDmg = eliteFlag ? 0.07 : 0.16 * defender.Stats.MaxHp;
+                    baseDmg = Math.Min(baseDmg, 2 * lvlMultiplier[defender.Level] * defender.Stats.MaxToughness);
+                }
+                else if (ent.Modification.Effects.Any(x =>
+                             x.EffType is Effect.EffectType.Burn or Effect.EffectType.Freeze))
+                    baseDmg = 1 * lvlMultiplier[defender.Level];
+                else if (ent.Modification.Effects.Any(x =>
+                             x.EffType is Effect.EffectType.Shock))
+                    baseDmg = 2 * lvlMultiplier[defender.Level];
+                else if (ent.Modification.Effects.Any(x =>
+                             x.EffType is Effect.EffectType.WindShear))
+                    baseDmg = 1* ent.Modification.Stack  * lvlMultiplier[defender.Level];
+                else if (ent.Modification.Effects.Any(x =>
+                             x.EffType is Effect.EffectType.Entanglement))
+                    baseDmg =0.6* ent.Modification.Stack  * lvlMultiplier[defender.Level] * maxToughnessMult;
+                else
+                    baseDmg = 0;
+            }
             else
             {
-                //shield breake DOT
-                //Mod dot;
-                baseDmg = 0;
+                return 0;
             }
 
             double breakEffect = 1 + attacker.Stats.BreakDmg;
             double def = defender.Stats.Def;
-            double defWithIgnore = def*(1-attacker.DefIgnore(ent));
-            double defMultiplier=1-(defWithIgnore/(defWithIgnore+200+(10*attacker.Level)));
-            double resPen = 1-(defender.GetResists(attackElem,ent)-attacker.ResistsPenetration(attackElem,ent));
-            double vulnMult = 1 + defender.GetElemVulnerability(attackElem,ent)+ defender.GetAllDamageVulnerability(ent);
-            double brokenMultiplier =  defender.GetBrokenMultiplier();
-            double totalDmg = baseDmg * breakEffect  * defMultiplier * resPen * vulnMult * brokenMultiplier;
+            double defWithIgnore = def * (1 - attacker.DefIgnore(ent));
+            double defMultiplier = 1 - (defWithIgnore / (defWithIgnore + 200 + (10 * attacker.Level)));
+            double resPen = 1 - (defender.GetResists(attackElem, ent) - attacker.ResistsPenetration(attackElem, ent));
+            double vulnMult = 1 + defender.GetElemVulnerability(attackElem, ent) + defender.GetAllDamageVulnerability(ent);
+            double brokenMultiplier = defender.GetBrokenMultiplier();
+            double totalDmg = baseDmg * breakEffect * defMultiplier * resPen * vulnMult * brokenMultiplier;
             ent.ParentStep.Parent.Parent?.LogDebug($"baseDmg({baseDmg:f}) ; breakEffect({breakEffect:f})");
             ent.ParentStep.Parent.Parent?.LogDebug($"Def {def:f} -> ignored to {defWithIgnore:f} ");
             ent.ParentStep.Parent.Parent?.LogDebug($"defMultiplier({defMultiplier:f}) = 1-(defender.Stats.Def({defWithIgnore:f})/(defender.Stats.Def({defWithIgnore:f})+200+(10*attacker.Level({attacker.Level:d}))))");
-            ent.ParentStep.Parent.Parent?.LogDebug($"resPen= {resPen:f} ; vulnMult= {vulnMult:f} ; brokenMultiplier= {brokenMultiplier:f}" );
+            ent.ParentStep.Parent.Parent?.LogDebug($"resPen= {resPen:f} ; vulnMult= {vulnMult:f} ; brokenMultiplier= {brokenMultiplier:f}");
             ent.ParentStep.Parent.Parent?.LogDebug($"TOTAL DAMAGE= {totalDmg:f}");
             return totalDmg;
         }
@@ -81,21 +111,21 @@ namespace HSR_SIM_LIB.Fighters
         /// <param name="baseDmg"></param>
         /// <param name="ent"></param>
         /// <returns></returns>
-        public static double CalculateBasicDmg(double baseDmg,Event ent)
+        public static double CalculateDmgByBasicVal(double baseDmg, Event ent)
         {
-            var attacker = ent.ParentStep.Actor;
+            var attacker = ent.SourceUnit;
             var defender = ent.TargetUnit;
 
-            var attackElem=ent.ParentStep.ActorAbility.Element??attacker.Fighter.Element;
+            var attackElem = ent.AbilityValue.Element ?? attacker.Fighter.Element;
 
             //crit multiplier
-            double critMultiplier =1;
-            double dotMultiplier=0;
-            double dotVulnerability=0;
-            if (ent.Type == Event.EventType.DirectDamage  )
+            double critMultiplier = 1;
+            double dotMultiplier = 0;
+            double dotVulnerability = 0;
+            if (ent.Type == Event.EventType.DirectDamage)
             {
-                ent.IsCrit = new MersenneTwister().NextDouble()<=attacker.Stats.CritChance;
-                if (ent.IsCrit )
+                ent.IsCrit = new MersenneTwister().NextDouble() <= attacker.Stats.CritChance;
+                if (ent.IsCrit)
                     critMultiplier = 1 + attacker.Stats.CritDmg;
             }
             else
@@ -103,35 +133,35 @@ namespace HSR_SIM_LIB.Fighters
                 dotMultiplier = attacker.DotBoost(ent);
                 dotVulnerability = defender.GetDotVulnerability(ent);
             }
-            
-           
-            double damageBoost = 1 
-                                 + attacker.GetElemBoostValue(attackElem,ent)
+
+
+            double damageBoost = 1
+                                 + attacker.GetElemBoostValue(attackElem, ent)
                                  + attacker.AllDmgBoost(ent)
                                  + dotMultiplier
                                  ;
-            double abilityTypeMultiplier = attacker.GetAbilityTypeMultiplier(ent.AbilityValue,ent);
+            double abilityTypeMultiplier = attacker.GetAbilityTypeMultiplier(ent.AbilityValue, ent);
             double def = defender.Stats.Def;
-            double defWithIgnore = def*(1-attacker.DefIgnore(ent));
-            double defMultiplier=1-(defWithIgnore/(defWithIgnore+200+(10*attacker.Level)));
+            double defWithIgnore = def * (1 - attacker.DefIgnore(ent));
+            double defMultiplier = 1 - (defWithIgnore / (defWithIgnore + 200 + (10 * attacker.Level)));
 
-            double resPen = 1-(defender.GetResists(attackElem,ent)-attacker.ResistsPenetration(attackElem,ent));
+            double resPen = 1 - (defender.GetResists(attackElem, ent) - attacker.ResistsPenetration(attackElem, ent));
 
-            double vulnMult = 1 + defender.GetElemVulnerability(attackElem,ent)+ defender.GetAllDamageVulnerability(ent)+dotVulnerability;
+            double vulnMult = 1 + defender.GetElemVulnerability(attackElem, ent) + defender.GetAllDamageVulnerability(ent) + dotVulnerability;
 
             double dmgReduction = defender.GetDamageReduction(defender);
 
             double brokenMultiplier = defender.GetBrokenMultiplier();
 
-            double totalDmg = baseDmg *abilityTypeMultiplier* critMultiplier * damageBoost * defMultiplier * resPen * vulnMult *
+            double totalDmg = baseDmg * abilityTypeMultiplier * critMultiplier * damageBoost * defMultiplier * resPen * vulnMult *
                               dmgReduction * brokenMultiplier;
             ent.ParentStep.Parent.Parent?.LogDebug("=======================");
             ent.ParentStep.Parent.Parent?.LogDebug($"baseDmg={baseDmg:f}");
-            ent.ParentStep.Parent.Parent?.LogDebug($"{attacker.Name:s} ({attacker.ParentTeam.Units.IndexOf(attacker)+1:d}) Damaging {defender.Name} ({defender.ParentTeam.Units.IndexOf(defender)+1:d})");
-            ent.ParentStep.Parent.Parent?.LogDebug($"damageBoost({damageBoost:f}) = 1+ GetElemBoostValue({attacker.GetElemBoostValue(attackElem,ent):f})  +AllDmgBoost({attacker.AllDmgBoost(ent):f}) + dotMultiplier({dotMultiplier:f})");
+            ent.ParentStep.Parent.Parent?.LogDebug($"{attacker.Name:s} ({attacker.ParentTeam.Units.IndexOf(attacker) + 1:d}) Damaging {defender.Name} ({defender.ParentTeam.Units.IndexOf(defender) + 1:d})");
+            ent.ParentStep.Parent.Parent?.LogDebug($"damageBoost({damageBoost:f}) = 1+ GetElemBoostValue({attacker.GetElemBoostValue(attackElem, ent):f})  +AllDmgBoost({attacker.AllDmgBoost(ent):f}) + dotMultiplier({dotMultiplier:f})");
             ent.ParentStep.Parent.Parent?.LogDebug($"Def {def:f} -> ignored to {defWithIgnore:f} ");
             ent.ParentStep.Parent.Parent?.LogDebug($"defMultiplier({defMultiplier:f}) = 1-(defender.Stats.Def({defWithIgnore:f})/(defender.Stats.Def({defWithIgnore:f})+200+(10*attacker.Level({attacker.Level:d}))))");
-            ent.ParentStep.Parent.Parent?.LogDebug($"resPen= {resPen:f} ; vulnMult= {vulnMult:f} ; critMultiplier={critMultiplier:f} ; dmgReduction= {dmgReduction:f} ; brokenMultiplier= {brokenMultiplier:f} ; abilityTypeMultiplier {abilityTypeMultiplier:f}" );
+            ent.ParentStep.Parent.Parent?.LogDebug($"resPen= {resPen:f} ; vulnMult= {vulnMult:f} ; critMultiplier={critMultiplier:f} ; dmgReduction= {dmgReduction:f} ; brokenMultiplier= {brokenMultiplier:f} ; abilityTypeMultiplier {abilityTypeMultiplier:f}");
             ent.ParentStep.Parent.Parent?.LogDebug($"TOTAL DAMAGE= {totalDmg:f}");
             return totalDmg;
         }
@@ -140,7 +170,7 @@ namespace HSR_SIM_LIB.Fighters
         /// </summary>
         static FighterUtils()
         {
-            lvlMultiplier = new ()
+            lvlMultiplier = new()
             {
                 {1,54.0000 }
                 ,{2,58.0000 }
@@ -235,7 +265,7 @@ namespace HSR_SIM_LIB.Fighters
             Nihility,
             Preservation,
             Abundance
-                
+
         }
 
         public enum UnitRole
@@ -245,13 +275,13 @@ namespace HSR_SIM_LIB.Fighters
             ThirdDPS,
             Support,
             Healer,
-           
+
         }
 
         //debuff is resisted?
         public static bool CalculateDebuffResisted(Event ent)
         {
-            Unit attacker = ent.ParentStep.Actor;
+            Unit attacker = ent.SourceUnit;
             Unit defender = ent.TargetUnit;
 
             Effect.EffectType mod = ent.Modification.Effects.First().EffType;
@@ -265,14 +295,33 @@ namespace HSR_SIM_LIB.Fighters
             {
                 ccRes = defender.GetDebuffResists(Effect.EffectType.CrowControl);
             }
-            double realChance = baseChance  * (1+ effectHitRate)*(1-effectRes)*(1-debuffRes)*(1-ccRes);
+            double realChance = baseChance * (1 + effectHitRate) * (1 - effectRes) * (1 - debuffRes) * (1 - ccRes);
 
 
             ent.ParentStep.Parent.Parent?.LogDebug("=======================");
-            ent.ParentStep.Parent.Parent?.LogDebug($"Debuff realChance {realChance:f} =baseChance {baseChance:f} * (1+ effectHitRate {effectHitRate:f})* (1- effectRes {effectRes:f})  * (1- debuffRes {debuffRes:f})" +(isCC?$"* (1- ccRes {ccRes:f})":"" ));
+            ent.ParentStep.Parent.Parent?.LogDebug($"Debuff realChance {realChance:f} =baseChance {baseChance:f} * (1+ effectHitRate {effectHitRate:f})* (1- effectRes {effectRes:f})  * (1- debuffRes {debuffRes:f})" + (isCC ? $"* (1- ccRes {ccRes:f})" : ""));
 
 
-            return (new MersenneTwister().NextDouble()<=realChance);
+            return (new MersenneTwister().NextDouble() <= realChance);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="baseDmg"></param>
+        /// <param name="ent"></param>
+        /// <returns></returns>
+        public static double CalculateShield(double baseVal, Event ent, Unit caster = null)
+        {
+            Unit attacker = caster ?? ent.SourceUnit;
+
+
+            double additiveShieldBonus = attacker.AdditiveShieldBonus(ent);
+            double prcShieldBonus = attacker.PrcShieldBonus(ent);
+            double shieldVal = (baseVal + additiveShieldBonus) * (1 + prcShieldBonus);
+
+            ent.ParentStep.Parent.Parent?.LogDebug("=======================");
+            ent.ParentStep.Parent.Parent?.LogDebug($"Shield val is {shieldVal:f} = (baseVal {baseVal:f} + additiveShieldBonus {additiveShieldBonus:f}) * (1+ prcShieldBonus{prcShieldBonus:f})");
+            return shieldVal;
         }
     }
 }

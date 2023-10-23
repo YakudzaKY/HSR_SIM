@@ -23,11 +23,11 @@ namespace HSR_SIM_LIB.Fighters.Character
                 //if enemy enter combat need debuff
                 if (Parent.Enemies.Any(x => x == ent.TargetUnit))
                 {
-                    Event newEvent = new(ent.ParentStep, this)
+                    Event newEvent = new(ent.ParentStep, this,Parent)
                     {
                         Type = Event.EventType.Mod
                         ,TargetUnit = ent.TargetUnit,
-                        Modification = new Mod()
+                        Modification = new Mod(Parent)
                         {
                             Type = Mod.ModType.Debuff, 
                             Effects= new (){new (){EffType = Effect.EffectType.EffectResPrc, Value = -0.20}}
@@ -46,7 +46,7 @@ namespace HSR_SIM_LIB.Fighters.Character
 
         public double? CalculateFqpDmg(Event ent)
         {
-            return FighterUtils.CalculateBasicDmg(Parent.Stats.Attack* 0.8, ent);
+            return FighterUtils.CalculateDmgByBasicVal(Parent.Stats.Attack* 0.8, ent);
         }
 
         //get 0.2 AllDmg per debuff  on enemy Team
@@ -88,9 +88,9 @@ namespace HSR_SIM_LIB.Fighters.Character
                 , IgnoreWeakness=true
             };
             //dmg events
-            ability.Events.Add(new Event(null, this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.DirectDamage, CalculateValue = CalculateFqpDmg,  AbilityValue = ability });
+            ability.Events.Add(new Event(null, this, this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.DirectDamage, CalculateValue = CalculateFqpDmg,  AbilityValue = ability });
             //shield break in this case going after skill dmg
-            ability.Events.Add(new Event(null, this) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.ResourceDrain,ResType = Resource.ResourceType.Toughness, Val = 60, AbilityValue = ability });
+            ability.Events.Add(new Event(null, this, this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.ResourceDrain,ResType = Resource.ResourceType.Toughness, Val = 60, AbilityValue = ability });
       
             Abilities.Add(ability);
 
@@ -98,7 +98,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             {
                 PassiveMods.Add(new PassiveMod(Parent)
                 {
-                    Mod = new Mod()
+                    Mod = new Mod(Parent)
                         { Effects = new List<Effect>() { new Effect() { EffType = Effect.EffectType.AllDamageBoost, CalculateValue = CalculateE6 } } },
                     Target = Parent,
                     IsTargetCheck = true

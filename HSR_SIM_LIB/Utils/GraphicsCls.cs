@@ -197,12 +197,12 @@ namespace HSR_SIM_LIB.Utils
         }
         public static Bitmap ResizeBitmap(Bitmap b, int nWidth, int nHeight)
         {
-            Bitmap result = new (nWidth, nHeight);
+            Bitmap result = new(nWidth, nHeight);
             using (Graphics g = Graphics.FromImage(result))
             {
-               // g.InterpolationMode = InterpolationMode.NearestNeighbor;
+                // g.InterpolationMode = InterpolationMode.NearestNeighbor;
                 double scMode = (double)nWidth / (double)b.Width;
-                g.DrawImage(b, 0, 0, (int)Math.Round(b.Width*scMode),(int) Math.Round(b.Height*scMode));
+                g.DrawImage(b, 0, 0, (int)Math.Round(b.Width * scMode), (int)Math.Round(b.Height * scMode));
             }
             return result;
         }
@@ -236,21 +236,23 @@ namespace HSR_SIM_LIB.Utils
                 //defeat flag
                 if (step.Events.Any(x => x.Type == Event.EventType.Defeat && x.TargetUnit == unit))
                 {
-                    Bitmap btm = new (Utl.LoadBitmap("defeat"), PortraitSize);
+                    Bitmap btm = new(Utl.LoadBitmap("defeat"), PortraitSize);
                     gfx.DrawImage(btm, portraitPoint);
                 }
+                if (unit.Controlled)
+                    gfx.DrawImage(new Bitmap( Utl.LoadBitmap("CC"), PortraitSize), portraitPoint);
                 //Role
                 FighterUtils.UnitRole? unitRole = unit.Fighter.Role;
                 if (unitRole != null)
                 {
-                    gfx.DrawImage(new Bitmap(Utl.LoadBitmap("role"+unitRole.ToString()), ElemSizeMini), new Point(portraitPoint.X + PortraitSize.Width - ElemSizeMini.Width, portraitPoint.Y+ PortraitSize.Height - ElemSizeMini.Height));
+                    gfx.DrawImage(new Bitmap(Utl.LoadBitmap("role" + unitRole.ToString()), ElemSizeMini), new Point(portraitPoint.X + PortraitSize.Width - ElemSizeMini.Width, portraitPoint.Y + PortraitSize.Height - ElemSizeMini.Height));
                 }
-                 
+
                 //name
                 DrawText(portraitPoint.X + 3, portraitPoint.Y + 3, gfx, string.Format("{0:s}({1:d})", unit.Name, unit.Level), null, new Font("Tahoma", txtNameSize, FontStyle.Bold), true);
                 //aggro
-                if (unit.Stats.Aggro>0) 
-                    DrawText(portraitPoint.X + 3, portraitPoint.Y + txtNameSize*2, gfx, $"aggro: {(int)Math.Round(unit.Stats.Aggro):d} ({(int)Math.Round((unit.Stats.Aggro/unit.ParentTeam.TeamAggro)*100):d}%)", new SolidBrush(Color.Coral), new Font("Tahoma", BarFontSize, FontStyle.Bold), true);
+                if (unit.Stats.Aggro > 0)
+                    DrawText(portraitPoint.X + 3, portraitPoint.Y + txtNameSize * 2, gfx, $"aggro: {(int)Math.Round(unit.Stats.Aggro):d} ({(int)Math.Round((unit.Stats.Aggro / unit.ParentTeam.TeamAggro) * 100):d}%)", new SolidBrush(Color.Coral), new Font("Tahoma", BarFontSize, FontStyle.Bold), true);
                 //elements
                 gfx.DrawImage(new Bitmap(Utl.LoadBitmap(unit.Fighter.Element.ToString()), ElemSizeMini), new Point(portraitPoint.X + PortraitSize.Width - ElemSizeMini.Width, portraitPoint.Y));
                 //weaknesses
@@ -300,7 +302,7 @@ namespace HSR_SIM_LIB.Utils
                     DrawText(portraitPoint.X + 5
                         , portraitPoint.Y + PortraitSize.Height + HealthBarSize.Height
                         , gfx
-                        , string.Format("{0:d}/{1:d}", (int)Math.Floor(unit.Stats.CurrentEnergy),(int)Math.Floor( unit.Stats.BaseMaxEnergy))
+                        , string.Format("{0:d}/{1:d}", (int)Math.Floor(unit.Stats.CurrentEnergy), (int)Math.Floor(unit.Stats.BaseMaxEnergy))
                         , null
                         , new Font("Tahoma", BarFontSize));
                 }
@@ -331,7 +333,7 @@ namespace HSR_SIM_LIB.Utils
                     gfx.DrawRectangle(new Pen(Color.YellowGreen, 3), portraitPoint.X, portraitPoint.Y, PortraitSize.Width, PortraitSize.Height);
                 }
                 //if target
-                if (step.Events.Any(x => x.TargetUnit == unit ))
+                if (step.Events.Any(x => x.TargetUnit == unit))
                 {
                     gfx.DrawRectangle(new Pen(Color.BurlyWood, 3), portraitPoint.X + (int)(PortraitSize.Width * 0.05), portraitPoint.Y + (int)(PortraitSize.Height * 0.05), PortraitSize.Width - (int)(PortraitSize.Width * 0.1), PortraitSize.Height - (int)(PortraitSize.Width * 0.1));
                 }
@@ -359,7 +361,7 @@ namespace HSR_SIM_LIB.Utils
                             , pointY
                             , gfx
                             , Math.Floor((double)(ent.Val ?? 0)).ToString()
-                            , new SolidBrush(Color.Red)
+                            , new SolidBrush(ent.Type!=Event.EventType.DoTDamage ? Color.Red:Color.Chocolate)
                             , new Font("Tahoma", BarFontSize));
 
                         j++;
@@ -372,8 +374,8 @@ namespace HSR_SIM_LIB.Utils
                 {
                     var buffPoint = new Point(portraitPoint.X + PortraitSize.Width,
                         portraitPoint.Y + j * ElemSizeMini.Height);
-                    gfx.DrawImage(new Bitmap(Utl.LoadBitmap(buff.CustomIconName??buff.Effects.First().EffType.ToString()), ElemSizeMini), buffPoint);
-                    gfx.DrawRectangle(new Pen(buff.Type == Mod.ModType.Buff ? Color.Aquamarine : buff.Type == Mod.ModType.Debuff?Color.Brown:Color.Violet, 1), buffPoint.X, buffPoint.Y, ElemSizeMini.Width, ElemSizeMini.Height);
+                    gfx.DrawImage(new Bitmap(Utl.LoadBitmap(buff.CustomIconName ?? buff.Effects.First().EffType.ToString()), ElemSizeMini), buffPoint);
+                    gfx.DrawRectangle(new Pen(buff.Type == Mod.ModType.Buff ? Color.Aquamarine : buff.Type == Mod.ModType.Debuff ? Color.Brown : Color.Violet, 1), buffPoint.X, buffPoint.Y, ElemSizeMini.Width, ElemSizeMini.Height);
 
                     //duration
                     DrawText(buffPoint.X
@@ -382,6 +384,16 @@ namespace HSR_SIM_LIB.Utils
                         , buff.DurationLeft.ToString()
                         , new SolidBrush(Color.Aqua)
                         , new Font("Tahoma", (int)Math.Round(BarFontSize * 0.8), FontStyle.Bold), true);
+                    //shield val
+                    double? shieldVal =
+                        (buff.Effects.FirstOrDefault(x => x.EffType == Effect.EffectType.Shield)?.Value);
+                    if (shieldVal > 0)
+                        DrawText(buffPoint.X
+                            , buffPoint.Y + (int)(ElemSizeMini.Height * 0.1)
+                            , gfx
+                            , (Math.Ceiling((double)(shieldVal ?? 0))).ToString()
+                            , new SolidBrush(Color.GreenYellow)
+                            , new Font("Tahoma", (int)Math.Round(BarFontSize * 0.8), FontStyle.Bold), true);
                     //stacks
                     if (buff.MaxStack > 1)
                     {
@@ -398,14 +410,14 @@ namespace HSR_SIM_LIB.Utils
 
                 //ConditionsBuffs
                 j = 0;
-                foreach (var buff in unit.GetConditionMods().Where(x=>x is ConditionMod))
+                foreach (var buff in unit.GetConditionMods().Where(x => x is ConditionMod))
                 {
-                    var buffPoint = new Point(portraitPoint.X+ (j * ElemSizeMini.Width),
+                    var buffPoint = new Point(portraitPoint.X + (j * ElemSizeMini.Width),
                         portraitPoint.Y + PortraitSize.Height - ElemSizeMini.Width);
-                    gfx.DrawImage(new Bitmap(Utl.LoadBitmap(buff.Mod.CustomIconName??buff.Mod.Effects.First().EffType.ToString()), ElemSizeMini), buffPoint);
-                    gfx.DrawRectangle(new Pen(  Color.Blue , 1), buffPoint.X, buffPoint.Y, ElemSizeMini.Width, ElemSizeMini.Height);
+                    gfx.DrawImage(new Bitmap(Utl.LoadBitmap(buff.Mod.CustomIconName ?? buff.Mod.Effects.First().EffType.ToString()), ElemSizeMini), buffPoint);
+                    gfx.DrawRectangle(new Pen(Color.Blue, 1), buffPoint.X, buffPoint.Y, ElemSizeMini.Width, ElemSizeMini.Height);
 
-                    
+
                     j++;
 
                 }
@@ -415,11 +427,11 @@ namespace HSR_SIM_LIB.Utils
                 if (step.Parent.CurrentFight?.CurrentWave != null)
                 {
                     Color fntColor;
-                    if (step.Events.Any(x => x.Type == Event.EventType.ModActionValue && x.Val < 0&&x.TargetUnit==unit))
+                    if (step.Events.Any(x => x.Type == Event.EventType.ModActionValue && x.Val < 0 && x.TargetUnit == unit))
                     {
                         fntColor = Color.Red;
                     }
-                    else if (step.Events.Any(x => x.Type == Event.EventType.ModActionValue && x.Val > 0&&x.TargetUnit==unit))
+                    else if (step.Events.Any(x => x.Type == Event.EventType.ModActionValue && x.Val > 0 && x.TargetUnit == unit))
                     {
                         fntColor = Color.GreenYellow;
                     }
@@ -427,9 +439,9 @@ namespace HSR_SIM_LIB.Utils
                     {
                         fntColor = Color.Violet;
                     }
-                        
 
-                        
+
+
 
                     //AV
                     DrawText(portraitPoint.X + 5, portraitPoint.Y + (int)(PortraitSize.Height * 0.4), gfx, Math.Ceiling(unit.Stats.ActionValue).ToString(), new SolidBrush(fntColor), new Font("Tahoma", DefaultFontSize), true);

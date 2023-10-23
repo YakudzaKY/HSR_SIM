@@ -17,7 +17,7 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
             {
                 if (step.StepType==Step.StepTypeEnm.StartCombat)
                 {
-                    Event newEvent = new (step, this)
+                    Event newEvent = new (step, this,Parent.Parent)
                     {
                         Type = Event.EventType.PartyResourceGain
                         ,ResType = Resource.ResourceType.SP

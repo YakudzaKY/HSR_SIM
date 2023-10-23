@@ -21,7 +21,7 @@ namespace HSR_SIM_LIB.Fighters.NPC
             Resists.Add(new Resist(){ResistType=Unit.ElementEnm.Wind,ResistVal=0.20});
             Resists.Add(new Resist(){ResistType=Unit.ElementEnm.Quantum,ResistVal=0.20});
             Resists.Add(new Resist(){ResistType=Unit.ElementEnm.Imaginary,ResistVal=0.20});
-            DebuffResists.Add(new DebuffResist(){Debuff =Effect.EffectType.Frozen,ResistVal = 0.5});
+            DebuffResists.Add(new DebuffResist(){Debuff =Effect.EffectType.Freeze,ResistVal = 0.5});
             DebuffResists.Add(new DebuffResist(){Debuff =Effect.EffectType.Imprisonment,ResistVal = 0.5});
             DebuffResists.Add(new DebuffResist(){Debuff =Effect.EffectType.Entanglement,ResistVal = 0.5});
         }

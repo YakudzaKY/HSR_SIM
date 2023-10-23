@@ -21,8 +21,7 @@ namespace HSR_SIM_LIB.UnitStuff
             TP,
             SP,
             HP,
-            Toughness,
-            Barrier
+            Toughness
         }
     }
 }

@@ -50,7 +50,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 IEnumerable<Unit> units = new List<Unit>();
                 foreach (Team team in Teams)
                 {
-                    units = units.Concat(team.Units);
+                    if (team.Units!=null)
+                        units = units.Concat(team.Units);
                 }
                 return units;
 
@@ -121,24 +122,31 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             if (ent.Type == EventType.StartWave)
                 foreach (Unit unit in AllUnits)
                 {
-                    ent.ParentStep.AddEvent(new Event(ent.ParentStep, this) { TargetUnit = unit, Type = EventType.UnitEnteringBattle },true);
+                    ent.ParentStep.AddEvent(new Event(ent.ParentStep, this,unit) { TargetUnit = unit, Type = EventType.UnitEnteringBattle },true);
                 }
             //next handlers 
-            foreach (Unit unit in PartyTeam.Units)
+            foreach (Unit unit in AllUnits)
+            {
                 unit.Fighter.EventHandlerProc.Invoke(ent);
-            if (HostileTeam?.Units != null)
-                foreach (Unit unit in HostileTeam.Units)
-                    unit.Fighter.EventHandlerProc.Invoke(ent);
+                foreach (Mod mod in unit.Mods.Where(x => x.EventHandlerProc != null))
+                {
+                    mod.EventHandlerProc?.Invoke(ent);
+                }
+            }
+
 
         }
         public virtual void HandleStep(Step step)
         {
-      
-            foreach (Unit unit in CurrentStep.Parent.PartyTeam.Units)
+
+            foreach (Unit unit in AllUnits)
+            {
                 unit.Fighter.StepHandlerProc.Invoke(CurrentStep);
-            if (CurrentStep.Parent?.HostileTeam?.Units != null)
-                foreach (Unit unit in CurrentStep.Parent.HostileTeam.Units)
-                    unit.Fighter.StepHandlerProc.Invoke(CurrentStep);
+                foreach (Mod mod in unit.Mods.Where(x => x.EventHandlerProc != null))
+                {
+                    mod.StepHandlerProc?.Invoke(step);
+                }
+            }
         }
 
 
@@ -255,7 +263,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 else
                 {
                     newStep.StepType = StepTypeEnm.StartWave;
-                    newStep.Events.Add(new Event(newStep, this) { Type = EventType.StartWave });
+                    newStep.Events.Add(new Event(newStep, this,null) { Type = EventType.StartWave });
                 }
 
             }
@@ -277,7 +285,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         TurnStage = newStep.StepType
                     };
                     newStep.Actor = CurrentFight.Turn.Actor;
-                    newStep.Events.Add(new Event(newStep, this)
+                    newStep.Events.Add(new Event(newStep, this,null)
                         { Type = EventType.ModActionValue, Val = currentFight.Turn.Actor.Stats.ActionValue });
                 }
             }
@@ -290,7 +298,15 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                     newStep.StepType = StepTypeEnm.UnitTurnStarted;
                     newStep.Actor = CurrentFight.Turn.Actor;
                     CurrentFight.Turn.TurnStage =  newStep.StepType;
-                    //DO PROCS //proc debuff
+                    foreach (var dot in currentFight.Turn.Actor.Mods.Where(x=>x.Type==Mod.ModType.Dot||x.IsEarlyProc()) )
+                    {
+                        dot.Proceed(newStep);
+                    }
+                    //if alive and has no cc
+                    if (CurrentFight.Turn.Actor.IsAlive && !CurrentFight.Turn.Actor.Controlled)
+                    {
+                        //TODO do something
+                    }
                 }
 
          
@@ -304,9 +320,13 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         
                         newStep.StepType = StepTypeEnm.UnitTurnEnded;
                         newStep.Actor = CurrentFight.Turn.Actor;
-                        newStep.Events.Add(new Event(newStep, this)
+                        newStep.Events.Add(new Event(newStep, this,null)
                             { Type = EventType.ResetAV, TargetUnit = CurrentFight.Turn.Actor});
-                        //do remove finish buffs
+                        //remove buffs
+                        foreach (var dot in currentFight.Turn.Actor.Mods.Where(x=>x.Type!=Mod.ModType.Dot&&!x.IsEarlyProc()) )
+                        {
+                            dot.Proceed(newStep);
+                        }
                         CurrentFight.Turn = null;
       
                             

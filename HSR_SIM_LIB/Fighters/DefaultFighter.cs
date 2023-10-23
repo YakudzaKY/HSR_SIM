@@ -98,7 +98,6 @@ namespace HSR_SIM_LIB.Fighters
         public IEnumerable<Unit> GetWeaknessTargets()
         {
             return Parent.Enemies.Where(x => x.IsAlive
-                                             && x.GetRes(Resource.ResourceType.Barrier).ResVal == 0
                                              && x.Fighter.Weaknesses.Any(x => x == Parent.Fighter.Element));
         }
 

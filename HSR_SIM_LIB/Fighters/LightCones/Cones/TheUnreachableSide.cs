@@ -23,7 +23,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
                 ent.ResType == Resource.ResourceType.HP && ent.RealVal != 0)
                 || (ent.TargetUnit == Parent.Parent && ent.Type == Event.EventType.DirectDamage))
             {
-                Event newEvent = new (ent.ParentStep,this)
+                Event newEvent = new (ent.ParentStep,this,Parent.Parent)
                 {
                     Type = Event.EventType.Mod
                     ,TargetUnit =  Parent.Parent,
@@ -40,7 +40,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
         {
             if (step.StepType == Step.StepTypeEnm.ExecuteAbility&&step.Actor == Parent.Parent && step.ActorAbility.Attack)
             {
-                Event newEvent = new (step, this)
+                Event newEvent = new (step, this,Parent.Parent)
                 {
                     Type = Event.EventType.RemoveMod
                     ,TargetUnit =  Parent.Parent,
@@ -54,7 +54,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
 
         public TheUnreachableSide(IFighter parent, int rank) : base(parent, rank)
         {
-            uniqueBuff = new Mod()
+            uniqueBuff = new Mod(Parent.Parent)
             {
                 Type = Mod.ModType.Buff, BaseDuration = null, MaxStack = 1, 
                 Effects = new List<Effect>(){ new Effect() {EffType = Effect.EffectType.AllDamageBoost, Value = modifiers[rank]}}  

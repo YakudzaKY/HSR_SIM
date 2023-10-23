@@ -9,7 +9,7 @@ namespace HSR_SIM_LIB
     public class CloneClass : ICloneable
     {
 
-        public object Clone()
+        public virtual object Clone()
         {
             return this.MemberwiseClone();
         }

@@ -12,6 +12,7 @@ namespace HSR_SIM_LIB.Skills
     {
         public Event.CalculateValuePrc CalculateValue { get; init; }
         public EffectType EffType { get; set; }
+
         public double? Value { get; set; }
         public bool StackAffectValue { get; set; } = true;// do we multiply final value by stack count ?
         public List<Ability.AbilityTypeEnm> AbilityTypes { get; set; } = new List<Ability.AbilityTypeEnm>();//for ability type amplification
@@ -51,7 +52,7 @@ namespace HSR_SIM_LIB.Skills
             Delay,
             Entanglement,
             Burn,
-            Frozen,
+            Freeze,
             Shock,
             WindShear,
             Dominated,
@@ -61,7 +62,11 @@ namespace HSR_SIM_LIB.Skills
             Advance,
             DefIgnore,
             BaseAgrroPrc,
-            AgrroPrc
+            AgrroPrc,
+            Shield,//its a barrier
+            AdditiveShieldBonus//+ to shield value when cast
+            ,
+            PrcShieldBonus//+%shieldVal buff .
         }
     }
 }

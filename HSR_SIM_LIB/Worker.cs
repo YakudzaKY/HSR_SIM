@@ -170,6 +170,8 @@ namespace HSR_SIM_LIB
 
             foreach (Event ent in step.Events)
             {
+                if (String.IsNullOrEmpty(ent.GetDescription()))
+                    continue;
                 OutText = " * " + ent.GetDescription();
                 if (revert)
                     OutText = "reverted: " + OutText;

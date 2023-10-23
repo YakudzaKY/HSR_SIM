@@ -152,6 +152,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         if ((unitEnt.Type == EventType.DirectDamage) &&
                             (ability.ToughnessShred != 0 || ability.CalculateToughnessShred != null))
                             UnitThgShred(unit, ability);
+                        //then primary dmg
                         Events.Add(unitEnt);
 
                     }
@@ -163,6 +164,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                     unitEnt.ParentStep = this;
                     if ((unitEnt.Type==EventType.DirectDamage) &&  (ability.ToughnessShred != 0 || ability.CalculateToughnessShred != null))
                         UnitThgShred(ent.TargetUnit, ability);
+                    //then primary dmg
                     Events.Add(unitEnt);
                 }
 
@@ -173,7 +175,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
             if (ability.AbilityType == Ability.AbilityTypeEnm.Technique)
             {
-                Events.Add(new Event(this, null)
+                Events.Add(new Event(this, null,ability.Parent)
                 {
                     Type = EventType.CombatStartSkillDeQueue,
                     ParentStep = this,
@@ -196,7 +198,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             }
 
             if (unit.Fighter.Weaknesses.Any(x=>x==( ability.Element ?? ability.Parent.Fighter.Element)) || ability.IgnoreWeakness)
-                Events.Add(new Event(null, null)
+                Events.Add(new Event(null, null,ability.Parent)
                 {
                     ParentStep = this,
                     Type = EventType.ResourceDrain,
@@ -223,7 +225,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             StepType = StepTypeEnm.ExecuteTechnique;
             if (ability.AbilityType == Ability.AbilityTypeEnm.Technique)
             {
-                Events.Add(new Event(this, null)
+                Events.Add(new Event(this, null,ability.Parent)
                 {
                     Type = EventType.CombatStartSkillQueue,
                     ParentStep = this,
@@ -231,7 +233,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
                 });
                 if (ability.Attack)
-                    Events.Add(new Event(this, null)
+                    Events.Add(new Event(this, null,ability.Parent)
                     {
                         Type = EventType.EnterCombat,
                         ParentStep = this,
@@ -253,10 +255,10 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
             if (ability.CostType == ResourceType.TP || ability.CostType == ResourceType.SP)
             {
-                Events.Add(new Event(this, null) { Type = EventType.PartyResourceDrain, ResType = ability.CostType, Val = ability.Cost });
+                Events.Add(new Event(this, null, ability.Parent) { Type = EventType.PartyResourceDrain, ResType = ability.CostType, Val = ability.Cost });
             }
             else if (ability.CostType != ResourceType.nil)
-                Events.Add(new Event(this, null) { Type = EventType.ResourceDrain, ResType = ability.CostType, Val = ability.Cost });
+                Events.Add(new Event(this, null, ability.Parent) { Type = EventType.ResourceDrain, ResType = ability.CostType, Val = ability.Cost });
 
             Actor = ability.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
             ActorAbility = ability;//WAT ABILITY is casting
@@ -271,7 +273,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         {
             if (Parent.CurrentFight == null)
             {
-                Events.Add(new Event(this, null) { Type = EventType.StartCombat });
+                Events.Add(new Event(this, null,null) { Type = EventType.StartCombat });
                 StepType = StepTypeEnm.StartCombat;
             }
 

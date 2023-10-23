@@ -42,6 +42,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         public Ability.TargetTypeEnm? TargetType { get; set; }
 
         public Ability.AbilityCurrentTargetEnm? CurentTargetType { get; set; }
+        public Unit SourceUnit { get; set; }
         public Unit TargetUnit { get; set; }
         public StepTypeEnm OnStepType { get; init; }
         public EventType Type { get => type; set => type = value; }
@@ -81,13 +82,15 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             ,
             ResetAV//reset action value
             ,
-            PartyResourceGain
+            PartyResourceGain,
+            ReduceDuration
         }
 
-        public Event(Step parent, ICloneable source)
+        public Event(Step parent, ICloneable source, Unit sourceUnit)
         {
             ParentStep = parent;
             Source = source;
+            SourceUnit = sourceUnit;
         }
 
         public string GetDescription()
@@ -102,7 +105,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             else if (Type == EventType.PartyResourceDrain)
                 res = "Party res drain : " + Val + " " + ResType.ToString();
             else if (Type == EventType.ResourceDrain)
-                res = TargetUnit.Name + " res drain : " + Val + " " + ResType.ToString() + "(by " + ParentStep.Actor.Name + ")";
+                res = TargetUnit.Name + " res drain : " + Val + " " + ResType.ToString() + "(by " + SourceUnit.Name + ")";
             else if (Type == EventType.Defeat)
                 res = TargetUnit.Name + " get rekt (:";
             else if (Type == EventType.Attack)
@@ -120,6 +123,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             else if (Type == EventType.DirectDamage)
                 res = "Dealing damage" + (IsCrit ? " (CRITICAL)" : "") +
                       $" overall={val:f} to_barier={RealBarrierVal:f} to_hp={RealVal:f}";
+            else if (Type == EventType.DoTDamage)
+                res = $"DoT tick from {SourceUnit.Name}" +
+                      $" overall={val:f} to_barier={RealBarrierVal:f} to_hp={RealVal:f}";
             else if (Type == EventType.ShieldBreak)
                 res = TargetUnit.Name + " shield broken " +
                       $" overall={val:f} to_hp={RealVal:f}";
@@ -133,6 +139,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 res = $"{TargetUnit?.Name:s} reset action value";
             else if (Type == EventType.PartyResourceGain)
                 res = $"Party res gain :  {Val:f} {ResType} by {TargetUnit.Name}";
+            else if (Type == EventType.ReduceDuration)
+                res = null;
             else
                 throw new NotImplementedException();
             return res;
@@ -151,7 +159,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 Val = CalculateValue(this);
             if (Type == EventType.PartyResourceDrain)//SP or technical points
             {
-                ParentStep.Actor.ParentTeam.GetRes(ResType).ResVal -= (double)(revert ? -Val : Val);
+                SourceUnit.ParentTeam.GetRes(ResType).ResVal -= (double)(revert ? -Val : Val);
             }
             else if (Type == EventType.PartyResourceGain)//SP or technical points
             {
@@ -170,14 +178,14 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             }
             else if (Type == EventType.CombatStartSkillQueue)//party buffs or opening
                 if (!revert)
-                    ParentStep.Parent.BeforeStartQueue.Add(ParentStep.ActorAbility);
+                    ParentStep.Parent.BeforeStartQueue.Add(AbilityValue);
                 else
-                    ParentStep.Parent.BeforeStartQueue.Remove(ParentStep.ActorAbility);
+                    ParentStep.Parent.BeforeStartQueue.Remove(AbilityValue);
             else if (Type == EventType.CombatStartSkillDeQueue)//DEQUEUE party buffs or opening
                 if (!revert)
-                    ParentStep.Parent.BeforeStartQueue.Remove(ParentStep.ActorAbility);
+                    ParentStep.Parent.BeforeStartQueue.Remove(AbilityValue);
                 else
-                    ParentStep.Parent.BeforeStartQueue.Add(ParentStep.ActorAbility);
+                    ParentStep.Parent.BeforeStartQueue.Add(AbilityValue);
             else if (Type == EventType.EnterCombat)//entering combat
                 ParentStep.Parent.DoEnterCombat = !revert;
             else if (Type == EventType.FinishCombat) //Finish combat
@@ -233,7 +241,6 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             {
                 if (!revert)
                 {
-                    //TODO reset start wave passives
                     ParentStep.Parent.CurrentFight.CurrentWaveCnt += 1;
                     ParentStep.Parent.CurrentFight.CurrentWave = ParentStep.Parent.CurrentFight.ReferenceFight.Waves[ParentStep.Parent.CurrentFight.CurrentWaveCnt - 1];
                     StartingUnits ??= SimCls.GetCombatUnits(ParentStep.Parent.CurrentFight.CurrentWave.Units);
@@ -276,6 +283,18 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                     else
                         TargetUnit.RemoveMod(Modification);
                 }
+
+            }
+            else if (Type == EventType.ReduceDuration) //reduce MOD turns durationleft
+            {
+
+                Modification.DurationLeft -= !revert ? 1 : -1;
+                if (!TriggersHandled && Modification.DurationLeft <= 0)
+                {
+                    DispelMod(Modification,true);
+
+                }
+
 
             }
             else if (Type == EventType.RemoveMod) //remove mod
@@ -328,20 +347,58 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             {
                 //Event handlers handle this event
             }
-            else if (Type == EventType.DirectDamage || Type == EventType.ShieldBreak) //Direct damage
+            else if (Type is EventType.DirectDamage or EventType.ShieldBreak or EventType.DoTDamage)
             {
                 if (RealVal == null)
                 {
-                    RealBarrierVal = Math.Min((double)TargetUnit.GetRes(Resource.ResourceType.Barrier).ResVal,
+                    //find the all shields and max value
+                    double maxShieldval=0;
+                    double srchVal;
+                    foreach (Mod mod in TargetUnit.Mods.Where(x=>x.Effects.Any(y=>y.EffType==EffectType.Shield)))
+                    {
+                        foreach (Effect eff in mod.Effects.Where(x=>x.EffType==EffectType.Shield))
+                        {
+                            srchVal = eff.Value ?? 0;
+                            if (srchVal > maxShieldval)
+                            {
+                                maxShieldval = srchVal; 
+                            }
+                        }
+                       
+                    }
+                    //cant hit more than val
+                    RealBarrierVal = Math.Min((double)maxShieldval,
                         (double)Val);
-
+                    //get current hp
                     var resVal = TargetUnit.GetRes(Resource.ResourceType.HP).ResVal;
-
+                    //same shit here
                     RealVal = Math.Min((double)resVal,
                         (double)Val - (double)RealBarrierVal);
                 }
 
-                SetResByEvent(Resource.ResourceType.Barrier, (double)-(revert ? -RealBarrierVal : RealBarrierVal));
+                //reduce all shields
+                foreach (Mod mod in TargetUnit.Mods.Where(x => x.Effects.Any(y => y.EffType == EffectType.Shield)))
+                {
+                    foreach (Effect eff in mod.Effects.Where(x=>x.EffType==EffectType.Shield))
+                    {
+                        eff.Value-= (revert ? -RealBarrierVal : RealBarrierVal);
+                    }
+                }
+
+                //need create event once
+                if (!TriggersHandled)
+                {
+                    List<Mod> toDispell = new List<Mod>();
+                    toDispell.AddRange(TargetUnit.Mods.Where(x =>
+                        x.Effects.Any(y => y.EffType == EffectType.Shield && y.Value <= 0)));
+                    //dispell zero shields
+                    foreach (Mod mod in toDispell)
+                    {
+                        DispelMod(mod,true);
+                        
+                    }
+                }
+
                 SetResByEvent(Resource.ResourceType.HP, (double)-(revert ? -RealVal : RealVal));
             }
             else
@@ -358,6 +415,24 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
         }
 
+        /// <summary>
+        /// Remove modifictaion
+        /// </summary>
+        /// <param name="mod">Modification</param>
+        /// <param name="naturalFinish">If true - MOD exceed by duratiuon. If false - dispeleed by ability</param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void DispelMod(Mod mod,bool naturalFinish )
+        {
+            if (naturalFinish)
+            {
+                mod.ProceedExpire(this);
+            }
+            Event dispell = new Event(this.ParentStep, this.AbilityValue,SourceUnit)
+                { type = EventType.RemoveMod, AbilityValue = this.AbilityValue, Modification = mod, TargetUnit = TargetUnit };
+            dispell.ProcEvent(false);
+            ParentStep.Events.Add(dispell);
+            
+        }
 
 
         /// <summary>
@@ -373,24 +448,28 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         private void TryDebuff(Mod.ModType modType, List<Effect> effects, int baseDuration, double baseChance, int maxStack = 1, string uniqueStr = "", Unit uniqueUnit = null)
         {
             //add Dots and debuffs
-            Event dotEvent = new(ParentStep, this.Source)
+            Event dotEvent = new(ParentStep, this.Source,SourceUnit)
             {
                 Type = EventType.Mod,
                 AbilityValue = AbilityValue,
                 TargetUnit = TargetUnit,
                 BaseChance = baseChance,
-                Modification = new Mod() { Type = modType, BaseDuration = baseDuration, Effects = effects, MaxStack = maxStack, UniqueStr = uniqueStr, UniqueUnit = uniqueUnit }
+                Modification = new Mod(SourceUnit) { DoNotClone= true ,Type = modType, BaseDuration = baseDuration, Effects = effects, MaxStack = maxStack, UniqueStr = uniqueStr, UniqueUnit = uniqueUnit }
             };
+
 
             if (FighterUtils.CalculateDebuffResisted(dotEvent))
             {
                 ParentStep.Events.Add(dotEvent);
+                //subscription to events(need calc stacks at attacks)
+                if (dotEvent.Modification.Effects.Any(x=>x.EffType==EffectType.Entanglement))
+                    dotEvent.Modification.EventHandlerProc += dotEvent.Modification.EntanglementEventHandler;
                 dotEvent.ProcEvent(false);
             }
             else
             {
                 //debuff apply failed
-                Event failEvent = new(ParentStep, this.Source)
+                Event failEvent = new(ParentStep, this.Source, SourceUnit)
                 {
                     Type = EventType.DebuffResisted,
                     AbilityValue = AbilityValue,
@@ -425,7 +504,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         {
 
 
-                            Event shieldBrkEvent = new(ParentStep, this.Source)
+                            Event shieldBrkEvent = new(ParentStep, this.Source, SourceUnit)
                             {
                                 Type = EventType.ShieldBreak,
                                 AbilityValue = AbilityValue,
@@ -436,11 +515,11 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                             ParentStep.Events.Add(shieldBrkEvent);
                             shieldBrkEvent.ProcEvent(false);
 
-                            Event delayAV = new (ParentStep, this.Source) { Type = EventType.ModActionValue, TargetUnit = TargetUnit, Val = -TargetUnit.Stats.BaseActionValue * 0.25 };//default delay
+                            Event delayAV = new (ParentStep, this.Source, SourceUnit) { Type = EventType.ModActionValue, TargetUnit = TargetUnit, Val = -TargetUnit.Stats.BaseActionValue * 0.25 };//default delay
                             ParentStep.Events.Add(delayAV);
                             delayAV.ProcEvent(false);
                             //TODO https://honkai-star-rail.fandom.com/wiki/Toughness need implement additional effects
-                            switch (ParentStep.ActorAbility.Element ?? ParentStep.Actor.Fighter.Element)
+                            switch (this.AbilityValue.Element?? SourceUnit.Fighter.Element)
                             {
                                 case Unit.ElementEnm.Physical:
                                     TryDebuff(Mod.ModType.Dot, new List<Effect>() { new Effect() { EffType = EffectType.Bleed, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } }, 2, 1.5);
@@ -449,24 +528,24 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                                     TryDebuff(Mod.ModType.Dot, new List<Effect>() { new Effect() { EffType = EffectType.Burn, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } }, 2, 1.5);
                                     break;
                                 case Unit.ElementEnm.Ice:
-                                    TryDebuff(Mod.ModType.Debuff, new List<Effect>() { new Effect() { EffType = EffectType.Frozen, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } }, 1, 1.5);
+                                    TryDebuff(Mod.ModType.Debuff, new List<Effect>() { new Effect() { EffType = EffectType.Freeze, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } }, 1, 1.5);
                                     break;
                                 case Unit.ElementEnm.Lightning:
                                     TryDebuff(Mod.ModType.Dot, new List<Effect>() { new Effect() { EffType = EffectType.Shock, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } }, 2, 1.5);
                                     break;
                                 case Unit.ElementEnm.Wind:
-                                    TryDebuff(Mod.ModType.Dot, new List<Effect>() { new Effect() { EffType = EffectType.WindShear, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } }, 2, 1.5, 5, uniqueUnit: ParentStep.Actor);
+                                    TryDebuff(Mod.ModType.Dot, new List<Effect>() { new Effect() { EffType = EffectType.WindShear, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } }, 2, 1.5, 5, uniqueUnit: SourceUnit);
                                     break;
                                 case Unit.ElementEnm.Quantum:
                                     TryDebuff(Mod.ModType.Debuff, new List<Effect>() {
                                         new Effect(){EffType=EffectType.Entanglement,CalculateValue = FighterUtils.CalculateShieldBrokeDmg}
-                                        ,new Effect(){EffType=EffectType.Delay,Value = 0.20*(1+ParentStep.Actor.Stats.BreakDmg) ,StackAffectValue = false}
+                                        ,new Effect(){EffType=EffectType.Delay,Value = 0.20*(1+SourceUnit.Stats.BreakDmg) ,StackAffectValue = false}
                                     }, 1, 1.5, 5);
                                     break;
                                 case Unit.ElementEnm.Imaginary:
                                     TryDebuff(Mod.ModType.Debuff, new List<Effect>() {
                                         new Effect(){EffType=EffectType.Imprisonment,CalculateValue = FighterUtils.CalculateShieldBrokeDmg}
-                                        ,new Effect(){EffType=EffectType.Delay,Value = 0.30*(1+ParentStep.Actor.Stats.BreakDmg)}
+                                        ,new Effect(){EffType=EffectType.Delay,Value = 0.30*(1+SourceUnit.Stats.BreakDmg)}
                                         ,new Effect(){EffType=EffectType.ReduceSpdPrc,Value = 0.1}
                                     }, 1, 1.5, 1);
                                     break;
@@ -493,7 +572,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         if (res.ResType == Resource.ResourceType.HP)
                         {
 
-                            Event defeatEvent = new(ParentStep, this.Source)
+                            Event defeatEvent = new(ParentStep, this.Source, SourceUnit)
                             {
                                 Type = EventType.Defeat,
                                 AbilityValue = AbilityValue,

@@ -15,7 +15,7 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
             if (num >= 2)
                 PassiveMods.Add(new PassiveMod(Parent.Parent)
                 {
-                    Mod = new Mod()
+                    Mod = new Mod(Parent.Parent)
                     { Effects = new List<Effect>() { new Effect() { EffType = Effect.EffectType.DefIgnore, Value = 0.10 } } },
                     Target = Parent.Parent
 
@@ -24,7 +24,7 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
             if (num >= 4)
                 ConditionMods.Add(new ConditionMod(parent.Parent)
                 {
-                    Mod = new Mod() { Effects = new List<Effect>() { new Effect() { EffType = Effect.EffectType.DefIgnore, Value = 0.10 } } }
+                    Mod = new Mod(Parent.Parent) { Effects = new List<Effect>() { new Effect() { EffType = Effect.EffectType.DefIgnore, Value = 0.10 } } }
                     ,
                     IsTargetCheck = true
                     ,

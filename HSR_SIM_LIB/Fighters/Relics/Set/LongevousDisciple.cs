@@ -15,7 +15,7 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
 
         public LongevousDisciple(IFighter parent,int num) : base(parent,num)
         {
-            uniqueBuff = new Mod()
+            uniqueBuff = new Mod(Parent.Parent)
             {
                 Type = Mod.ModType.Buff, BaseDuration = 2, MaxStack = 2, 
                 Effects= new (){new (){EffType = Effect.EffectType.CritPrc, Value = 0.08}}
@@ -33,7 +33,7 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
                       && ent.ResType == Resource.ResourceType.HP && ent.RealVal != 0)
                     || (ent.TargetUnit == Parent.Parent && ent.Type == Event.EventType.DirectDamage))
                 {
-                    Event newEvent = new (ent.ParentStep, this)
+                    Event newEvent = new (ent.ParentStep, this, Parent.Parent)
                     {
                         Type = Event.EventType.Mod
                         ,TargetUnit = Parent.Parent,

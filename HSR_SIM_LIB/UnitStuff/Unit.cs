@@ -124,6 +124,16 @@ namespace HSR_SIM_LIB.UnitStuff
             return GetModsByType(EffectType.AllDamageBoost, ent: ent);
         }
 
+        public double AdditiveShieldBonus(Event ent = null)
+        {
+            return GetModsByType(EffectType.AdditiveShieldBonus, ent: ent);
+        }
+
+        public double PrcShieldBonus(Event ent = null)
+        {
+            return GetModsByType(EffectType.PrcShieldBonus, ent: ent);
+        }
+
         public double ResistsPenetration(ElementEnm elem, Event ent = null)
         {
             return GetModsByType(EffectType.ElementalPenetration, elem, ent: ent);
@@ -155,7 +165,7 @@ namespace HSR_SIM_LIB.UnitStuff
                 res += Fighter.DebuffResists.First(x => x.Debuff == debuff).ResistVal;
             }
 
-            res += GetModsByType(EffectType.ElementalResist, ent: ent);
+            res += GetModsByType(EffectType.DebufResist, ent: ent);
             return res;
         }
         public double DotBoost(Event ent = null)
@@ -190,7 +200,7 @@ namespace HSR_SIM_LIB.UnitStuff
         public double GetModsByType(EffectType modType, ElementEnm? elem = null, AbilityTypeEnm? entAbilityValue = null, Event ent = null)
         {
             double res = 0;
-            List<Mod> conditionsToCheck = new ();
+            List<Mod> conditionsToCheck = new();
             //get all mods to check
             conditionsToCheck.AddRange(Mods);
             foreach (PassiveMod pmode in GetConditionMods(ent?.TargetUnit))
@@ -298,12 +308,12 @@ namespace HSR_SIM_LIB.UnitStuff
         {
             Mod srchMod = Mods.FirstOrDefault(x => (x.RefMod == (mod.RefMod ?? mod)
                                                    && (mod.UniqueUnit == null || x.UniqueUnit == mod.UniqueUnit))
-                                                  || ( (!String.IsNullOrEmpty(mod.UniqueStr) &&String.Equals(x.UniqueStr, mod.UniqueStr))));
-          
+                                                  || ((!String.IsNullOrEmpty(mod.UniqueStr) && String.Equals(x.UniqueStr, mod.UniqueStr))));
 
-            
+
+
             //find existing by ref, or by UNIQUE tag
-            if (srchMod!=null)
+            if (srchMod != null)
             {
                 //add stack
                 srchMod.Stack = Math.Min(srchMod.MaxStack, srchMod.Stack + 1);
@@ -311,9 +321,20 @@ namespace HSR_SIM_LIB.UnitStuff
             else
             {
                 //or add new
-                srchMod = (Mod)mod.Clone();
+                if (!mod.DoNotClone)
+                {
+                    srchMod = (Mod)mod.Clone();
+                }
+                else
+                {
+                    srchMod = mod;
+                }
                 srchMod.RefMod = mod.RefMod ?? mod;
+                srchMod.Owner = this;
                 Mods.Add(srchMod);
+
+
+
 
             }
 
@@ -392,12 +413,22 @@ namespace HSR_SIM_LIB.UnitStuff
         public List<KeyValuePair<string, int>> RelicsClasses { get; set; } = new List<KeyValuePair<string, int>>();
         public string FighterClassName { get; set; }
 
+        //if unit under control
+        public bool Controlled
+        {
+            get
+            {
+                return Mods.Any(x => x.CrowdControl);
+            }
+
+        }
+
         public IEnumerable<Unit> GetTargetsForUnit(TargetTypeEnm? targetType)
         {
             if (targetType == TargetTypeEnm.Friend)
-                return Friends.Where(x=>x.IsAlive);
+                return Friends.Where(x => x.IsAlive);
             else if (targetType == TargetTypeEnm.Enemy)
-                return Enemies.Where(x=>x.IsAlive);
+                return Enemies.Where(x => x.IsAlive);
 
             throw new NotImplementedException();
         }
