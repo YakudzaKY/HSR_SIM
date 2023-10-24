@@ -29,7 +29,7 @@ namespace HSR_SIM_LIB.Fighters
         /// <returns></returns>
         public static double? CalculateShieldBrokeDmg(Event ent)
         {
-            if (ent.Type == EventType.ShieldBreak && ent.Type != EventType.DoTDamage)
+            if (ent.Type != EventType.ShieldBreak && ent.Type != EventType.DoTDamage)
             {
                 return 0;
             }

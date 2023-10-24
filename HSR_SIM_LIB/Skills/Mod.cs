@@ -19,6 +19,7 @@ namespace HSR_SIM_LIB.Skills
 
         //dot will be auto on start
         public static List<EffectType> EarlyProcMods = new List<EffectType>() { EffectType.Entanglement };
+        public Ability? AbilityValue { get; set; }
 
         //do buff/debuff work on turn start?(DoT always at start)
         public bool IsEarlyProc()
@@ -59,6 +60,7 @@ namespace HSR_SIM_LIB.Skills
                     CalculateValue = effect.CalculateValue,
                     TargetUnit = step.Actor,
                     Modification = this,
+                    AbilityValue = AbilityValue
 
 
                 }))
@@ -99,12 +101,14 @@ namespace HSR_SIM_LIB.Skills
         /// <param name="ent"></param>
         public void ProceedExpire(Event ent)
         {
+            //delayed damage
             foreach (var dotProcEvent in Effects.Where(x => x.EffType is EffectType.Freeze or EffectType.Entanglement).Select(effect => new Event(ent.ParentStep, this.Caster, Caster)
             {
                 Type = Event.EventType.DoTDamage,
                 CalculateValue = effect.CalculateValue,
                 TargetUnit = ent.TargetUnit,
                 Modification = this,
+                AbilityValue = AbilityValue
 
 
             }))
@@ -112,6 +116,17 @@ namespace HSR_SIM_LIB.Skills
                 dotProcEvent.ProcEvent(false);
                 ent.ParentStep.Events.Add(dotProcEvent);
             }
+            //50% advance  for Frost
+            foreach (var dotProcEvent in Effects.Where(x => x.EffType==EffectType.Freeze))
+            {
+                
+                Event delayAV = new (ent.ParentStep, this.Caster, Caster) { AbilityValue = AbilityValue,Type = Event.EventType.ModActionValue, TargetUnit = ent.TargetUnit, Val = ent.TargetUnit.Stats.BaseActionValue * 0.5 };//50% advance
+                delayAV.ProcEvent(false);
+                ent.ParentStep.Events.Add(delayAV);
+                
+            }
+
+
         }
         public int Stack { get; set; } = 1;
 

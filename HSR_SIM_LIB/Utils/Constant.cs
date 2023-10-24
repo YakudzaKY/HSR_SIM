@@ -47,6 +47,7 @@ namespace HSR_SIM_LIB.Utils
         public static readonly short fHCycleAvFirst = 150;
         public static readonly short fHCycleAvNext = 150;
         public static readonly short txtNameSize = 12;
+        public static readonly Size DmgIconSize = new Size(14,14);
 
 
 

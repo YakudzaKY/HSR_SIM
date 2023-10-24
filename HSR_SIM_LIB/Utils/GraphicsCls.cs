@@ -356,13 +356,24 @@ namespace HSR_SIM_LIB.Utils
                         {
                             pointY = portraitPoint.Y - CombatImgSize.Height / 50 * (j + 2);
                         }
-
-                        DrawText(portraitPoint.X
+                        Bitmap dmgIcon = ent.Type switch
+                        {
+                            Event.EventType.DirectDamage => Utl.LoadBitmap("Sword"),
+                            Event.EventType.ShieldBreak=> Utl.LoadBitmap("BreakShield"),
+                            Event.EventType.DoTDamage =>  Utl.LoadBitmap("DoT"),
+                            Event.EventType.ResourceDrain =>Utl.LoadBitmap("Blood"),
+                            _ => null
+                        };
+                        if (dmgIcon!=null)
+                        {
+                            gfx.DrawImage(new Bitmap(dmgIcon, DmgIconSize), new Point(portraitPoint.X,pointY+1));
+                        }
+                        DrawText(portraitPoint.X+ DmgIconSize.Width
                             , pointY
                             , gfx
-                            , Math.Floor((double)(ent.Val ?? 0)).ToString()
-                            , new SolidBrush(ent.Type!=Event.EventType.DoTDamage ? Color.Red:Color.Chocolate)
-                            , new Font("Tahoma", BarFontSize));
+                            , Math.Floor((double)(ent.Val ?? 0)).ToString() + (ent.IsCrit?$" crit":"")
+                            , new SolidBrush(Unit.GetColorByElem((ent.Type != Event.EventType.ResourceDrain)?ent.AbilityValue?.Element:null))
+                            , new Font("Tahoma",BarFontSize,FontStyle.Bold));
 
                         j++;
                     }
