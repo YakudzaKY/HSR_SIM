@@ -63,6 +63,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         {
             CombatStartSkillQueue,// insert technique skill to queue
             ResourceDrain,//drain some resource
+            ResourceGain,//drain some resource
             PartyResourceDrain,//drain party resource
             EnterCombat,// command to start battle(when combat technique used)
             StartCombat,//starting the combat
@@ -107,6 +108,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 res = "Party res drain : " + Val + " " + ResType.ToString();
             else if (Type == EventType.ResourceDrain)
                 res = TargetUnit.Name + " res drain : " + Val + " " + ResType.ToString() + "(by " + SourceUnit.Name + ")";
+            else if (Type == EventType.ResourceGain)
+                res = TargetUnit.Name + " res gain : " + Val + " " + ResType.ToString() + "(by " + SourceUnit.Name + ")";
             else if (Type == EventType.Defeat)
                 res = TargetUnit.Name + " get rekt (:";
             else if (Type == EventType.Attack)
@@ -269,6 +272,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             }
             else if (Type == EventType.Mod) //Apply mod
             {
+                if (Modification.AbilityValue == null)
+                    Modification.AbilityValue = AbilityValue;
                 if (TargetUnit.IsAlive)
                 {
                     //calc value first
@@ -318,6 +323,17 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                     }
                 }
                 SetResByEvent(ResType, (double)-(revert ? -RealVal : RealVal));
+            }
+            else if (Type == EventType.ResourceGain) //Resource drain
+            {
+                RealVal ??= ResType switch
+                {
+                    Resource.ResourceType.Toughness => Math.Min((double)Val, (double)TargetUnit.Stats.MaxToughness),
+                    Resource.ResourceType.HP => Math.Min((double)Val, (double)TargetUnit.Stats.MaxHp),
+                    Resource.ResourceType.Energy => Math.Min((double)Val, (double)TargetUnit.Stats.BaseMaxEnergy),
+                    _ => Val
+                };
+                SetResByEvent(ResType, (double)(revert ? -RealVal : RealVal));
             }
             else if (Type == EventType.Defeat) //got defeated
             {
@@ -465,6 +481,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 //subscription to events(need calc stacks at attacks)
                 if (dotEvent.Modification.Effects.Any(x=>x.EffType==EffectType.Entanglement))
                     dotEvent.Modification.EventHandlerProc += dotEvent.Modification.EntanglementEventHandler;
+                dotEvent.Modification.AbilityValue = AbilityValue;
                 dotEvent.ProcEvent(false);
             }
             else
@@ -516,14 +533,14 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                             ParentStep.Events.Add(shieldBrkEvent);
                             shieldBrkEvent.ProcEvent(false);
 
-                            Event delayAV = new (ParentStep, this.Source, SourceUnit) { Type = EventType.ModActionValue, TargetUnit = TargetUnit, Val = -TargetUnit.Stats.BaseActionValue * 0.25 };//default delay
-                            ParentStep.Events.Add(delayAV);
+                            Event delayAV = new (ParentStep, this.Source, SourceUnit) { AbilityValue = AbilityValue,Type = EventType.ModActionValue, TargetUnit = TargetUnit, Val = -TargetUnit.Stats.BaseActionValue * 0.25 };//default delay
                             delayAV.ProcEvent(false);
-                            //TODO https://honkai-star-rail.fandom.com/wiki/Toughness need implement additional effects
+                            ParentStep.Events.Add(delayAV);
+                            // https://honkai-star-rail.fandom.com/wiki/Toughness need implement additional effects
                             switch (this.AbilityValue.Element?? SourceUnit.Fighter.Element)
                             {
                                 case Unit.ElementEnm.Physical:
-                                    TryDebuff(new Mod(SourceUnit) { DoNotClone= true ,Type = Mod.ModType.Dot, BaseDuration = 2, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Bleed, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
+                                    TryDebuff(new Mod(SourceUnit) {  DoNotClone= true ,Type = Mod.ModType.Dot, BaseDuration = 2, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Bleed, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
                                     break;
                                 case Unit.ElementEnm.Fire:
                                     TryDebuff(new Mod(SourceUnit) { DoNotClone= true ,Type = Mod.ModType.Dot, BaseDuration = 2, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Burn, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);

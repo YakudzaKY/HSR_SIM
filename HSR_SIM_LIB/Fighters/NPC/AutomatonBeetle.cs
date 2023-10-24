@@ -13,7 +13,7 @@ namespace HSR_SIM_LIB.Fighters.NPC
     public class AutomatonBeetle:DefaultNPCFighter
     {     
         
-       
+    /*   dobule shield for testing shields
         public override void DefaultFighter_HandleEvent(Event ent)
         {
             //if unit consume hp or got attack then apply buff
@@ -54,7 +54,7 @@ namespace HSR_SIM_LIB.Fighters.NPC
                 newEvent.ProcEvent(false);
             }
             base.DefaultFighter_HandleEvent(ent);
-        }
+        }*/
 
         public AutomatonBeetle(Unit parent) : base(parent)
         {

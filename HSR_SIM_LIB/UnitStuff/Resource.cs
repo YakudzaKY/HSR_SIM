@@ -11,17 +11,18 @@ namespace HSR_SIM_LIB.UnitStuff
     /// </summary>
     public class Resource : CloneClass
     {
-        public ResourceType ResType { get; set; }
+        public ResourceType? ResType { get; set; }
 
         public double ResVal { get; set; }
 
         public enum ResourceType
         {
-            nil,//dont use type
+            
             TP,
             SP,
             HP,
-            Toughness
+            Toughness,
+            Energy
         }
     }
 }

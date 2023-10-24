@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -291,6 +292,22 @@ namespace HSR_SIM_LIB.UnitStuff
 
         }
 
+        public static Color GetColorByElem(ElementEnm? elem)
+        {
+           
+           return elem  switch
+           {
+               ElementEnm.Wind=> Color.MediumSpringGreen,
+               ElementEnm.Fire=> Color.OrangeRed,
+               ElementEnm.Ice=> Color.LightSkyBlue,
+               ElementEnm.Imaginary=>Color.Yellow,
+               ElementEnm.Physical=>Color.WhiteSmoke,
+               ElementEnm.Lightning=>Color.Violet,
+               ElementEnm.Quantum=>Color.SlateBlue,
+               
+               _ => Color.Red
+           };
+        }
 
         public enum TypeEnm
         {
@@ -299,11 +316,13 @@ namespace HSR_SIM_LIB.UnitStuff
             Character
 
         }
+
         /// <summary>
         /// Search mod by ref. and add stack or reset duration.
         /// If mod have no ref then search by itself
         /// </summary>
         /// <param name="mod"></param>
+        /// <param name="abilityValue"></param>
         public void ApplyMod(Mod mod)
         {
             Mod srchMod = Mods.FirstOrDefault(x => (x.RefMod == (mod.RefMod ?? mod)
