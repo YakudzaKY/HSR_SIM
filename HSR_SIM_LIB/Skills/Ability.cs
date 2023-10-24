@@ -31,7 +31,7 @@ namespace HSR_SIM_LIB.Skills
         public string Name { get; internal set; }
         public List<Event> Events { get; set; } = new List<Event>();
         public short Cost { get; set; } = 0;
-        public ResourceType CostType { get; set; } = ResourceType.nil;
+        public ResourceType? CostType { get; set; } 
         public TargetTypeEnm TargetType { get; set; } = TargetTypeEnm.Enemy;
         public AdjacentTargetsEnm AdjacentTargets { get; set; } = AdjacentTargetsEnm.None;
 

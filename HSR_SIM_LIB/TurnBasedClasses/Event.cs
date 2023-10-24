@@ -63,6 +63,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         {
             CombatStartSkillQueue,// insert technique skill to queue
             ResourceDrain,//drain some resource
+            ResourceGain,//drain some resource
             PartyResourceDrain,//drain party resource
             EnterCombat,// command to start battle(when combat technique used)
             StartCombat,//starting the combat
@@ -107,6 +108,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 res = "Party res drain : " + Val + " " + ResType.ToString();
             else if (Type == EventType.ResourceDrain)
                 res = TargetUnit.Name + " res drain : " + Val + " " + ResType.ToString() + "(by " + SourceUnit.Name + ")";
+            else if (Type == EventType.ResourceGain)
+                res = TargetUnit.Name + " res gain : " + Val + " " + ResType.ToString() + "(by " + SourceUnit.Name + ")";
             else if (Type == EventType.Defeat)
                 res = TargetUnit.Name + " get rekt (:";
             else if (Type == EventType.Attack)
@@ -318,6 +321,17 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                     }
                 }
                 SetResByEvent(ResType, (double)-(revert ? -RealVal : RealVal));
+            }
+            else if (Type == EventType.ResourceGain) //Resource drain
+            {
+                RealVal ??= ResType switch
+                {
+                    Resource.ResourceType.Toughness => Math.Min((double)Val, (double)TargetUnit.Stats.MaxToughness),
+                    Resource.ResourceType.HP => Math.Min((double)Val, (double)TargetUnit.Stats.MaxHp),
+                    Resource.ResourceType.Energy => Math.Min((double)Val, (double)TargetUnit.Stats.BaseMaxEnergy),
+                    _ => Val
+                };
+                SetResByEvent(ResType, (double)(revert ? -RealVal : RealVal));
             }
             else if (Type == EventType.Defeat) //got defeated
             {

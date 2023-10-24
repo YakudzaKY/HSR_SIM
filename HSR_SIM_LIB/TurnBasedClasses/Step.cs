@@ -255,10 +255,10 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
             if (ability.CostType == ResourceType.TP || ability.CostType == ResourceType.SP)
             {
-                Events.Add(new Event(this, null, ability.Parent) { Type = EventType.PartyResourceDrain, ResType = ability.CostType, Val = ability.Cost });
+                Events.Add(new Event(this, null, ability.Parent) { Type = EventType.PartyResourceDrain, ResType = (ResourceType)ability.CostType, Val = ability.Cost });
             }
-            else if (ability.CostType != ResourceType.nil)
-                Events.Add(new Event(this, null, ability.Parent) { Type = EventType.ResourceDrain, ResType = ability.CostType, Val = ability.Cost });
+            else if (ability.CostType != null)
+                Events.Add(new Event(this, null, ability.Parent) { Type = EventType.ResourceDrain, ResType = (ResourceType)ability.CostType, Val = ability.Cost });
 
             Actor = ability.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
             ActorAbility = ability;//WAT ABILITY is casting

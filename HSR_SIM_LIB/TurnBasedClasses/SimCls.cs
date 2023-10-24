@@ -305,7 +305,16 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                     //if alive and has no cc
                     if (CurrentFight.Turn.Actor.IsAlive && !CurrentFight.Turn.Actor.Controlled)
                     {
-                        //TODO do something
+                        //restore toughness 
+                        if (CurrentFight.Turn.Actor.Stats.MaxToughness > 0 &&
+                            CurrentFight.Turn.Actor.GetRes(ResourceType.Toughness).ResVal == 0)
+                        {
+                            Event gainThg = new (newStep, this, CurrentFight.Turn.Actor)
+                                { Type = EventType.ResourceGain ,TargetUnit = CurrentFight.Turn.Actor,ResType = ResourceType.Toughness,Val = CurrentFight.Turn.Actor.Stats.MaxToughness};
+                            newStep.Events.Add(gainThg);
+                        }
+                            
+
                     }
                 }
 
