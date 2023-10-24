@@ -287,6 +287,11 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                     newStep.Actor = CurrentFight.Turn.Actor;
                     newStep.Events.Add(new Event(newStep, this,null)
                         { Type = EventType.ModActionValue, Val = currentFight.Turn.Actor.Stats.ActionValue });
+                    //dot proc
+                    foreach (var dot in currentFight.Turn.Actor.Mods.Where(x=>x.Type==Mod.ModType.Dot||x.IsEarlyProc()) )
+                    {
+                        dot.Proceed(newStep);
+                    }
                 }
             }
             else if (newStep.StepType == StepTypeEnm.Idle && currentFight.Turn.TurnStage == StepTypeEnm.UnitTurnSelected )//try follow up actions before target do something
@@ -298,10 +303,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                     newStep.StepType = StepTypeEnm.UnitTurnStarted;
                     newStep.Actor = CurrentFight.Turn.Actor;
                     CurrentFight.Turn.TurnStage =  newStep.StepType;
-                    foreach (var dot in currentFight.Turn.Actor.Mods.Where(x=>x.Type==Mod.ModType.Dot||x.IsEarlyProc()) )
-                    {
-                        dot.Proceed(newStep);
-                    }
+
                     //if alive and has no cc
                     if (CurrentFight.Turn.Actor.IsAlive && !CurrentFight.Turn.Actor.Controlled)
                     {
