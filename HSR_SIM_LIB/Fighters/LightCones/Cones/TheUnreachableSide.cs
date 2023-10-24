@@ -12,21 +12,22 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
     internal class TheUnreachableSide : DefaultLightCone
     {
 
-        private readonly Dictionary<int, double> modifiers = new () { { 1, 0.24 }, { 2, 0.28 }, { 3, 0.32 }, { 4, 0.36 }, { 5, 0.40 } };
+        private readonly Dictionary<int, double> modifiers = new() { { 1, 0.24 }, { 2, 0.28 }, { 3, 0.32 }, { 4, 0.36 }, { 5, 0.40 } };
         private readonly Mod uniqueBuff = null;
 
         //add buff when attacked or loose hp
         public override void DefaultLightCone_HandleEvent(Event ent)
         {
             //if unit consume hp or got attack then apply buff
-            if ((ent.AbilityValue?.Parent==Parent.Parent&&ent.TargetUnit == Parent.Parent && ent.Type == Event.EventType.ResourceDrain &&
+            if (((ent.AbilityValue?.Parent == Parent.Parent && ent.TargetUnit == Parent.Parent && ent.Type == Event.EventType.ResourceDrain &&
                 ent.ResType == Resource.ResourceType.HP && ent.RealVal != 0)
-                || (ent.TargetUnit == Parent.Parent && ent.Type == Event.EventType.DirectDamage))
+                || (ent.TargetUnit == Parent.Parent && ent.Type == Event.EventType.DirectDamage)) && uniqueBuff != null)
             {
-                Event newEvent = new (ent.ParentStep,this,Parent.Parent)
+                Event newEvent = new(ent.ParentStep, this, Parent.Parent)
                 {
                     Type = Event.EventType.Mod
-                    ,TargetUnit =  Parent.Parent,
+                    ,
+                    TargetUnit = Parent.Parent,
                     Modification = uniqueBuff
                 };
                 newEvent.ProcEvent(false);
@@ -38,12 +39,13 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
         //remove buff when attack completed
         public override void DefaultLightCone_HandleStep(Step step)
         {
-            if (step.StepType == Step.StepTypeEnm.ExecuteAbility&&step.Actor == Parent.Parent && step.ActorAbility.Attack)
+            if (step.StepType == Step.StepTypeEnm.ExecuteAbility && step.Actor == Parent.Parent && step.ActorAbility.Attack && uniqueBuff != null)
             {
-                Event newEvent = new (step, this,Parent.Parent)
+                Event newEvent = new(step, this, Parent.Parent)
                 {
                     Type = Event.EventType.RemoveMod
-                    ,TargetUnit =  Parent.Parent,
+                    ,
+                    TargetUnit = Parent.Parent,
                     Modification = uniqueBuff
                 };
                 newEvent.ProcEvent(false);
@@ -54,11 +56,14 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
 
         public TheUnreachableSide(IFighter parent, int rank) : base(parent, rank)
         {
-            uniqueBuff = new Mod(Parent.Parent)
-            {
-                Type = Mod.ModType.Buff, BaseDuration = null, MaxStack = 1, 
-                Effects = new List<Effect>(){ new Effect() {EffType = Effect.EffectType.AllDamageBoost, Value = modifiers[rank]}}  
-            };
+            if (Parent.Path == FighterUtils.PathType.Destruction)
+                uniqueBuff = new Mod(Parent.Parent)
+                {
+                    Type = Mod.ModType.Buff,
+                    BaseDuration = null,
+                    MaxStack = 1,
+                    Effects = new List<Effect>() { new Effect() { EffType = Effect.EffectType.AllDamageBoost, Value = modifiers[rank] } }
+                };
         }
     }
 }

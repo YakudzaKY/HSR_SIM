@@ -272,6 +272,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             }
             else if (Type == EventType.Mod) //Apply mod
             {
+                if (Modification.AbilityValue == null)
+                    Modification.AbilityValue = AbilityValue;
                 if (TargetUnit.IsAlive)
                 {
                     //calc value first
@@ -479,6 +481,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 //subscription to events(need calc stacks at attacks)
                 if (dotEvent.Modification.Effects.Any(x=>x.EffType==EffectType.Entanglement))
                     dotEvent.Modification.EventHandlerProc += dotEvent.Modification.EntanglementEventHandler;
+                dotEvent.Modification.AbilityValue = AbilityValue;
                 dotEvent.ProcEvent(false);
             }
             else
@@ -530,14 +533,14 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                             ParentStep.Events.Add(shieldBrkEvent);
                             shieldBrkEvent.ProcEvent(false);
 
-                            Event delayAV = new (ParentStep, this.Source, SourceUnit) { Type = EventType.ModActionValue, TargetUnit = TargetUnit, Val = -TargetUnit.Stats.BaseActionValue * 0.25 };//default delay
-                            ParentStep.Events.Add(delayAV);
+                            Event delayAV = new (ParentStep, this.Source, SourceUnit) { AbilityValue = AbilityValue,Type = EventType.ModActionValue, TargetUnit = TargetUnit, Val = -TargetUnit.Stats.BaseActionValue * 0.25 };//default delay
                             delayAV.ProcEvent(false);
-                            //TODO https://honkai-star-rail.fandom.com/wiki/Toughness need implement additional effects
+                            ParentStep.Events.Add(delayAV);
+                            // https://honkai-star-rail.fandom.com/wiki/Toughness need implement additional effects
                             switch (this.AbilityValue.Element?? SourceUnit.Fighter.Element)
                             {
                                 case Unit.ElementEnm.Physical:
-                                    TryDebuff(new Mod(SourceUnit) { DoNotClone= true ,Type = Mod.ModType.Dot, BaseDuration = 2, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Bleed, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
+                                    TryDebuff(new Mod(SourceUnit) {  DoNotClone= true ,Type = Mod.ModType.Dot, BaseDuration = 2, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Bleed, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
                                     break;
                                 case Unit.ElementEnm.Fire:
                                     TryDebuff(new Mod(SourceUnit) { DoNotClone= true ,Type = Mod.ModType.Dot, BaseDuration = 2, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Burn, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
