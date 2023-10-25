@@ -258,7 +258,7 @@ namespace HSR_SIM_LIB.Fighters
 
         public double GetFriendSpender(UnitRole role)
         {
-            DefaultFighter fhgt = (DefaultFighter)GetFriends().FirstOrDefault(x => x != this.Parent && x.Fighter.Role == UnitRole.MainDPS)?.Fighter;
+            DefaultFighter fhgt = (DefaultFighter)GetFriends().FirstOrDefault(x => x != this.Parent && x.Fighter.Role == role)?.Fighter;
             if (fhgt != null)
                 return fhgt.WillSpend();
             else
@@ -270,42 +270,57 @@ namespace HSR_SIM_LIB.Fighters
         /// <returns></returns>
         public double HowManySpICanSpend()
         {
-            double res = Parent.ParentTeam.GetRes(Resource.ResourceType.SP).ResVal;
+            double totalRes = Parent.ParentTeam.GetRes(Resource.ResourceType.SP).ResVal;
+            double res = totalRes;
             Parent.ParentTeam.ParentSim?.Parent.LogDebug("---search for free SP---");
             double reservedSp = 0;
+            double myReserve = HowManySpIReserve();
             //get friends reserved SP
             foreach (Unit friend in this.GetFriends().Where(x => x != this.Parent))
             {
                 reservedSp += ((DefaultFighter)friend.Fighter).HowManySpIReserve();
 
             }
-            Parent.ParentTeam.ParentSim?.Parent.LogDebug($"My friends reserve {reservedSp:f} Sp");
+            Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Resource: {res} .My friends reserve {reservedSp:f} Sp. My reserve is {myReserve:f} Sp");
+            
             if (Role is UnitRole.MainDPS)
             {
-                res -= reservedSp;
+                //Cut Free  res to total-reserve
+                res = Math.Min(res, totalRes - reservedSp);
                 Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Im {Role}, don't care about other spenders except RESERVE SP");
             }
             else if (Role is UnitRole.Support)
             {
                 double addSpenders = GetFriendSpender(UnitRole.MainDPS);
-                res -= (reservedSp + addSpenders);
+                res -= ( addSpenders);
+                //Cut Free  res to total-reserve
+                res = Math.Min(res, totalRes - reservedSp);
                 Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Im {Role},I care about reserve+ MainDps spenders({addSpenders})");
             }
             else if (Role is UnitRole.SecondDPS or UnitRole.ThirdDPS)
             {
                 double addSpenders = GetFriendSpender(UnitRole.MainDPS) + GetFriendSpender(UnitRole.Support);
-                res -= (reservedSp +addSpenders );
+                res -= (addSpenders );
+                //Cut Free  res to total-reserve
+                res = Math.Min(res, totalRes - reservedSp);
                 Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Im {Role},I care about reserve+ MainDps+Support spenders({addSpenders})");
             }
             else if  (Role is  UnitRole.Healer)
             {
-              
                 Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Im {Role},i don't care about SP");
             }
 
 
+
+            //retake SP if not enough by role but have reserved
+            if (res < myReserve)
+            {
+                Parent.ParentTeam.ParentSim?.Parent.LogDebug($"I will try use my reserve {myReserve} anyway ");
+                res = Math.Min(myReserve, totalRes);
+            }
+
             Parent.ParentTeam.ParentSim?.Parent.LogDebug("----");
-            //current SP minus other spenders
+    
 
             return Math.Max(res,0 );
         }
@@ -314,7 +329,7 @@ namespace HSR_SIM_LIB.Fighters
         /// How many SP i reserve for next turn VERY IMPORTANT n1 ABILITY!
         /// </summary>
         /// <returns></returns>
-        public double HowManySpIReserve()
+        public virtual double HowManySpIReserve()
         {
             return 0;
         }

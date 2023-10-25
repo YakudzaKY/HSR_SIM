@@ -58,6 +58,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             return $"SG: {(int)Mechanics.Values[shuhuGift]:d}\\{(int)ShuHuMaxCnt:d}";
         }
 
+
         public bool ICanUseHellscape(Step step)
         {
             return true;
@@ -107,8 +108,6 @@ namespace HSR_SIM_LIB.Fighters.Character
             //Passive counter
             ShuHuMaxCnt = (parent.Rank == 6) ? 4 : 5;//4 stacks on 6 eidolon 
             Mechanics.AddVal(shuhuGift);
-            
-
             
             Ability Hellscape;
             //Karma Wind

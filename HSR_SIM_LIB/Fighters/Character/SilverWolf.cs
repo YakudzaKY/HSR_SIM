@@ -47,9 +47,10 @@ namespace HSR_SIM_LIB.Fighters.Character
         {
             return FighterUtils.CalculateDmgByBasicVal(Parent.Stats.Attack* 0.8, ent);
         }
+        //50-110
         public double? CalculateBasicDmg(Event ent)
         {
-            return FighterUtils.CalculateDmgByBasicVal(Parent.Stats.Attack* Parent.Skills.FirstOrDefault(x=>x.Name=="System Warning").Level, ent);
+            return FighterUtils.CalculateDmgByBasicVal(Parent.Stats.Attack*(0.4 + (Parent.Skills.FirstOrDefault(x=>x.Name=="System Warning").Level*0.1)), ent);
         }
 
         //get 0.2 AllDmg per debuff  on enemy Team
