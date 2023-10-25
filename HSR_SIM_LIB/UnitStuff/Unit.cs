@@ -97,7 +97,7 @@ namespace HSR_SIM_LIB.UnitStuff
         {
 
         }
-
+        public List<Skill> Skills { get; set; } = new List<Skill>();
 
         /// <summary>
         /// Prepare to combat

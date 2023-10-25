@@ -155,7 +155,7 @@ namespace HSR_SIM_LIB.Utils
 
             foreach (Ability ability in startQueue)
             {
-                DrawText(point.X, point.Y + (StartQueuefontSize + StartQueuefontSizeSpc) * i, gfx, string.Format("{0:s}: {1:s}", ability.Parent.Name, ability.Name),
+                DrawText(point.X, point.Y + (StartQueuefontSize + StartQueuefontSizeSpc) * i, gfx, string.Format("{0:s}: {1:s}", ability.Parent.Parent.Name, ability.Name),
                     new SolidBrush(clrGreen), new Font("Tahoma", StartQueuefontSize));
                 i++;
             }

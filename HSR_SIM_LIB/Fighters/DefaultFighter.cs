@@ -81,12 +81,7 @@ namespace HSR_SIM_LIB.Fighters
         }
 
 
-
-
-
-
-
-        public List<Skill> Skills { get; set; } = new List<Skill>();
+   
 
         //all alive enemies
         public IEnumerable<Unit> GetAoeTargets()
@@ -106,7 +101,6 @@ namespace HSR_SIM_LIB.Fighters
         {
             return Parent.Friends.Where(x => x.IsAlive);
         }
-
         
         public double Cost
         {
@@ -131,19 +125,20 @@ namespace HSR_SIM_LIB.Fighters
             }
         }
 
-        public UnitRole? Role {
+        public UnitRole? Role
+        {
             get
             {
 
-                var unitsToSearch = Parent.ParentTeam.Units.Where(x=>x.IsAlive).OrderByDescending(x => x.Fighter.Cost).ThenByDescending(x=>x.Stats.Attack*x.Stats.CritChance*x.Stats.CritDmg).ToList();
+                var unitsToSearch = Parent.ParentTeam.Units.Where(x => x.IsAlive).OrderByDescending(x => x.Fighter.Cost).ThenByDescending(x => x.Stats.Attack * x.Stats.CritChance * x.Stats.CritDmg).ToList();
                 if (Parent == unitsToSearch.First())
                     return UnitRole.MainDPS;
                 //if second on list then second dps
-                else if (new List<PathType?>() { PathType.Hunt, PathType.Destruction,PathType.Erudition, PathType.Nihility }.Contains(Path)&&Parent==unitsToSearch.ElementAt(1) )
+                else if (new List<PathType?>() { PathType.Hunt, PathType.Destruction, PathType.Erudition, PathType.Nihility }.Contains(Path) && Parent == unitsToSearch.ElementAt(1))
                 {
                     return UnitRole.SecondDPS;
                 }
-                else if (new List<PathType?>() { PathType.Hunt, PathType.Destruction,PathType.Erudition}.Contains(Path)&&Parent==unitsToSearch.ElementAt(2) )
+                else if (new List<PathType?>() { PathType.Hunt, PathType.Destruction, PathType.Erudition }.Contains(Path) && Parent == unitsToSearch.ElementAt(2))
                 {
                     return UnitRole.ThirdDPS;
                 }
@@ -154,7 +149,7 @@ namespace HSR_SIM_LIB.Fighters
                     return UnitRole.Support;
 
             }
-        } 
+        }
 
         //Try to choose some good ability to cast
         public virtual Ability ChooseAbilityToCast(Step step)
@@ -164,7 +159,7 @@ namespace HSR_SIM_LIB.Fighters
             {
                 //sort by combat then cost. avalable for casting by cost
                 foreach (Ability ability in Abilities
-                            .Where(x => x.AbilityType == Ability.AbilityTypeEnm.Technique && x.Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= x.Cost)
+                            .Where(x => x.AbilityType == Ability.AbilityTypeEnm.Technique && x.Parent.Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= x.Cost)
                             .OrderBy(x => x.Attack)
                             .ThenByDescending(x => x.Cost))
                 {
@@ -217,8 +212,19 @@ namespace HSR_SIM_LIB.Fighters
                     }
                 }
             }
+            else
+            {
+                Ability chosenAbility = null;
+                Parent.ParentTeam.ParentSim?.Parent.LogDebug("========What i can cast=====");
+                double freeSp = HowManySpICanSpend();
+                Parent.ParentTeam.ParentSim?.Parent.LogDebug($"I have {freeSp:f} SP");
+                chosenAbility = Abilities.Where(x => x.CanUsePrc?.Invoke(step) ?? true &&x.Cost<=freeSp && (x.AbilityType is Ability.AbilityTypeEnm.Ability or Ability.AbilityTypeEnm.Basic)).MaxBy(x=>x.AbilityType);
+                Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Choose  {chosenAbility?.Name}");
+                return chosenAbility;
+            }
 
             return null;
+            
         }
 
         public virtual string GetSpecialText()
@@ -241,6 +247,79 @@ namespace HSR_SIM_LIB.Fighters
             }
         }
 
+        /// <summary>
+        /// I will spend in next turn
+        /// </summary>
+        /// <returns></returns>
+        public double WillSpend()
+        {
+            return 1;//todo get ability cost by default
+        }
+
+        public double GetFriendSpender(UnitRole role)
+        {
+            DefaultFighter fhgt = (DefaultFighter)GetFriends().FirstOrDefault(x => x != this.Parent && x.Fighter.Role == UnitRole.MainDPS)?.Fighter;
+            if (fhgt != null)
+                return fhgt.WillSpend();
+            else
+                return 0;
+        }
+        /// <summary>
+        /// How many SP Fighter can spend on cast 
+        /// </summary>
+        /// <returns></returns>
+        public double HowManySpICanSpend()
+        {
+            double res = Parent.ParentTeam.GetRes(Resource.ResourceType.SP).ResVal;
+            Parent.ParentTeam.ParentSim?.Parent.LogDebug("---search for free SP---");
+            double reservedSp = 0;
+            //get friends reserved SP
+            foreach (Unit friend in this.GetFriends().Where(x => x != this.Parent))
+            {
+                reservedSp += ((DefaultFighter)friend.Fighter).HowManySpIReserve();
+
+            }
+            Parent.ParentTeam.ParentSim?.Parent.LogDebug($"My friends reserve {reservedSp:f} Sp");
+            if (Role is UnitRole.MainDPS)
+            {
+                res -= reservedSp;
+                Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Im {Role}, don't care about other spenders except RESERVE SP");
+            }
+            else if (Role is UnitRole.Support)
+            {
+                double addSpenders = GetFriendSpender(UnitRole.MainDPS);
+                res -= (reservedSp + addSpenders);
+                Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Im {Role},I care about reserve+ MainDps spenders({addSpenders})");
+            }
+            else if (Role is UnitRole.SecondDPS or UnitRole.ThirdDPS)
+            {
+                double addSpenders = GetFriendSpender(UnitRole.MainDPS) + GetFriendSpender(UnitRole.Support);
+                res -= (reservedSp +addSpenders );
+                Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Im {Role},I care about reserve+ MainDps+Support spenders({addSpenders})");
+            }
+            else if  (Role is  UnitRole.Healer)
+            {
+              
+                Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Im {Role},i don't care about SP");
+            }
+
+
+            Parent.ParentTeam.ParentSim?.Parent.LogDebug("----");
+            //current SP minus other spenders
+
+            return Math.Max(res,0 );
+        }
+
+        /// <summary>
+        /// How many SP i reserve for next turn VERY IMPORTANT n1 ABILITY!
+        /// </summary>
+        /// <returns></returns>
+        public double HowManySpIReserve()
+        {
+            return 0;
+        }
+
+
         //Blade constructor
         public DefaultFighter(Unit parent)
         {
@@ -254,7 +333,7 @@ namespace HSR_SIM_LIB.Fighters
 
             Ability defOpener;
             //Default Opener
-            defOpener = new Ability(Parent)
+            defOpener = new Ability(this)
             {
                 AbilityType = Ability.AbilityTypeEnm.Technique
                 ,
@@ -287,9 +366,9 @@ namespace HSR_SIM_LIB.Fighters
         }
         public virtual void DefaultFighter_HandleStep(Step step)
         {
-            if (step.StepType==Step.StepTypeEnm.StartCombat ||step.StepType==Step.StepTypeEnm.FinishCombat  )
+            if (step.StepType == Step.StepTypeEnm.StartCombat || step.StepType == Step.StepTypeEnm.FinishCombat)
             {
-               Reset();
+                Reset();
             }
             LightCone?.StepHandlerProc.Invoke(step);
             foreach (IRelicSet relic in Relics)

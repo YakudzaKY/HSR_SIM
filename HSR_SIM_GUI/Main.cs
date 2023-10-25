@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using HSR_SIM_LIB;
@@ -16,11 +18,14 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolBar;
 using static HSR_SIM_LIB.Worker;
 using static HSR_SIM_GUI.Utils;
 using HSR_SIM_LIB.Utils;
-
+using System.Globalization;
+using System.Threading;
 namespace HSR_SIM_GUI
 {
+
     public partial class Main : Form
     {
+
         private bool busy = false;
         readonly Worker wrk;
         private DebugWindow dbg;
@@ -64,7 +69,7 @@ namespace HSR_SIM_GUI
 
         public Main()
         {
-
+         
 
             callBackStr = new(WorkerCallBackString);
             callBackRender = new(WorkerCallBackImages);

@@ -55,9 +55,11 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             else if (StepType == StepTypeEnm.UnitTurnSelected)
                 res = $"{Actor.Name:s} turn next";
             else if (StepType == StepTypeEnm.UnitTurnStarted)
-                res = $"{Actor.Name:s} turn start";
+                res = $"{Actor.Name:s} turn start"+ ((ActorAbility!=null)?$" with {ActorAbility.Name}":"");
             else if (StepType == StepTypeEnm.UnitTurnEnded)
                 res = $"{Actor.Name:s} finish the turn";
+            else if (StepType == StepTypeEnm.UnitTurnContinued)
+                res = $"{Actor.Name:s} continue the turn"  + ((ActorAbility!=null)?$" with {ActorAbility.Name}":"");
             else
                 throw new NotImplementedException();
             return res;
@@ -83,7 +85,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             UnitTurnEnded,
             UnitAction,
             UnitFollowUpAction,
-            FinishCombat
+            FinishCombat,
+            UnitTurnContinued
         }
 
 
@@ -133,11 +136,11 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         /// <param name="ability"></param>
         public void ExecuteAbility(Ability ability,Unit target =null)
         {
-            Actor = ability.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
+            Actor = ability.Parent.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
             ActorAbility = ability;//WAT ABILITY is casting
 
 
-            foreach (Event ent in ability.Events.Where(x => x.OnStepType == StepType))
+            foreach (Event ent in ability.Events.Where(x => x.OnStepType == StepType|| x.OnStepType ==null))
             {
                 if (ent.CalculateTargets != null || ent.TargetUnit == null) //need set targets
                 {
@@ -175,7 +178,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
             if (ability.AbilityType == Ability.AbilityTypeEnm.Technique)
             {
-                Events.Add(new Event(this, null,ability.Parent)
+                Events.Add(new Event(this, null,ability.Parent.Parent)
                 {
                     Type = EventType.CombatStartSkillDeQueue,
                     ParentStep = this,
@@ -197,8 +200,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 shredVal = ability.ToughnessShred;
             }
 
-            if (unit.Fighter.Weaknesses.Any(x=>x==( ability.Element ?? ability.Parent.Fighter.Element)) || ability.IgnoreWeakness)
-                Events.Add(new Event(null, null,ability.Parent)
+            if (unit.Fighter.Weaknesses.Any(x=>x==( ability.Element)) || ability.IgnoreWeakness)
+                Events.Add(new Event(null, null,ability.Parent.Parent)
                 {
                     ParentStep = this,
                     Type = EventType.ResourceDrain,
@@ -225,7 +228,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             StepType = StepTypeEnm.ExecuteTechnique;
             if (ability.AbilityType == Ability.AbilityTypeEnm.Technique)
             {
-                Events.Add(new Event(this, null,ability.Parent)
+                Events.Add(new Event(this, null,ability.Parent.Parent)
                 {
                     Type = EventType.CombatStartSkillQueue,
                     ParentStep = this,
@@ -233,7 +236,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
                 });
                 if (ability.Attack)
-                    Events.Add(new Event(this, null,ability.Parent)
+                    Events.Add(new Event(this, null,ability.Parent.Parent)
                     {
                         Type = EventType.EnterCombat,
                         ParentStep = this,
@@ -255,12 +258,12 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
             if (ability.CostType == ResourceType.TP || ability.CostType == ResourceType.SP)
             {
-                Events.Add(new Event(this, null, ability.Parent) { Type = EventType.PartyResourceDrain, ResType = (ResourceType)ability.CostType, Val = ability.Cost });
+                Events.Add(new Event(this, null, ability.Parent.Parent) { Type = EventType.PartyResourceDrain, ResType = (ResourceType)ability.CostType, Val = ability.Cost });
             }
             else if (ability.CostType != null)
-                Events.Add(new Event(this, null, ability.Parent) { Type = EventType.ResourceDrain, ResType = (ResourceType)ability.CostType, Val = ability.Cost });
+                Events.Add(new Event(this, null, ability.Parent.Parent) { Type = EventType.ResourceDrain, ResType = (ResourceType)ability.CostType, Val = ability.Cost });
 
-            Actor = ability.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
+            Actor = ability.Parent.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
             ActorAbility = ability;//WAT ABILITY is casting
 
         }

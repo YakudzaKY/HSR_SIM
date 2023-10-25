@@ -28,7 +28,7 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
             if (Num >= 4)
             {
                 if (( ent.Type == Event.EventType.ResourceDrain
-                      &&ent.AbilityValue?.Parent.ParentTeam==Parent.Parent.ParentTeam
+                      &&ent.AbilityValue?.Parent.Parent.ParentTeam==Parent.Parent.ParentTeam
                       && ent.TargetUnit == Parent.Parent
                       && ent.ResType == Resource.ResourceType.HP && ent.RealVal != 0)
                     || (ent.TargetUnit == Parent.Parent && ent.Type == Event.EventType.DirectDamage))
