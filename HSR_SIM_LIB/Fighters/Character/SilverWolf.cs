@@ -100,7 +100,7 @@ namespace HSR_SIM_LIB.Fighters.Character
 
 
             Ability SystemWarning;
-            //Force Quit Program
+            //System Warning
             SystemWarning = new Ability(this) {   AbilityType = Ability.AbilityTypeEnm.Basic
                 , Name = "System Warning"
                 , CostType = Resource.ResourceType.TP
