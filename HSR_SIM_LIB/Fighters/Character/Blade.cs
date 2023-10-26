@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -14,15 +15,18 @@ namespace HSR_SIM_LIB.Fighters.Character
 {
     public class Blade : DefaultFighter
     {
-        public override FighterUtils.PathType? Path { get; set; } = FighterUtils.PathType.Destruction;
+ 
 
         private readonly double ShuHuMaxCnt;
         private readonly Ability shuhuGift;
-        public override Ability ChooseAbilityToCast(Step step)
+        public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Destruction;
+        public override Unit.ElementEnm Element { get;  } =Unit.ElementEnm.Wind;
+
+        public override Ability ChoseAbilityToCast(Step step)
         {
             Ability watAbility = null;
 
-            return watAbility ?? base.ChooseAbilityToCast(step);
+            return watAbility ?? base.ChoseAbilityToCast(step);
         }
 
         public override void DefaultFighter_HandleEvent(Event ent)
@@ -59,15 +63,19 @@ namespace HSR_SIM_LIB.Fighters.Character
         }
 
 
-        public bool ICanUseHellscape(Step step)
+        public bool ICanUseHellscape()
         {
             return true;
+        }
+
+        public bool SGAvailable()
+        {
+            return (Mechanics.Values[shuhuGift] == ShuHuMaxCnt);
         }
         //Blade constructor
         public Blade(Unit parent) : base(parent)
         {
-            //Elemenet
-            Element = Unit.ElementEnm.Wind;
+
             Parent.Stats.BaseMaxEnergy = 130;
 
 
@@ -94,7 +102,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             Abilities.Add(KarmaWind);
 
             //Passive
-            shuhuGift = new Ability(this) {   AbilityType = Ability.AbilityTypeEnm.FolowUpAttack
+            shuhuGift = new Ability(this) {   AbilityType = Ability.AbilityTypeEnm.FollowUpAction
                 , Name = "Shuhu's Gift"
                 , Element = Element
                 , ToughnessShred = 30
@@ -102,6 +110,8 @@ namespace HSR_SIM_LIB.Fighters.Character
                 , AdjacentTargets = AdjacentTargetsEnm.All
                 , EnergyGain =10
                 , Attack=true
+                , Available=SGAvailable
+                , Priority = PriorityEnm.Medium
             };
             Abilities.Add(shuhuGift);
 
@@ -120,7 +130,7 @@ namespace HSR_SIM_LIB.Fighters.Character
                 , TargetType = Ability.TargetTypeEnm.Self
                 , AdjacentTargets =AdjacentTargetsEnm.None
                 , EndTheTurn= false
-                , CanUsePrc=ICanUseHellscape
+                , Available=ICanUseHellscape
             };
             //dmg events
             Hellscape.Events.Add(new Event(null, this,this.Parent) { Type = Event.EventType.ResourceDrain, ResType = Resource.ResourceType.HP, TargetType =TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateHellscapeSelfDmg, AbilityValue = Hellscape ,CurentTargetType=AbilityCurrentTargetEnm.AbilityMain});
@@ -149,7 +159,7 @@ namespace HSR_SIM_LIB.Fighters.Character
                 PassiveMods.Add(new PassiveMod(Parent)
                 {
                     Mod = new Mod(Parent)
-                    { Effects =  new List<Effect>() { new Effect(){ EffType = Effect.EffectType.AbilityTypeBoost, Value = 0.20, AbilityTypes = new List<Ability.AbilityTypeEnm>(){ Ability.AbilityTypeEnm.FolowUpAttack} }, 
+                    { Effects =  new List<Effect>() { new Effect(){ EffType = Effect.EffectType.AbilityTypeBoost, Value = 0.20, AbilityTypes = new List<Ability.AbilityTypeEnm>(){ Ability.AbilityTypeEnm.FollowUpAction} }, 
                        } },
                     Target = Parent
                    

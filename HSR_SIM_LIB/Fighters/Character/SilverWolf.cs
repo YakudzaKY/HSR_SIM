@@ -11,8 +11,8 @@ namespace HSR_SIM_LIB.Fighters.Character
 {
     public class SilverWolf:DefaultFighter
     {
-        public  override FighterUtils.PathType? Path { get; set; } = FighterUtils.PathType.Nihility;
-
+        public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Nihility;
+        public override Unit.ElementEnm Element { get;  } =Unit.ElementEnm.Quantum;
 
         public override void DefaultFighter_HandleEvent(Event ent)
         {
@@ -71,8 +71,6 @@ namespace HSR_SIM_LIB.Fighters.Character
         }
         public SilverWolf(Unit parent) : base(parent)
         {
-            //Elemenet
-            Element = Unit.ElementEnm.Quantum;
             Parent.Stats.BaseMaxEnergy = 110;
 
 

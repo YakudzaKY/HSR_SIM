@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.UnitStuff;
+using static HSR_SIM_LIB.Skills.Ability;
 using static HSR_SIM_LIB.TurnBasedClasses.Event;
 using static HSR_SIM_LIB.UnitStuff.Resource;
 
@@ -55,11 +56,13 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             else if (StepType == StepTypeEnm.UnitTurnSelected)
                 res = $"{Actor.Name:s} turn next";
             else if (StepType == StepTypeEnm.UnitTurnStarted)
-                res = $"{Actor.Name:s} turn start"+ ((ActorAbility!=null)?$" with {ActorAbility.Name}":"");
+                res = $"{Actor.Name:s} turn start" + ((ActorAbility != null) ? $" with {ActorAbility.Name}" : "");
             else if (StepType == StepTypeEnm.UnitTurnEnded)
                 res = $"{Actor.Name:s} finish the turn";
             else if (StepType == StepTypeEnm.UnitTurnContinued)
-                res = $"{Actor.Name:s} continue the turn"  + ((ActorAbility!=null)?$" with {ActorAbility.Name}":"");
+                res = $"{Actor.Name:s} continue the turn" + ((ActorAbility != null) ? $" with {ActorAbility.Name}" : "");
+            else if (StepType == StepTypeEnm.UnitFollowUpAction)
+                res = $"{Actor.Name:s} FOLLOW UP" + ((ActorAbility != null) ? $" with {ActorAbility.Name}" : "");
             else
                 throw new NotImplementedException();
             return res;
@@ -118,9 +121,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         public void TechniqueWork(Team whosTeam)
         {
             Ability someThingToCast = null;
-            foreach (Unit unit in whosTeam.Units.Where(partyMember => partyMember.IsAlive).OrderBy(x=>x.Fighter.Role))
+            foreach (Unit unit in whosTeam.Units.Where(partyMember => partyMember.IsAlive).OrderBy(x => x.Fighter.Role))
             {
-                someThingToCast = unit.Fighter.ChooseAbilityToCast(this);
+                someThingToCast = unit.Fighter.ChoseAbilityToCast(this);
                 if (someThingToCast != null)
                 {
                     ExecuteTechniqueUse(someThingToCast);
@@ -134,18 +137,18 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         /// Execute one ability
         /// </summary>
         /// <param name="ability"></param>
-        public void ExecuteAbility(Ability ability,Unit target =null)
+        public void ExecuteAbility(Ability ability, Unit target = null)
         {
             Actor = ability.Parent.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
             ActorAbility = ability;//WAT ABILITY is casting
 
 
-            foreach (Event ent in ability.Events.Where(x => x.OnStepType == StepType|| x.OnStepType ==null))
+            foreach (Event ent in ability.Events.Where(x => x.OnStepType == StepType || x.OnStepType == null))
             {
                 if (ent.CalculateTargets != null || ent.TargetUnit == null) //need set targets
                 {
                     IEnumerable<Unit> targetsUnits =
-                        (ent.CalculateTargets != null) ? ent.CalculateTargets() : ability.GetTargets(target,ent.TargetType,ent.CurentTargetType);
+                        (ent.CalculateTargets != null) ? ent.CalculateTargets() : ability.GetTargets(target, ent.TargetType, ent.CurentTargetType);
                     foreach (Unit unit in targetsUnits)
                     {
                         Event unitEnt = (Event)ent.Clone();
@@ -165,7 +168,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
                     Event unitEnt = (Event)ent.Clone();
                     unitEnt.ParentStep = this;
-                    if ((unitEnt.Type==EventType.DirectDamage) &&  (ability.ToughnessShred != 0 || ability.CalculateToughnessShred != null))
+                    if ((unitEnt.Type == EventType.DirectDamage) && (ability.ToughnessShred != 0 || ability.CalculateToughnessShred != null))
                         UnitThgShred(ent.TargetUnit, ability);
                     //then primary dmg
                     Events.Add(unitEnt);
@@ -178,7 +181,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
             if (ability.AbilityType == Ability.AbilityTypeEnm.Technique)
             {
-                Events.Add(new Event(this, null,ability.Parent.Parent)
+                Events.Add(new Event(this, null, ability.Parent.Parent)
                 {
                     Type = EventType.CombatStartSkillDeQueue,
                     ParentStep = this,
@@ -200,8 +203,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 shredVal = ability.ToughnessShred;
             }
 
-            if (unit.Fighter.Weaknesses.Any(x=>x==( ability.Element)) || ability.IgnoreWeakness)
-                Events.Add(new Event(null, null,ability.Parent.Parent)
+            if (unit.Fighter.Weaknesses.Any(x => x == (ability.Element)) || ability.IgnoreWeakness)
+                Events.Add(new Event(null, null, ability.Parent.Parent)
                 {
                     ParentStep = this,
                     Type = EventType.ResourceDrain,
@@ -228,7 +231,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             StepType = StepTypeEnm.ExecuteTechnique;
             if (ability.AbilityType == Ability.AbilityTypeEnm.Technique)
             {
-                Events.Add(new Event(this, null,ability.Parent.Parent)
+                Events.Add(new Event(this, null, ability.Parent.Parent)
                 {
                     Type = EventType.CombatStartSkillQueue,
                     ParentStep = this,
@@ -236,7 +239,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
                 });
                 if (ability.Attack)
-                    Events.Add(new Event(this, null,ability.Parent.Parent)
+                    Events.Add(new Event(this, null, ability.Parent.Parent)
                     {
                         Type = EventType.EnterCombat,
                         ParentStep = this,
@@ -276,7 +279,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         {
             if (Parent.CurrentFight == null)
             {
-                Events.Add(new Event(this, null,null) { Type = EventType.StartCombat });
+                Events.Add(new Event(this, null, null) { Type = EventType.StartCombat });
                 StepType = StepTypeEnm.StartCombat;
             }
 
@@ -288,7 +291,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         /// <param name="ent">event</param>
         /// <param name="doProceed">Proceed event</param>
         /// <param name="revert">is revert ?</param>
-        public void AddEvent(Event ent,bool doProceed=false,bool revert =false)
+        public void AddEvent(Event ent, bool doProceed = false, bool revert = false)
         {
             if (doProceed)
                 ent.ProcEvent(revert);
@@ -300,6 +303,24 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         /// </summary>
         public bool FollowUpActions()
         {
+            //all alive and NO-cced units
+            foreach (Ability.PriorityEnm prio in Enum.GetValues(typeof(PriorityEnm)).Cast<PriorityEnm>())
+            {
+                foreach (Unit unit in this.Parent.AllUnits.Where(x => !x.Controlled && x.IsAlive))
+                {
+
+                    foreach (Ability ability in unit.Fighter.Abilities.Where(x => x.Priority == prio &&
+                                 x.AbilityType == Ability.AbilityTypeEnm.FollowUpAction && x.Available()))
+                    {
+                        StepType = StepTypeEnm.UnitFollowUpAction;
+                        Actor = unit;
+                        ActorAbility = ability;
+                        ExecuteAbility(ability, unit);
+                        return true;
+                    }
+                }
+            }
+
             return false;
         }
 

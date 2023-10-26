@@ -11,11 +11,11 @@ namespace HSR_SIM_LIB.Fighters.Character
 {
     public class Bronya:DefaultFighter
     {
-        public  override FighterUtils.PathType? Path { get; set; } = FighterUtils.PathType.Harmony;
+        public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Harmony;
+        public override Unit.ElementEnm Element { get;  } =Unit.ElementEnm.Wind;
         public Bronya(Unit parent) : base(parent)
         {
-            //Elemenet
-            Element = Unit.ElementEnm.Wind;
+            Parent.Stats.BaseMaxEnergy = 120;
             var ability =
                 //buff tech
                 new Ability(this) { AbilityType = Ability.AbilityTypeEnm.Technique, Name = "Banner of Command", Cost = 1, CostType = Resource.ResourceType.TP, Element = Element , AdjacentTargets = Ability.AdjacentTargetsEnm.All,TargetType = Ability.TargetTypeEnm.Friend};

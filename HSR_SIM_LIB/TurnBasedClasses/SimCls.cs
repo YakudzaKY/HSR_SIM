@@ -288,7 +288,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                     newStep.Events.Add(new Event(newStep, this,null)
                         { Type = EventType.ModActionValue, Val = currentFight.Turn.Actor.Stats.ActionValue });
                     //dot proc
-                    foreach (var dot in currentFight.Turn.Actor.Mods.Where(x=>x.Type==Mod.ModType.Dot||x.IsEarlyProc()) )
+                    foreach (var dot in  currentFight.Turn.Actor.Mods.Where(x=>x.Type==Mod.ModType.Dot||x.IsEarlyProc()) )
                     {
                         dot.Proceed(newStep);
                     }
@@ -316,7 +316,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                             newStep.Events.Add(gainThg);
                         }
 
-                        Ability chooseAbility = CurrentFight.Turn.Actor.Fighter.ChooseAbilityToCast(newStep);
+                        Ability chooseAbility = CurrentFight.Turn.Actor.Fighter.ChoseAbilityToCast(newStep);
                         if (chooseAbility != null)
                         {
                             newStep.ExecuteAbility(chooseAbility,chooseAbility.GetBestTarget());
@@ -352,7 +352,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         
                         
                         //remove buffs
-                        foreach (var dot in currentFight.Turn.Actor.Mods.Where(x=>x.Type!=Mod.ModType.Dot&&!x.IsEarlyProc()) )
+                        foreach (var dot in  currentFight.Turn.Actor.Mods.Where(x=>x.Type!=Mod.ModType.Dot&&!x.IsEarlyProc()) )
                         {
                             dot.Proceed(newStep);
                         }

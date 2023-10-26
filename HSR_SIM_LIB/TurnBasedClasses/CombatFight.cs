@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.UnitStuff;
 using static HSR_SIM_LIB.TurnBasedClasses.Step;
 
@@ -21,6 +22,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         {
             public Unit Actor { get; set; } = null;
             public StepTypeEnm? TurnStage { get; set; }= null;
+
         }
 
 

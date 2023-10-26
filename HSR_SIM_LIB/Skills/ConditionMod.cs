@@ -35,6 +35,11 @@ namespace HSR_SIM_LIB.Skills
 
         public bool Truly(Unit chkUnit=null)
         {
+            if (Condition.ConditionAvailable != null)
+            {
+                return Condition.ConditionAvailable();
+            }
+            
             switch (chkUnit)
             {
                 case null when IsTargetCheck:
@@ -63,8 +68,10 @@ namespace HSR_SIM_LIB.Skills
 
         public record ConditionRec
         {
-            public ConditionCheckParam CondtionParam;
+            public ConditionCheckParam CondtionParam;//us this 2 fileds
             public ConditionCheckExpression CondtionExpression;
+            public Ability.DCanUsePrc ConditionAvailable;//or this
+
             public double Value;
             public Unit.ElementEnm ElemValue;
         }

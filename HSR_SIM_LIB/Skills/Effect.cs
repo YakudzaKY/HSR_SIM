@@ -67,6 +67,8 @@ namespace HSR_SIM_LIB.Skills
             AdditiveShieldBonus//+ to shield value when cast
             ,
             PrcShieldBonus//+%shieldVal buff .
+            ,
+            ReduceBAV
         }
     }
 }

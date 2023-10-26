@@ -133,7 +133,7 @@ namespace HSR_SIM_LIB.Utils
                     unitStats.BaseEnergyRes = SafeToDouble(xnode.Attributes.GetNamedItem("sp_rate")?.Value.Trim());
                     if (xnode.Attributes.GetNamedItem("baseActionValue") is not null)
                     {
-                        unitStats.BaseActionValue =
+                        unitStats.InitialBaseActionValue =
                             SafeToInt(xnode.Attributes.GetNamedItem("baseActionValue")?.Value.Trim());
                     }
 

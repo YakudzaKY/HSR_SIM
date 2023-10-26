@@ -18,8 +18,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolBar;
 using static HSR_SIM_LIB.Worker;
 using static HSR_SIM_GUI.Utils;
 using HSR_SIM_LIB.Utils;
-using System.Globalization;
-using System.Threading;
+
 namespace HSR_SIM_GUI
 {
 

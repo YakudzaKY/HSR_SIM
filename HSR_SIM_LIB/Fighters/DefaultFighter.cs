@@ -18,12 +18,12 @@ namespace HSR_SIM_LIB.Fighters
     /// <summary>
     /// default fighter logics
     /// </summary>
-    public class DefaultFighter : IFighter
+    public abstract class DefaultFighter : IFighter
     {
         public List<ConditionMod> ConditionMods { get; set; } = new List<ConditionMod>();
         public List<PassiveMod> PassiveMods { get; set; } = new List<PassiveMod>();
-        public virtual PathType? Path { get; set; } = null;
-        public Unit.ElementEnm Element { get; set; }
+        public abstract PathType? Path { get; } 
+        public abstract Unit.ElementEnm Element { get; }
         public List<Unit.ElementEnm> Weaknesses { get; set; } = null;
         public List<DebuffResist> DebuffResists { get; set; }
         public List<Resist> Resists { get; set; } = new List<Resist>();
@@ -129,7 +129,7 @@ namespace HSR_SIM_LIB.Fighters
         {
             get
             {
-
+                if (!Parent.IsAlive) return null;
                 var unitsToSearch = Parent.ParentTeam.Units.Where(x => x.IsAlive).OrderByDescending(x => x.Fighter.Cost).ThenByDescending(x => x.Stats.Attack * x.Stats.CritChance * x.Stats.CritDmg).ToList();
                 if (Parent == unitsToSearch.First())
                     return UnitRole.MainDPS;
@@ -152,14 +152,14 @@ namespace HSR_SIM_LIB.Fighters
         }
 
         //Try to choose some good ability to cast
-        public virtual Ability ChooseAbilityToCast(Step step)
+        public virtual Ability ChoseAbilityToCast(Step step)
         {
             //Technique before fight
             if (step.Parent.CurrentFight == null)
             {
                 //sort by combat then cost. avalable for casting by cost
                 foreach (Ability ability in Abilities
-                            .Where(x => x.AbilityType == Ability.AbilityTypeEnm.Technique && x.Parent.Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= x.Cost)
+                            .Where(x =>x.Available() && x.AbilityType == Ability.AbilityTypeEnm.Technique && x.Parent.Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= x.Cost)
                             .OrderBy(x => x.Attack)
                             .ThenByDescending(x => x.Cost))
                 {
@@ -218,7 +218,7 @@ namespace HSR_SIM_LIB.Fighters
                 Parent.ParentTeam.ParentSim?.Parent.LogDebug("========What i can cast=====");
                 double freeSp = HowManySpICanSpend();
                 Parent.ParentTeam.ParentSim?.Parent.LogDebug($"I have {freeSp:f} SP");
-                chosenAbility = Abilities.Where(x => x.CanUsePrc?.Invoke(step) ?? true &&x.Cost<=freeSp && (x.AbilityType is Ability.AbilityTypeEnm.Ability or Ability.AbilityTypeEnm.Basic)).MaxBy(x=>x.AbilityType);
+                chosenAbility = Abilities.Where(x => x.Available.Invoke()&&x.Cost<=freeSp && x.AbilityType is Ability.AbilityTypeEnm.Basic or Ability.AbilityTypeEnm.Ability ).MaxBy(x=>x.AbilityType);
                 Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Choose  {chosenAbility?.Name}");
                 return chosenAbility;
             }
@@ -372,10 +372,10 @@ namespace HSR_SIM_LIB.Fighters
         public virtual void DefaultFighter_HandleEvent(Event ent)
         {
 
-            LightCone?.EventHandlerProc.Invoke(ent);
+            LightCone?.EventHandlerProc?.Invoke(ent);
             foreach (IRelicSet relic in Relics)
             {
-                relic.EventHandlerProc.Invoke(ent);
+                relic.EventHandlerProc?.Invoke(ent);
             }
 
         }
@@ -385,10 +385,10 @@ namespace HSR_SIM_LIB.Fighters
             {
                 Reset();
             }
-            LightCone?.StepHandlerProc.Invoke(step);
+            LightCone?.StepHandlerProc?.Invoke(step);
             foreach (IRelicSet relic in Relics)
             {
-                relic.StepHandlerProc.Invoke(step);
+                relic.StepHandlerProc?.Invoke(step);
             }
         }
 

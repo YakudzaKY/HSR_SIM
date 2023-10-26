@@ -42,7 +42,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         public ICloneable Source { get; }
         public Ability.TargetTypeEnm? TargetType { get; set; }
 
-        public Ability.AbilityCurrentTargetEnm? CurentTargetType { get; set; }
+        public Ability.AbilityCurrentTargetEnm? CurentTargetType { get; set; } 
         public Unit SourceUnit { get; set; }
         public Unit TargetUnit { get; set; }
         public StepTypeEnm? OnStepType { get; init; }
@@ -85,7 +85,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             ResetAV//reset action value
             ,
             PartyResourceGain,
-            ReduceDuration
+            ReduceDuration,
+            IncreaseLevel
         }
 
         public Event(Step parent, ICloneable source, Unit sourceUnit)
@@ -143,6 +144,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 res = $"{TargetUnit?.Name:s} reset action value";
             else if (Type == EventType.PartyResourceGain)
                 res = $"Party res gain :  {Val:f} {ResType} by {TargetUnit.Name}";
+            else if (Type == EventType.IncreaseLevel)
+                res = null;
             else if (Type == EventType.ReduceDuration)
                 res = null;
             else
@@ -321,8 +324,14 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                     {
                         RealVal -= 1;
                     }
+                    //Game mechanics depend on Val instead
+                    Val = RealVal;
                 }
                 SetResByEvent(ResType, (double)-(revert ? -RealVal : RealVal));
+            }
+            else if (Type == EventType.IncreaseLevel) //IncreaseLevel
+            {
+                TargetUnit.Level += (int)(revert ? -Val : Val);
             }
             else if (Type == EventType.ResourceGain) //Resource drain
             {

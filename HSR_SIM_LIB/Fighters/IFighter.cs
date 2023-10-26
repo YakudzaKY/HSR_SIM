@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.UnitStuff;
+using static HSR_SIM_LIB.Fighters.FighterUtils;
 
 namespace HSR_SIM_LIB.Fighters
 {
@@ -14,8 +15,8 @@ namespace HSR_SIM_LIB.Fighters
     {
         public List<ConditionMod> ConditionMods { get; set; }
         public List<PassiveMod> PassiveMods { get; set; }
-        public FighterUtils.PathType? Path { get; set; }
-        public Unit.ElementEnm Element { get; set; }
+        public Unit.ElementEnm Element { get;  }
+        public PathType? Path { get; } 
         public List<Unit.ElementEnm> Weaknesses { get; set; }
         public List<Resist> Resists { get; set; }
         public List<DebuffResist> DebuffResists { get; set; } 
@@ -30,7 +31,7 @@ namespace HSR_SIM_LIB.Fighters
         public double Cost { get;  }//unit cost in the squad
         public FighterUtils.UnitRole? Role { get;  }
         public void Reset();
-        public  Ability ChooseAbilityToCast(Step step);
+        public  Ability ChoseAbilityToCast(Step step);
 
     }
 }

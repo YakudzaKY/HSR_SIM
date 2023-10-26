@@ -12,6 +12,8 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
     internal class TheUnreachableSide : DefaultLightCone
     {
 
+        public sealed override FighterUtils.PathType Path { get; } = FighterUtils.PathType.Destruction;
+
         private readonly Dictionary<int, double> modifiers = new() { { 1, 0.24 }, { 2, 0.28 }, { 3, 0.32 }, { 4, 0.36 }, { 5, 0.40 } };
         private readonly Mod uniqueBuff = null;
 
@@ -56,7 +58,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
 
         public TheUnreachableSide(IFighter parent, int rank) : base(parent, rank)
         {
-            if (Parent.Path == FighterUtils.PathType.Destruction)
+            if (Path == Parent.Path)
                 uniqueBuff = new Mod(Parent.Parent)
                 {
                     Type = Mod.ModType.Buff,

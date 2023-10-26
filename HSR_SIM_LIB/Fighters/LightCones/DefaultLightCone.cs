@@ -4,11 +4,12 @@ using HSR_SIM_LIB.TurnBasedClasses;
 
 namespace HSR_SIM_LIB.Fighters.LightCones
 {
-    internal class DefaultLightCone:ILightCone
+    internal abstract class DefaultLightCone:ILightCone
     {
         public List<ConditionMod> ConditionMods { get; set; }=new List<ConditionMod>();
         public List<PassiveMod> PassiveMods { get; set; } = new List<PassiveMod>();
         public int Rank { get; set; }
+        public abstract  FighterUtils.PathType Path { get; } 
         public ILightCone.EventHandler EventHandlerProc { get; set; }
         public ILightCone.StepHandler StepHandlerProc { get; set; }
         public List<Ability> Abilities { get; set; }
@@ -21,10 +22,14 @@ namespace HSR_SIM_LIB.Fighters.LightCones
         {
             Parent = parent;
             Rank = rank;
+            if (Path != Parent.Path)//prevent from wrong Path lc
+                return;
             EventHandlerProc += DefaultLightCone_HandleEvent;
             StepHandlerProc += DefaultLightCone_HandleStep;
 
         }
+
+
 
         public IFighter Parent { get; set; }
 

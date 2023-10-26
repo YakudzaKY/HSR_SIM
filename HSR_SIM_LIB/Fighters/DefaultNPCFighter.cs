@@ -49,6 +49,7 @@ namespace HSR_SIM_LIB.Fighters
         {
             get
             {
+                if (!Parent.IsAlive) return null;
                 //special units have no role
                 if (Parent.ParentTeam == Parent.ParentTeam.ParentSim.SpecialTeam)
                     return null;
@@ -57,7 +58,7 @@ namespace HSR_SIM_LIB.Fighters
                 if (Parent == unitsToSearch.First())
                     return UnitRole.MainDPS;
  
-                if (Parent == unitsToSearch.ElementAt(1))
+                else if (Parent == unitsToSearch.ElementAt(1))
                 {
                     return UnitRole.SecondDPS;
                 }
@@ -72,9 +73,14 @@ namespace HSR_SIM_LIB.Fighters
             
         }
 
-        public Ability ChooseAbilityToCast(Step step)
+        public Ability ChoseAbilityToCast(Step step)
         {
-            throw new NotImplementedException();
+            Ability chosenAbility = null;
+            Parent.ParentTeam.ParentSim?.Parent.LogDebug("========What i can cast=====");
+          //TODO :cooldown
+            chosenAbility = Abilities.Where(x => x.Available.Invoke() && x.AbilityType is Ability.AbilityTypeEnm.Basic or Ability.AbilityTypeEnm.Ability ).MaxBy(x=>x.AbilityType);
+            Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Choose  {chosenAbility?.Name}");
+            return chosenAbility;
         }
 
 

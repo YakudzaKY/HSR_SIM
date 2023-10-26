@@ -19,7 +19,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones
         public delegate void EventHandler(Event ent);
         public delegate void StepHandler(Step step);
         public int Rank { get; set; }
-        public  PathType Path { get; set; } 
+        public PathType Path { get; } 
 
         public EventHandler EventHandlerProc{ get; set; }
         public StepHandler StepHandlerProc{ get; set; }

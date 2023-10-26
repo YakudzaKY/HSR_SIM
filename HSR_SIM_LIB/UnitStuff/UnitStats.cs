@@ -87,11 +87,18 @@ namespace HSR_SIM_LIB.UnitStuff
         public int MaxToughness { get; set; } = 0;
 
         private double? baseActionValue;
-        public double BaseActionValue
+        public double InitialBaseActionValue
         {
             get => baseActionValue ?? 10000 / Speed;
             set => baseActionValue = value;
         }
+
+        public double BaseActionValue
+        {
+            get => InitialBaseActionValue - Parent.GetModsByType(EffectType.ReduceBAV);
+
+        }
+
 
         public double PerformedActionValue { get; set; } = 0;
 
