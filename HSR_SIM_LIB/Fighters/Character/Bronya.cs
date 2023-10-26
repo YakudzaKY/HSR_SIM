@@ -18,7 +18,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             Element = Unit.ElementEnm.Wind;
             var ability =
                 //buff tech
-                new Ability(Parent) { AbilityType = Ability.AbilityTypeEnm.Technique, Name = "Banner of Command", Cost = 1, CostType = Resource.ResourceType.TP, Element = Element , AdjacentTargets = Ability.AdjacentTargetsEnm.All,TargetType = Ability.TargetTypeEnm.Friend};
+                new Ability(this) { AbilityType = Ability.AbilityTypeEnm.Technique, Name = "Banner of Command", Cost = 1, CostType = Resource.ResourceType.TP, Element = Element , AdjacentTargets = Ability.AdjacentTargetsEnm.All,TargetType = Ability.TargetTypeEnm.Friend};
 
             //buff apply
             Event eventBuff = new(null, this,this.Parent)

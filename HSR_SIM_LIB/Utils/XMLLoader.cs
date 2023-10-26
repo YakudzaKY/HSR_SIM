@@ -239,7 +239,7 @@ namespace HSR_SIM_LIB.Utils
 
             if (unit.Fighter is DefaultFighter)
             {
-                DefaultFighter fighter = unit.Fighter as DefaultFighter;
+               
                 foreach (XmlElement xmlLcone in xRoot.SelectNodes("LightCone"))
                 {
                     unit.LightConeStringPath = $"HSR_SIM_LIB.Fighters.LightCones.Cones.{xmlLcone.Attributes.GetNamedItem("name").Value.Trim().Replace(" ", "").Replace("-", "").Replace(":", "")}";
@@ -258,7 +258,7 @@ namespace HSR_SIM_LIB.Utils
                 {
 
                     Skill skill = new() { Name = xmlSkill.Attributes.GetNamedItem("name").Value.Trim(), Level = int.Parse(xmlSkill.Attributes.GetNamedItem("level").Value) };
-                    fighter.Skills.Add(skill);
+                   unit.Skills.Add(skill);
 
                 }
             }

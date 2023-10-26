@@ -45,7 +45,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         public Ability.AbilityCurrentTargetEnm? CurentTargetType { get; set; }
         public Unit SourceUnit { get; set; }
         public Unit TargetUnit { get; set; }
-        public StepTypeEnm OnStepType { get; init; }
+        public StepTypeEnm? OnStepType { get; init; }
         public EventType Type { get => type; set => type = value; }
         public Ability AbilityValue { get; set; }
         public double? Val { get => val; set => val = value; }
@@ -113,7 +113,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             else if (Type == EventType.Defeat)
                 res = TargetUnit.Name + " get rekt (:";
             else if (Type == EventType.Attack)
-                res = AbilityValue.Parent.Name + " doing Attack";
+                res = AbilityValue.Parent.Parent.Name + " doing Attack";
             else if (Type == EventType.EnterCombat)
                 res = "entering the combat...";
             else if (Type == EventType.Mod)
@@ -537,7 +537,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                             delayAV.ProcEvent(false);
                             ParentStep.Events.Add(delayAV);
                             // https://honkai-star-rail.fandom.com/wiki/Toughness need implement additional effects
-                            switch (this.AbilityValue.Element?? SourceUnit.Fighter.Element)
+                            switch (this.AbilityValue.Element)
                             {
                                 case Unit.ElementEnm.Physical:
                                     TryDebuff(new Mod(SourceUnit) {  DoNotClone= true ,Type = Mod.ModType.Dot, BaseDuration = 2, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Bleed, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);

@@ -116,7 +116,7 @@ namespace HSR_SIM_LIB.Fighters
             var attacker = ent.SourceUnit;
             var defender = ent.TargetUnit;
 
-            var attackElem = ent.AbilityValue.Element ?? attacker.Fighter.Element;
+            var attackElem = ent.AbilityValue.Element;
 
             //crit multiplier
             double critMultiplier = 1;

@@ -287,21 +287,23 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                     newStep.Actor = CurrentFight.Turn.Actor;
                     newStep.Events.Add(new Event(newStep, this,null)
                         { Type = EventType.ModActionValue, Val = currentFight.Turn.Actor.Stats.ActionValue });
+                    //dot proc
+                    foreach (var dot in currentFight.Turn.Actor.Mods.Where(x=>x.Type==Mod.ModType.Dot||x.IsEarlyProc()) )
+                    {
+                        dot.Proceed(newStep);
+                    }
                 }
             }
-            else if (newStep.StepType == StepTypeEnm.Idle && currentFight.Turn.TurnStage == StepTypeEnm.UnitTurnSelected )//try follow up actions before target do something
+            else if (newStep.StepType == StepTypeEnm.Idle && currentFight.Turn.TurnStage == StepTypeEnm.UnitTurnSelected )
             {
-              
+                //try follow up actions before target do something
                 if (!newStep.FollowUpActions())
                 {
                     
                     newStep.StepType = StepTypeEnm.UnitTurnStarted;
                     newStep.Actor = CurrentFight.Turn.Actor;
                     CurrentFight.Turn.TurnStage =  newStep.StepType;
-                    foreach (var dot in currentFight.Turn.Actor.Mods.Where(x=>x.Type==Mod.ModType.Dot||x.IsEarlyProc()) )
-                    {
-                        dot.Proceed(newStep);
-                    }
+
                     //if alive and has no cc
                     if (CurrentFight.Turn.Actor.IsAlive && !CurrentFight.Turn.Actor.Controlled)
                     {
@@ -313,15 +315,26 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                                 { Type = EventType.ResourceGain ,TargetUnit = CurrentFight.Turn.Actor,ResType = ResourceType.Toughness,Val = CurrentFight.Turn.Actor.Stats.MaxToughness};
                             newStep.Events.Add(gainThg);
                         }
-                            
 
+                        Ability chooseAbility = CurrentFight.Turn.Actor.Fighter.ChooseAbilityToCast(newStep);
+                        if (chooseAbility != null)
+                        {
+                            newStep.ExecuteAbility(chooseAbility,chooseAbility.GetBestTarget());
+                            //reset turn
+                            if (!chooseAbility.EndTheTurn)
+                            {
+                                newStep.StepType= StepTypeEnm.UnitTurnContinued;
+                            }
+                        }
                     }
+
                 }
 
          
             }
-            else if (newStep.StepType == StepTypeEnm.Idle && currentFight.Turn.TurnStage == StepTypeEnm.UnitTurnStarted  )//try follow up actions before target do something
+            else if (newStep.StepType == StepTypeEnm.Idle && currentFight.Turn.TurnStage == StepTypeEnm.UnitTurnStarted  )
             {
+                //try follow up actions before target do something
                 if (!newStep.FollowUpActions())
                 {
                     if (!newStep.Actions())
@@ -331,6 +344,13 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         newStep.Actor = CurrentFight.Turn.Actor;
                         newStep.Events.Add(new Event(newStep, this,null)
                             { Type = EventType.ResetAV, TargetUnit = CurrentFight.Turn.Actor});
+                        //50% reduce av if frosted
+                        if (CurrentFight.Turn.Actor.Controlled&&CurrentFight.Turn.Actor.Mods.Any(x=>x.Effects.Any(y=>y.EffType==Effect.EffectType.Freeze))) 
+                            newStep.Events.Add(new (newStep, CurrentFight.Turn.Actor, CurrentFight.Turn.Actor) { AbilityValue = newStep.ActorAbility,Type = Event.EventType.ModActionValue, TargetUnit = CurrentFight.Turn.Actor, Val = CurrentFight.Turn.Actor.Stats.BaseActionValue * 0.5 });
+                            
+                
+                        
+                        
                         //remove buffs
                         foreach (var dot in currentFight.Turn.Actor.Mods.Where(x=>x.Type!=Mod.ModType.Dot&&!x.IsEarlyProc()) )
                         {

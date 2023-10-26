@@ -32,10 +32,6 @@ namespace HSR_SIM_LIB.Fighters
         {
             return Parent.Friends.Where(x => x.IsAlive);
         }
-        public Ability ChooseAbilityToCast(Step step)
-        {
-            throw new NotImplementedException();
-        }
 
         public string GetSpecialText()
         {
@@ -75,6 +71,12 @@ namespace HSR_SIM_LIB.Fighters
         {
             
         }
+
+        public Ability ChooseAbilityToCast(Step step)
+        {
+            throw new NotImplementedException();
+        }
+
 
         public IFighter.EventHandler EventHandlerProc { get; set; }
         public IFighter.StepHandler StepHandlerProc { get; set; }

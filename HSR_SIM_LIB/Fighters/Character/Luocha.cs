@@ -24,7 +24,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             //Abilities
             //=====================
             //Cycle of life
-            cycleOfLife = new Ability(Parent) {   AbilityType = Ability.AbilityTypeEnm.FollowUpAction
+            cycleOfLife = new Ability(this) {   AbilityType = Ability.AbilityTypeEnm.FollowUpAction
                 , Name = "Cycle of life"
                 , Element = Element
             };
@@ -32,7 +32,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             Abilities.Add(cycleOfLife);
 
             //Mercy of a Fool
-            ability = new Ability(Parent) {   AbilityType = Ability.AbilityTypeEnm.Technique
+            ability = new Ability(this) {   AbilityType = Ability.AbilityTypeEnm.Technique
                 , Name = "Mercy of a Fool"
                 , Cost = 1
                 , CostType = Resource.ResourceType.TP

@@ -14,7 +14,6 @@ namespace HSR_SIM_LIB.Fighters.Character
         public  override FighterUtils.PathType? Path { get; set; } = FighterUtils.PathType.Nihility;
 
 
-
         public override void DefaultFighter_HandleEvent(Event ent)
         {
             //if unit consume hp or got attack then apply buff
@@ -48,6 +47,11 @@ namespace HSR_SIM_LIB.Fighters.Character
         {
             return FighterUtils.CalculateDmgByBasicVal(Parent.Stats.Attack* 0.8, ent);
         }
+        //50-110
+        public double? CalculateBasicDmg(Event ent)
+        {
+            return FighterUtils.CalculateDmgByBasicVal(Parent.Stats.Attack*(0.4 + (Parent.Skills.FirstOrDefault(x=>x.Name=="System Warning").Level*0.1)), ent);
+        }
 
         //get 0.2 AllDmg per debuff  on enemy Team
         public static double? CalculateE6(Event ent)
@@ -78,7 +82,7 @@ namespace HSR_SIM_LIB.Fighters.Character
 
             Ability ability;
             //Force Quit Program
-            ability = new Ability(Parent) {   AbilityType = Ability.AbilityTypeEnm.Technique
+            ability = new Ability(this) {   AbilityType = Ability.AbilityTypeEnm.Technique
                 , Name = "Force Quit Program"
                 , Cost = 1
                 , CostType = Resource.ResourceType.TP
@@ -93,6 +97,24 @@ namespace HSR_SIM_LIB.Fighters.Character
             ability.Events.Add(new Event(null, this, this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.ResourceDrain,ResType = Resource.ResourceType.Toughness, Val = 60, AbilityValue = ability });
       
             Abilities.Add(ability);
+
+
+            Ability SystemWarning;
+            //System Warning
+            SystemWarning = new Ability(this) {   AbilityType = Ability.AbilityTypeEnm.Basic
+                , Name = "System Warning"
+                , CostType = Resource.ResourceType.TP
+                , Element = Element
+                , AdjacentTargets = Ability.AdjacentTargetsEnm.None
+                , Attack=true
+                , ToughnessShred = 30
+            };
+            //dmg events
+            SystemWarning.Events.Add(new Event(null, this, this.Parent) {Type = Event.EventType.DirectDamage, CalculateValue = CalculateBasicDmg,  AbilityValue = SystemWarning });
+            SystemWarning.Events.Add(new Event(null, this, this.Parent) {Type = Event.EventType.PartyResourceGain,ResType = Resource.ResourceType.SP,TargetUnit = Parent, Val = 1,  AbilityValue = SystemWarning });
+      
+            Abilities.Add(SystemWarning);
+
 
             if (Parent.Rank >= 6)
             {

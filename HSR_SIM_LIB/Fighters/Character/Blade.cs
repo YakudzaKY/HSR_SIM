@@ -47,12 +47,22 @@ namespace HSR_SIM_LIB.Fighters.Character
         {
             return FighterUtils.CalculateDmgByBasicVal(Parent.Stats.MaxHp * 0.4, ent);
         }
+        
+        public double? CalculateHellscapeSelfDmg(Event ent)
+        {
+            return FighterUtils.CalculateDmgByBasicVal(Parent.Stats.MaxHp * 0.3, ent);
+        }
 
         public override string GetSpecialText()
         {
             return $"SG: {(int)Mechanics.Values[shuhuGift]:d}\\{(int)ShuHuMaxCnt:d}";
         }
 
+
+        public bool ICanUseHellscape(Step step)
+        {
+            return true;
+        }
         //Blade constructor
         public Blade(Unit parent) : base(parent)
         {
@@ -65,9 +75,9 @@ namespace HSR_SIM_LIB.Fighters.Character
             //Abilities
             //=====================
 
-            Ability ability;
+            Ability KarmaWind;
             //Karma Wind
-            ability = new Ability(Parent) {   AbilityType = Ability.AbilityTypeEnm.Technique
+            KarmaWind = new Ability(this) {   AbilityType = Ability.AbilityTypeEnm.Technique
                                             , Name = "Karma Wind"
                                             , Cost = 1
                                             , CostType = Resource.ResourceType.TP
@@ -78,13 +88,13 @@ namespace HSR_SIM_LIB.Fighters.Character
                                             , AdjacentTargets = AdjacentTargetsEnm.All
             };
             //dmg events
-            ability.Events.Add(new Event(null, this,this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.ResourceDrain, ResType = Resource.ResourceType.HP, TargetType =TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateKarmaSelfDmg, AbilityValue = ability ,CurentTargetType=AbilityCurrentTargetEnm.AbilityMain});
-            ability.Events.Add(new Event(null, this,this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.DirectDamage, CalculateValue = CalculateKarmaDmg, AbilityValue = ability });
+            KarmaWind.Events.Add(new Event(null, this,this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.ResourceDrain, ResType = Resource.ResourceType.HP, TargetType =TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateKarmaSelfDmg, AbilityValue = KarmaWind ,CurentTargetType=AbilityCurrentTargetEnm.AbilityMain});
+            KarmaWind.Events.Add(new Event(null, this,this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.DirectDamage, CalculateValue = CalculateKarmaDmg, AbilityValue = KarmaWind });
 
-            Abilities.Add(ability);
+            Abilities.Add(KarmaWind);
 
-
-            shuhuGift = new Ability(Parent) {   AbilityType = Ability.AbilityTypeEnm.FolowUpAttack
+            //Passive
+            shuhuGift = new Ability(this) {   AbilityType = Ability.AbilityTypeEnm.FolowUpAttack
                 , Name = "Shuhu's Gift"
                 , Element = Element
                 , ToughnessShred = 30
@@ -99,6 +109,25 @@ namespace HSR_SIM_LIB.Fighters.Character
             ShuHuMaxCnt = (parent.Rank == 6) ? 4 : 5;//4 stacks on 6 eidolon 
             Mechanics.AddVal(shuhuGift);
             
+            Ability Hellscape;
+            //Karma Wind
+            Hellscape = new Ability(this) {   AbilityType = Ability.AbilityTypeEnm.Ability
+                , Name = "Hellscape"
+                , Cost = 1
+                , CostType = Resource.ResourceType.SP
+                , ToughnessShred = 60
+                , Attack=false
+                , TargetType = Ability.TargetTypeEnm.Self
+                , AdjacentTargets =AdjacentTargetsEnm.None
+                , EndTheTurn= false
+                , CanUsePrc=ICanUseHellscape
+            };
+            //dmg events
+            Hellscape.Events.Add(new Event(null, this,this.Parent) { Type = Event.EventType.ResourceDrain, ResType = Resource.ResourceType.HP, TargetType =TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateHellscapeSelfDmg, AbilityValue = Hellscape ,CurentTargetType=AbilityCurrentTargetEnm.AbilityMain});
+            
+
+            Abilities.Add(Hellscape);
+
             //=====================
 
 

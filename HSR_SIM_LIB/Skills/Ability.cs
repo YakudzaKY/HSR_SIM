@@ -4,8 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.UnitStuff;
+using static HSR_SIM_LIB.TurnBasedClasses.Event;
 using static HSR_SIM_LIB.UnitStuff.Resource;
 using static HSR_SIM_LIB.UnitStuff.Unit;
 
@@ -20,11 +22,11 @@ namespace HSR_SIM_LIB.Skills
         //public Event.CalculateValuePrc CalculateValue { get; init; }
         //public Event.CalculateTargetPrc CalculateTargets { get; init; }
 
-        public ElementEnm? Element { get; set; }
+        public ElementEnm Element { get; set; }
 
         public AbilityTypeEnm AbilityType { get; set; }
 
-        public Unit Parent { get; set; }
+        public IFighter Parent { get; set; }
         public delegate double? DCalculateToughnessShred(Unit target);
         public DCalculateToughnessShred CalculateToughnessShred { get; init; }
         public double ToughnessShred;
@@ -39,10 +41,13 @@ namespace HSR_SIM_LIB.Skills
         public int EnergyGain { get; set; }
         public bool IgnoreWeakness { get; set; }
         public int Cooldown { get; set; }
-
-        public Ability(Unit parent)
+        public bool EndTheTurn { get; set; } = true;//If ability used - end the turn
+        public delegate bool DCanUsePrc(Step step);
+        public DCanUsePrc CanUsePrc { get; init; }
+        public Ability(IFighter parent)
         {
             Parent = parent;
+            Element = parent.Element;
         }
 
 
@@ -103,7 +108,7 @@ namespace HSR_SIM_LIB.Skills
             {
                 if (currTargetType == AbilityCurrentTargetEnm.AbilityMain)
                 {
-                    res=  new[]{Parent};
+                    res=  new[]{Parent.Parent};
                 }
                 else 
                     throw new NotImplementedException();
@@ -117,7 +122,7 @@ namespace HSR_SIM_LIB.Skills
                 else if (currTargetType == AbilityCurrentTargetEnm.AbilityAdjacent)
                 {
                     if (AdjacentTargets==AdjacentTargetsEnm.All)
-                     res =Parent.GetTargetsForUnit(eventTargetType);
+                     res =Parent.Parent.GetTargetsForUnit(eventTargetType);
                     else
                         throw new NotImplementedException();
                 }
@@ -126,6 +131,37 @@ namespace HSR_SIM_LIB.Skills
             }
   
             return res;
+        }
+
+        public Unit GetBestTarget()
+        {
+            if (TargetType == TargetTypeEnm.Self)
+                return Parent.Parent;
+            else if (TargetType == TargetTypeEnm.Enemy)
+            {
+                /*
+                 * MainDD,SecondDD focus on massive dmg, pref max weakness targets
+                 * Others- shield breaking
+                 *
+                 */
+
+                if (AdjacentTargets==AdjacentTargetsEnm.None)
+                {
+
+                    return Parent.Parent.Enemies.Where(x => x.IsAlive).OrderByDescending(x=>x.Fighter.Weaknesses.Contains(Element)).MinBy(x=>x.GetRes(ResourceType.HP).ResVal);
+
+                }
+                else
+                {
+                    throw new NotImplementedException(); 
+                }
+            }
+            else
+            {
+                throw new NotImplementedException();  
+            }
+
+            return null;
         }
     }
 }
