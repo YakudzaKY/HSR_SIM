@@ -423,6 +423,11 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                     newStep.Actor = CurrentFight.Turn.Actor;
                     newStep.Events.Add(new ModActionValue(newStep, this, null)
                     { Val = currentFight.Turn.Actor.Stats.ActionValue });
+                    //set all Mods are "old"
+                    foreach (var mod in currentFight.Turn.Actor.Mods)
+                    {
+                        mod.IsOld = true;
+                    }
                     //dot proc
                     foreach (var dot in currentFight.Turn.Actor.Mods.Where(x => x.Type == Mod.ModType.Dot || x.IsEarlyProc()))
                     {

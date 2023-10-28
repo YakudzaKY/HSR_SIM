@@ -358,6 +358,7 @@ namespace HSR_SIM_LIB.UnitStuff
             }
 
             //reset duration
+            srchMod.IsOld = false;//renew the flag
             srchMod.DurationLeft = srchMod.BaseDuration;
 
 

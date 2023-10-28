@@ -21,6 +21,7 @@ namespace HSR_SIM_LIB.Skills
         //dot will be auto on start
         public static List<EffectType> EarlyProcMods = new List<EffectType>() { EffectType.Entanglement };
         public Ability AbilityValue { get; set; }
+        public bool IsOld { get; set; } = false;
 
         //do buff/debuff work on turn start?(DoT always at start)
         public bool IsEarlyProc()
@@ -67,16 +68,19 @@ namespace HSR_SIM_LIB.Skills
                 {
                     step.Events.Add(dotProcEvent);
                 }
-
-            //minus duration
-            Event reduceModDuration = new ReduceDuration(step, this.Caster, Caster)
+            //only Mods aplied before turn started
+            if (IsOld)
             {
-               
-                Modification = this,
-                TargetUnit = step.Actor,
+                //minus duration
+                Event reduceModDuration = new ReduceDuration(step, this.Caster, Caster)
+                {
 
-            };
-            step.Events.Add(reduceModDuration);
+                    Modification = this,
+                    TargetUnit = step.Actor,
+
+                };
+                step.Events.Add(reduceModDuration);
+            }
 
         }
         public delegate void EventHandler(Event ent);
