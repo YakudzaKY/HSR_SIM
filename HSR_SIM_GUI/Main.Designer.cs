@@ -45,6 +45,7 @@ namespace HSR_SIM_GUI
             button3 = new System.Windows.Forms.Button();
             button4 = new System.Windows.Forms.Button();
             button5 = new System.Windows.Forms.Button();
+            button6 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)combatOut).BeginInit();
             SuspendLayout();
             // 
@@ -188,10 +189,22 @@ namespace HSR_SIM_GUI
             button5.UseVisualStyleBackColor = true;
             button5.Click += Button5_Click;
             // 
+            // button6
+            // 
+            button6.Location = new System.Drawing.Point(262, 678);
+            button6.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            button6.Name = "button6";
+            button6.Size = new System.Drawing.Size(61, 62);
+            button6.TabIndex = 14;
+            button6.Text = "force new next";
+            button6.UseVisualStyleBackColor = true;
+            button6.Click += button6_Click;
+            // 
             // Main
             // 
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             ClientSize = new System.Drawing.Size(1225, 834);
+            Controls.Add(button6);
             Controls.Add(button5);
             Controls.Add(button4);
             Controls.Add(button3);
@@ -232,6 +245,7 @@ namespace HSR_SIM_GUI
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.Button button6;
     }
 }
 

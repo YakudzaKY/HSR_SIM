@@ -69,11 +69,20 @@ namespace HSR_SIM_LIB
         /// <summary>
         /// GoNextStep or go back
         /// </summary>
-        public void MoveStep(bool goBack = false, int stepcount = 1)
+        public void MoveStep(bool goBack = false, int stepcount = 1, bool forceNewSteps = false)
         {
             int stepndx = sim?.steps?.IndexOf(sim.CurrentStep) ?? 0;
             Step oldStep = sim?.CurrentStep;
-
+            //delete future steps
+            if (forceNewSteps && sim != null && sim.steps?.Count()>1)
+            {
+                for (int i = sim?.steps.Count()??0 ; i > stepndx+1; i--)
+                {
+                    sim.steps[i-1] = null;
+                    sim.steps.Remove(sim.steps[i-1]);
+                    
+                }
+            }
             if (goBack)
             {
                 for (int i = 0; i < stepcount || stepcount == -1; i++)

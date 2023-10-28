@@ -68,7 +68,7 @@ namespace HSR_SIM_GUI
 
         public Main()
         {
-         
+
 
             callBackStr = new(WorkerCallBackString);
             callBackRender = new(WorkerCallBackImages);
@@ -183,6 +183,9 @@ namespace HSR_SIM_GUI
             dbg.Show();
         }
 
-
+        private void button6_Click(object sender, EventArgs e)
+        {
+            wrk.MoveStep(false, 1, true);
+        }
     }
 }
