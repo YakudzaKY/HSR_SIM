@@ -346,9 +346,11 @@ namespace HSR_SIM_LIB.Utils
                     foreach (Event ent in step.Events.Where(x => x.TargetUnit == unit &&
                                                                (x is DirectDamage
                                                                || x is ShieldBreak
+                                                               || x is Healing
                                                                || x is DoTDamage
-                                                               || (x is ResourceDrain && x.Val > 0 && ((ResourceDrain)x).ResType == ResourceType.HP))
-                                                               ))
+                                                               || (x is ResourceDrain && x.Val > 0 && ((ResourceDrain)x).ResType == ResourceType.HP)
+                                                               || (x is ResourceGain && x.Val > 0 && ((ResourceGain)x).ResType == ResourceType.HP)
+                                                               )))
                     {
                         int pointY = 0;
                         if (drawDirection == DrawDirection.TopToBottom)
@@ -363,18 +365,35 @@ namespace HSR_SIM_LIB.Utils
                             DoTDamage =>  Utl.LoadBitmap("DoT"),
                             DirectDamage => Utl.LoadBitmap("Sword"),
                             ResourceDrain =>Utl.LoadBitmap("Blood"),
+                            ResourceGain =>Utl.LoadBitmap("Blood"),
+                            Healing =>Utl.LoadBitmap("Healing"),
                             _ => null
                         };
                         if (dmgIcon!=null)
                         {
                             gfx.DrawImage(new Bitmap(dmgIcon, DmgIconSize), new Point(portraitPoint.X,pointY+1));
                         }
+
+                        Color nmbrColor;
+                        if (ent is ShieldBreak or DoTDamage or DirectDamage)
+                        {
+                            nmbrColor = Unit.GetColorByElem(ent.AbilityValue?.Element);
+                        }
+                        else if (ent is ResourceGain or Healing)
+                        {
+                            nmbrColor = Color.GreenYellow;
+                        }
+                        else
+                        {
+                            nmbrColor = Color.Red;
+                        }
+
                         DrawText(portraitPoint.X+ DmgIconSize.Width
                             , pointY
                             , gfx
                             , Math.Floor((double)(ent.Val ?? 0)).ToString() +
                               ((ent is DirectDamage damage && damage.IsCrit) ? $" crit" : "")
-                            , new SolidBrush(Unit.GetColorByElem(!(ent is ResourceDrain)?ent.AbilityValue?.Element:null))
+                            , new SolidBrush(nmbrColor)
                             , new Font("Tahoma",BarFontSize,FontStyle.Bold));
 
                         j++;

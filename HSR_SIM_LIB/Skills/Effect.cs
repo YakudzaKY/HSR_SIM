@@ -15,7 +15,7 @@ namespace HSR_SIM_LIB.Skills
 
         public double? Value { get; set; }
         public bool StackAffectValue { get; set; } = true;// do we multiply final value by stack count ?
-        public List<Ability.AbilityTypeEnm> AbilityTypes { get; set; } = new List<Ability.AbilityTypeEnm>();//for ability type amplification
+        public Ability.AbilityTypeEnm AbilityType { get; set; } 
         public Unit.ElementEnm? Element { get; init; }
         public enum EffectType
         {
@@ -46,6 +46,7 @@ namespace HSR_SIM_LIB.Skills
             DebufResist,
             AbilityTypeBoost,
             IncomeHealingPrc,
+            OutgoingHealingPrc,
             EnergyRatePrc,
             Bleed,
             Imprisonment,

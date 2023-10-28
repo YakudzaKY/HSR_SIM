@@ -107,6 +107,7 @@ namespace HSR_SIM_LIB.Fighters.Character
                 , AdjacentTargets = Ability.AdjacentTargetsEnm.None
                 , Attack=true
                 , ToughnessShred = 30
+                , EnergyGain = 20
             };
             //dmg events
             SystemWarning.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateBasicDmg,  AbilityValue = SystemWarning });

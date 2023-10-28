@@ -79,7 +79,7 @@ namespace HSR_SIM_LIB.Fighters
             Ability chosenAbility = null;
             Parent.ParentTeam.ParentSim?.Parent.LogDebug("========What i can cast=====");
           //TODO :cooldown
-            chosenAbility = Abilities.Where(x => x.Available.Invoke() && x.AbilityType is Ability.AbilityTypeEnm.Basic or Ability.AbilityTypeEnm.Ability ).MaxBy(x=>x.AbilityType);
+            chosenAbility = Abilities.Where(x => x.Available.Invoke() && (x.AbilityType.HasFlag( Ability.AbilityTypeEnm.Basic) || x.AbilityType.HasFlag(Ability.AbilityTypeEnm.Ability) )).MaxBy(x=>x.AbilityType);
             Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Choose  {chosenAbility?.Name}");
             return chosenAbility;
         }

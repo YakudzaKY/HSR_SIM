@@ -61,7 +61,7 @@ namespace HSR_SIM_LIB.Fighters
             }
             else
             {
-                 var modEnt = ent as ModEventTemplate;
+                 var modEnt = ent as DoTDamage;
                 if (modEnt.Modification.Effects.Any(x => x.EffType == Effect.EffectType.Bleed))
                 {
                     bool eliteFlag = defender.Fighter is DefaultNPCBossFIghter;
@@ -120,9 +120,9 @@ namespace HSR_SIM_LIB.Fighters
             double dotVulnerability = 0;
             if (ent is DirectDamage)
             {
-                ((DirectDamage)ent).IsCrit = new MersenneTwister().NextDouble() <= attacker.Stats.CritChance;
+                ((DirectDamage)ent).IsCrit = new MersenneTwister().NextDouble() <= attacker.GetCritRate(ent);
                 if (((DirectDamage)ent).IsCrit)
-                    critMultiplier = 1 + attacker.Stats.CritDmg;
+                    critMultiplier = 1 + attacker.GetCritDamage(ent);
             }
             else
             {
@@ -136,7 +136,7 @@ namespace HSR_SIM_LIB.Fighters
                                  + attacker.AllDmgBoost(ent)
                                  + dotMultiplier
                                  ;
-            double abilityTypeMultiplier = attacker.GetAbilityTypeMultiplier(ent.AbilityValue, ent);
+            double abilityTypeMultiplier = attacker.GetAbilityTypeMultiplier(ent);
             double def = defender.Stats.Def;
             double defWithIgnore = def * (1 - attacker.DefIgnore(ent));
             double defMultiplier = 1 - (defWithIgnore / (defWithIgnore + 200 + (10 * attacker.Level)));
@@ -152,7 +152,7 @@ namespace HSR_SIM_LIB.Fighters
             double totalDmg = baseDmg * abilityTypeMultiplier * critMultiplier * damageBoost * defMultiplier * resPen * vulnMult *
                               dmgReduction * brokenMultiplier;
             ent.ParentStep.Parent.Parent?.LogDebug("=======================");
-            ent.ParentStep.Parent.Parent?.LogDebug($"baseDmg={baseDmg:f}");
+            ent.ParentStep.Parent.Parent?.LogDebug($"baseDmg={baseDmg:f} crit chance={ attacker.GetCritRate(ent):f} ");
             ent.ParentStep.Parent.Parent?.LogDebug($"{attacker.Name:s} ({attacker.ParentTeam.Units.IndexOf(attacker) + 1:d}) Damaging {defender.Name} ({defender.ParentTeam.Units.IndexOf(defender) + 1:d})");
             ent.ParentStep.Parent.Parent?.LogDebug($"damageBoost({damageBoost:f}) = 1+ GetElemBoostValue({attacker.GetElemBoostValue(attackElem, ent):f})  +AllDmgBoost({attacker.AllDmgBoost(ent):f}) + dotMultiplier({dotMultiplier:f})");
             ent.ParentStep.Parent.Parent?.LogDebug($"Def {def:f} -> ignored to {defWithIgnore:f} ");
@@ -318,6 +318,25 @@ namespace HSR_SIM_LIB.Fighters
             ent.ParentStep.Parent.Parent?.LogDebug("=======================");
             ent.ParentStep.Parent.Parent?.LogDebug($"Shield val is {shieldVal:f} = (baseVal {baseVal:f} + additiveShieldBonus {additiveShieldBonus:f}) * (1+ prcShieldBonus{prcShieldBonus:f})");
             return shieldVal;
+        }
+
+        /// <summary>
+        /// Calc healing numbers
+        /// </summary>
+        /// <param name="baseHeal"></param>
+        /// <param name="ent"></param>
+        /// <returns></returns>
+        public static double CalculateHealByBasicVal(double baseHeal, Event ent)
+        {
+            var healer = ent.SourceUnit;
+            var receiver = ent.TargetUnit;
+            double outMod = healer.GetOutgoingHealMultiplier(ent);
+            double inMod = receiver.GetIncomingHealMultiplier(ent);
+            var res = baseHeal *  outMod *  inMod;
+            ent.ParentStep.Parent.Parent?.LogDebug("=======================");
+            ent.ParentStep.Parent.Parent?.LogDebug($"Heal val is {res:f} = baseHeal{baseHeal:f} * outMod{outMod:f} *  inMod{inMod:f}");
+            return res;
+
         }
     }
 }

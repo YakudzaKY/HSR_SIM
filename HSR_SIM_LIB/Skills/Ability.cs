@@ -19,9 +19,6 @@ namespace HSR_SIM_LIB.Skills
     {
 
 
-        //public Event.CalculateValuePrc CalculateValue { get; init; }
-        //public Event.CalculateTargetPrc CalculateTargets { get; init; }
-
         public ElementEnm Element { get; set; }
 
         public AbilityTypeEnm AbilityType { get; set; }
@@ -40,7 +37,7 @@ namespace HSR_SIM_LIB.Skills
         public AdjacentTargetsEnm AdjacentTargets { get; set; } = AdjacentTargetsEnm.None;
 
         public bool Attack { get; set; }
-        public int EnergyGain { get; set; }
+        public double EnergyGain { get; set; }
         public bool IgnoreWeakness { get; set; }
 
         public int Cooldown { get; set; }
@@ -63,13 +60,14 @@ namespace HSR_SIM_LIB.Skills
             Ultimate,
             Low,
         }
+        [Flags]
         public enum AbilityTypeEnm
-        {
-            Basic,
-            Ability,
-            Ultimate,
-            Technique,
-            FollowUpAction//Add priority Hight Medium Low . Ultimate can use before low. Blade shuhu medium, Locha heal - hight. Kafka-hight, Locha aura - low
+        {   None=0,
+            Basic=1,
+            Ability=2,
+            Ultimate=4,
+            Technique=8,
+            FollowUpAction=16
         }
 
 

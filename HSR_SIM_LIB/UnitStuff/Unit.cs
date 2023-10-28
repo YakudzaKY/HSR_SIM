@@ -198,7 +198,7 @@ namespace HSR_SIM_LIB.UnitStuff
         /// Get total stat by Mods by type
         /// </summary>
         /// <returns></returns>
-        public double GetModsByType(EffectType modType, ElementEnm? elem = null, AbilityTypeEnm? entAbilityValue = null, Event ent = null)
+        public double GetModsByType(EffectType modType, ElementEnm? elem = null, Event ent = null)
         {
             double res = 0;
             List<Mod> conditionsToCheck = new();
@@ -212,8 +212,7 @@ namespace HSR_SIM_LIB.UnitStuff
             {
                 foreach (Effect effect in mod.Effects.Where(y => y.EffType == modType
                                                                  && y.Element == elem
-                                                                 && (y.AbilityTypes.Any(y => y == entAbilityValue) ||
-                                                                     entAbilityValue == null)
+                                                                 &&  (y.AbilityType==AbilityTypeEnm.None||(ent?.AbilityValue!=null&&y.AbilityType.HasFlag(ent.AbilityValue.AbilityType)))
                          )
                         )
                 {
@@ -517,10 +516,35 @@ namespace HSR_SIM_LIB.UnitStuff
             else
                 return 1;
         }
-
-        public double GetAbilityTypeMultiplier(Ability entAbilityValue, Event ent = null)
+        /// <summary>
+        /// ability by type damage amplifier
+        /// </summary>
+        /// <param name="entAbilityValue"></param>
+        /// <param name="ent"></param>
+        /// <returns></returns>
+        public double GetAbilityTypeMultiplier( Event ent = null)
         {
-            return 1 + GetModsByType(EffectType.AbilityTypeBoost, null, entAbilityValue.AbilityType, ent: ent);
+            return 1 + GetModsByType(EffectType.AbilityTypeBoost, ent: ent);
+        }
+
+        public double GetOutgoingHealMultiplier(Event ent)
+        {
+           return 1+Stats.HealRate+GetModsByType(EffectType.OutgoingHealingPrc,  ent: ent);
+        }
+
+        public double GetIncomingHealMultiplier(Event ent)
+        {
+            return 1+GetModsByType(EffectType.IncomeHealingPrc,  ent: ent);
+        }
+
+        public double GetCritRate(Event ent)
+        {
+            return Stats.CritChance +GetModsByType(EffectType.CritPrc,  ent: ent);
+        }
+
+        public double GetCritDamage(Event ent)
+        {
+            return Stats.CritDmg +GetModsByType(EffectType.CritDmg,  ent: ent);
         }
     }
 

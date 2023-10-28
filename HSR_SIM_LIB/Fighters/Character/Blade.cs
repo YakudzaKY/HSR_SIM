@@ -55,7 +55,7 @@ namespace HSR_SIM_LIB.Fighters.Character
         
         public double? CalculateHellscapeSelfDmg(Event ent)
         {
-            return FighterUtils.CalculateDmgByBasicVal(Parent.Stats.MaxHp * 0.3, ent);
+            return Parent.Stats.MaxHp * 0.3;
         }
 
         public override string GetSpecialText()
@@ -160,7 +160,7 @@ namespace HSR_SIM_LIB.Fighters.Character
                 PassiveMods.Add(new PassiveMod(Parent)
                 {
                     Mod = new Mod(Parent)
-                    { Effects =  new List<Effect>() { new Effect(){ EffType = Effect.EffectType.AbilityTypeBoost, Value = 0.20, AbilityTypes = new List<Ability.AbilityTypeEnm>(){ Ability.AbilityTypeEnm.FollowUpAction} }, 
+                    { Effects =  new List<Effect>() { new Effect(){ EffType = Effect.EffectType.AbilityTypeBoost, Value = 0.20, AbilityType =  Ability.AbilityTypeEnm.FollowUpAction }, 
                        } },
                     Target = Parent
                    

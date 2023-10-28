@@ -208,13 +208,13 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                     switch (ent.AbilityValue.Element)
                     {
                         case Unit.ElementEnm.Physical:
-                            ent.TryDebuff(new Mod(ent.SourceUnit) { DoNotClone = true, Type = ModType.Dot, BaseDuration = 2, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Bleed, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
+                            ent.TryDebuff(new Mod(ent.SourceUnit) {  DoNotClone = true, Type = ModType.Dot, BaseDuration = 2, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Bleed, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
                             break;
                         case Unit.ElementEnm.Fire:
-                            ent.TryDebuff(new Mod(ent.SourceUnit) { DoNotClone = true, Type = ModType.Dot, BaseDuration = 2, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Burn, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
+                            ent.TryDebuff(new Mod(ent.SourceUnit) {  DoNotClone = true, Type = ModType.Dot, BaseDuration = 2, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Burn, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
                             break;
                         case Unit.ElementEnm.Ice:
-                            ent.TryDebuff(new Mod(ent.SourceUnit) { DoNotClone = true, Type = ModType.Debuff, BaseDuration = 1, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Freeze, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
+                            ent.TryDebuff(new Mod(ent.SourceUnit) {  DoNotClone = true, Type = ModType.Debuff, BaseDuration = 1, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Freeze, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
                             break;
                         case Unit.ElementEnm.Lightning:
                             ent.TryDebuff(new Mod(ent.SourceUnit) { DoNotClone = true, Type = ModType.Dot, BaseDuration = 2, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Shock, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
@@ -225,6 +225,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         case Unit.ElementEnm.Quantum:
                             ent.TryDebuff(new Mod(ent.SourceUnit)
                             {
+                                Dispellable = true,
                                 DoNotClone = true,
                                 Type = ModType.Debuff,
                                 BaseDuration = 1,
@@ -239,6 +240,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         case Unit.ElementEnm.Imaginary:
                             ent.TryDebuff(new Mod(ent.SourceUnit)
                             {
+                                Dispellable = true,
                                 DoNotClone = true,
                                 Type = ModType.Debuff,
                                 BaseDuration = 1,
@@ -506,15 +508,6 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 }
             }
 
-            //TODO предусмотреть если Actor сдох-то просто заканчивает ход. скипаект
-
-
-            //TODO ON MOVE START STEP - procs DotS  hots Set Action value
-            //TODO ON MOVE START STEP  TRIGGERS (if second ability allowed or need heal by follow up attacks) Loucha heals 
-            //TODO ON MOVE PROGRESS  STEP (if second ability allowed or need heal by follow up attacks) Loucha heals , kafka folow up
-            //TODO ON MOVE PROGRESS TRIGGERS  TRIGGERS (if second ability allowed or need heal by follow up attacks) Loucha heals
-            //TODO BEFORE MOVE END TRIGGERS- crio girl ultimate may be
-            //TODO ON MOVE END -  ALSO RESET AV()!!!!dispell buffs who ended .  also dispell debuffs(with dmg)
 
 
 

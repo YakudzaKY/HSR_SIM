@@ -131,6 +131,7 @@ namespace HSR_SIM_LIB.Utils
                     unitStats.BaseEffectRes = SafeToDouble(xnode.Attributes.GetNamedItem("effect_res")?.Value.Trim());
                     unitStats.BaseEffectHit = SafeToDouble(xnode.Attributes.GetNamedItem("effect_hit")?.Value.Trim());
                     unitStats.BaseEnergyRes = SafeToDouble(xnode.Attributes.GetNamedItem("sp_rate")?.Value.Trim());
+                    unitStats.BaseHealRate = SafeToDouble(xnode.Attributes.GetNamedItem("heal_rate")?.Value.Trim());
                     if (xnode.Attributes.GetNamedItem("baseActionValue") is not null)
                     {
                         unitStats.InitialBaseActionValue =
@@ -148,6 +149,7 @@ namespace HSR_SIM_LIB.Utils
                     unitStats.EffectHitPrc = SafeToDouble(xnode.Attributes.GetNamedItem("effect_hit_prc")?.Value.Trim());
                     unitStats.EffectResPrc = SafeToDouble(xnode.Attributes.GetNamedItem("effect_res_prc")?.Value.Trim());
                     unitStats.BaseEnergyResPrc = SafeToDouble(xnode.Attributes.GetNamedItem("sp_rate_prc")?.Value.Trim());
+                    unitStats.HealRatePrc = SafeToDouble(xnode.Attributes.GetNamedItem("heal_rate_prc")?.Value.Trim());
 
 
 

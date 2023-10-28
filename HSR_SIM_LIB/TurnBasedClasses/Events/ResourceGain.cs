@@ -23,16 +23,16 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
 
         public override void ProcEvent(bool revert)
         {
-            
+            Resource res = TargetUnit.GetRes(ResType);
             //Resource drain
             RealVal ??= ResType switch
             {
-                Resource.ResourceType.Toughness => Math.Min((double)Val, TargetUnit.Stats.MaxToughness),
-                Resource.ResourceType.HP => Math.Min((double)Val, (double)TargetUnit.Stats.MaxHp),
-                Resource.ResourceType.Energy => Math.Min((double)Val, (double)TargetUnit.Stats.BaseMaxEnergy),
+                Resource.ResourceType.Toughness => Math.Min((double)Val, TargetUnit.Stats.MaxToughness-res.ResVal),
+                Resource.ResourceType.HP =>  Math.Min(TargetUnit.Stats.MaxHp-res.ResVal ,(double)Val ),
+                Resource.ResourceType.Energy => Math.Min((double)Val, (double)TargetUnit.Stats.BaseMaxEnergy-res.ResVal),
                 _ => Val
             };
-            TargetUnit.GetRes(ResType).ResVal+= (double)(revert ? -RealVal : RealVal);
+            res.ResVal+= (double)(revert ? -RealVal : RealVal);
             base.ProcEvent(revert);
         }
     }

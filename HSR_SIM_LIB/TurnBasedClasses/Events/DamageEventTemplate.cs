@@ -8,10 +8,11 @@ using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events
 {
-    public  abstract class DamageEventTemplate:ModEventTemplate
+    public  abstract class DamageEventTemplate:Event
     {
         public double? RealBarrierVal { get => realBarrierVal; set => realBarrierVal = value; }
         private double? realBarrierVal;
+        public Mod Modification { get; set; }
         public bool CanSetToZero { get; init; } = true;
 
         public DamageEventTemplate(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)

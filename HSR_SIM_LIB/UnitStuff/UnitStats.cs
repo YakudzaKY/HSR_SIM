@@ -117,14 +117,14 @@ namespace HSR_SIM_LIB.UnitStuff
         public double SpeedPrc { get; set; }
 
         public double BaseCritChance { get; set; } = 0;
-        public double CritChance => BaseCritChance + Parent.GetModsByType(EffectType.CritPrc) + CritRatePrc;
+        public double CritChance => BaseCritChance  + CritRatePrc;
         public double CritRatePrc { get; set; }
 
 
 
         public double BaseCritDmg { get; set; }
 
-        public double CritDmg => BaseCritDmg + Parent.GetModsByType(EffectType.CritDmg) + CritDmgPrc;
+        public double CritDmg => BaseCritDmg + CritDmgPrc;
         public double CritDmgPrc { get; set; }
 
         public double CurrentEnergy
@@ -132,6 +132,11 @@ namespace HSR_SIM_LIB.UnitStuff
             get => Parent.GetRes(Resource.ResourceType.HP).ResVal;
             set => Parent.GetRes(Resource.ResourceType.HP).ResVal = value;
         }
+
+        public double BaseHealRate { get; set; }
+        public double HealRatePrc { get; set; }
+
+        public double HealRate => BaseHealRate  + HealRatePrc;
 
         public UnitStats(Unit unit)
         {

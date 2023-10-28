@@ -134,7 +134,7 @@ namespace HSR_SIM_LIB.Skills
 
         public Mod RefMod { get; set; }
 
-        public bool Dispellable { get; init; }
+        public bool? Dispellable { get; init; }
         public Unit UniqueUnit { get; set; }
         public bool DoNotClone { get; set; } = false;
 
@@ -153,6 +153,14 @@ namespace HSR_SIM_LIB.Skills
         {
             RefMod = reference;
             Caster = caster;
+            //auto set dispellable
+            Dispellable ??= Type switch
+            {
+                ModType.Buff => false,
+                ModType.Debuff => true,
+                ModType.Dot => true,
+                _ => false
+            };
 
         }
 
