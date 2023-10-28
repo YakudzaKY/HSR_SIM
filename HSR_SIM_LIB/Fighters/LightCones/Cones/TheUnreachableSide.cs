@@ -21,7 +21,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
         public override void DefaultLightCone_HandleEvent(Event ent)
         {
             //if unit consume hp or got attack then apply buff
-            if (((ent.AbilityValue?.Parent == Parent.Parent && ent.TargetUnit == Parent.Parent && ent.Type == Event.EventType.ResourceDrain &&
+            if (((ent.AbilityValue?.Parent == Parent && ent.TargetUnit == Parent.Parent && ent.Type == Event.EventType.ResourceDrain &&
                 ent.ResType == Resource.ResourceType.HP && ent.RealVal != 0)
                 || (ent.TargetUnit == Parent.Parent && ent.Type == Event.EventType.DirectDamage)) && uniqueBuff != null)
             {
@@ -50,7 +50,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
                     TargetUnit = Parent.Parent,
                     Modification = uniqueBuff
                 };
-                newEvent.ProcEvent(false);
+          
                 step.Events.Add(newEvent);
             }
             base.DefaultLightCone_HandleStep(step);

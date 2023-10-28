@@ -193,6 +193,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
         private void UnitThgShred(Unit unit, Ability ability)
         {
+            if (unit == null) return;
+            if (ability==null) return;
             double? shredVal = 0;
             if (ability.CalculateToughnessShred != null)
             {

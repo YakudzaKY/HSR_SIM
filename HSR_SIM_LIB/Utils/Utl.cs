@@ -57,7 +57,7 @@ namespace HSR_SIM_LIB.Utils
         public static Bitmap LoadBitmap(string filename)
         {
             if (!ImageCache.ContainsKey(filename))
-                ImageCache[filename] = new FileInfo(GetAvalableImageFile(filename)).NewBitmap();
+                ImageCache[filename] = new FileInfo(GetAvailableImageFile(filename)).NewBitmap();
             return ImageCache[filename];
         }
         /// <summary>
@@ -65,7 +65,7 @@ namespace HSR_SIM_LIB.Utils
         /// </summary>
         /// <param name="unitCode"></param>
         /// <returns></returns>
-        public static string GetAvalableImageFile(string unitCode)
+        public static string GetAvailableImageFile(string unitCode)
         {
             string imageFileName = DataFolder + "Images\\" + unitCode;
             if (File.Exists(imageFileName + ".png"))
