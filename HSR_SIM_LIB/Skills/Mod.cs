@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices.JavaScript;
 using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.TurnBasedClasses;
+using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using static HSR_SIM_LIB.Skills.Effect;
 
@@ -54,9 +55,8 @@ namespace HSR_SIM_LIB.Skills
         {
             //do some shit
             if (Type == ModType.Dot)
-                foreach (var dotProcEvent in Effects.Select(effect => new Event(step, this.Caster, Caster)
+                foreach (var dotProcEvent in Effects.Select(effect => new DoTDamage(step, this.Caster, Caster)
                 {
-                    Type = Event.EventType.DoTDamage,
                     CalculateValue = effect.CalculateValue,
                     TargetUnit = step.Actor,
                     Modification = this,
@@ -69,9 +69,9 @@ namespace HSR_SIM_LIB.Skills
                 }
 
             //minus duration
-            Event reduceModDuration = new Event(step, this.Caster, Caster)
+            Event reduceModDuration = new ReduceDuration(step, this.Caster, Caster)
             {
-                Type = Event.EventType.ReduceDuration,
+               
                 Modification = this,
                 TargetUnit = step.Actor,
 
@@ -84,7 +84,7 @@ namespace HSR_SIM_LIB.Skills
 
         public void EntanglementEventHandler(Event ent)
         {
-            if (ent.Type == Event.EventType.DirectDamage && ent.TargetUnit == this.Owner)
+            if (ent is DirectDamage && ent.TargetUnit == this.Owner)
                 Stack = Math.Min(Stack + 1, MaxStack);
 
         }
@@ -102,9 +102,8 @@ namespace HSR_SIM_LIB.Skills
         public void ProceedExpire(Event ent)
         {
             //delayed damage
-            foreach (var dotProcEvent in Effects.Where(x => x.EffType is EffectType.Freeze or EffectType.Entanglement).Select(effect => new Event(ent.ParentStep, this.Caster, Caster)
+            foreach (var dotProcEvent in Effects.Where(x => x.EffType is EffectType.Freeze or EffectType.Entanglement).Select(effect => new DoTDamage(ent.ParentStep, this.Caster, Caster)
             {
-                Type = Event.EventType.DoTDamage,
                 CalculateValue = effect.CalculateValue,
                 TargetUnit = ent.TargetUnit,
                 Modification = this,

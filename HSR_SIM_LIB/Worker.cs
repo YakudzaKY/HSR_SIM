@@ -18,13 +18,14 @@ using ImageMagick;
 using static HSR_SIM_LIB.Utils.Constant;
 using static HSR_SIM_LIB.TurnBasedClasses.Step;
 using System.Net.Mail;
-using static HSR_SIM_LIB.TurnBasedClasses.Event;
+using static HSR_SIM_LIB.TurnBasedClasses.Events.Event;
 using static HSR_SIM_LIB.UnitStuff.Resource;
 using System.Resources;
 using System.Drawing;
 using HSR_SIM_LIB.Utils;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.TurnBasedClasses.Events;
 
 namespace HSR_SIM_LIB
 {
@@ -178,9 +179,10 @@ namespace HSR_SIM_LIB
                 else if (replay)
                     OutText = "reproduced: " + OutText;
                 LogText(OutText);
-                if (ent.Modification != null)
+                if (ent is ModEventTemplate)
+                if (((ModEventTemplate)ent).Modification != null)
                 {
-                    OutText = " * " + ent.Modification.GetDescription();
+                    OutText = " * " + ((ModEventTemplate)ent).Modification.GetDescription();
                     LogText(OutText);
                 }
 

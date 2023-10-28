@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
+using HSR_SIM_LIB.TurnBasedClasses.Events;
 
 namespace HSR_SIM_LIB.Fighters.LightCones
 {

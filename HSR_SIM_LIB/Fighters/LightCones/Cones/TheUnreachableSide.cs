@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
+using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Fighters.LightCones.Cones
@@ -21,14 +22,13 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
         public override void DefaultLightCone_HandleEvent(Event ent)
         {
             //if unit consume hp or got attack then apply buff
-            if (((ent.AbilityValue?.Parent == Parent && ent.TargetUnit == Parent.Parent && ent.Type == Event.EventType.ResourceDrain &&
-                ent.ResType == Resource.ResourceType.HP && ent.RealVal != 0)
-                || (ent.TargetUnit == Parent.Parent && ent.Type == Event.EventType.DirectDamage)) && uniqueBuff != null)
+            if (((ent.AbilityValue?.Parent == Parent && ent.TargetUnit == Parent.Parent && ent  is ResourceDrain &&
+                ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal != 0)
+                || (ent.TargetUnit == Parent.Parent && ent is DirectDamage)) && uniqueBuff != null)
             {
-                Event newEvent = new(ent.ParentStep, this, Parent.Parent)
+                ApplyMod newEvent = new(ent.ParentStep, this, Parent.Parent)
                 {
-                    Type = Event.EventType.Mod
-                    ,
+                    
                     TargetUnit = Parent.Parent,
                     Modification = uniqueBuff
                 };
@@ -43,10 +43,8 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
         {
             if (step.StepType == Step.StepTypeEnm.ExecuteAbility && step.Actor == Parent.Parent && step.ActorAbility.Attack && uniqueBuff != null)
             {
-                Event newEvent = new(step, this, Parent.Parent)
+                RemoveMod newEvent = new(step, this, Parent.Parent)
                 {
-                    Type = Event.EventType.RemoveMod
-                    ,
                     TargetUnit = Parent.Parent,
                     Modification = uniqueBuff
                 };

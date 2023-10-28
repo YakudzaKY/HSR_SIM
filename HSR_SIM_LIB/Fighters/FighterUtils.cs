@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HSR_SIM_LIB.Skills;
-using HSR_SIM_LIB.TurnBasedClasses;
+using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using HSR_SIM_LIB.Utils.Utils;
-using static HSR_SIM_LIB.TurnBasedClasses.Event;
+using static HSR_SIM_LIB.TurnBasedClasses.Events.Event;
 using static HSR_SIM_LIB.UnitStuff.Unit;
 
 namespace HSR_SIM_LIB.Fighters
@@ -29,7 +29,7 @@ namespace HSR_SIM_LIB.Fighters
         /// <returns></returns>
         public static double? CalculateShieldBrokeDmg(Event ent)
         {
-            if (ent.Type != EventType.ShieldBreak && ent.Type != EventType.DoTDamage)
+            if (!(ent is ShieldBreak) && !(ent is DoTDamage))
             {
                 return 0;
             }
@@ -43,7 +43,7 @@ namespace HSR_SIM_LIB.Fighters
             double baseDmg;
             double maxToughnessMult = 0.5 + (double)defender.Stats.MaxToughness / 120;
             //if this is direct shield break
-            if (ent.Type == (EventType.ShieldBreak))
+            if (ent is ShieldBreak)
             {
                 
 
@@ -59,33 +59,29 @@ namespace HSR_SIM_LIB.Fighters
                     _ => throw new NotImplementedException()
                 };
             }
-            else if (ent.Type == (EventType.DoTDamage))
+            else
             {
-
-                if (ent.Modification.Effects.Any(x => x.EffType == Effect.EffectType.Bleed))
+                 var modEnt = ent as ModEventTemplate;
+                if (modEnt.Modification.Effects.Any(x => x.EffType == Effect.EffectType.Bleed))
                 {
                     bool eliteFlag = defender.Fighter is DefaultNPCBossFIghter;
                     baseDmg = eliteFlag ? 0.07 : 0.16 * defender.Stats.MaxHp;
                     baseDmg = Math.Min(baseDmg, 2 * lvlMultiplier[defender.Level] * defender.Stats.MaxToughness);
                 }
-                else if (ent.Modification.Effects.Any(x =>
+                else if (modEnt.Modification.Effects.Any(x =>
                              x.EffType is Effect.EffectType.Burn or Effect.EffectType.Freeze))
                     baseDmg = 1 * lvlMultiplier[defender.Level];
-                else if (ent.Modification.Effects.Any(x =>
+                else if (modEnt.Modification.Effects.Any(x =>
                              x.EffType is Effect.EffectType.Shock))
                     baseDmg = 2 * lvlMultiplier[defender.Level];
-                else if (ent.Modification.Effects.Any(x =>
+                else if (modEnt.Modification.Effects.Any(x =>
                              x.EffType is Effect.EffectType.WindShear))
-                    baseDmg = 1* ent.Modification.Stack  * lvlMultiplier[defender.Level];
-                else if (ent.Modification.Effects.Any(x =>
+                    baseDmg = 1* modEnt.Modification.Stack  * lvlMultiplier[defender.Level];
+                else if (modEnt.Modification.Effects.Any(x =>
                              x.EffType is Effect.EffectType.Entanglement))
-                    baseDmg =0.6* ent.Modification.Stack  * lvlMultiplier[defender.Level] * maxToughnessMult;
+                    baseDmg =0.6* modEnt.Modification.Stack  * lvlMultiplier[defender.Level] * maxToughnessMult;
                 else
                     baseDmg = 0;
-            }
-            else
-            {
-                return 0;
             }
 
             double breakEffect = 1 + attacker.Stats.BreakDmg;
@@ -122,10 +118,10 @@ namespace HSR_SIM_LIB.Fighters
             double critMultiplier = 1;
             double dotMultiplier = 0;
             double dotVulnerability = 0;
-            if (ent.Type == Event.EventType.DirectDamage)
+            if (ent is DirectDamage)
             {
-                ent.IsCrit = new MersenneTwister().NextDouble() <= attacker.Stats.CritChance;
-                if (ent.IsCrit)
+                ((DirectDamage)ent).IsCrit = new MersenneTwister().NextDouble() <= attacker.Stats.CritChance;
+                if (((DirectDamage)ent).IsCrit)
                     critMultiplier = 1 + attacker.Stats.CritDmg;
             }
             else
@@ -279,7 +275,7 @@ namespace HSR_SIM_LIB.Fighters
         }
 
         //debuff is resisted?
-        public static bool CalculateDebuffResisted(Event ent)
+        public static bool CalculateDebuffResisted(ApplyMod ent)
         {
             Unit attacker = ent.SourceUnit;
             Unit defender = ent.TargetUnit;

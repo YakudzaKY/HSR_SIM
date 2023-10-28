@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
+using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Fighters.Relics.Set
@@ -23,9 +24,9 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
 
                         foreach (Unit unit in step.Actor.GetTargetsForUnit(Ability.TargetTypeEnm.Friend))
                         {
-                            Event eventBuff = new(null, this,Parent.Parent)
+                            ApplyMod eventBuff = new(null, this,Parent.Parent)
                             {
-                                OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.Mod,
+                                OnStepType = Step.StepTypeEnm.ExecuteAbility,
                                 AbilityValue = step.ActorAbility,
                                 ParentStep = step,
                                 TargetUnit = unit,

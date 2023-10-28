@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
+using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using static HSR_SIM_LIB.Skills.Ability;
 
@@ -32,7 +33,7 @@ namespace HSR_SIM_LIB.Fighters.Character
         public override void DefaultFighter_HandleEvent(Event ent)
         {
             //if unit consume hp or got attack then apply buff
-            if (ent.TargetUnit == Parent && ent.Type == Event.EventType.ResourceDrain && ent.ResType == Resource.ResourceType.HP && ent.RealVal > 0)
+            if (ent.TargetUnit == Parent && ent is ResourceDrain && ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal > 0)
             {
                 Mechanics.Values[shuhuGift] =  Math.Min( (double) Mechanics.Values[shuhuGift] +1,  (double)  ShuHuMaxCnt);
             }
@@ -96,8 +97,8 @@ namespace HSR_SIM_LIB.Fighters.Character
                                             , AdjacentTargets = AdjacentTargetsEnm.All
             };
             //dmg events
-            KarmaWind.Events.Add(new Event(null, this,this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.ResourceDrain, ResType = Resource.ResourceType.HP, TargetType =TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateKarmaSelfDmg, AbilityValue = KarmaWind ,CurentTargetType=AbilityCurrentTargetEnm.AbilityMain});
-            KarmaWind.Events.Add(new Event(null, this,this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.DirectDamage, CalculateValue = CalculateKarmaDmg, AbilityValue = KarmaWind });
+            KarmaWind.Events.Add(new ResourceDrain(null, this,this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, ResType = Resource.ResourceType.HP, TargetType =TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateKarmaSelfDmg, AbilityValue = KarmaWind ,CurentTargetType=AbilityCurrentTargetEnm.AbilityMain});
+            KarmaWind.Events.Add(new DirectDamage(null, this,this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility,  CalculateValue = CalculateKarmaDmg, AbilityValue = KarmaWind });
 
             Abilities.Add(KarmaWind);
 
@@ -133,7 +134,7 @@ namespace HSR_SIM_LIB.Fighters.Character
                 , Available=ICanUseHellscape
             };
             //dmg events
-            Hellscape.Events.Add(new Event(null, this,this.Parent) { Type = Event.EventType.ResourceDrain, ResType = Resource.ResourceType.HP, TargetType =TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateHellscapeSelfDmg, AbilityValue = Hellscape ,CurentTargetType=AbilityCurrentTargetEnm.AbilityMain});
+            Hellscape.Events.Add(new ResourceDrain(null, this,this.Parent) {  ResType = Resource.ResourceType.HP, TargetType =TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateHellscapeSelfDmg, AbilityValue = Hellscape ,CurentTargetType=AbilityCurrentTargetEnm.AbilityMain});
             
 
             Abilities.Add(Hellscape);

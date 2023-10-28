@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
+using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using static HSR_SIM_LIB.Fighters.FighterUtils;
 

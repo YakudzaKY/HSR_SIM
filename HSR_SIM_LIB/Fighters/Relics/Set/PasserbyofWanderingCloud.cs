@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HSR_SIM_LIB.TurnBasedClasses;
+using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Fighters.Relics.Set
@@ -17,10 +18,10 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
             {
                 if (step.StepType==Step.StepTypeEnm.StartCombat)
                 {
-                    Event newEvent = new (step, this,Parent.Parent)
+                    PartyResourceGain newEvent = new (step, this,Parent.Parent)
                     {
-                        Type = Event.EventType.PartyResourceGain
-                        ,ResType = Resource.ResourceType.SP
+                        
+                        ResType = Resource.ResourceType.SP
                         ,Val=1
                         ,TargetUnit = Parent.Parent
                     };

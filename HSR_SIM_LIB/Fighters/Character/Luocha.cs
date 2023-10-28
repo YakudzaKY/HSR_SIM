@@ -2,6 +2,7 @@
 using System.Linq;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
+using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Fighters.Character
@@ -47,11 +48,10 @@ namespace HSR_SIM_LIB.Fighters.Character
                 , Priority = Ability.PriorityEnm.Low
                 , TargetType = Ability.TargetTypeEnm.Self
             };
-            cycleOfLife.Events.Add(new Event(null, this, this.Parent) {Type = Event.EventType.MechanicValChg, TargetUnit = Parent , AbilityValue = cycleOfLife , Val = -cycleOfLifeMaxCnt});
-            cycleOfLife.Events.Add(new(null, this, Parent)
+            cycleOfLife.Events.Add(new MechanicValChg(null, this, this.Parent) { TargetUnit = Parent , AbilityValue = cycleOfLife , Val = -cycleOfLifeMaxCnt});
+            cycleOfLife.Events.Add(new ApplyMod(null, this, Parent)
             {
                 AbilityValue = cycleOfLife,
-                Type = Event.EventType.Mod,
                 TargetUnit = Parent,
                 Modification = uniqueBuff
             });
@@ -66,7 +66,7 @@ namespace HSR_SIM_LIB.Fighters.Character
                 , CostType = Resource.ResourceType.TP
                 , Element = Element
             };
-            ability.Events.Add(new Event(null, this,Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, TargetUnit = Parent,Type = Event.EventType.MechanicValChg, Val = cycleOfLifeMaxCnt, AbilityValue = cycleOfLife });//AbilityValue for Cycle of life
+            ability.Events.Add(new MechanicValChg(null, this,Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, TargetUnit = Parent, Val = cycleOfLifeMaxCnt, AbilityValue = cycleOfLife });//AbilityValue for Cycle of life
             Abilities.Add(ability);
 
             //CoL buffs

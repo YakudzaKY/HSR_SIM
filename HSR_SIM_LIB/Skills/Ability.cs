@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using HSR_SIM_LIB.Fighters;
-using HSR_SIM_LIB.TurnBasedClasses;
+using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
-using static HSR_SIM_LIB.TurnBasedClasses.Event;
+using static HSR_SIM_LIB.TurnBasedClasses.Events.Event;
 using static HSR_SIM_LIB.UnitStuff.Resource;
 using static HSR_SIM_LIB.UnitStuff.Unit;
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
+using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Fighters.NPC
@@ -35,7 +36,7 @@ namespace HSR_SIM_LIB.Fighters.NPC
                 Attack = true
             };
             //dmg events
-            ability.Events.Add(new Event(null, this,Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.DirectDamage, CanSetToZero = false, Val=1, AbilityValue = ability });
+            ability.Events.Add(new DirectDamage(null, this,Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility,  CanSetToZero = false, Val=1, AbilityValue = ability });
 
 
             Abilities.Add(ability);

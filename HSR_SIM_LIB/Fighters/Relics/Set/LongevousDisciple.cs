@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
+using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Fighters.Relics.Set
@@ -27,16 +28,15 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
             //if friend unit consume our hp or got attack then apply buff
             if (Num >= 4)
             {
-                if (( ent.Type == Event.EventType.ResourceDrain
+                if (( ent is ResourceDrain
                       &&ent.AbilityValue?.Parent.Parent.ParentTeam==Parent.Parent.ParentTeam
                       && ent.TargetUnit == Parent.Parent
-                      && ent.ResType == Resource.ResourceType.HP && ent.RealVal != 0)
-                    || (ent.TargetUnit == Parent.Parent && ent.Type == Event.EventType.DirectDamage))
+                      && ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal != 0)
+                    || (ent.TargetUnit == Parent.Parent && ent is DirectDamage))
                 {
-                    Event newEvent = new (ent.ParentStep, this, Parent.Parent)
+                    ApplyMod newEvent = new (ent.ParentStep, this, Parent.Parent)
                     {
-                        Type = Event.EventType.Mod
-                        ,TargetUnit = Parent.Parent,
+                        TargetUnit = Parent.Parent,
                         Modification = uniqueBuff
                     };
                     newEvent.ProcEvent(false);

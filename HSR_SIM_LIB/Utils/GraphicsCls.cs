@@ -14,6 +14,7 @@ using static HSR_SIM_LIB.Utils.Constant;
 using static HSR_SIM_LIB.UnitStuff.Resource;
 using static HSR_SIM_LIB.UnitStuff.Unit;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.TurnBasedClasses.Events;
 
 namespace HSR_SIM_LIB.Utils
 {/// <summary>
@@ -234,7 +235,7 @@ namespace HSR_SIM_LIB.Utils
                     grayPortrait.Dispose();
                 }
                 //defeat flag
-                if (step.Events.Any(x => x.Type == Event.EventType.Defeat && x.TargetUnit == unit))
+                if (step.Events.Any(x => x is Defeat && x.TargetUnit == unit))
                 {
                     Bitmap btm = new(Utl.LoadBitmap("defeat"), PortraitSize);
                     gfx.DrawImage(btm, portraitPoint);
@@ -343,10 +344,10 @@ namespace HSR_SIM_LIB.Utils
                 {
                     j = 0;
                     foreach (Event ent in step.Events.Where(x => x.TargetUnit == unit &&
-                                                               (x.Type == Event.EventType.DirectDamage
-                                                               || x.Type == Event.EventType.ShieldBreak
-                                                               || x.Type == Event.EventType.DoTDamage
-                                                               || x.Type == Event.EventType.ResourceDrain && x.Val > 0 && x.ResType == ResourceType.HP)
+                                                               (x is DirectDamage
+                                                               || x is ShieldBreak
+                                                               || x is DoTDamage
+                                                               || (x is ResourceDrain && x.Val > 0 && ((ResourceDrain)x).ResType == ResourceType.HP))
                                                                ))
                     {
                         int pointY = 0;
@@ -356,12 +357,12 @@ namespace HSR_SIM_LIB.Utils
                         {
                             pointY = portraitPoint.Y - CombatImgSize.Height / 50 * (j + 2);
                         }
-                        Bitmap dmgIcon = ent.Type switch
+                        Bitmap dmgIcon = ent  switch
                         {
-                            Event.EventType.DirectDamage => Utl.LoadBitmap("Sword"),
-                            Event.EventType.ShieldBreak=> Utl.LoadBitmap("BreakShield"),
-                            Event.EventType.DoTDamage =>  Utl.LoadBitmap("DoT"),
-                            Event.EventType.ResourceDrain =>Utl.LoadBitmap("Blood"),
+                            ShieldBreak=> Utl.LoadBitmap("BreakShield"),
+                            DoTDamage =>  Utl.LoadBitmap("DoT"),
+                            DirectDamage => Utl.LoadBitmap("Sword"),
+                            ResourceDrain =>Utl.LoadBitmap("Blood"),
                             _ => null
                         };
                         if (dmgIcon!=null)
@@ -371,8 +372,9 @@ namespace HSR_SIM_LIB.Utils
                         DrawText(portraitPoint.X+ DmgIconSize.Width
                             , pointY
                             , gfx
-                            , Math.Floor((double)(ent.Val ?? 0)).ToString() + (ent.IsCrit?$" crit":"")
-                            , new SolidBrush(Unit.GetColorByElem((ent.Type != Event.EventType.ResourceDrain)?ent.AbilityValue?.Element:null))
+                            , Math.Floor((double)(ent.Val ?? 0)).ToString() +
+                              ((ent is DirectDamage damage && damage.IsCrit) ? $" crit" : "")
+                            , new SolidBrush(Unit.GetColorByElem(!(ent is ResourceDrain)?ent.AbilityValue?.Element:null))
                             , new Font("Tahoma",BarFontSize,FontStyle.Bold));
 
                         j++;
@@ -438,11 +440,11 @@ namespace HSR_SIM_LIB.Utils
                 if (step.Parent.CurrentFight?.CurrentWave != null)
                 {
                     Color fntColor;
-                    if (step.Events.Any(x => x.Type == Event.EventType.ModActionValue && x.Val < 0 && x.TargetUnit == unit))
+                    if (step.Events.Any(x => x is ModActionValue && x.Val < 0 && x.TargetUnit == unit))
                     {
                         fntColor = Color.Red;
                     }
-                    else if (step.Events.Any(x => x.Type == Event.EventType.ModActionValue && x.Val > 0 && x.TargetUnit == unit))
+                    else if (step.Events.Any(x => x is ModActionValue && x.Val > 0 && x.TargetUnit == unit))
                     {
                         fntColor = Color.GreenYellow;
                     }

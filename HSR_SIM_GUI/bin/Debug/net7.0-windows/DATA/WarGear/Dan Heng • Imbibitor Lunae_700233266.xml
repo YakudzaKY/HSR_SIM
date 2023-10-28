@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Unit name="Dan Heng • Imbibitor Lunae" level="80" rank="3">
+  <Stats hp="2300.2560000000003" atk="1333.5839999999998" def="760.725" spd="102" crit_rate="0.05" crit_dmg="0.5" imaginary_dmg_prc="0.7128030142988939" crit_rate_prc="0.674840006390591" hp_prc="0.285760002816098" hp_fix="705.6000000101048" crit_dmg_prc="1.354320022277538" break_dmg_prc="0.23976000538095799" atk_fix="393.02066901535727" def_prc="0.24839999922550998" spd_fix="12.400000002235176" effect_hit_prc="0.043200000654907" atk_prc="0.9417600156739441" effect_res_prc="0.043200000654907" def_fix="42.337546004448086" />
+  <LightCone rank="1" level="80" name="Brighter Than the Sun" />
+  <Skill name="Beneficent Lotus" level="7" max_level="9" />
+  <Skill name="Dracore Libre" level="11" max_level="15" />
+  <Skill name="Azure's Aqua Ablutes All" level="9" max_level="15" />
+  <Skill name="Righteous Heart" level="8" max_level="15" />
+  <Skill name="121306" level="0" max_level="1" />
+  <Skill name="Heaven-Quelling Prismadrakon" level="1" max_level="1" />
+  <Skill name="Transcendence" level="7" max_level="9" />
+  <Skill name="121309" level="0" max_level="1" />
+  <Skill name="Divine Spear" level="7" max_level="9" />
+  <Skill name="Fulgurant Leap" level="7" max_level="9" />
+  <RelicSet name="Wastelander of Banditry Desert" num="4" />
+  <RelicSet name="Rutilant Arena" num="2" />
+</Unit>

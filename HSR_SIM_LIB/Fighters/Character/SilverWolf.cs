@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
+using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Fighters.Character
@@ -17,15 +18,15 @@ namespace HSR_SIM_LIB.Fighters.Character
         public override void DefaultFighter_HandleEvent(Event ent)
         {
             //if unit consume hp or got attack then apply buff
-            if ( Parent.Rank>=2&& Parent.IsAlive&& ent.Type == Event.EventType.UnitEnteringBattle )
+            if ( Parent.Rank>=2&& Parent.IsAlive&& ent is UnitEnteringBattle )
             {
                 //if enemy enter combat need debuff
                 if (Parent.Enemies.Any(x => x == ent.TargetUnit))
                 {
-                    Event newEvent = new(ent.ParentStep, this,Parent)
+                    ApplyMod newEvent = new(ent.ParentStep, this,Parent)
                     {
-                        Type = Event.EventType.Mod
-                        ,TargetUnit = ent.TargetUnit,
+                      
+                        TargetUnit = ent.TargetUnit,
                         Modification = new Mod(Parent)
                         {
                             Type = Mod.ModType.Debuff, 
@@ -90,9 +91,9 @@ namespace HSR_SIM_LIB.Fighters.Character
                 , IgnoreWeakness=true
             };
             //dmg events
-            ability.Events.Add(new Event(null, this, this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.DirectDamage, CalculateValue = CalculateFqpDmg,  AbilityValue = ability });
+            ability.Events.Add(new DirectDamage(null, this, this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility,  CalculateValue = CalculateFqpDmg,  AbilityValue = ability });
             //shield break in this case going after skill dmg
-            ability.Events.Add(new Event(null, this, this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Type = Event.EventType.ResourceDrain,ResType = Resource.ResourceType.Toughness, Val = 60, AbilityValue = ability });
+            ability.Events.Add(new ResourceDrain(null, this, this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, ResType = Resource.ResourceType.Toughness, Val = 60, AbilityValue = ability });
       
             Abilities.Add(ability);
 
@@ -108,8 +109,8 @@ namespace HSR_SIM_LIB.Fighters.Character
                 , ToughnessShred = 30
             };
             //dmg events
-            SystemWarning.Events.Add(new Event(null, this, this.Parent) {Type = Event.EventType.DirectDamage, CalculateValue = CalculateBasicDmg,  AbilityValue = SystemWarning });
-            SystemWarning.Events.Add(new Event(null, this, this.Parent) {Type = Event.EventType.PartyResourceGain,ResType = Resource.ResourceType.SP,TargetUnit = Parent, Val = 1,  AbilityValue = SystemWarning });
+            SystemWarning.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateBasicDmg,  AbilityValue = SystemWarning });
+            SystemWarning.Events.Add(new PartyResourceGain(null, this, this.Parent) {ResType = Resource.ResourceType.SP,TargetUnit = Parent, Val = 1,  AbilityValue = SystemWarning });
       
             Abilities.Add(SystemWarning);
 
