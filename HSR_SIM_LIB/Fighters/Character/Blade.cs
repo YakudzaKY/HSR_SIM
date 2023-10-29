@@ -16,19 +16,32 @@ namespace HSR_SIM_LIB.Fighters.Character
 {
     public class Blade : DefaultFighter
     {
- 
+
         private readonly Dictionary<int, double> forestAdjAtkMods = new()
         {
             { 1, 0.08 }, { 2, 0.096 }, { 3, 0.112 }, { 4, 0.128 }, { 5, 0.144 }
             ,{ 6, 0.16 }, {7, 0.176 }
         };
 
+        private readonly Dictionary<int, double> sgAtkMods = new()
+        {
+            { 1, 0.22 }, { 2, 0.242 }, { 3, 0.264 }, { 4, 0.286 }, { 5, 0.308 }
+            ,{ 6, 0.330 }, {7, 0.358 },{ 8, 0.385}, {9, 0.431 },{ 10, 0.44 }
+            , {11, 0.462 },{ 12, 0.484 }
+        };
+        private readonly Dictionary<int, double> sgHpMods = new()
+        {
+            { 1, 0.55 }, { 2, 0.605 }, { 3, 0.66 }, { 4, 0.715 }, { 5, 0.77}
+            ,{ 6, 0.825}, {7, 0.894 },{ 8, 0.963 }, {9, 1.031 },{ 10, 1.10 }
+            , {11, 1.155 },{ 12, 1.21 }
+        };
 
-        private readonly double ShuHuMaxCnt;
+
+        private readonly double shuHuMaxCnt;
         private readonly Ability shuhuGift;
         private readonly Mod hellscapeBuff = null;
         public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Destruction;
-        public sealed override Unit.ElementEnm Element { get;  } =Unit.ElementEnm.Wind;
+        public sealed override Unit.ElementEnm Element { get; } = Unit.ElementEnm.Wind;
 
         public override Ability ChoseAbilityToCast(Step step)
         {
@@ -40,13 +53,14 @@ namespace HSR_SIM_LIB.Fighters.Character
         public override void DefaultFighter_HandleEvent(Event ent)
         {
             //if unit consume hp or got attack then apply buff
-            if (ent.TargetUnit == Parent && ent is ResourceDrain && ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal > 0)
+            if (Mechanics.Values[shuhuGift]<shuHuMaxCnt&&ent.TargetUnit == Parent && ent is ResourceDrain && ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal > 0)
             {
+
                 MechanicValChg sgProc = new MechanicValChg(ent.ParentStep, this, Parent)
-                    { TargetUnit = Parent, Val = 1, AbilityValue = shuhuGift };
+                { TargetUnit = Parent, Val = 1, AbilityValue = shuhuGift };
                 ent.ChildEvents.Add(sgProc);
             }
-           
+
             base.DefaultFighter_HandleEvent(ent);
         }
 
@@ -67,7 +81,16 @@ namespace HSR_SIM_LIB.Fighters.Character
         {
             return FighterUtils.CalculateDmgByBasicVal(Parent.GetMaxHp(ent) * 0.4, ent);
         }
-        
+
+        public double? CalculateSGDmg(Event ent)
+        {
+            int skillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Shuhu's Gift").Level;
+            double attackPart = Parent.Stats.Attack * sgAtkMods[skillLvl];
+            double maxHpPart = Parent.GetMaxHp(ent) * sgHpMods[skillLvl];
+            return FighterUtils.CalculateDmgByBasicVal(attackPart + maxHpPart, ent);
+        }
+
+
         public double? CalculateHellscapeSelfDmg(Event ent)
         {
             return Parent.GetMaxHp(ent) * 0.3;
@@ -75,30 +98,30 @@ namespace HSR_SIM_LIB.Fighters.Character
 
         public override string GetSpecialText()
         {
-            return $"SG: {(int)Mechanics.Values[shuhuGift]:d}\\{(int)ShuHuMaxCnt:d}";
+            return $"SG: {(int)Mechanics.Values[shuhuGift]:d}\\{(int)shuHuMaxCnt:d}";
         }
 
 
 
         public bool SGAvailable()
         {
-            return (Mechanics.Values[shuhuGift] == ShuHuMaxCnt);
+            return (Mechanics.Values[shuhuGift] == shuHuMaxCnt);
         }
 
         //50-110
         public double? CalculateBasicDmg(Event ent)
         {
-            return FighterUtils.CalculateDmgByBasicVal(Parent.Stats.Attack*(0.4 + (Parent.Skills.FirstOrDefault(x=>x.Name=="Shard Sword").Level*0.1)), ent);
+            return FighterUtils.CalculateDmgByBasicVal(Parent.Stats.Attack * (0.4 + (Parent.Skills.FirstOrDefault(x => x.Name == "Shard Sword").Level * 0.1)), ent);
         }
 
         //damage for main target
         public double? CalculateForestDmg(Event ent)
         {
             int skillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Forest of Swords").Level;
-            double attackPart =Parent.Stats.Attack *(0.16 +
+            double attackPart = Parent.Stats.Attack * (0.16 +
                 (skillLvl * 0.04));
-            double maxHpPart =Parent.GetMaxHp(ent) *(0.4 +( skillLvl* 0.1));
-            return FighterUtils.CalculateDmgByBasicVal(attackPart+maxHpPart, ent);
+            double maxHpPart = Parent.GetMaxHp(ent) * (0.4 + (skillLvl * 0.1));
+            return FighterUtils.CalculateDmgByBasicVal(attackPart + maxHpPart, ent);
         }
 
         //damage for adjacent target
@@ -106,8 +129,8 @@ namespace HSR_SIM_LIB.Fighters.Character
         {
             int skillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Forest of Swords").Level;
             double attackPart = Parent.Stats.Attack * forestAdjAtkMods[skillLvl];
-            double maxHpPart =Parent.GetMaxHp(ent) *(0.16 + (skillLvl * 0.04));
-            return FighterUtils.CalculateDmgByBasicVal(attackPart+maxHpPart, ent);
+            double maxHpPart = Parent.GetMaxHp(ent) * (0.16 + (skillLvl * 0.04));
+            return FighterUtils.CalculateDmgByBasicVal(attackPart + maxHpPart, ent);
         }
 
         public bool HellscapeActive()
@@ -117,6 +140,12 @@ namespace HSR_SIM_LIB.Fighters.Character
         public bool HellscapeNotActive()
         {
             return Parent.Mods.All(x => x.RefMod != hellscapeBuff);
+        }
+
+        public double? CalculateSgHeal(Event ent)
+        {
+
+            return FighterUtils.CalculateHealByBasicVal(Parent.GetMaxHp(ent) * 0.25, ent);
         }
 
         //Blade constructor
@@ -133,96 +162,157 @@ namespace HSR_SIM_LIB.Fighters.Character
                 CustomIconName = "Hellscape"
             };
 
+
+
             //=====================
             //Abilities
             //=====================
 
+
+            
+            //Passive
+            shuhuGift = new Ability(this)
+            {
+                AbilityType = Ability.AbilityTypeEnm.FollowUpAction
+                ,
+                Name = "Shuhu's Gift"
+                ,
+                Element = Element
+                ,
+                ToughnessShred = 30
+                ,
+                TargetType = TargetTypeEnm.Enemy
+                ,
+                AdjacentTargets = AdjacentTargetsEnm.All
+                ,
+                EnergyGain = 10
+                ,
+                Attack = true
+                ,
+                Available = SGAvailable
+                ,
+                Priority = PriorityEnm.Medium
+            };
+            shuHuMaxCnt = (parent.Rank == 6) ? 4 : 5;//4 stacks on 6 eidolon 
+            shuhuGift.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateSGDmg, AbilityValue = shuhuGift });
+            shuhuGift.Events.Add(new Healing(null, this, this.Parent) { TargetUnit = Parent, CalculateValue = CalculateSgHeal, AbilityValue = shuhuGift });
+            shuhuGift.Events.Add(new MechanicValChg(null, this, this.Parent) { TargetUnit = Parent, AbilityValue = shuhuGift, Val = -shuHuMaxCnt });
+            Abilities.Add(shuhuGift);
+                        
+            //Passive counter
+     
+            Mechanics.AddVal(shuhuGift);
+
             //basic
 
             Ability shardSword;
-            shardSword = new Ability(this) {   AbilityType = Ability.AbilityTypeEnm.Basic
-                , Name = "Shard Sword"
-                , Element = Element
-                , AdjacentTargets = Ability.AdjacentTargetsEnm.None
-                , Attack=true
-                , ToughnessShred = 30
-                , EnergyGain = 20
-                , SPgain = 1
-                , Available = HellscapeNotActive
+            shardSword = new Ability(this)
+            {
+                AbilityType = Ability.AbilityTypeEnm.Basic
+                ,
+                Name = "Shard Sword"
+                ,
+                Element = Element
+                ,
+                AdjacentTargets = Ability.AdjacentTargetsEnm.None
+                ,
+                Attack = true
+                ,
+                ToughnessShred = 30
+                ,
+                EnergyGain = 20
+                ,
+                SPgain = 1
+                ,
+                Available = HellscapeNotActive
             };
             //dmg events
-            shardSword.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateBasicDmg,  AbilityValue = shardSword });
+            shardSword.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateBasicDmg, AbilityValue = shardSword });
             Abilities.Add(shardSword);
 
             Ability ForestofSwords;
-            ForestofSwords = new Ability(this) {   AbilityType = Ability.AbilityTypeEnm.Basic
-                , Name = "Forest of Swords"
-                , Element = Element
-                , AdjacentTargets = Ability.AdjacentTargetsEnm.Blast
-                , Attack=true
-                , ToughnessShred = 60
-                , AdjacentToughnessShred =30
-                , EnergyGain = 30
-                , Available = HellscapeActive
+            ForestofSwords = new Ability(this)
+            {
+                AbilityType = Ability.AbilityTypeEnm.Basic
+                ,
+                Name = "Forest of Swords"
+                ,
+                Element = Element
+                ,
+                AdjacentTargets = Ability.AdjacentTargetsEnm.Blast
+                ,
+                Attack = true
+                ,
+                ToughnessShred = 60
+                ,
+                AdjacentToughnessShred = 30
+                ,
+                EnergyGain = 30
+                ,
+                Available = HellscapeActive
             };
             //dmg events
-            ForestofSwords.Events.Add(new ResourceDrain(null, this,this.Parent) { ResType = Resource.ResourceType.HP, TargetType =TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateForestSelfDmg, AbilityValue = ForestofSwords ,CurentTargetType=AbilityCurrentTargetEnm.AbilityMain});
-            ForestofSwords.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateForestDmg,  AbilityValue = ForestofSwords ,CurentTargetType = AbilityCurrentTargetEnm.AbilityMain});
-            ForestofSwords.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateForestDmgAdj,  AbilityValue = ForestofSwords ,CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent});
+            ForestofSwords.Events.Add(new ResourceDrain(null, this, this.Parent) { ResType = Resource.ResourceType.HP, TargetType = TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateForestSelfDmg, AbilityValue = ForestofSwords, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
+            ForestofSwords.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateForestDmg, AbilityValue = ForestofSwords, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
+            ForestofSwords.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateForestDmgAdj, AbilityValue = ForestofSwords, CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
             Abilities.Add(ForestofSwords);
 
 
-            Ability KarmaWind;
+            Ability karmaWind;
             //Karma Wind
-            KarmaWind = new Ability(this) {   AbilityType = Ability.AbilityTypeEnm.Technique
-                                            , Name = "Karma Wind"
-                                            , Cost = 1
-                                            , CostType = Resource.ResourceType.TP
-                                            , Element = Element
-                                            , ToughnessShred = 60
-                                            , Attack=true
-                                            , TargetType = Ability.TargetTypeEnm.Enemy
-                                            , AdjacentTargets = AdjacentTargetsEnm.All
+            karmaWind = new Ability(this)
+            {
+                AbilityType = Ability.AbilityTypeEnm.Technique
+                                            ,
+                Name = "Karma Wind"
+                                            ,
+                Cost = 1
+                                            ,
+                CostType = Resource.ResourceType.TP
+                                            ,
+                Element = Element
+                                            ,
+                ToughnessShred = 60
+                                            ,
+                Attack = true
+                                            ,
+                TargetType = Ability.TargetTypeEnm.Enemy
+                                            ,
+                AdjacentTargets = AdjacentTargetsEnm.All
             };
             //dmg events
-            KarmaWind.Events.Add(new ResourceDrain(null, this,this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, ResType = Resource.ResourceType.HP, TargetType =TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateKarmaSelfDmg, AbilityValue = KarmaWind ,CurentTargetType=AbilityCurrentTargetEnm.AbilityMain});
-            KarmaWind.Events.Add(new DirectDamage(null, this,this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility,  CalculateValue = CalculateKarmaDmg, AbilityValue = KarmaWind });
+            karmaWind.Events.Add(new ResourceDrain(null, this, this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, ResType = Resource.ResourceType.HP, TargetType = TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateKarmaSelfDmg, AbilityValue = karmaWind, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
+            karmaWind.Events.Add(new DirectDamage(null, this, this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, CalculateValue = CalculateKarmaDmg, AbilityValue = karmaWind });
 
-            Abilities.Add(KarmaWind);
+            Abilities.Add(karmaWind);
 
-            //Passive
-            shuhuGift = new Ability(this) {   AbilityType = Ability.AbilityTypeEnm.FollowUpAction
-                , Name = "Shuhu's Gift"
-                , Element = Element
-                , ToughnessShred = 30
-                , TargetType = TargetTypeEnm.Enemy
-                , AdjacentTargets = AdjacentTargetsEnm.All
-                , EnergyGain =10
-                , Attack=true
-                , Available=SGAvailable
-                , Priority = PriorityEnm.Medium
-            };
-            Abilities.Add(shuhuGift);
 
-            //Passive counter
-            ShuHuMaxCnt = (parent.Rank == 6) ? 4 : 5;//4 stacks on 6 eidolon 
-            Mechanics.AddVal(shuhuGift);
-            
             Ability Hellscape;
             //Hellscape
-            Hellscape = new Ability(this) {   AbilityType = Ability.AbilityTypeEnm.Ability
-                , Name = "Hellscape"
-                , Cost = 1
-                , CostType = Resource.ResourceType.SP
-                , ToughnessShred = 60
-                , Attack=false
-                , TargetType = Ability.TargetTypeEnm.Self
-                , AdjacentTargets =AdjacentTargetsEnm.None
-                , EndTheTurn= false
-                , Available=HellscapeNotActive
+            Hellscape = new Ability(this)
+            {
+                AbilityType = Ability.AbilityTypeEnm.Ability
+                ,
+                Name = "Hellscape"
+                ,
+                Cost = 1
+                ,
+                CostType = Resource.ResourceType.SP
+                ,
+                ToughnessShred = 60
+                ,
+                Attack = false
+                ,
+                TargetType = Ability.TargetTypeEnm.Self
+                ,
+                AdjacentTargets = AdjacentTargetsEnm.None
+                ,
+                EndTheTurn = false
+                ,
+                Available = HellscapeNotActive
             };
             //dmg events
-            Hellscape.Events.Add(new ResourceDrain(null, this,this.Parent) {  ResType = Resource.ResourceType.HP, TargetType =TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateHellscapeSelfDmg, AbilityValue = Hellscape ,CurentTargetType=AbilityCurrentTargetEnm.AbilityMain});
+            Hellscape.Events.Add(new ResourceDrain(null, this, this.Parent) { ResType = Resource.ResourceType.HP, TargetType = TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateHellscapeSelfDmg, AbilityValue = Hellscape, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
             Hellscape.Events.Add(new ApplyMod(null, this, Parent)
             {
                 AbilityValue = Hellscape,
@@ -242,10 +332,12 @@ namespace HSR_SIM_LIB.Fighters.Character
             {
                 ConditionMods.Add(new ConditionMod(Parent)
                 {
-                    Mod=new Mod(Parent){Effects = new List<Effect>(){ new Effect(){ EffType = Effect.EffectType.IncomeHealingPrc,Value = 0.20}},CustomIconName = "Traces\\A2"}
-                    , Target=Parent
-                    ,Condition= new ConditionMod.ConditionRec(){CondtionParam = ConditionMod.ConditionCheckParam.HPPrc,CondtionExpression = ConditionMod.ConditionCheckExpression.EqualOrLess,Value = 0.5}
-                    
+                    Mod = new Mod(Parent) { Effects = new List<Effect>() { new Effect() { EffType = Effect.EffectType.IncomeHealingPrc, Value = 0.20 } }, CustomIconName = "Traces\\A2" }
+                    ,
+                    Target = Parent
+                    ,
+                    Condition = new ConditionMod.ConditionRec() { CondtionParam = ConditionMod.ConditionCheckParam.HPPrc, CondtionExpression = ConditionMod.ConditionCheckExpression.EqualOrLess, Value = 0.5 }
+
                 });
             }
             if (Atraces.HasFlag(ATracesEnm.A6))
@@ -253,18 +345,20 @@ namespace HSR_SIM_LIB.Fighters.Character
                 PassiveMods.Add(new PassiveMod(Parent)
                 {
                     Mod = new Mod(Parent)
-                    { Effects =  new List<Effect>() { new Effect(){ EffType = Effect.EffectType.AbilityTypeBoost, Value = 0.20, AbilityType =  Ability.AbilityTypeEnm.FollowUpAction }, 
-                       } },
+                    {
+                        Effects = new List<Effect>() { new Effect(){ EffType = Effect.EffectType.AbilityTypeBoost, Value = 0.20, AbilityType =  Ability.AbilityTypeEnm.FollowUpAction },
+                       }
+                    },
                     Target = Parent
-                   
+
                 });
             }
 
-          
+
             //TODO A4
 
 
-    
+
 
         }
     }

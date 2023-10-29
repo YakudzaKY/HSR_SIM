@@ -191,8 +191,17 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
             if (ability.SPgain > 0)
             {
-                Events.Add(new PartyResourceGain(null, ability.Parent, ability.Parent.Parent) { ResType = Resource.ResourceType.SP, TargetUnit = ability.Parent.Parent, Val = ability.SPgain, AbilityValue = ability });
+                Events.Add(new PartyResourceGain(this, ability.Parent, ability.Parent.Parent) { ResType = Resource.ResourceType.SP, TargetUnit = ability.Parent.Parent, Val = ability.SPgain, AbilityValue = ability });
             }
+            
+            if (ability.CostType == ResourceType.TP || ability.CostType == ResourceType.SP)
+            {
+                Events.Add(new PartyResourceDrain(this, null, ability.Parent.Parent) { ResType = (ResourceType)ability.CostType, Val = ability.Cost });
+            }
+            else if (ability.CostType != null)
+                Events.Add(new ResourceDrain(this, null, ability.Parent.Parent) { ResType = (ResourceType)ability.CostType, Val = ability.Cost });
+
+
             foreach (Event ent in ability.Events.Where(x => x.OnStepType == StepType || x.OnStepType == null) )
             {
                 if (ent.CalculateTargets != null || ent.TargetUnit == null) //need set targets
