@@ -1,9 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Profile>
-  <Party>
-    <Unit template="Character\Dan Heng • Imbibitor Lunae" wargear="Dan Heng • Imbibitor Lunae_700233266" />
-    <Unit template="Character\Fu Xuan" wargear="Fu Xuan_700233266" />
-    <Unit template="Character\Tingyun" wargear="Tingyun_700233266" />
-    <Unit template="Character\Silver Wolf" wargear="Silver Wolf_700233266" />
-  </Party>
-</Profile>
