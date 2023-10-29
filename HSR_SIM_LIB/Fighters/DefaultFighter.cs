@@ -25,7 +25,7 @@ namespace HSR_SIM_LIB.Fighters
         public List<PassiveMod> PassiveMods { get; set; } = new List<PassiveMod>();
         public abstract PathType? Path { get; } 
         public abstract Unit.ElementEnm Element { get; }
-        public List<Unit.ElementEnm> Weaknesses { get; set; } = null;
+        public List<Unit.ElementEnm> Weaknesses { get; set; } =  new List<Unit.ElementEnm>();
         public List<DebuffResist> DebuffResists { get; set; }
         public List<Resist> Resists { get; set; } = new List<Resist>();
         public Unit Parent { get; set; }

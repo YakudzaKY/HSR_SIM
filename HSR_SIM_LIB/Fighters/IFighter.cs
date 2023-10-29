@@ -17,8 +17,8 @@ namespace HSR_SIM_LIB.Fighters
         public List<ConditionMod> ConditionMods { get; set; }
         public List<PassiveMod> PassiveMods { get; set; }
         public Unit.ElementEnm Element { get;  }
-        public PathType? Path { get; } 
-        public List<Unit.ElementEnm> Weaknesses { get; set; }
+        public PathType? Path { get; }
+        public List<Unit.ElementEnm> Weaknesses { get; set; } 
         public List<Resist> Resists { get; set; }
         public List<DebuffResist> DebuffResists { get; set; } 
         public delegate void EventHandler(Event ent);
