@@ -40,7 +40,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
         //remove buff when attack completed
         public override void DefaultLightCone_HandleStep(Step step)
         {
-            if (step.StepType == Step.StepTypeEnm.ExecuteAbility && step.Actor == Parent.Parent && step.ActorAbility.Attack && uniqueBuff != null)
+            if ( step.Actor == Parent.Parent && (step.ActorAbility?.Attack??false) && uniqueBuff != null)
             {
                 RemoveMod newEvent = new(step, this, Parent.Parent)
                 {
