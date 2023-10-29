@@ -136,11 +136,11 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 res = Events.FirstOrDefault(x => !proceedEvents.Contains(x));
             else
                 res = Events.LastOrDefault(x => !proceedEvents.Contains(x));
-            
+
             return res;
         }
 
-    /// <summary>
+        /// <summary>
         /// Proc all events in step. No random here or smart thinking. Do it on DoSomething...
         /// </summary>
         public void ProcEvents(bool revert = false, bool replay = false)
@@ -148,14 +148,14 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             //for all events saved in step
             List<Event> events;
             proceedEvents = new List<Event>();
-     
 
-            Event ent=GetNextEvent(revert);
+
+            Event ent = GetNextEvent(revert);
             //while because new events can occur by procs
             while (ent != null)
             {
                 ent.ProcEvent(revert);
-                ent=GetNextEvent(revert);
+                ent = GetNextEvent(revert);
             }
 
 
@@ -189,8 +189,11 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             Actor = ability.Parent.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
             ActorAbility = ability;//WAT ABILITY is casting
 
-
-            foreach (Event ent in ability.Events.Where(x => x.OnStepType == StepType || x.OnStepType == null))
+            if (ability.SPgain > 0)
+            {
+                Events.Add(new PartyResourceGain(null, ability.Parent, ability.Parent.Parent) { ResType = Resource.ResourceType.SP, TargetUnit = ability.Parent.Parent, Val = ability.SPgain, AbilityValue = ability });
+            }
+            foreach (Event ent in ability.Events.Where(x => x.OnStepType == StepType || x.OnStepType == null) )
             {
                 if (ent.CalculateTargets != null || ent.TargetUnit == null) //need set targets
                 {
@@ -204,7 +207,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         // shred toughness 
                         if ((unitEnt is DirectDamage) &&
                             (ability.ToughnessShred != 0 || ability.CalculateToughnessShred != null))
-                            UnitThgShred(unit, ability);
+                            UnitThgShred(unit, ability, ent.CurentTargetType);
                         //then primary dmg
                         Events.Add(unitEnt);
 
@@ -216,7 +219,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                     Event unitEnt = (Event)ent.Clone();
                     unitEnt.ParentStep = this;
                     if ((unitEnt is DirectDamage) && (ability.ToughnessShred != 0 || ability.CalculateToughnessShred != null))
-                        UnitThgShred(ent.TargetUnit, ability);
+                        UnitThgShred(ent.TargetUnit, ability,ent.CurentTargetType);
                     //then primary dmg
                     Events.Add(unitEnt);
                 }
@@ -238,7 +241,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             }
         }
 
-        private void UnitThgShred(Unit unit, Ability ability)
+        private void UnitThgShred(Unit unit, Ability ability, AbilityCurrentTargetEnm? abilityCurrentTargetEnm)
         {
             if (unit == null) return;
             if (ability == null) return;
@@ -249,7 +252,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             }
             else
             {
-                shredVal = ability.ToughnessShred;
+                shredVal = abilityCurrentTargetEnm == AbilityCurrentTargetEnm.AbilityAdjacent ? ability.AdjacentToughnessShred : ability.ToughnessShred;
             }
 
             if (unit.Fighter.Weaknesses.Any(x => x == (ability.Element)) || ability.IgnoreWeakness)

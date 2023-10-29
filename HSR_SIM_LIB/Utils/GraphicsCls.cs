@@ -266,7 +266,7 @@ namespace HSR_SIM_LIB.Utils
                     }
 
                 //healthbar
-                if (unit.Stats.MaxHp > 0)
+                if (unit.GetMaxHp(null) > 0)
                 {
                     using (SolidBrush brush = new(Color.FromArgb(170, 000, 000)))
                     {
@@ -277,13 +277,13 @@ namespace HSR_SIM_LIB.Utils
                     using (SolidBrush brush = new(clrGreen))
                     {
                         int greenWidth =
-                            (int)Math.Ceiling(HealthBarSize.Width * (double)unit.GetRes(ResourceType.HP).ResVal / unit.Stats.MaxHp);
+                            (int)Math.Ceiling(HealthBarSize.Width * (double)unit.GetRes(ResourceType.HP).ResVal / unit.GetMaxHp(null));
                         gfx.FillRectangle(brush, portraitPoint.X, portraitPoint.Y + PortraitSize.Height, greenWidth,
                             HealthBarSize.Height);
                     }
 
                     DrawText(portraitPoint.X + 5, portraitPoint.Y + PortraitSize.Height, gfx,
-                        string.Format("{0:d}/{1:d}", (int)Math.Floor((double)unit.GetRes(ResourceType.HP).ResVal), (int)Math.Floor(unit.Stats.MaxHp)), null,
+                        string.Format("{0:d}/{1:d}", (int)Math.Floor((double)unit.GetRes(ResourceType.HP).ResVal), (int)Math.Floor(unit.GetMaxHp(null))), null,
                         new Font("Tahoma", BarFontSize));
                 }
 
@@ -442,7 +442,7 @@ namespace HSR_SIM_LIB.Utils
 
                 //ConditionsBuffs
                 j = 0;
-                foreach (var buff in unit.GetConditionMods().Where(x => x is ConditionMod))
+                foreach (var buff in unit.GetConditionMods(null,null).Where(x => x is ConditionMod))
                 {
                     var buffPoint = new Point(portraitPoint.X + (j * ElemSizeMini.Width),
                         portraitPoint.Y + PortraitSize.Height - ElemSizeMini.Width);

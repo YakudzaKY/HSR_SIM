@@ -53,9 +53,9 @@ namespace HSR_SIM_LIB.Skills
             {
                 ConditionCheckParam.SPD => CheckExpression(chkUnit.Stats.Speed),
                 ConditionCheckParam.CritRate => CheckExpression(chkUnit.Stats.CritRatePrc),
-                ConditionCheckParam.HPPrc => chkUnit.Stats.MaxHp != 0 &&
+                ConditionCheckParam.HPPrc => chkUnit.GetMaxHp(null) != 0 &&
                                              CheckExpression(chkUnit.GetRes(Resource.ResourceType.HP).ResVal /
-                                                             chkUnit.Stats.MaxHp),
+                                                             chkUnit.GetMaxHp(null)),
                 ConditionCheckParam.Weakness => chkUnit.Fighter.Weaknesses.Any(x => x == Condition.ElemValue),
                 _ => throw new NotImplementedException()
             };

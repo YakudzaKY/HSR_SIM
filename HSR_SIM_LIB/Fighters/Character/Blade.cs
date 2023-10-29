@@ -17,11 +17,18 @@ namespace HSR_SIM_LIB.Fighters.Character
     public class Blade : DefaultFighter
     {
  
+        private readonly Dictionary<int, double> forestAdjAtkMods = new()
+        {
+            { 1, 0.08 }, { 2, 0.096 }, { 3, 0.112 }, { 4, 0.128 }, { 5, 0.144 }
+            ,{ 6, 0.16 }, {7, 0.176 }
+        };
+
 
         private readonly double ShuHuMaxCnt;
         private readonly Ability shuhuGift;
+        private readonly Mod hellscapeBuff = null;
         public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Destruction;
-        public override Unit.ElementEnm Element { get;  } =Unit.ElementEnm.Wind;
+        public sealed override Unit.ElementEnm Element { get;  } =Unit.ElementEnm.Wind;
 
         public override Ability ChoseAbilityToCast(Step step)
         {
@@ -47,17 +54,23 @@ namespace HSR_SIM_LIB.Fighters.Character
 
         public double? CalculateKarmaSelfDmg(Event ent)
         {
-            return Parent.Stats.MaxHp * 0.2;
+            return Parent.GetMaxHp(ent) * 0.2;
         }
+
+        public double? CalculateForestSelfDmg(Event ent)
+        {
+            return Parent.GetMaxHp(ent) * 0.1;
+        }
+
 
         public double? CalculateKarmaDmg(Event ent)
         {
-            return FighterUtils.CalculateDmgByBasicVal(Parent.Stats.MaxHp * 0.4, ent);
+            return FighterUtils.CalculateDmgByBasicVal(Parent.GetMaxHp(ent) * 0.4, ent);
         }
         
         public double? CalculateHellscapeSelfDmg(Event ent)
         {
-            return Parent.Stats.MaxHp * 0.3;
+            return Parent.GetMaxHp(ent) * 0.3;
         }
 
         public override string GetSpecialText()
@@ -66,25 +79,98 @@ namespace HSR_SIM_LIB.Fighters.Character
         }
 
 
-        public bool ICanUseHellscape()
-        {
-            return true;
-        }
 
         public bool SGAvailable()
         {
             return (Mechanics.Values[shuhuGift] == ShuHuMaxCnt);
         }
+
+        //50-110
+        public double? CalculateBasicDmg(Event ent)
+        {
+            return FighterUtils.CalculateDmgByBasicVal(Parent.Stats.Attack*(0.4 + (Parent.Skills.FirstOrDefault(x=>x.Name=="Shard Sword").Level*0.1)), ent);
+        }
+
+        //damage for main target
+        public double? CalculateForestDmg(Event ent)
+        {
+            int skillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Forest of Swords").Level;
+            double attackPart =Parent.Stats.Attack *(0.16 +
+                (skillLvl * 0.04));
+            double maxHpPart =Parent.GetMaxHp(ent) *(0.4 +( skillLvl* 0.1));
+            return FighterUtils.CalculateDmgByBasicVal(attackPart+maxHpPart, ent);
+        }
+
+        //damage for adjacent target
+        public double? CalculateForestDmgAdj(Event ent)
+        {
+            int skillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Forest of Swords").Level;
+            double attackPart = Parent.Stats.Attack * forestAdjAtkMods[skillLvl];
+            double maxHpPart =Parent.GetMaxHp(ent) *(0.16 + (skillLvl * 0.04));
+            return FighterUtils.CalculateDmgByBasicVal(attackPart+maxHpPart, ent);
+        }
+
+        public bool HellscapeActive()
+        {
+            return Parent.Mods.Any(x => x.RefMod == hellscapeBuff);
+        }
+        public bool HellscapeNotActive()
+        {
+            return Parent.Mods.All(x => x.RefMod != hellscapeBuff);
+        }
+
         //Blade constructor
         public Blade(Unit parent) : base(parent)
         {
 
             Parent.Stats.BaseMaxEnergy = 130;
 
+            hellscapeBuff = new Mod(Parent)
+            {
+                Type = Mod.ModType.Buff,
+                BaseDuration = 3,
+                MaxStack = 1,
+                CustomIconName = "Hellscape"
+            };
 
             //=====================
             //Abilities
             //=====================
+
+            //basic
+
+            Ability shardSword;
+            shardSword = new Ability(this) {   AbilityType = Ability.AbilityTypeEnm.Basic
+                , Name = "Shard Sword"
+                , Element = Element
+                , AdjacentTargets = Ability.AdjacentTargetsEnm.None
+                , Attack=true
+                , ToughnessShred = 30
+                , EnergyGain = 20
+                , SPgain = 1
+                , Available = HellscapeNotActive
+            };
+            //dmg events
+            shardSword.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateBasicDmg,  AbilityValue = shardSword });
+            Abilities.Add(shardSword);
+
+            Ability ForestofSwords;
+            ForestofSwords = new Ability(this) {   AbilityType = Ability.AbilityTypeEnm.Basic
+                , Name = "Forest of Swords"
+                , Element = Element
+                , AdjacentTargets = Ability.AdjacentTargetsEnm.Blast
+                , Attack=true
+                , ToughnessShred = 60
+                , AdjacentToughnessShred =30
+                , EnergyGain = 30
+                , Available = HellscapeActive
+            };
+            //dmg events
+            ForestofSwords.Events.Add(new ResourceDrain(null, this,this.Parent) { ResType = Resource.ResourceType.HP, TargetType =TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateForestSelfDmg, AbilityValue = ForestofSwords ,CurentTargetType=AbilityCurrentTargetEnm.AbilityMain});
+            ForestofSwords.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateForestDmg,  AbilityValue = ForestofSwords ,CurentTargetType = AbilityCurrentTargetEnm.AbilityMain});
+            ForestofSwords.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateForestDmgAdj,  AbilityValue = ForestofSwords ,CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent});
+            Abilities.Add(ForestofSwords);
+
 
             Ability KarmaWind;
             //Karma Wind
@@ -123,7 +209,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             Mechanics.AddVal(shuhuGift);
             
             Ability Hellscape;
-            //Karma Wind
+            //Hellscape
             Hellscape = new Ability(this) {   AbilityType = Ability.AbilityTypeEnm.Ability
                 , Name = "Hellscape"
                 , Cost = 1
@@ -133,11 +219,16 @@ namespace HSR_SIM_LIB.Fighters.Character
                 , TargetType = Ability.TargetTypeEnm.Self
                 , AdjacentTargets =AdjacentTargetsEnm.None
                 , EndTheTurn= false
-                , Available=ICanUseHellscape
+                , Available=HellscapeNotActive
             };
             //dmg events
             Hellscape.Events.Add(new ResourceDrain(null, this,this.Parent) {  ResType = Resource.ResourceType.HP, TargetType =TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateHellscapeSelfDmg, AbilityValue = Hellscape ,CurentTargetType=AbilityCurrentTargetEnm.AbilityMain});
-            
+            Hellscape.Events.Add(new ApplyMod(null, this, Parent)
+            {
+                AbilityValue = Hellscape,
+                TargetUnit = Parent,
+                Modification = hellscapeBuff
+            });
 
             Abilities.Add(Hellscape);
 

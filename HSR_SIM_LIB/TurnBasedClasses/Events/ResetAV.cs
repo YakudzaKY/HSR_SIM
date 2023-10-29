@@ -8,7 +8,7 @@ using HSR_SIM_LIB.UnitStuff;
 namespace HSR_SIM_LIB.TurnBasedClasses.Events
 {
     //reset action value
-    public class ResetAV:Event
+    public class ResetAV : Event
     {
         public ResetAV(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
         {
@@ -21,9 +21,17 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
 
         public override void ProcEvent(bool revert)
         {
-           
+
             //reset av
-            TargetUnit.Stats.ResetAV();
+            if (!TriggersHandled)
+                Val = TargetUnit.Stats.PerformedActionValue;
+            if (!revert)
+                TargetUnit.Stats.ResetAV();
+            else
+                TargetUnit.Stats.PerformedActionValue = (double)Val;
+            
+
+
             base.ProcEvent(revert);
 
         }

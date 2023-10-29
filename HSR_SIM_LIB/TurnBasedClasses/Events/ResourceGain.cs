@@ -28,7 +28,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             RealVal ??= ResType switch
             {
                 Resource.ResourceType.Toughness => Math.Min((double)Val, TargetUnit.Stats.MaxToughness-res.ResVal),
-                Resource.ResourceType.HP =>  Math.Min(TargetUnit.Stats.MaxHp-res.ResVal ,(double)Val ),
+                Resource.ResourceType.HP =>  Math.Min(TargetUnit.GetMaxHp(null) -res.ResVal ,(double)Val ),
                 Resource.ResourceType.Energy => Math.Min((double)Val, (double)TargetUnit.Stats.BaseMaxEnergy-res.ResVal),
                 _ => Val
             };

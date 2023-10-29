@@ -64,7 +64,7 @@ namespace HSR_SIM_LIB.UnitStuff
         public double DefPrc { get; set; } = 0;
 
 
-        public double MaxHp => BaseMaxHp * (1 + Parent.GetModsByType(EffectType.MaxHpPrc) + MaxHpPrc) + Parent.GetModsByType(EffectType.MaxHp) + MaxHpFix;
+        
         public double MaxHpFix { get; set; }
 
         public double MaxHpPrc { get; set; } = 0;

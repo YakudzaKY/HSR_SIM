@@ -26,7 +26,8 @@ namespace HSR_SIM_LIB.Skills
         public IFighter Parent { get; set; }
         public delegate double? DCalculateToughnessShred(Unit target);
         public DCalculateToughnessShred CalculateToughnessShred { get; init; }
-        public double ToughnessShred;
+        public double ToughnessShred { get; set; }
+        public double AdjacentToughnessShred { get; set; }
 
 
         public string Name { get; internal set; }
@@ -47,10 +48,13 @@ namespace HSR_SIM_LIB.Skills
         public PriorityEnm Priority { get; set; } = PriorityEnm.Low;
 
         public DCanUsePrc Available { get; init; } = DefaultAbilityAvailable;
+        public int SPgain { get; set; } = 0;
+
         public Ability(IFighter parent)
         {
             Parent = parent;
-            Element = parent.Element;
+            if (Element == ElementEnm.None)
+                Element = parent.Element;
         }
 
         public enum PriorityEnm
@@ -62,12 +66,13 @@ namespace HSR_SIM_LIB.Skills
         }
         [Flags]
         public enum AbilityTypeEnm
-        {   None=0,
-            Basic=1,
-            Ability=2,
-            Ultimate=4,
-            Technique=8,
-            FollowUpAction=16
+        {
+            None = 0,
+            Basic = 1,
+            Ability = 2,
+            Ultimate = 4,
+            Technique = 8,
+            FollowUpAction = 16
         }
 
 
@@ -136,15 +141,57 @@ namespace HSR_SIM_LIB.Skills
                 }
                 else if (currTargetType == AbilityCurrentTargetEnm.AbilityAdjacent)
                 {
-                    if (AdjacentTargets == AdjacentTargetsEnm.All)
-                        res = Parent.Parent.GetTargetsForUnit(eventTargetType);
-                    else
-                        throw new NotImplementedException();
+                    res = GetAffectedTargets(target, true);
                 }
                 else
                     throw new NotImplementedException();
             }
 
+            return res;
+        }
+
+        /// <summary>
+        /// Get units affected by ability
+        /// </summary>
+        /// <returns></returns>
+        public List<Unit> GetAffectedTargets(Unit unit, bool onlyAdjacent = false)
+        {
+            List<Unit> res = new List<Unit>();
+            if (AdjacentTargets == AdjacentTargetsEnm.Blast)
+            {
+                if (!onlyAdjacent)
+                    res.Add(unit);
+                List<Unit> party = new List<Unit>();
+                party.AddRange(unit.GetTargetsForUnit(TargetTypeEnm.Friend));
+                var leftTarget = party.LastOrDefault(x => party.IndexOf(x) < party.IndexOf(unit));
+                if (leftTarget != null)
+                    res.Add(leftTarget);
+                var rightTarget = party.FirstOrDefault(x => party.IndexOf(x) > party.IndexOf(unit));
+                if (rightTarget != null)
+                    res.Add(rightTarget);
+            }
+            else if (AdjacentTargets == AdjacentTargetsEnm.One)
+            {
+                if (!onlyAdjacent)
+                    res.Add(unit);
+                List<Unit> party = new List<Unit>();
+                party.AddRange(unit.GetTargetsForUnit(TargetTypeEnm.Friend));
+                var leftTarget = party.LastOrDefault(x => party.IndexOf(x) < party.IndexOf(unit));
+                if (leftTarget != null)
+                    res.Add(leftTarget);
+                else
+                {
+                    var rightTarget = party.FirstOrDefault(x => party.IndexOf(x) > party.IndexOf(unit));
+                    if (rightTarget != null)
+                        res.Add(rightTarget);
+                }
+            }
+            else if (AdjacentTargets == AdjacentTargetsEnm.All)
+            {
+                res.AddRange(Parent.Parent.GetTargetsForUnit(TargetTypeEnm.Enemy));
+            }
+            else
+                throw new NotImplementedException();
             return res;
         }
 
@@ -165,12 +212,33 @@ namespace HSR_SIM_LIB.Skills
                 {
                     //Support,Healer focus on Shield shred. 
                     if (Parent.Role is FighterUtils.UnitRole.Support or FighterUtils.UnitRole.Healer or FighterUtils.UnitRole.SecondDPS)
-                        return Parent.Parent.Enemies.Where(x => x.IsAlive).OrderByDescending(x => x.Fighter.Weaknesses.Contains(Element)).ThenBy(x => x.GetRes(ResourceType.Toughness).ResVal * (leader?.Fighter.Path is FighterUtils.PathType.Destruction or FighterUtils.PathType.Erudition ? -1 : 1)).ThenBy(x => x.GetRes(ResourceType.HP).ResVal * (leader?.Fighter.Path is FighterUtils.PathType.Destruction or FighterUtils.PathType.Erudition ? -1 : 1)).FirstOrDefault();
+                        return Parent.Parent.GetTargetsForUnit(TargetType).OrderByDescending(x => x.Fighter.Weaknesses.Contains(Element)).ThenBy(x => x.GetRes(ResourceType.Toughness).ResVal * (leader?.Fighter.Path is FighterUtils.PathType.Destruction or FighterUtils.PathType.Erudition ? -1 : 1)).ThenBy(x => x.GetRes(ResourceType.HP).ResVal * (leader?.Fighter.Path is FighterUtils.PathType.Destruction or FighterUtils.PathType.Erudition ? -1 : 1)).FirstOrDefault();
 
                     else
                         // focus on High hp if main dps Destruction,Erudition. Other- low hp
-                        return Parent.Parent.Enemies.Where(x => x.IsAlive).OrderByDescending(x => x.Fighter.Weaknesses.Contains(Element)).ThenBy(x => x.GetRes(ResourceType.HP).ResVal * (leader?.Fighter.Path is FighterUtils.PathType.Destruction or FighterUtils.PathType.Erudition ? -1 : 1)).FirstOrDefault();
+                        return Parent.Parent.GetTargetsForUnit(TargetType).OrderByDescending(x => x.Fighter.Weaknesses.Contains(Element)).ThenBy(x => x.GetRes(ResourceType.HP).ResVal * (leader?.Fighter.Path is FighterUtils.PathType.Destruction or FighterUtils.PathType.Erudition ? -1 : 1)).FirstOrDefault();
 
+                }
+                else if (AdjacentTargets == AdjacentTargetsEnm.Blast)
+                {
+                    Unit bestTarget = null;
+                    double bestScore = -1;
+                    foreach (Unit unit in Parent.Parent.GetTargetsForUnit(TargetType))
+                    {
+                        double score = 0;
+                        List<Unit> targets = GetAffectedTargets(unit);
+                        score = 10 * targets.Count;
+                        score += 5 * targets.Count(x => x.GetRes(ResourceType.Toughness).ResVal == 0);
+                        score += 3 * targets.Count(x => x.Fighter.Element == Element);
+                        if (score > bestScore)
+                        {
+
+                            bestTarget = unit;
+                            bestScore = score;
+                        }
+
+                    }
+                    return bestTarget;
                 }
                 else
                 {

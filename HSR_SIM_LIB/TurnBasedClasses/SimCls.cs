@@ -434,7 +434,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                     }
                 }
             }
-            else if (newStep.StepType == StepTypeEnm.Idle && currentFight.Turn.TurnStage == StepTypeEnm.UnitTurnSelected)
+            else if (newStep.StepType == StepTypeEnm.Idle && currentFight.Turn.TurnStage is StepTypeEnm.UnitTurnSelected or StepTypeEnm.UnitTurnContinued)
             {
                 //try follow up actions before target do something
                 if (!newStep.FollowUpActions())
@@ -464,6 +464,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                             if (!chooseAbility.EndTheTurn)
                             {
                                 newStep.StepType = StepTypeEnm.UnitTurnContinued;
+                                CurrentFight.Turn.TurnStage = newStep.StepType;
                             }
                         }
                     }

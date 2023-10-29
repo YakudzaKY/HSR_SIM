@@ -65,7 +65,7 @@ namespace HSR_SIM_LIB.Fighters
                 if (modEnt.Modification.Effects.Any(x => x.EffType == Effect.EffectType.Bleed))
                 {
                     bool eliteFlag = defender.Fighter is DefaultNPCBossFIghter;
-                    baseDmg = eliteFlag ? 0.07 : 0.16 * defender.Stats.MaxHp;
+                    baseDmg = eliteFlag ? 0.07 : 0.16 * defender.GetMaxHp(ent);
                     baseDmg = Math.Min(baseDmg, 2 * lvlMultiplier[defender.Level] * defender.Stats.MaxToughness);
                 }
                 else if (modEnt.Modification.Effects.Any(x =>

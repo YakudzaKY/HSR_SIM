@@ -14,7 +14,7 @@ namespace HSR_SIM_LIB.Fighters.Character
         private readonly Dictionary<int, double> PoAFAtkMods = new()
         {
             { 1, 0.40 }, { 2, 0.425 }, { 3, 0.45 }, { 4, 0.475 }, { 5, 0.50 }
-            ,{ 6, 52 }, {7, 0.54 }, { 8, 0.56 }, { 9, 0.58}, { 10, 0.60 }
+            ,{ 6, 0.52 }, {7, 0.54 }, { 8, 0.56 }, { 9, 0.58}, { 10, 0.60 }
             ,{ 11, 0.62 }, { 12, 0.64 }
         };
 
@@ -37,7 +37,7 @@ namespace HSR_SIM_LIB.Fighters.Character
         //If unit hp<=50% for Luocha follow up heals
         private bool UnitAtLowHpForAuto(Unit unit)
         {
-            return unit.GetRes(Resource.ResourceType.HP).ResVal / unit.Stats.MaxHp <= 0.5;
+            return unit.GetRes(Resource.ResourceType.HP).ResVal / unit.GetMaxHp(null) <= 0.5;
         }
 
         //Handler for healing

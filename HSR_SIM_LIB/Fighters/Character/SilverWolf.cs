@@ -108,10 +108,11 @@ namespace HSR_SIM_LIB.Fighters.Character
                 , Attack=true
                 , ToughnessShred = 30
                 , EnergyGain = 20
+                , SPgain = 1
             };
             //dmg events
             SystemWarning.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateBasicDmg,  AbilityValue = SystemWarning });
-            SystemWarning.Events.Add(new PartyResourceGain(null, this, this.Parent) {ResType = Resource.ResourceType.SP,TargetUnit = Parent, Val = 1,  AbilityValue = SystemWarning });
+          
       
             Abilities.Add(SystemWarning);
 

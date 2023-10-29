@@ -27,7 +27,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
          
   
                 //cant overheal
-                RealVal = Math.Min(TargetUnit.Stats.MaxHp-res.ResVal ,(double)Val );
+                RealVal = Math.Min(TargetUnit.GetMaxHp(null) -res.ResVal ,(double)Val );
             }
     
            

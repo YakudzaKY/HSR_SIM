@@ -35,7 +35,7 @@ namespace HSR_SIM_LIB.UnitStuff
         int level = 1;
         Bitmap portrait = null;
         UnitStats stats = null;
-        public bool IsAlive = true;//TODO учесть сброс всех бафов и триггеров когда сдыхает, чтоб доты не аффектились бафами
+        public bool IsAlive = true;
 
         public record DamageBoostRec
         {
@@ -105,7 +105,7 @@ namespace HSR_SIM_LIB.UnitStuff
         public void InitToCombat()
         {
 
-            GetRes(ResourceType.HP).ResVal = Stats.MaxHp;
+            GetRes(ResourceType.HP).ResVal = GetMaxHp(null);
             GetRes(ResourceType.Toughness).ResVal = Stats.MaxToughness;
             Fighter = null;
 
@@ -204,7 +204,7 @@ namespace HSR_SIM_LIB.UnitStuff
             List<Mod> conditionsToCheck = new();
             //get all mods to check
             conditionsToCheck.AddRange(Mods);
-            foreach (PassiveMod pmode in GetConditionMods(ent?.TargetUnit))
+            foreach (PassiveMod pmode in GetConditionMods(ent?.TargetUnit,modType))
                 conditionsToCheck.Add(pmode.Mod);
 
 
@@ -240,7 +240,7 @@ namespace HSR_SIM_LIB.UnitStuff
         /// search avalable for unit condition mods(planars self or ally)
         /// </summary>
         /// <returns></returns>
-        public List<PassiveMod> GetConditionMods(Unit targetForCondition = null)
+        public List<PassiveMod> GetConditionMods(Unit? targetForCondition , EffectType? effTypeToSearch)
         {
             List<PassiveMod> res = new();
             if (ParentTeam == null)
@@ -251,7 +251,7 @@ namespace HSR_SIM_LIB.UnitStuff
             foreach (Unit unit in ParentTeam.Units.Where(x => x.IsAlive))
             {
                 if (unit.fighter.ConditionMods.Concat(unit.fighter.PassiveMods).Any())
-                    res.AddRange(from cmod in unit.fighter.ConditionMods.Concat(unit.fighter.PassiveMods)
+                    res.AddRange(from cmod in unit.fighter.ConditionMods.Where(x=>x.Mod.Effects.Any(x=>effTypeToSearch==null||x.EffType==effTypeToSearch)).Concat(unit.fighter.PassiveMods)
                                  where (cmod.Target == this || cmod.Target == this.ParentTeam) && (cmod is not ConditionMod mod || mod.Truly(targetForCondition))
                                  select cmod);
                 if (unit.Fighter is DefaultFighter unitFighter)
@@ -259,13 +259,13 @@ namespace HSR_SIM_LIB.UnitStuff
                     //LC
 
                     if (unitFighter.LightCone != null)
-                        res.AddRange(from cmod in unitFighter.LightCone.ConditionMods.Concat(unitFighter.LightCone.PassiveMods)
+                        res.AddRange(from cmod in unitFighter.LightCone.ConditionMods.Where(x=>x.Mod.Effects.Any(x=>effTypeToSearch==null||x.EffType==effTypeToSearch)).Concat(unitFighter.LightCone.PassiveMods)
                                      where (cmod.Target == this || cmod.Target == this.ParentTeam) && (cmod is not ConditionMod mod || mod.Truly(targetForCondition))
                                      select cmod);
                     //GEAR
                     foreach (IRelicSet relic in unitFighter.Relics)
                     {
-                        res.AddRange(from cmod in relic.ConditionMods.Concat(relic.PassiveMods)
+                        res.AddRange(from cmod in relic.ConditionMods.Where(x=>x.Mod.Effects.Any(x=>effTypeToSearch==null||x.EffType==effTypeToSearch)).Concat(relic.PassiveMods)
                                      where (cmod.Target == this || cmod.Target == this.ParentTeam) && (cmod is not ConditionMod mod || mod.Truly(targetForCondition))
                                      select cmod);
                     }
@@ -281,6 +281,7 @@ namespace HSR_SIM_LIB.UnitStuff
 
         public enum ElementEnm
         {
+            None,
             Wind,
             Physical,
             Fire,
@@ -494,7 +495,7 @@ namespace HSR_SIM_LIB.UnitStuff
                     }
                 }
             //Condition
-            foreach (PassiveMod pmod in GetConditionMods(targetForCondition))
+            foreach (PassiveMod pmod in GetConditionMods(targetForCondition,EffectType.DamageReduction))
             {
                 foreach (Effect effect in pmod.Mod.Effects.Where(x => x.EffType == EffectType.DamageReduction))
                 {
@@ -546,6 +547,11 @@ namespace HSR_SIM_LIB.UnitStuff
         {
             return Stats.CritDmg +GetModsByType(EffectType.CritDmg,  ent: ent);
         }
+        public double GetMaxHp(Event ent)
+        {
+            return Stats.BaseMaxHp * (1 + GetModsByType(EffectType.MaxHpPrc) + Stats.MaxHpPrc) + GetModsByType(EffectType.MaxHp) + Stats.MaxHpFix;
+        }
+     
     }
 
 }
