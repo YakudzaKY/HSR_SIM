@@ -84,8 +84,8 @@ namespace HSR_SIM_LIB.Fighters
                     baseDmg = 0;
             }
 
-            double breakEffect = 1 + attacker.Stats.BreakDmg;
-            double def = defender.Stats.Def;
+            double breakEffect = 1 + attacker.GetBreakDmg(ent);
+            double def = defender.GetDef(ent);
             double defWithIgnore = def * (1 - attacker.DefIgnore(ent));
             double defMultiplier = 1 - (defWithIgnore / (defWithIgnore + 200 + (10 * attacker.Level)));
             double resPen = 1 - (defender.GetResists(attackElem, ent) - attacker.ResistsPenetration(attackElem, ent));
@@ -137,7 +137,7 @@ namespace HSR_SIM_LIB.Fighters
                                  + dotMultiplier
                                  ;
             double abilityTypeMultiplier = attacker.GetAbilityTypeMultiplier(ent);
-            double def = defender.Stats.Def;
+            double def = defender.GetDef(ent);
             double defWithIgnore = def * (1 - attacker.DefIgnore(ent));
             double defMultiplier = 1 - (defWithIgnore / (defWithIgnore + 200 + (10 * attacker.Level)));
 
@@ -283,9 +283,9 @@ namespace HSR_SIM_LIB.Fighters
             Effect.EffectType mod = ent.Modification.Effects.First().EffType;
             bool isCC = ent.Modification.CrowdControl;
             double baseChance = ent.BaseChance;
-            double effectHitRate = attacker.Stats.EffectHit;
-            double effectRes = defender.Stats.EffectRes;
-            double debuffRes = defender.GetDebuffResists(mod);
+            double effectHitRate = attacker.GetEffectHit(ent);
+            double effectRes = defender.GetEffectRes(ent);
+            double debuffRes = defender.GetDebuffResists(mod,ent);
             double ccRes = 0;
             if (isCC)
             {

@@ -199,7 +199,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                     shieldBrkEvent.Val = FighterUtils.CalculateShieldBrokeDmg(shieldBrkEvent);
                     ent.ChildEvents.Add(shieldBrkEvent);
 
-                    ModActionValue delayAV = new(ent.ParentStep, ent.Source, ent.SourceUnit) { AbilityValue = ent.AbilityValue, TargetUnit = ent.TargetUnit, Val = -ent.TargetUnit.Stats.BaseActionValue * 0.25 };//default delay
+                    ModActionValue delayAV = new(ent.ParentStep, ent.Source, ent.SourceUnit) { AbilityValue = ent.AbilityValue, TargetUnit = ent.TargetUnit, Val = -ent.TargetUnit.GetBaseActionValue(ent) * 0.25 };//default delay
                     ent.ChildEvents.Add(delayAV);
                     // https://honkai-star-rail.fandom.com/wiki/Toughness need implement additional effects
                     switch (ent.AbilityValue.Element)
@@ -229,7 +229,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                                 MaxStack = 5,
                                 Effects = new List<Effect>() {
                                         new Effect(){EffType=EffectType.Entanglement,CalculateValue = FighterUtils.CalculateShieldBrokeDmg}
-                                        ,new Effect(){EffType=EffectType.Delay,Value = 0.20*(1+ent.SourceUnit.Stats.BreakDmg) ,StackAffectValue = false}
+                                        ,new Effect(){EffType=EffectType.Delay,Value = 0.20*(1+ent.SourceUnit.GetBreakDmg(ent)) ,StackAffectValue = false}
                                     }
                             }, 1.5);
 
@@ -243,7 +243,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                                 BaseDuration = 1,
                                 Effects = new List<Effect>() {
                                             new Effect(){EffType=EffectType.Imprisonment,CalculateValue = FighterUtils.CalculateShieldBrokeDmg}
-                                            ,new Effect(){EffType=EffectType.Delay,Value = 0.30*(1+ent.SourceUnit.Stats.BreakDmg)}
+                                            ,new Effect(){EffType=EffectType.Delay,Value = 0.30*(1+ent.SourceUnit.GetBreakDmg(ent))}
                                             ,new Effect(){EffType=EffectType.ReduceSpdPrc,Value = 0.1}
                                         }
                             }, 1.5);
@@ -416,12 +416,12 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                     //get first by AV unit
                     CurrentFight.Turn = new CombatFight.TurnR
                     {
-                        Actor = CurrentFight.AllAliveUnits.OrderBy(x => x.Stats.ActionValue).First(),
+                        Actor = CurrentFight.AllAliveUnits.OrderBy(x => x.GetActionValue(null)).First(),
                         TurnStage = newStep.StepType
                     };
                     newStep.Actor = CurrentFight.Turn.Actor;
                     newStep.Events.Add(new ModActionValue(newStep, this, null)
-                    { Val = currentFight.Turn.Actor.Stats.ActionValue });
+                    { Val = currentFight.Turn.Actor.GetActionValue(null) });
                     //set all Mods are "old"
                     foreach (var mod in currentFight.Turn.Actor.Mods)
                     {
@@ -487,7 +487,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         { TargetUnit = CurrentFight.Turn.Actor });
                         //50% reduce av if frosted
                         if (CurrentFight.Turn.Actor.Controlled && CurrentFight.Turn.Actor.Mods.Any(x => x.Effects.Any(y => y.EffType == Effect.EffectType.Freeze)))
-                            newStep.Events.Add(new ModActionValue(newStep, CurrentFight.Turn.Actor, CurrentFight.Turn.Actor) { AbilityValue = newStep.ActorAbility, TargetUnit = CurrentFight.Turn.Actor, Val = CurrentFight.Turn.Actor.Stats.BaseActionValue * 0.5 });
+                            newStep.Events.Add(new ModActionValue(newStep, CurrentFight.Turn.Actor, CurrentFight.Turn.Actor) { AbilityValue = newStep.ActorAbility, TargetUnit = CurrentFight.Turn.Actor, Val = CurrentFight.Turn.Actor.GetBaseActionValue(null) * 0.5 });
 
 
 

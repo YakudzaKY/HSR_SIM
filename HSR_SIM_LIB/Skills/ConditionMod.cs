@@ -51,11 +51,10 @@ namespace HSR_SIM_LIB.Skills
 
             bool res = Condition.CondtionParam switch
             {
-                ConditionCheckParam.SPD => CheckExpression(chkUnit.Stats.Speed),
-                ConditionCheckParam.CritRate => CheckExpression(chkUnit.Stats.CritRatePrc),
+                ConditionCheckParam.SPD => CheckExpression(chkUnit.GetSpeed(null)),
+                ConditionCheckParam.CritRate => CheckExpression(chkUnit.GetCritRate(null)),
                 ConditionCheckParam.HPPrc => chkUnit.GetMaxHp(null) != 0 &&
-                                             CheckExpression(chkUnit.GetRes(Resource.ResourceType.HP).ResVal /
-                                                             chkUnit.GetMaxHp(null)),
+                                             CheckExpression(chkUnit.GetHpPrc(null)),
                 ConditionCheckParam.Weakness => chkUnit.Fighter.Weaknesses.Any(x => x == Condition.ElemValue),
                 _ => throw new NotImplementedException()
             };

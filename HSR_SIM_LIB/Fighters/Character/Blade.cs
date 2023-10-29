@@ -53,13 +53,14 @@ namespace HSR_SIM_LIB.Fighters.Character
         public override void DefaultFighter_HandleEvent(Event ent)
         {
             //if unit consume hp or got attack then apply buff
-            if (Mechanics.Values[shuhuGift]<shuHuMaxCnt&&ent.TargetUnit == Parent && ent is ResourceDrain && ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal > 0)
+            if (Mechanics.Values[shuhuGift] < shuHuMaxCnt && ent.TargetUnit == Parent && ent is ResourceDrain && ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal > 0)
             {
 
                 MechanicValChg sgProc = new MechanicValChg(ent.ParentStep, this, Parent)
                 { TargetUnit = Parent, Val = 1, AbilityValue = shuhuGift };
                 ent.ChildEvents.Add(sgProc);
             }
+            //buffering Lost hp pull
 
             base.DefaultFighter_HandleEvent(ent);
         }
@@ -85,7 +86,7 @@ namespace HSR_SIM_LIB.Fighters.Character
         public double? CalculateSGDmg(Event ent)
         {
             int skillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Shuhu's Gift").Level;
-            double attackPart = Parent.Stats.Attack * sgAtkMods[skillLvl];
+            double attackPart = Parent.GetAttack(null) * sgAtkMods[skillLvl];
             double maxHpPart = Parent.GetMaxHp(ent) * sgHpMods[skillLvl];
             return FighterUtils.CalculateDmgByBasicVal(attackPart + maxHpPart, ent);
         }
@@ -111,14 +112,14 @@ namespace HSR_SIM_LIB.Fighters.Character
         //50-110
         public double? CalculateBasicDmg(Event ent)
         {
-            return FighterUtils.CalculateDmgByBasicVal(Parent.Stats.Attack * (0.4 + (Parent.Skills.FirstOrDefault(x => x.Name == "Shard Sword").Level * 0.1)), ent);
+            return FighterUtils.CalculateDmgByBasicVal(Parent.GetAttack(null) * (0.4 + (Parent.Skills.FirstOrDefault(x => x.Name == "Shard Sword").Level * 0.1)), ent);
         }
 
         //damage for main target
         public double? CalculateForestDmg(Event ent)
         {
             int skillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Forest of Swords").Level;
-            double attackPart = Parent.Stats.Attack * (0.16 +
+            double attackPart = Parent.GetAttack(null) * (0.16 +
                 (skillLvl * 0.04));
             double maxHpPart = Parent.GetMaxHp(ent) * (0.4 + (skillLvl * 0.1));
             return FighterUtils.CalculateDmgByBasicVal(attackPart + maxHpPart, ent);
@@ -128,7 +129,7 @@ namespace HSR_SIM_LIB.Fighters.Character
         public double? CalculateForestDmgAdj(Event ent)
         {
             int skillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Forest of Swords").Level;
-            double attackPart = Parent.Stats.Attack * forestAdjAtkMods[skillLvl];
+            double attackPart = Parent.GetAttack(null) * forestAdjAtkMods[skillLvl];
             double maxHpPart = Parent.GetMaxHp(ent) * (0.16 + (skillLvl * 0.04));
             return FighterUtils.CalculateDmgByBasicVal(attackPart + maxHpPart, ent);
         }
@@ -169,7 +170,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             //=====================
 
 
-            
+
             //Passive
             shuhuGift = new Ability(this)
             {
@@ -198,9 +199,9 @@ namespace HSR_SIM_LIB.Fighters.Character
             shuhuGift.Events.Add(new Healing(null, this, this.Parent) { TargetUnit = Parent, CalculateValue = CalculateSgHeal, AbilityValue = shuhuGift });
             shuhuGift.Events.Add(new MechanicValChg(null, this, this.Parent) { TargetUnit = Parent, AbilityValue = shuhuGift, Val = -shuHuMaxCnt });
             Abilities.Add(shuhuGift);
-                        
+
             //Passive counter
-     
+
             Mechanics.AddVal(shuhuGift);
 
             //basic
@@ -222,7 +223,7 @@ namespace HSR_SIM_LIB.Fighters.Character
                 ,
                 EnergyGain = 20
                 ,
-                SPgain = 1
+                SpGain = 1
                 ,
                 Available = HellscapeNotActive
             };
@@ -258,26 +259,52 @@ namespace HSR_SIM_LIB.Fighters.Character
             Abilities.Add(ForestofSwords);
 
 
-            Ability karmaWind;
-            //Karma Wind
-            karmaWind = new Ability(this)
+            var deathSentence = new Ability(this)
+            {
+                AbilityType = Ability.AbilityTypeEnm.Ultimate
+                ,
+                Name = "Death Sentence"
+                ,
+                AdjacentTargets = Ability.AdjacentTargetsEnm.Blast
+                ,
+                Attack = true
+                ,
+                ToughnessShred = 60
+                ,
+                AdjacentToughnessShred = 60
+                ,
+                EnergyGain = 5
+                ,
+                Available = UltimateAvailable
+               
+            };
+            //dmg events
+            deathSentence.Events.Add(new ResourceDrain(null, this, this.Parent) { ResType = Resource.ResourceType.HP, TargetType = TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateForestSelfDmg, AbilityValue = deathSentence, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
+            deathSentence.Events.Add(new ResourceGain(null, this, this.Parent) { ResType = Resource.ResourceType.HP, TargetType = TargetTypeEnm.Self, CalculateValue = CalculateForestSelfDmg, AbilityValue = deathSentence, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
+            deathSentence.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateForestDmg, AbilityValue = deathSentence, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
+            deathSentence.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateForestDmgAdj, AbilityValue = deathSentence, CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
+            Abilities.Add(deathSentence);
+
+            var karmaWind =
+                //Karma Wind
+                new Ability(this)
             {
                 AbilityType = Ability.AbilityTypeEnm.Technique
-                                            ,
+                ,
                 Name = "Karma Wind"
-                                            ,
+                ,
                 Cost = 1
-                                            ,
+                ,
                 CostType = Resource.ResourceType.TP
-                                            ,
+                ,
                 Element = Element
-                                            ,
+                ,
                 ToughnessShred = 60
-                                            ,
+                ,
                 Attack = true
-                                            ,
+                ,
                 TargetType = Ability.TargetTypeEnm.Enemy
-                                            ,
+                ,
                 AdjacentTargets = AdjacentTargetsEnm.All
             };
             //dmg events

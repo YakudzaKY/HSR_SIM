@@ -551,7 +551,77 @@ namespace HSR_SIM_LIB.UnitStuff
         {
             return Stats.BaseMaxHp * (1 + GetModsByType(EffectType.MaxHpPrc) + Stats.MaxHpPrc) + GetModsByType(EffectType.MaxHp) + Stats.MaxHpFix;
         }
-     
+
+        public double GetActionValue(Event ent)
+        {
+                return GetBaseActionValue(ent)*(1- GetModsByType(EffectType.Advance,ent:ent) + GetModsByType(EffectType.Delay,ent:ent)) - Stats.PerformedActionValue;
+
+        } 
+
+        public double GetBaseActionValue(Event ent)
+        {
+            return GetInitialBaseActionValue(ent) - GetModsByType(EffectType.ReduceBAV,ent:ent);
+
+        }
+
+        public double GetHpPrc(Event ent)
+        {
+            return GetRes(Resource.ResourceType.HP).ResVal / GetMaxHp(ent);
+        }
+
+        public double GetSpeed(Event ent)
+        {
+            return Stats.BaseSpeed * (1 + GetModsByType(EffectType.SpeedPrc,ent:ent) -
+                       GetModsByType(EffectType.ReduceSpdPrc,ent:ent) + Stats.SpeedPrc) +
+                   GetModsByType(EffectType.Speed,ent:ent) +
+                   Stats.SpeedFix;
+        }
+
+        private double GetInitialBaseActionValue(Event ent)
+        {
+            return Stats.LoadedBaseActionValue ?? 10000 / GetSpeed(ent);
+
+        }
+
+
+        public double GetEffectRes(Event ent)
+        {
+            return GetModsByType(EffectType.EffectResPrc,ent:ent) + Stats.EffectResPrc+Stats.BaseEffectRes + GetModsByType(EffectType.EffectRes,ent:ent) ;
+        }
+
+        public double GetEffectHit(Event ent)
+        {
+            return GetModsByType(EffectType.EffectHitPrc,ent:ent) + Stats.EffectHitPrc + Stats.BaseEffectHit +
+                   GetModsByType(EffectType.EffectHit,ent:ent);
+        }
+
+        public double EnergyRegenPrc(Event ent)
+        {
+         return   Stats.BaseEnergyRes * (1 + GetModsByType(EffectType.EnergyRatePrc, ent: ent) + Stats.BaseEnergyResPrc);
+        }
+
+        public double GetDef(Event ent)
+        {
+            return Stats.BaseDef * (1 + GetModsByType(EffectType.DefPrc, ent: ent) + Stats.DefPrc) +
+                   GetModsByType(EffectType.Def,ent:ent);
+        }
+
+        public double GetAggro(Event ent)
+        {
+            return Stats.BaseAggro * (1 + GetModsByType(EffectType.BaseAgrroPrc,ent:ent)) *
+                   (1 + GetModsByType(EffectType.AgrroPrc,ent:ent));
+        }
+
+        public double GetAttack(Event ent)
+        {
+            return Stats.BaseAttack * (1 + GetModsByType(EffectType.AtkPrc,ent:ent) + Stats.AttackPrc) +
+                   GetModsByType(EffectType.Atk,ent:ent) + Stats.AttackFix;
+        }
+
+        public double GetBreakDmg(Event ent)
+        {
+            return GetModsByType(EffectType.BreakDmgPrc, ent: ent) + Stats.BreakDmgPrc;
+        }
     }
 
 }

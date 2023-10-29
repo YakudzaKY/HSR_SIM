@@ -32,7 +32,7 @@ namespace HSR_SIM_LIB.Skills
 
         public string Name { get; internal set; }
         public List<Event> Events { get; set; } = new List<Event>();
-        public short Cost { get; set; } = 0;
+        public double Cost { get; set; } = 0;
         public ResourceType? CostType { get; set; }
         public TargetTypeEnm TargetType { get; set; } = TargetTypeEnm.Enemy;
         public AdjacentTargetsEnm AdjacentTargets { get; set; } = AdjacentTargetsEnm.None;
@@ -48,13 +48,20 @@ namespace HSR_SIM_LIB.Skills
         public PriorityEnm Priority { get; set; } = PriorityEnm.Low;
 
         public DCanUsePrc Available { get; init; } = DefaultAbilityAvailable;
-        public int SPgain { get; set; } = 0;
+        public int SpGain { get; set; } = 0;
 
         public Ability(IFighter parent)
         {
             Parent = parent;
             if (Element == ElementEnm.None)
                 Element = parent.Element;
+            if (AbilityType.HasFlag(AbilityTypeEnm.Ultimate))
+            {
+                Priority = PriorityEnm.Ultimate;
+                EndTheTurn = false;
+                CostType = Resource.ResourceType.Energy;
+                Cost = Parent.Parent.Stats.BaseMaxEnergy;
+            }
         }
 
         public enum PriorityEnm

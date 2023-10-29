@@ -127,7 +127,7 @@ namespace HSR_SIM_LIB.Fighters.Character
         public double? CalculatePrayerOfAbyssFlower(Event ent)
         {
             int skillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Prayer of Abyss Flower")!.Level;
-            return FighterUtils.CalculateHealByBasicVal((Parent.Stats.Attack * PoAFAtkMods[skillLvl]) + PoAFFix[skillLvl], ent);
+            return FighterUtils.CalculateHealByBasicVal((Parent.GetAttack(null) * PoAFAtkMods[skillLvl]) + PoAFFix[skillLvl], ent);
         }
 
         //get targets for auto heal. One target for Luocha

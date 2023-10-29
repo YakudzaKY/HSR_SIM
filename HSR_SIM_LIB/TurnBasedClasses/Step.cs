@@ -189,9 +189,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             Actor = ability.Parent.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
             ActorAbility = ability;//WAT ABILITY is casting
 
-            if (ability.SPgain > 0)
+            if (ability.SpGain > 0)
             {
-                Events.Add(new PartyResourceGain(this, ability.Parent, ability.Parent.Parent) { ResType = Resource.ResourceType.SP, TargetUnit = ability.Parent.Parent, Val = ability.SPgain, AbilityValue = ability });
+                Events.Add(new PartyResourceGain(this, ability.Parent, ability.Parent.Parent) { ResType = Resource.ResourceType.SP, TargetUnit = ability.Parent.Parent, Val = ability.SpGain, AbilityValue = ability });
             }
             
             if (ability.CostType == ResourceType.TP || ability.CostType == ResourceType.SP)

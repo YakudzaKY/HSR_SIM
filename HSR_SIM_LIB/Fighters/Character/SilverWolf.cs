@@ -46,12 +46,12 @@ namespace HSR_SIM_LIB.Fighters.Character
 
         public double? CalculateFqpDmg(Event ent)
         {
-            return FighterUtils.CalculateDmgByBasicVal(Parent.Stats.Attack* 0.8, ent);
+            return FighterUtils.CalculateDmgByBasicVal(Parent.GetAttack(null) * 0.8, ent);
         }
         //50-110
         public double? CalculateBasicDmg(Event ent)
         {
-            return FighterUtils.CalculateDmgByBasicVal(Parent.Stats.Attack*(0.4 + (Parent.Skills.FirstOrDefault(x=>x.Name=="System Warning").Level*0.1)), ent);
+            return FighterUtils.CalculateDmgByBasicVal(Parent.GetAttack(null) *(0.4 + (Parent.Skills.FirstOrDefault(x=>x.Name=="System Warning").Level*0.1)), ent);
         }
 
         //get 0.2 AllDmg per debuff  on enemy Team
@@ -108,7 +108,7 @@ namespace HSR_SIM_LIB.Fighters.Character
                 , Attack=true
                 , ToughnessShred = 30
                 , EnergyGain = 20
-                , SPgain = 1
+                , SpGain = 1
             };
             //dmg events
             SystemWarning.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateBasicDmg,  AbilityValue = SystemWarning });

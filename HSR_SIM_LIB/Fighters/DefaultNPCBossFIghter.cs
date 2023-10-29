@@ -17,7 +17,7 @@ namespace HSR_SIM_LIB.Fighters
 
         public override double Cost
         {
-            get => Parent.Stats.Attack * 1.5;
+            get => Parent.GetAttack(null) * 1.5;
         }
     }
 }

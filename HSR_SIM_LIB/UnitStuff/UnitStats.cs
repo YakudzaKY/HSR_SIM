@@ -18,7 +18,7 @@ namespace HSR_SIM_LIB.UnitStuff
         public Unit Parent { get; set; }
         public double BaseMaxHp { get; set; } = 0;
 
-        public double BreakDmg => Parent.GetModsByType(EffectType.BreakDmgPrc) + BreakDmgPrc;
+  
         public double BreakDmgPrc { get; set; } = 0;
 
         public double BaseAttack { get; set; } = 0;
@@ -43,8 +43,8 @@ namespace HSR_SIM_LIB.UnitStuff
                 };
             }
         }
-        public double Aggro => BaseAggro * (1 + Parent.GetModsByType(EffectType.BaseAgrroPrc) ) * (1+Parent.GetModsByType(EffectType.AgrroPrc));
-        public double Attack => BaseAttack * (1 + Parent.GetModsByType(EffectType.AtkPrc) + AttackPrc) + Parent.GetModsByType(EffectType.Atk) + AttackFix;
+        
+     
         public double AttackFix { get; set; }
 
         public double AttackPrc { get; set; } = 0;
@@ -60,7 +60,7 @@ namespace HSR_SIM_LIB.UnitStuff
             set => baseDef = value;
         }
 
-        public double Def => BaseDef * (1 + Parent.GetModsByType(EffectType.DefPrc) + DefPrc) + Parent.GetModsByType(EffectType.Def);
+   
         public double DefPrc { get; set; } = 0;
 
 
@@ -71,13 +71,11 @@ namespace HSR_SIM_LIB.UnitStuff
 
         public double BaseEffectRes { get; set; } = 0;//always 0 ?
         public double EffectResPrc { get; set; } = 0;
-        public double EffectRes =>   Parent.GetModsByType(EffectType.EffectResPrc) + EffectResPrc+BaseEffectRes + Parent.GetModsByType(EffectType.EffectRes) ;
+       
 
         public double BaseEffectHit { get; set; } = 0;//always 0 ?
         public double EffectHitPrc { get; set; } = 0;
-        public double EffectHit =>   Parent.GetModsByType(EffectType.EffectHitPrc) + EffectHitPrc + BaseEffectHit + Parent.GetModsByType(EffectType.EffectHit) ;
-
-        public double EnergyRegenPrc => BaseEnergyRes * (1 + Parent.GetModsByType(EffectType.EnergyRatePrc) + BaseEnergyResPrc) ;
+        
         public double BaseEnergyResPrc { get; set; }
 
         public double BaseEnergyRes { get; set; }
@@ -86,32 +84,14 @@ namespace HSR_SIM_LIB.UnitStuff
 
         public int MaxToughness { get; set; } = 0;
 
-        private double? baseActionValue;
-        public double InitialBaseActionValue
-        {
-            get => baseActionValue ?? 10000 / Speed;
-            set => baseActionValue = value;
-        }
-
-        public double BaseActionValue
-        {
-            get => InitialBaseActionValue - Parent.GetModsByType(EffectType.ReduceBAV);
-
-        }
+        public double? LoadedBaseActionValue { get; set; }
 
 
         public double PerformedActionValue { get; set; } = 0;
 
-        public double ActionValue
-        {
-            get
-            {
-                return BaseActionValue*(1- Parent.GetModsByType(EffectType.Advance) + Parent.GetModsByType(EffectType.Delay)) - PerformedActionValue;
-            }
 
-        } 
         public double BaseSpeed { get; internal set; }
-        public double Speed => BaseSpeed * (1 + Parent.GetModsByType(EffectType.SpeedPrc) -Parent.GetModsByType(EffectType.ReduceSpdPrc) + SpeedPrc) + Parent.GetModsByType(EffectType.Speed) + SpeedFix;
+      
         public double SpeedFix { get; set; }
 
         public double SpeedPrc { get; set; }

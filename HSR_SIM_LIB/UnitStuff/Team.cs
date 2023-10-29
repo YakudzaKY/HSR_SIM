@@ -60,7 +60,7 @@ namespace HSR_SIM_LIB.UnitStuff
             {
                 double res=0;
                 foreach (Unit unit in units.Where(x=>x.IsAlive))
-                    res += unit.Stats.Aggro;
+                    res += unit.GetAggro(null);
                 return res;
             }
         }

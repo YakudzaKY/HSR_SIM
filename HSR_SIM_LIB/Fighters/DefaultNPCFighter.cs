@@ -41,7 +41,7 @@ namespace HSR_SIM_LIB.Fighters
 
         public virtual double Cost
         {
-            get => Parent.Stats.Attack/(Parent.Fighter.Abilities.Count(x=>x.TargetType==Ability.TargetTypeEnm.Friend)+1);
+            get => Parent.GetAttack(null) /(Parent.Fighter.Abilities.Count(x=>x.TargetType==Ability.TargetTypeEnm.Friend)+1);
         }
 
 
@@ -55,7 +55,7 @@ namespace HSR_SIM_LIB.Fighters
                 if (Parent.ParentTeam == Parent.ParentTeam.ParentSim.SpecialTeam)
                     return null;
                 var unitsToSearch = Parent.ParentTeam.Units.Where(x => x.IsAlive).OrderByDescending(x => x.Fighter.Cost)
-                    .ThenByDescending(x => x.Stats.Attack * x.Stats.CritChance * x.Stats.CritDmg).ToList();
+                    .ThenByDescending(x => x.GetAttack(null) * x.Stats.CritChance * x.Stats.CritDmg).ToList();
                 if (Parent == unitsToSearch.First())
                     return UnitRole.MainDPS;
  

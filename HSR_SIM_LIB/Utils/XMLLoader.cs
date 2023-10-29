@@ -134,7 +134,7 @@ namespace HSR_SIM_LIB.Utils
                     unitStats.BaseHealRate = SafeToDouble(xnode.Attributes.GetNamedItem("heal_rate")?.Value.Trim());
                     if (xnode.Attributes.GetNamedItem("baseActionValue") is not null)
                     {
-                        unitStats.InitialBaseActionValue =
+                        unitStats.LoadedBaseActionValue =
                             SafeToInt(xnode.Attributes.GetNamedItem("baseActionValue")?.Value.Trim());
                     }
 

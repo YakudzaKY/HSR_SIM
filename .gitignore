@@ -96,3 +96,7 @@
 /HSR_SIM.sln.DotSettings
 /HSR_SIM_GUI/obj/Debug/net7.0-windows/*.resources
 /HSR_SIM_GUI/bin/Debug/net7.0-windows/DATA/api.txt
+/HSR_SIM_GUI/bin/Debug/net7.0-windows/DATA/WarGear/Blade_712767509.xml
+/HSR_SIM_GUI/bin/Debug/net7.0-windows/DATA/WarGear/Bronya_712767509.xml
+/HSR_SIM_GUI/bin/Debug/net7.0-windows/DATA/WarGear/Luocha_712767509.xml
+/HSR_SIM_GUI/bin/Debug/net7.0-windows/DATA/WarGear/Silver Wolf_712767509.xml

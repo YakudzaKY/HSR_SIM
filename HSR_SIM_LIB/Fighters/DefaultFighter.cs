@@ -103,6 +103,10 @@ namespace HSR_SIM_LIB.Fighters
             return Parent.Friends.Where(x => x.IsAlive);
         }
         
+        public bool UltimateAvailable()
+        {
+            return Parent.GetRes(Resource.ResourceType.Energy).ResVal>=Parent.Stats.BaseMaxEnergy;
+        }
         public double Cost
         {
             get
@@ -131,7 +135,7 @@ namespace HSR_SIM_LIB.Fighters
             get
             {
                 if (!Parent.IsAlive) return null;
-                var unitsToSearch = Parent.ParentTeam.Units.Where(x => x.IsAlive).OrderByDescending(x => x.Fighter.Cost).ThenByDescending(x => x.Stats.Attack * x.Stats.CritChance * x.Stats.CritDmg).ToList();
+                var unitsToSearch = Parent.ParentTeam.Units.Where(x => x.IsAlive).OrderByDescending(x => x.Fighter.Cost).ThenByDescending(x => x.GetAttack(null) * x.Stats.CritChance * x.Stats.CritDmg).ToList();
                 if (Parent == unitsToSearch.First())
                     return UnitRole.MainDPS;
                 //if second on list then second dps
@@ -219,7 +223,7 @@ namespace HSR_SIM_LIB.Fighters
                 Parent.ParentTeam.ParentSim?.Parent.LogDebug("========What i can cast=====");
                 double freeSp = HowManySpICanSpend();
                 Parent.ParentTeam.ParentSim?.Parent.LogDebug($"I have {freeSp:f} SP");
-                chosenAbility = Abilities.Where(x => x.Available.Invoke()&&x.Cost<=freeSp && ((x.AbilityType.HasFlag(Ability.AbilityTypeEnm.Basic))|| (x.AbilityType.HasFlag (Ability.AbilityTypeEnm.Ability)))).MaxBy(x=>x.AbilityType);
+                chosenAbility = Abilities.Where(x => x.Available.Invoke()&&(x.Cost<=freeSp ||x.CostType!=Resource.ResourceType.SP)&& ((x.AbilityType.HasFlag(Ability.AbilityTypeEnm.Basic))|| (x.AbilityType.HasFlag (Ability.AbilityTypeEnm.Ability)))).MaxBy(x=>x.AbilityType);
                 Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Choose  {chosenAbility?.Name}");
                 return chosenAbility;
             }
