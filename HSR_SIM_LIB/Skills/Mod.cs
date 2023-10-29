@@ -116,8 +116,7 @@ namespace HSR_SIM_LIB.Skills
 
             }))
             {
-                dotProcEvent.ProcEvent(false);
-                ent.ParentStep.Events.Add(dotProcEvent);
+                ent.ChildEvents.Add(dotProcEvent);
             }
 
 

@@ -40,6 +40,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
    
         public ICloneable Source { get; }
         public Ability.TargetTypeEnm? TargetType { get; set; }
+        public List<Event> ChildEvents= new List<Event>();
 
         public Ability.AbilityCurrentTargetEnm? CurentTargetType { get; set; }
         public Unit SourceUnit { get; set; }
@@ -88,6 +89,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
         public virtual void ProcEvent(bool revert)
         {
             ParentStep.ProceedEvents.Add(this);
+
             //call handlers
             if (!TriggersHandled)
             {
@@ -95,6 +97,12 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
                 ParentStep.Parent.EventHandlerProc?.Invoke(this);
 
             }
+            //Child events
+            foreach (Event e in ChildEvents)
+            {
+                e.ProcEvent(revert);
+            }
+            ChildEvents.Clear();
         }
 
 
@@ -115,8 +123,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             }
             RemoveMod dispell = new RemoveMod(ParentStep, AbilityValue, SourceUnit)
             {  AbilityValue = AbilityValue, Modification = mod, TargetUnit = TargetUnit };
-            dispell.ProcEvent(false);
-            ParentStep.Events.Add(dispell);
+            ChildEvents.Add(dispell);
 
         }
 
@@ -145,12 +152,11 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
 
             if (FighterUtils.CalculateDebuffResisted(dotEvent))
             {
-                ParentStep.Events.Add(dotEvent);
+                ChildEvents.Add(dotEvent);
                 //subscription to events(need calc stacks at attacks)
                 if (dotEvent.Modification.Effects.Any(x => x.EffType == EffectType.Entanglement))
                     dotEvent.Modification.EventHandlerProc += dotEvent.Modification.EntanglementEventHandler;
                 dotEvent.Modification.AbilityValue = AbilityValue;
-                dotEvent.ProcEvent(false);
             }
             else
             {
@@ -162,8 +168,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
                     Modification = dotEvent.Modification
 
                 };
-                ParentStep.Events.Add(failEvent);
-                failEvent.ProcEvent(false);
+                ChildEvents.Add(failEvent);
             }
         }
 

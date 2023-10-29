@@ -39,8 +39,7 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
                         TargetUnit = Parent.Parent,
                         Modification = uniqueBuff
                     };
-                    newEvent.ProcEvent(false);
-                    ent.ParentStep.Events.Add(newEvent);
+                    ent.ChildEvents.Add(newEvent);
                 }
             }
 

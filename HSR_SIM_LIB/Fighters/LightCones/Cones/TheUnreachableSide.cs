@@ -32,8 +32,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
                     TargetUnit = Parent.Parent,
                     Modification = uniqueBuff
                 };
-                newEvent.ProcEvent(false);
-                ent.ParentStep.Events.Add(newEvent);
+                ent.ChildEvents.Add(newEvent);
             }
             base.DefaultLightCone_HandleEvent(ent);
         }

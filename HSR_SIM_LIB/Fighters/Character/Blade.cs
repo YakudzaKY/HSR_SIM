@@ -35,7 +35,9 @@ namespace HSR_SIM_LIB.Fighters.Character
             //if unit consume hp or got attack then apply buff
             if (ent.TargetUnit == Parent && ent is ResourceDrain && ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal > 0)
             {
-                Mechanics.Values[shuhuGift] =  Math.Min( (double) Mechanics.Values[shuhuGift] +1,  (double)  ShuHuMaxCnt);
+                MechanicValChg sgProc = new MechanicValChg(ent.ParentStep, this, Parent)
+                    { TargetUnit = Parent, Val = 1, AbilityValue = shuhuGift };
+                ent.ChildEvents.Add(sgProc);
             }
            
             base.DefaultFighter_HandleEvent(ent);

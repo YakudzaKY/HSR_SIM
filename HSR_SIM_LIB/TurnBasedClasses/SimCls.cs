@@ -125,7 +125,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             if (ent is StartWave)
                 foreach (Unit unit in AllUnits)
                 {
-                    ent.ParentStep.AddEvent(new UnitEnteringBattle(ent.ParentStep, this, unit) { TargetUnit = unit }, true);
+                    ent.ChildEvents.Add(new UnitEnteringBattle(ent.ParentStep, this, unit) { TargetUnit = unit });
                 }
 
             if (ent is DamageEventTemplate)
@@ -153,8 +153,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                     };
                     //remove all buffs and debuffs
                     defeatEvent.RemovedMods.AddRange(ent.TargetUnit.Mods);
-                    ent.ParentStep.Events.Add(defeatEvent);
-                    defeatEvent.ProcEvent(false);
+                    ent.ChildEvents.Add(defeatEvent);
 
 
                 }
@@ -178,8 +177,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                     };
                     //remove all buffs and debuffs
                     defeatEvent.RemovedMods.AddRange(ent.TargetUnit.Mods);
-                    ent.ParentStep.Events.Add(defeatEvent);
-                    defeatEvent.ProcEvent(false);
+                    ent.ChildEvents.Add(defeatEvent);
+
 
 
                 }
@@ -198,12 +197,10 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
                     };
                     shieldBrkEvent.Val = FighterUtils.CalculateShieldBrokeDmg(shieldBrkEvent);
-                    ent.ParentStep.Events.Add(shieldBrkEvent);
-                    shieldBrkEvent.ProcEvent(false);
+                    ent.ChildEvents.Add(shieldBrkEvent);
 
                     ModActionValue delayAV = new(ent.ParentStep, ent.Source, ent.SourceUnit) { AbilityValue = ent.AbilityValue, TargetUnit = ent.TargetUnit, Val = -ent.TargetUnit.Stats.BaseActionValue * 0.25 };//default delay
-                    delayAV.ProcEvent(false);
-                    ent.ParentStep.Events.Add(delayAV);
+                    ent.ChildEvents.Add(delayAV);
                     // https://honkai-star-rail.fandom.com/wiki/Toughness need implement additional effects
                     switch (ent.AbilityValue.Element)
                     {

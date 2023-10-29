@@ -34,7 +34,7 @@ namespace HSR_SIM_LIB.Fighters.Character
                         }
                     };
 
-                    ent.ParentStep.AddEvent(newEvent,true);
+                    ent.ChildEvents.Add(newEvent);
                 }
             }
           

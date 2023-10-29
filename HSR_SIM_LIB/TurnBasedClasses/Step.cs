@@ -25,11 +25,39 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         private Ability actorAbility;
         public SimCls Parent { get; }
 
-        public StepTypeEnm StepType { get => stepType; set => stepType = value; }
-        public Unit Actor { get => actor; set => actor = value; }
-        public Ability ActorAbility { get => actorAbility; set => actorAbility = value; }
-        public List<Event> Events { get => events; set => events = value; }
-        public List<Event> ProceedEvents { get => proceedEvents; set => proceedEvents = value; }
+        public StepTypeEnm StepType
+        {
+            get => stepType;
+            set => stepType = value;
+        }
+
+        public Unit Actor
+        {
+            get => actor;
+            set => actor = value;
+        }
+
+        public Ability ActorAbility
+        {
+            get => actorAbility;
+            set => actorAbility = value;
+        }
+
+        public List<Event> Events
+        {
+            get => events;
+            set => events = value;
+        }
+
+        public List<Event> ProceedEvents
+        {
+            get => proceedEvents;
+            set => proceedEvents = value;
+        }
+
+        public List<Event> QueueEvents { get; set; }
+
+
         public bool TriggersHandled { get; set; } = false;
         private List<Event> proceedEvents = new();
         private List<Event> events = new();
@@ -61,7 +89,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             else if (StepType == StepTypeEnm.UnitTurnEnded)
                 res = $"{Actor.Name:s} finish the turn";
             else if (StepType == StepTypeEnm.UnitTurnContinued)
-                res = $"{Actor.Name:s} continue the turn" + ((ActorAbility != null) ? $" with {ActorAbility.Name}" : "");
+                res = $"{Actor.Name:s} continue the turn" +
+                      ((ActorAbility != null) ? $" with {ActorAbility.Name}" : "");
             else if (StepType == StepTypeEnm.UnitFollowUpAction)
                 res = $"{Actor.Name:s} FOLLOW UP" + ((ActorAbility != null) ? $" with {ActorAbility.Name}" : "");
             else
@@ -75,15 +104,20 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             StepType = StepTypeEnm.Idle;
             Parent = parent;
         }
+
         //Step have events
         public enum StepTypeEnm
         {
-            SimInit//on scenario load and combat init
-            , Idle//on Idle, nothing to_do
-            , ExecuteTechnique
-            , StartCombat//on fight starts
-            , StartWave//on wave starts
-            , ExecuteAbility,
+            SimInit //on scenario load and combat init
+            ,
+            Idle //on Idle, nothing to_do
+            ,
+            ExecuteTechnique,
+            StartCombat //on fight starts
+            ,
+            StartWave //on wave starts
+            ,
+            ExecuteAbility,
             UnitTurnSelected,
             UnitTurnStarted,
             UnitTurnEnded,
@@ -94,25 +128,37 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         }
 
 
+        //get next event
+        private Event GetNextEvent(bool revert)
+        {
+            Event res;
+            if (!revert)
+                res = Events.FirstOrDefault(x => !proceedEvents.Contains(x));
+            else
+                res = Events.LastOrDefault(x => !proceedEvents.Contains(x));
+            
+            return res;
+        }
 
-        /// <summary>
+    /// <summary>
         /// Proc all events in step. No random here or smart thinking. Do it on DoSomething...
         /// </summary>
         public void ProcEvents(bool revert = false, bool replay = false)
         {
             //for all events saved in step
-            List<Event> events = new();
+            List<Event> events;
             proceedEvents = new List<Event>();
+     
 
-            events.AddRange(Events);
-            //rollback changes from the end of list
-            if (revert)
-                events.Reverse();
-
-            foreach (Event ent in events)
+            Event ent=GetNextEvent(revert);
+            //while because new events can occur by procs
+            while (ent != null)
+            {
                 ent.ProcEvent(revert);
+                ent=GetNextEvent(revert);
+            }
 
-            events.Clear();
+
             if (!replay)
                 Events = proceedEvents;
         }
@@ -286,18 +332,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
         }
 
-        /// <summary>
-        /// Add event to step events
-        /// </summary>
-        /// <param name="ent">event</param>
-        /// <param name="doProceed">Proceed event</param>
-        /// <param name="revert">is revert ?</param>
-        public void AddEvent(Event ent, bool doProceed = false, bool revert = false)
-        {
-            if (doProceed)
-                ent.ProcEvent(revert);
-            this.Events.Add(ent);
-        }
+
 
         /// <summary>
         /// Do some folow up actions and unltimates

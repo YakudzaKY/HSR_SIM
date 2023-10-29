@@ -34,7 +34,7 @@ namespace HSR_SIM_LIB.Fighters.NPC
                     }
                     
                 };
-                newEvent.ProcEvent(false);
+
 
                 newEvent = new (ent.ParentStep,ent, Parent)
                 {
@@ -51,7 +51,7 @@ namespace HSR_SIM_LIB.Fighters.NPC
                     }
                     
                 };
-                newEvent.ProcEvent(false);
+ 
             }
             base.DefaultFighter_HandleEvent(ent);
         }*/
