@@ -121,7 +121,6 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             UnitTurnSelected,
             UnitTurnStarted,
             UnitTurnEnded,
-            UnitAction,
             UnitFollowUpAction,
             FinishCombat,
             UnitTurnContinued
@@ -189,19 +188,25 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             Actor = ability.Parent.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
             ActorAbility = ability;//WAT ABILITY is casting
 
+            //res gaining
             if (ability.SpGain > 0)
             {
                 Events.Add(new PartyResourceGain(this, ability.Parent, ability.Parent.Parent) { ResType = Resource.ResourceType.SP, TargetUnit = ability.Parent.Parent, Val = ability.SpGain, AbilityValue = ability });
             }
             
+            //res spending
             if (ability.CostType == ResourceType.TP || ability.CostType == ResourceType.SP)
             {
-                Events.Add(new PartyResourceDrain(this, null, ability.Parent.Parent) { ResType = (ResourceType)ability.CostType, Val = ability.Cost });
+                Events.Add(new PartyResourceDrain(this, null, ability.Parent.Parent) { ResType = (ResourceType)ability.CostType, Val = ability.Cost , AbilityValue = ability});
             }
             else if (ability.CostType != null)
-                Events.Add(new ResourceDrain(this, null, ability.Parent.Parent) { ResType = (ResourceType)ability.CostType, Val = ability.Cost });
+                Events.Add(new ResourceDrain(this, null, ability.Parent.Parent) { TargetUnit =Actor, ResType = (ResourceType)ability.CostType, Val = ability.Cost, AbilityValue = ability});
 
+            //Energy regen
+            if (ability.EnergyGain>0)
+                Events.Add(new EnergyGain(this, null, ability.Parent.Parent) { Val = ability.EnergyGain , TargetUnit = ability.Parent.Parent, AbilityValue = ability});
 
+            //clone events by targets
             foreach (Event ent in ability.Events.Where(x => x.OnStepType == StepType || x.OnStepType == null) )
             {
                 if (ent.CalculateTargets != null || ent.TargetUnit == null) //need set targets
@@ -358,12 +363,12 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 {
 
                     foreach (Ability ability in unit.Fighter.Abilities.Where(x => x.Priority == prio &&
-                                 x.AbilityType == Ability.AbilityTypeEnm.FollowUpAction && x.Available()))
+                                 (x.AbilityType.HasFlag(Ability.AbilityTypeEnm.FollowUpAction)|| x.AbilityType.HasFlag(Ability.AbilityTypeEnm.Ultimate)) && x.Available()))
                     {
                         StepType = StepTypeEnm.UnitFollowUpAction;
                         Actor = unit;
                         ActorAbility = ability;
-                        ExecuteAbility(ability, unit);
+                        ExecuteAbility(ability,ActorAbility.GetBestTarget());
                         return true;
                     }
                 }

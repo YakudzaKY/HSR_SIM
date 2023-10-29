@@ -30,7 +30,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             if (RealVal == null)
             {
                 RealVal = Math.Min((double)TargetUnit.GetRes(ResType).ResVal, (double)Val);
-                if (!CanSetToZero && RealVal < Val)
+                if (!CanSetToZero && RealVal >=(double)TargetUnit.GetRes(ResType).ResVal)
                 {
                     RealVal -= 1;
                 }

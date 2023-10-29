@@ -297,13 +297,13 @@ namespace HSR_SIM_LIB.Utils
                     }
                     using (SolidBrush brush = new(Color.FromArgb(43, 83, 140)))
                     {
-                        int blueWidth = (int)Math.Round((double)EnergyBarSize.Width * unit.Stats.CurrentEnergy / unit.Stats.BaseMaxEnergy);
+                        int blueWidth = (int)Math.Round((double)EnergyBarSize.Width * unit.CurrentEnergy / unit.Stats.BaseMaxEnergy);
                         gfx.FillRectangle(brush, portraitPoint.X, portraitPoint.Y + PortraitSize.Height + HealthBarSize.Height, blueWidth, EnergyBarSize.Height);
                     }
                     DrawText(portraitPoint.X + 5
                         , portraitPoint.Y + PortraitSize.Height + HealthBarSize.Height
                         , gfx
-                        , string.Format("{0:d}/{1:d}", (int)Math.Floor(unit.Stats.CurrentEnergy), (int)Math.Floor(unit.Stats.BaseMaxEnergy))
+                        , string.Format("{0:d}/{1:d}", (int)Math.Floor(unit.CurrentEnergy), (int)Math.Floor(unit.Stats.BaseMaxEnergy))
                         , null
                         , new Font("Tahoma", BarFontSize));
                 }
@@ -481,7 +481,7 @@ namespace HSR_SIM_LIB.Utils
 
                 if (step.Parent.CurrentFight != null)
                     //Special text
-                    DrawText(portraitPoint.X + 5, portraitPoint.Y + (int)(PortraitSize.Height * 0.6), gfx, unit.Fighter.GetSpecialText(), new SolidBrush(Color.Chartreuse), new Font("Tahoma", DefaultFontSize - 2), true);
+                    DrawText(portraitPoint.X + 5, portraitPoint.Y + (int)(PortraitSize.Height * 0.6), gfx, unit.Fighter.GetSpecialText(), new SolidBrush(Color.Chartreuse), new Font("Tahoma", (int)Math.Round((double)DefaultFontSize /2)), true);
 
                 i++;
             }

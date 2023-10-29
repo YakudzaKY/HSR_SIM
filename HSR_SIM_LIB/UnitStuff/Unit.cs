@@ -597,7 +597,7 @@ namespace HSR_SIM_LIB.UnitStuff
 
         public double EnergyRegenPrc(Event ent)
         {
-         return   Stats.BaseEnergyRes * (1 + GetModsByType(EffectType.EnergyRatePrc, ent: ent) + Stats.BaseEnergyResPrc);
+         return    (1 + GetModsByType(EffectType.EnergyRatePrc, ent: ent) + Stats.BaseEnergyResPrc+Stats.BaseEnergyRes);
         }
 
         public double GetDef(Event ent)
@@ -621,6 +621,12 @@ namespace HSR_SIM_LIB.UnitStuff
         public double GetBreakDmg(Event ent)
         {
             return GetModsByType(EffectType.BreakDmgPrc, ent: ent) + Stats.BreakDmgPrc;
+        }
+
+        public double CurrentEnergy
+        {
+            get => GetRes(Resource.ResourceType.Energy).ResVal;
+            set => GetRes(Resource.ResourceType.Energy).ResVal = value;
         }
     }
 

@@ -107,11 +107,7 @@ namespace HSR_SIM_LIB.UnitStuff
         public double CritDmg => BaseCritDmg + CritDmgPrc;
         public double CritDmgPrc { get; set; }
 
-        public double CurrentEnergy
-        {
-            get => Parent.GetRes(Resource.ResourceType.HP).ResVal;
-            set => Parent.GetRes(Resource.ResourceType.HP).ResVal = value;
-        }
+
 
         public double BaseHealRate { get; set; }
         public double HealRatePrc { get; set; }

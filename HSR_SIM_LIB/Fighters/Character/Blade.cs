@@ -17,6 +17,41 @@ namespace HSR_SIM_LIB.Fighters.Character
     public class Blade : DefaultFighter
     {
 
+
+        //ultimate
+        //main
+        private readonly Dictionary<int, double> dsMainAtkMods = new()
+        {
+            { 1, 0.24 }, { 2, 0.256 }, { 3, 0.272 }, { 4, 0.288 }, { 5, 0.304 },{ 6, 0.32 }
+            ,{ 7, 0.34 }, { 8, 0.36 }, { 9, 0.38 }, { 10, 0.40 }, { 11, 0.416 },{ 12, 0.432 }
+        };
+
+        private readonly Dictionary<int, double> dsMainHpMods = new()
+        {
+            { 1, 0.60 }, { 2, 0.64 }, { 3, 0.68 }, { 4, 0.72 }, { 5, 0.76 },{ 6, 0.80 }
+            ,{ 7, 0.85 }, { 8, 0.90 }, { 9, 0.95 }, { 10, 1.00 }, { 11, 1.04 },{ 12, 1.08 }
+        };
+        //adjacent
+        private readonly Dictionary<int, double> dsAdjAtkMods = new()
+        {
+            { 1, 0.096 }, { 2, 0.102 }, { 3, 0.109 }, { 4, 0.115 }, { 5, 0.122 },{ 6, 0.128 }
+            ,{ 7, 0.136 }, { 8, 0.144 }, { 9, 0.152 }, { 10, 0.16 }, { 11, 0.166 },{ 12, 0.173 }
+        };
+
+        private readonly Dictionary<int, double> dsAdjHpMods = new()
+        {
+            { 1, 0.24 }, { 2, 0.256 }, { 3, 0.272 }, { 4, 0.288 }, { 5, 0.304 },{ 6, 0.32 }
+            ,{ 7, 0.34 }, { 8, 0.36 }, { 9, 0.38 }, { 10, 0.40 }, { 11, 0.416 },{ 12, 0.432 }
+        };
+
+        private readonly Dictionary<int, double> dsAdjHpLossMods = new()
+        {
+            { 1, 0.24 }, { 2, 0.26 }, { 3, 0.27 }, { 4, 0.29 }, { 5, 0.30 },{ 6, 0.32 }
+            ,{ 7, 0.34 }, { 8, 0.36 }, { 9, 0.38 }, { 10, 0.40 }, { 11, 0.42 },{ 12, 0.43 }
+        };
+
+
+        //
         private readonly Dictionary<int, double> forestAdjAtkMods = new()
         {
             { 1, 0.08 }, { 2, 0.096 }, { 3, 0.112 }, { 4, 0.128 }, { 5, 0.144 }
@@ -39,7 +74,9 @@ namespace HSR_SIM_LIB.Fighters.Character
 
         private readonly double shuHuMaxCnt;
         private readonly Ability shuhuGift;
+        private readonly Ability deathSentence;
         private readonly Mod hellscapeBuff = null;
+        private readonly Ability forestOfSwords;
         public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Destruction;
         public sealed override Unit.ElementEnm Element { get; } = Unit.ElementEnm.Wind;
 
@@ -61,6 +98,25 @@ namespace HSR_SIM_LIB.Fighters.Character
                 ent.ChildEvents.Add(sgProc);
             }
             //buffering Lost hp pull
+            if (ent.TargetUnit == Parent
+                 && (
+                     (ent is ResourceDrain && ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal > 0)
+                     || ent is DirectDamage or ShieldBreak or DoTDamage
+                     ))
+            {
+
+                MechanicValChg dsValCharge = new MechanicValChg(ent.ParentStep, this, Parent)
+                { TargetUnit = Parent, Val = ent.RealVal, AbilityValue = deathSentence };
+                ent.ChildEvents.Add(dsValCharge);
+            }
+
+
+            if (Atraces.HasFlag(ATracesEnm.A2)&&ent.SourceUnit == Parent&&ent is DirectDamage&&ent.AbilityValue==forestOfSwords&&ent.TargetUnit.GetRes(Resource.ResourceType.Toughness).ResVal==0)
+            {
+                ent.ChildEvents.Add(new Healing(ent.ParentStep, this, this.Parent)
+                    { TargetUnit = Parent, CalculateValue = CalculateForestHeal, AbilityValue = forestOfSwords });
+            }
+
 
             base.DefaultFighter_HandleEvent(ent);
         }
@@ -99,7 +155,7 @@ namespace HSR_SIM_LIB.Fighters.Character
 
         public override string GetSpecialText()
         {
-            return $"SG: {(int)Mechanics.Values[shuhuGift]:d}\\{(int)shuHuMaxCnt:d}";
+            return $"SG: {(int)Mechanics.Values[shuhuGift]:d}\\{(int)shuHuMaxCnt:d}  DS: {(int)Mechanics.Values[deathSentence]:d}\\{(int)getDsMaxLostHp(null):d}";
         }
 
 
@@ -114,6 +170,32 @@ namespace HSR_SIM_LIB.Fighters.Character
         {
             return FighterUtils.CalculateDmgByBasicVal(Parent.GetAttack(null) * (0.4 + (Parent.Skills.FirstOrDefault(x => x.Name == "Shard Sword").Level * 0.1)), ent);
         }
+
+        public double getDsMaxLostHp(Event ent)
+        {
+            return Parent.GetMaxHp(ent) * 0.9;
+        }
+
+        //damage for ULTI main target
+        public double? CalculateDsDmg(Event ent)
+        {
+            int skillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Death Sentence").Level;
+            double attackPart = Parent.GetAttack(null) * dsMainAtkMods[skillLvl];
+            double maxHpPart = Parent.GetMaxHp(ent) * dsMainHpMods[skillLvl];
+            double hpLossPart = Math.Min(Mechanics.Values[deathSentence], getDsMaxLostHp(ent)) * dsMainHpMods[skillLvl];
+            return FighterUtils.CalculateDmgByBasicVal(attackPart + maxHpPart + hpLossPart, ent);
+        }
+
+        //damage for ULTI adjacent target
+        public double? CalculateDstDmgAdj(Event ent)
+        {
+            int skillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Death Sentence").Level;
+            double attackPart = Parent.GetAttack(null) * dsAdjAtkMods[skillLvl];
+            double maxHpPart = Parent.GetMaxHp(ent) * dsAdjHpMods[skillLvl];
+            double hpLossPart = Math.Min(Mechanics.Values[deathSentence], getDsMaxLostHp(ent)) * dsAdjHpLossMods[skillLvl];
+            return FighterUtils.CalculateDmgByBasicVal(attackPart + maxHpPart + hpLossPart, ent);
+        }
+
 
         //damage for main target
         public double? CalculateForestDmg(Event ent)
@@ -132,6 +214,30 @@ namespace HSR_SIM_LIB.Fighters.Character
             double attackPart = Parent.GetAttack(null) * forestAdjAtkMods[skillLvl];
             double maxHpPart = Parent.GetMaxHp(ent) * (0.16 + (skillLvl * 0.04));
             return FighterUtils.CalculateDmgByBasicVal(attackPart + maxHpPart, ent);
+        }
+        //a4
+        public double? CalculateForestHeal(Event ent)
+        {
+            return FighterUtils.CalculateHealByBasicVal(Parent.GetMaxHp(ent)*0.05+100, ent);
+
+        }
+
+        public double? CalculateDsSelfDmg(Event ent)
+        {
+
+            double setValue = 0;
+            if (Parent.GetHpPrc(ent) > 0.5)
+                setValue = Parent.GetRes(Resource.ResourceType.HP).ResVal - (Parent.GetMaxHp(ent) / 2);
+            return setValue;
+        }
+
+        public double? CalculateDsSelfHeal(Event ent)
+        {
+
+            double setValue = 0;
+            if (Parent.GetHpPrc(ent) < 0.5)
+                setValue = (Parent.GetMaxHp(ent) / 2) - Parent.GetRes(Resource.ResourceType.HP).ResVal;
+            return setValue;
         }
 
         public bool HellscapeActive()
@@ -199,9 +305,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             shuhuGift.Events.Add(new Healing(null, this, this.Parent) { TargetUnit = Parent, CalculateValue = CalculateSgHeal, AbilityValue = shuhuGift });
             shuhuGift.Events.Add(new MechanicValChg(null, this, this.Parent) { TargetUnit = Parent, AbilityValue = shuhuGift, Val = -shuHuMaxCnt });
             Abilities.Add(shuhuGift);
-
             //Passive counter
-
             Mechanics.AddVal(shuhuGift);
 
             //basic
@@ -231,8 +335,8 @@ namespace HSR_SIM_LIB.Fighters.Character
             shardSword.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateBasicDmg, AbilityValue = shardSword });
             Abilities.Add(shardSword);
 
-            Ability ForestofSwords;
-            ForestofSwords = new Ability(this)
+            
+            forestOfSwords = new Ability(this)
             {
                 AbilityType = Ability.AbilityTypeEnm.Basic
                 ,
@@ -253,13 +357,15 @@ namespace HSR_SIM_LIB.Fighters.Character
                 Available = HellscapeActive
             };
             //dmg events
-            ForestofSwords.Events.Add(new ResourceDrain(null, this, this.Parent) { ResType = Resource.ResourceType.HP, TargetType = TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateForestSelfDmg, AbilityValue = ForestofSwords, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
-            ForestofSwords.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateForestDmg, AbilityValue = ForestofSwords, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
-            ForestofSwords.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateForestDmgAdj, AbilityValue = ForestofSwords, CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
-            Abilities.Add(ForestofSwords);
+            forestOfSwords.Events.Add(new ResourceDrain(null, this, this.Parent) { ResType = Resource.ResourceType.HP, TargetType = TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateForestSelfDmg, AbilityValue = forestOfSwords, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
+            forestOfSwords.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateForestDmg, AbilityValue = forestOfSwords, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
+            forestOfSwords.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateForestDmgAdj, AbilityValue = forestOfSwords, CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
+           
+
+            Abilities.Add(forestOfSwords);
 
 
-            var deathSentence = new Ability(this)
+            deathSentence = new Ability(this)
             {
                 AbilityType = Ability.AbilityTypeEnm.Ultimate
                 ,
@@ -267,6 +373,7 @@ namespace HSR_SIM_LIB.Fighters.Character
                 ,
                 AdjacentTargets = Ability.AdjacentTargetsEnm.Blast
                 ,
+                
                 Attack = true
                 ,
                 ToughnessShred = 60
@@ -276,37 +383,47 @@ namespace HSR_SIM_LIB.Fighters.Character
                 EnergyGain = 5
                 ,
                 Available = UltimateAvailable
-               
+                ,
+                Priority = PriorityEnm.Ultimate
+                ,
+                EndTheTurn = false
+                ,
+                CostType = Resource.ResourceType.Energy
+                ,
+                Cost = Parent.Stats.BaseMaxEnergy
+
             };
             //dmg events
-            deathSentence.Events.Add(new ResourceDrain(null, this, this.Parent) { ResType = Resource.ResourceType.HP, TargetType = TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateForestSelfDmg, AbilityValue = deathSentence, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
-            deathSentence.Events.Add(new ResourceGain(null, this, this.Parent) { ResType = Resource.ResourceType.HP, TargetType = TargetTypeEnm.Self, CalculateValue = CalculateForestSelfDmg, AbilityValue = deathSentence, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
-            deathSentence.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateForestDmg, AbilityValue = deathSentence, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
-            deathSentence.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateForestDmgAdj, AbilityValue = deathSentence, CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
+            deathSentence.Events.Add(new ResourceDrain(null, this, this.Parent) { ResType = Resource.ResourceType.HP,TargetUnit = Parent, CanSetToZero = false, CalculateValue = CalculateDsSelfDmg, AbilityValue = deathSentence, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
+            deathSentence.Events.Add(new ResourceGain(null, this, this.Parent) { ResType = Resource.ResourceType.HP, TargetUnit = Parent, CalculateValue = CalculateDsSelfHeal, AbilityValue = deathSentence, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
+            deathSentence.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateDsDmg, AbilityValue = deathSentence, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
+            deathSentence.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateDstDmgAdj, AbilityValue = deathSentence, CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
+            deathSentence.Events.Add(new MechanicValChg(null, this, this.Parent) { TargetUnit = Parent, AbilityValue = deathSentence, CalculateValue = CalcResetDsCharge });
             Abilities.Add(deathSentence);
+            Mechanics.AddVal(deathSentence);
 
             var karmaWind =
                 //Karma Wind
                 new Ability(this)
-            {
-                AbilityType = Ability.AbilityTypeEnm.Technique
+                {
+                    AbilityType = Ability.AbilityTypeEnm.Technique
                 ,
-                Name = "Karma Wind"
+                    Name = "Karma Wind"
                 ,
-                Cost = 1
+                    Cost = 1
                 ,
-                CostType = Resource.ResourceType.TP
+                    CostType = Resource.ResourceType.TP
                 ,
-                Element = Element
+                    Element = Element
                 ,
-                ToughnessShred = 60
+                    ToughnessShred = 60
                 ,
-                Attack = true
+                    Attack = true
                 ,
-                TargetType = Ability.TargetTypeEnm.Enemy
+                    TargetType = Ability.TargetTypeEnm.Enemy
                 ,
-                AdjacentTargets = AdjacentTargetsEnm.All
-            };
+                    AdjacentTargets = AdjacentTargetsEnm.All
+                };
             //dmg events
             karmaWind.Events.Add(new ResourceDrain(null, this, this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, ResType = Resource.ResourceType.HP, TargetType = TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateKarmaSelfDmg, AbilityValue = karmaWind, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
             karmaWind.Events.Add(new DirectDamage(null, this, this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, CalculateValue = CalculateKarmaDmg, AbilityValue = karmaWind });
@@ -387,6 +504,11 @@ namespace HSR_SIM_LIB.Fighters.Character
 
 
 
+        }
+
+        private double? CalcResetDsCharge(Event ent)
+        {
+            return -Mechanics.Values[deathSentence];
         }
     }
 }

@@ -105,7 +105,7 @@ namespace HSR_SIM_LIB.Fighters
         
         public bool UltimateAvailable()
         {
-            return Parent.GetRes(Resource.ResourceType.Energy).ResVal>=Parent.Stats.BaseMaxEnergy;
+            return Parent.CurrentEnergy>=Parent.Stats.BaseMaxEnergy;
         }
         public double Cost
         {

@@ -55,13 +55,6 @@ namespace HSR_SIM_LIB.Skills
             Parent = parent;
             if (Element == ElementEnm.None)
                 Element = parent.Element;
-            if (AbilityType.HasFlag(AbilityTypeEnm.Ultimate))
-            {
-                Priority = PriorityEnm.Ultimate;
-                EndTheTurn = false;
-                CostType = Resource.ResourceType.Energy;
-                Cost = Parent.Parent.Stats.BaseMaxEnergy;
-            }
         }
 
         public enum PriorityEnm
@@ -235,9 +228,11 @@ namespace HSR_SIM_LIB.Skills
                         double score = 0;
                         List<Unit> targets = GetAffectedTargets(unit);
                         score = 10 * targets.Count;
-                        score += 5 * targets.Count(x => x.GetRes(ResourceType.Toughness).ResVal == 0);
-                        score += 3 * targets.Count(x => x.Fighter.Element == Element);
-                        if (score > bestScore)
+                        score += 5 * targets.Count(x =>x==unit&& x.GetRes(ResourceType.Toughness).ResVal == 0);
+                        score += 3 * targets.Count(x => x==unit&&x.Fighter.Weaknesses.Any(x=>x==Element));
+                        score += 2 * targets.Count(x => x.Fighter is DefaultNPCBossFIghter);
+                        //if equal but hp diff go focus big target
+                        if ((score > bestScore)||(score==bestScore&&unit.GetHpPrc(null)>bestTarget.GetHpPrc(null)))
                         {
 
                             bestTarget = unit;
@@ -246,6 +241,11 @@ namespace HSR_SIM_LIB.Skills
 
                     }
                     return bestTarget;
+                }
+                if (AdjacentTargets == AdjacentTargetsEnm.All)
+                {
+                    
+                    return null;
                 }
                 else
                 {
