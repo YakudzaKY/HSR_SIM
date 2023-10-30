@@ -13,30 +13,38 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
     {
         public Resource.ResourceType ResType { get => resType; set => resType = value; }
         private Resource.ResourceType resType;
+        public Team TargetTeam { get; set; }
+
         public PartyResourceGain(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
         {
         }
 
         public override string GetDescription()
         {
-            return $"Party res gain :  {Val:f} {ResType} by {TargetUnit.Name}";
+            return $"Party res gain :  {Val:f} {ResType} by {TargetUnit?.Name??"system"}";
         }
 
         public override void ProcEvent(bool revert)
         {
-            
-            double CurrentResVal = TargetUnit.ParentTeam.GetRes(ResType).ResVal;
+
+
+            Team tarTeam = TargetTeam ?? TargetUnit.ParentTeam;
+            double CurrentResVal = tarTeam.GetRes(ResType).ResVal;
             if (ResType == Resource.ResourceType.SP)
             {
                 if (CurrentResVal + Val > Constant.MaxSp)
                     Val = Constant.MaxSp - CurrentResVal;
             }
+
             if (ResType == Resource.ResourceType.TP)
             {
                 if (Val + CurrentResVal > Constant.MaxTp)
                     Val = Constant.MaxTp - CurrentResVal;
             }
-            TargetUnit.ParentTeam.GetRes(ResType).ResVal += (double)(revert ? -Val : Val);
+
+            tarTeam.GetRes(ResType).ResVal += (double)(revert ? -Val : Val);
+
+
             base.ProcEvent(revert);
         }
     }

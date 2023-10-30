@@ -44,12 +44,17 @@ namespace HSR_SIM_LIB
         private SimCls sim = null;
         public SimCls Sim { get => sim; set => sim = value; }//simulation class( combat ,fights etc in this shit)
         public bool Completed { get => completed; set => completed = value; }
-        public bool CompleteSuccess { get => completeSuccess; set => completeSuccess = value; }
 
-        private bool completeSuccess = false;
+
+
 
         private bool replay = false;//is replay not new gen
         private bool completed = false;
+
+        public record RCombatResult
+        {
+            public bool Success = false;
+        }
 
         //TODO вообще надо сделать на старте выбор списка сценариев и количество итераций для каждого
         //далее в несколько потоков собрать справочник СЦЕНАРИЙ:Результаты(агрегировать при выполнении каждой итерации)
@@ -66,6 +71,13 @@ namespace HSR_SIM_LIB
             LogText("Scenario  " + Sim.CurrentScenario.Name + " was loaded");
         }
 
+        public RCombatResult GetCombatResult()
+        {
+            RCombatResult res = new RCombatResult();
+            MoveStep(false, -1);
+            res.Success = sim.PartyTeam.Units.Any(x => x.IsAlive);
+            return res;
+        }
         /// <summary>
         /// GoNextStep or go back
         /// </summary>
@@ -137,7 +149,7 @@ namespace HSR_SIM_LIB
                             if (newStep.StepType == StepTypeEnm.Idle)
                             {
                                 Completed = true;
-                                LogText("scenario complete. Success: " + CompleteSuccess);
+                                LogText("scenario complete.");
                             }
 
 
@@ -239,7 +251,6 @@ namespace HSR_SIM_LIB
         public void Init()
         {
             Completed = false;
-            CompleteSuccess = false;
             LogText("lib loaded");
         }
 

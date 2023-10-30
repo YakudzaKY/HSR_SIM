@@ -46,6 +46,7 @@ namespace HSR_SIM_GUI
             button4 = new System.Windows.Forms.Button();
             button5 = new System.Windows.Forms.Button();
             button6 = new System.Windows.Forms.Button();
+            BtnStatCheck = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)combatOut).BeginInit();
             SuspendLayout();
             // 
@@ -116,6 +117,7 @@ namespace HSR_SIM_GUI
             cbProfile.Name = "cbProfile";
             cbProfile.Size = new System.Drawing.Size(116, 23);
             cbProfile.TabIndex = 6;
+            cbProfile.SelectedIndexChanged += cbProfile_SelectedIndexChanged;
             // 
             // label1
             // 
@@ -200,10 +202,22 @@ namespace HSR_SIM_GUI
             button6.UseVisualStyleBackColor = true;
             button6.Click += button6_Click;
             // 
+            // BtnStatCheck
+            // 
+            BtnStatCheck.Location = new System.Drawing.Point(13, 777);
+            BtnStatCheck.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            BtnStatCheck.Name = "BtnStatCheck";
+            BtnStatCheck.Size = new System.Drawing.Size(120, 30);
+            BtnStatCheck.TabIndex = 15;
+            BtnStatCheck.Text = "Stat check";
+            BtnStatCheck.UseVisualStyleBackColor = true;
+            BtnStatCheck.Click += BtnStatCheck_Click;
+            // 
             // Main
             // 
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             ClientSize = new System.Drawing.Size(1225, 834);
+            Controls.Add(BtnStatCheck);
             Controls.Add(button6);
             Controls.Add(button5);
             Controls.Add(button4);
@@ -246,6 +260,7 @@ namespace HSR_SIM_GUI
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button button6;
+        private System.Windows.Forms.Button BtnStatCheck;
     }
 }
 

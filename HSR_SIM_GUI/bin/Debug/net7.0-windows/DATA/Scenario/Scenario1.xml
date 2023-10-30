@@ -5,26 +5,23 @@
 	<Fights>
 		<Fight name="First fight">		
 			<Wave>			
-				<!--<Unit template="NPC\Vagrant"  level="74"/>
+				<Unit template="NPC\Vagrant"  level="74"/>
 				<Unit template="NPC\Automaton Beetle"  level="74"/>
 				<Unit template="NPC\Mara Struck Soldier"  level="77"/>
-				<Unit template="NPC\AutomatonGrizzlyComplete"  level="74"/>
-				<Unit template="NPC\AutomatonGrizzlyComplete"  level="74"/>-->
-				<Unit template="Character\Blade" wargear="Blade_fun" />   
-				<Unit template="Character\Blade" wargear="Blade_fun" />   
-				<Unit template="Character\Blade" wargear="Blade_fun" />  
-				<Unit template="Character\Blade" wargear="Blade_fun" />  				
+				<Unit template="NPC\Mara Struck Soldier"  level="77"/>
+				<Unit template="NPC\Mara Struck Soldier"  level="77"/>
 			</Wave>		
 		</Fight>
 		<Fight name="Second fight">		
 			<Wave>
 				<Unit template="NPC\Vagrant" level="80"/>
+				<Unit template="NPC\AutomatonGrizzlyComplete"  level="80"/>
 				<Unit template="NPC\Vagrant" level="80"/>
 			</Wave>
 			<Wave>
-				<Unit template="NPC\Automaton Beetle" level="80"/>
-				<Unit template="NPC\Vagrant" level="80"/>
-				<Unit template="NPC\Automaton Beetle" level="80"/>
+				<Unit template="NPC\AutomatonGrizzlyComplete"  level="80"/>
+				<Unit template="NPC\AutomatonGrizzlyComplete"  level="80"/>
+				<Unit template="NPC\AutomatonGrizzlyComplete"  level="80"/>
 			</Wave>	
 		</Fight>
 	</Fights>

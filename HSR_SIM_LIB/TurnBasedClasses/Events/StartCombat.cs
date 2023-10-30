@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HSR_SIM_LIB.UnitStuff;
+using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events
 {
@@ -30,6 +31,10 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
                 ParentStep.Parent.DoEnterCombat = false;
                 ParentStep.Parent.CurrentFight = new CombatFight(ParentStep.Parent.CurrentScenario.Fights[ParentStep.Parent.CurrentFightStep], ParentStep.Parent);
                 ParentStep.Parent.CurrentFightStep += 1;
+                if (!TriggersHandled)
+                {
+                    ChildEvents.Add(new PartyResourceGain(ParentStep,this,null){Val=Constant.StartSp ,TargetTeam = ParentStep.Parent.PartyTeam,ResType = Resource.ResourceType.SP});
+                }
             }
             else
             {

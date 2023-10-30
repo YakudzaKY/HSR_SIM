@@ -21,6 +21,7 @@ namespace HSR_SIM_LIB.Fighters
     /// </summary>
     public abstract class DefaultFighter : IFighter
     {
+        public Mod ShieldBreakMod { get; set; } = new Mod(null);
         public List<ConditionMod> ConditionMods { get; set; } = new List<ConditionMod>();
         public List<PassiveMod> PassiveMods { get; set; } = new List<PassiveMod>();
         public abstract PathType? Path { get; } 
@@ -386,10 +387,6 @@ namespace HSR_SIM_LIB.Fighters
         }
         public virtual void DefaultFighter_HandleStep(Step step)
         {
-            if (step.StepType == Step.StepTypeEnm.StartCombat || step.StepType == Step.StepTypeEnm.FinishCombat)
-            {
-                Reset();
-            }
             LightCone?.StepHandlerProc?.Invoke(step);
             foreach (IRelicSet relic in Relics)
             {

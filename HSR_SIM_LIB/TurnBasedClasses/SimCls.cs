@@ -84,14 +84,15 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         {
             get
             {
-                //try search next fight
-                if (nextFight == null)
+                if (CurrentScenario.Fights.Count>=CurrentFightStep+1)
+                    return CurrentScenario.Fights[CurrentFightStep];
+                else
                 {
-                    if (CurrentFightStep < CurrentScenario.Fights.Count)
-                        nextFight = CurrentScenario.Fights[CurrentFightStep];
+                    return null;
                 }
+                
 
-                return nextFight;
+          
             }
         }
 
@@ -201,26 +202,26 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
                     ModActionValue delayAV = new(ent.ParentStep, ent.Source, ent.SourceUnit) { AbilityValue = ent.AbilityValue, TargetUnit = ent.TargetUnit, Val = -ent.TargetUnit.GetBaseActionValue(ent) * 0.25 };//default delay
                     ent.ChildEvents.Add(delayAV);
-                    // https://honkai-star-rail.fandom.com/wiki/Toughness need implement additional effects
+                    // https://honkai-star-rail.fandom.com/wiki/Toughness
                     switch (ent.AbilityValue.Element)
                     {
                         case Unit.ElementEnm.Physical:
-                            ent.TryDebuff(new Mod(ent.SourceUnit) {  DoNotClone = true, Type = ModType.Dot, BaseDuration = 2, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Bleed, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
+                            ent.TryDebuff(new Mod(ent.SourceUnit,ent.SourceUnit.Fighter.ShieldBreakMod) { DoNotClone = true, Type = ModType.Dot, BaseDuration = 2, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Bleed, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
                             break;
                         case Unit.ElementEnm.Fire:
-                            ent.TryDebuff(new Mod(ent.SourceUnit) {  DoNotClone = true, Type = ModType.Dot, BaseDuration = 2, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Burn, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
+                            ent.TryDebuff(new Mod(ent.SourceUnit,ent.SourceUnit.Fighter.ShieldBreakMod) { DoNotClone = true, Type = ModType.Dot, BaseDuration = 2, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Burn, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
                             break;
                         case Unit.ElementEnm.Ice:
-                            ent.TryDebuff(new Mod(ent.SourceUnit) {  DoNotClone = true, Type = ModType.Debuff, BaseDuration = 1, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Freeze, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
+                            ent.TryDebuff(new Mod(ent.SourceUnit,ent.SourceUnit.Fighter.ShieldBreakMod) { DoNotClone = true, Type = ModType.Debuff, BaseDuration = 1, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Freeze, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
                             break;
                         case Unit.ElementEnm.Lightning:
-                            ent.TryDebuff(new Mod(ent.SourceUnit) { DoNotClone = true, Type = ModType.Dot, BaseDuration = 2, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Shock, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
+                            ent.TryDebuff(new Mod(ent.SourceUnit, ent.SourceUnit.Fighter.ShieldBreakMod) { DoNotClone = true, Type = ModType.Dot, BaseDuration = 2, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Shock, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
                             break;
                         case Unit.ElementEnm.Wind:
-                            ent.TryDebuff(new Mod(ent.SourceUnit) { DoNotClone = true, Type = ModType.Dot, BaseDuration = 2, MaxStack = 5, Effects = new List<Effect>() { new Effect() { EffType = EffectType.WindShear, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
+                            ent.TryDebuff(new Mod(ent.SourceUnit, ent.SourceUnit.Fighter.ShieldBreakMod) { DoNotClone = true, Type = ModType.Dot,Stack = (ent.TargetUnit.Fighter is DefaultNPCBossFIghter)?3:1, BaseDuration = 2, MaxStack = 5, Effects = new List<Effect>() { new Effect() { EffType = EffectType.WindShear, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
                             break;
                         case Unit.ElementEnm.Quantum:
-                            ent.TryDebuff(new Mod(ent.SourceUnit)
+                            ent.TryDebuff(new Mod(ent.SourceUnit, ent.SourceUnit.Fighter.ShieldBreakMod)
                             {
                                 Dispellable = true,
                                 DoNotClone = true,
@@ -235,7 +236,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
                             break;
                         case Unit.ElementEnm.Imaginary:
-                            ent.TryDebuff(new Mod(ent.SourceUnit)
+                            ent.TryDebuff(new Mod(ent.SourceUnit, ent.SourceUnit.Fighter.ShieldBreakMod)
                             {
                                 Dispellable = true,
                                 DoNotClone = true,
@@ -381,19 +382,23 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             }
             //buff before fight
             else if (newStep.StepType == StepTypeEnm.Idle && DoEnterCombat == false && CurrentFight == null)
-                newStep.TechniqueWork(PartyTeam);
-
+            {
+                if (CurrentFightStep != CurrentScenario.Fights.Count)
+                    newStep.TechniqueWork(PartyTeam);
+            }
             //enter the combat
             else if (newStep.StepType == StepTypeEnm.Idle && DoEnterCombat == true)
-                newStep.LoadBattleWork();
-
+            {
+                    newStep.LoadBattleWork();
+            }
             //load the wave
             else if (newStep.StepType == StepTypeEnm.Idle && currentFight is { CurrentWave: null })
             {
                 //fight is over
                 if (currentFight.CurrentWaveCnt == currentFight.ReferenceFight.Waves.Count)
                 {
-                    throw new NotImplementedException();
+                    newStep.StepType = StepTypeEnm.FinishCombat;
+                    newStep.Events.Add(new FinishCombat(newStep, this, null));
                 }
                 else
                 {
@@ -407,6 +412,22 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             else if (newStep.StepType == StepTypeEnm.Idle && currentFight?.CurrentWave != null && BeforeStartQueue.Count > 0)
             {
                 newStep.ExecuteAbilityFromQueue();
+            }
+            //check wave complete
+            else if (newStep.StepType == StepTypeEnm.Idle && currentFight?.CurrentWave != null && (PartyTeam.Units.All(x => !x.IsAlive) || HostileTeam.Units.All(x => !x.IsAlive)))
+            {
+                //party dead. finish sim
+                if (PartyTeam.Units.All(x => !x.IsAlive))
+                    return newStep;
+                else
+                {
+                    //go next wave
+                    currentFight.Turn = null;
+                    newStep.StepType = StepTypeEnm.EndWave;
+                    newStep.Events.Add(new EndWave(newStep, this, null));
+                }
+
+
             }
             else if (newStep.StepType == StepTypeEnm.Idle && currentFight.Turn == null)//set who wanna move
             {

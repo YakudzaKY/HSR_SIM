@@ -141,7 +141,11 @@ namespace HSR_SIM_LIB.Skills
                 }
                 else if (currTargetType == AbilityCurrentTargetEnm.AbilityAdjacent)
                 {
-                    res = GetAffectedTargets(target, true);
+                    if (eventTargetType == TargetTypeEnm.Friend)
+                        res = GetAffectedTargets( Parent.Parent, true);
+                    else
+                        res = GetAffectedTargets(target, true);
+
                 }
                 else
                     throw new NotImplementedException();
@@ -188,7 +192,12 @@ namespace HSR_SIM_LIB.Skills
             }
             else if (AdjacentTargets == AdjacentTargetsEnm.All)
             {
-                res.AddRange(Parent.Parent.GetTargetsForUnit(TargetTypeEnm.Enemy));
+                if (unit!=null)
+                    res.AddRange(Parent.Parent.GetTargetsForUnit(TargetTypeEnm.Friend));
+                else
+                {
+                    res.AddRange(Parent.Parent.GetTargetsForUnit(TargetTypeEnm.Enemy));
+                }
             }
             else
                 throw new NotImplementedException();

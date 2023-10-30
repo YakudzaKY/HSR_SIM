@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,7 @@ namespace HSR_SIM_LIB.Fighters
     /// <summary>
     /// dictionary with mechancis
     /// </summary>
-    public class MechDictionary
+    public class MechDictionary 
     {
  
 
@@ -38,6 +39,10 @@ namespace HSR_SIM_LIB.Fighters
              Values.Add(ability,0);
         }
 
-        
+
+        public IEnumerator GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

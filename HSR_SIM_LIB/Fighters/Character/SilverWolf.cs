@@ -102,7 +102,6 @@ namespace HSR_SIM_LIB.Fighters.Character
             //System Warning
             SystemWarning = new Ability(this) {   AbilityType = Ability.AbilityTypeEnm.Basic
                 , Name = "System Warning"
-                , CostType = Resource.ResourceType.TP
                 , Element = Element
                 , AdjacentTargets = Ability.AdjacentTargetsEnm.None
                 , Attack=true

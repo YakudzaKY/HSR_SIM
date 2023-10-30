@@ -185,7 +185,22 @@ namespace HSR_SIM_GUI
 
         private void button6_Click(object sender, EventArgs e)
         {
+            wrk.Completed = false;
             wrk.MoveStep(false, 1, true);
+        }
+
+        private void BtnStatCheck_Click(object sender, EventArgs e)
+        {
+            StatCheck st = new()
+            {
+                StartPosition = FormStartPosition.CenterScreen
+            };
+            st.Show();
+        }
+
+        private void cbProfile_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

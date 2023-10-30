@@ -128,6 +128,7 @@ namespace HSR_SIM_LIB.Skills
         public int? BaseDuration { get; set; }
         public int? DurationLeft { get; set; }
         public Unit Caster { get; set; }
+        public object SourceObject { get; set; }
 
         public string UniqueStr { get; set; }
 

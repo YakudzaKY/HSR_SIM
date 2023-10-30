@@ -12,6 +12,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
     {
         public Resource.ResourceType ResType { get => resType; set => resType = value; }
         private Resource.ResourceType resType;
+        public Team TargetTeam { get; set; }
         public PartyResourceDrain(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
         {
         }
@@ -23,9 +24,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
 
         public override void ProcEvent(bool revert)
         {
-            
+            Team tarTeam = TargetTeam ?? SourceUnit.ParentTeam;
             //SP or technical points
-            SourceUnit.ParentTeam.GetRes(ResType).ResVal -= (double)(revert ? -Val : Val);
+            tarTeam.GetRes(ResType).ResVal -= (double)(revert ? -Val : Val);
             base.ProcEvent(revert);
 
         }

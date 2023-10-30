@@ -43,12 +43,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             {
                 ParentStep.Parent.HostileTeam.UnBindUnits();
                 ParentStep.Parent.CurrentFight.CurrentWaveCnt -= 1;
-                if (ParentStep.Parent.CurrentFight.CurrentWaveCnt > 0)
-                    ParentStep.Parent.CurrentFight.CurrentWave = ParentStep.Parent.CurrentFight.ReferenceFight.Waves[ParentStep.Parent.CurrentFight.CurrentWaveCnt - 1];
-                else
-                {
-                    ParentStep.Parent.CurrentFight.CurrentWave = null;
-                }
+                ParentStep.Parent.CurrentFight.CurrentWave = null;
+                
 
             }
             base.ProcEvent(revert);

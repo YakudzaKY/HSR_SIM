@@ -76,8 +76,12 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 res = Actor.Name + " used " + ActorAbility.Name;
             else if (StepType == StepTypeEnm.StartCombat)
                 res = "Starting the combat!";
+            else if (StepType == StepTypeEnm.FinishCombat)
+                res = "Finish the combat!";
             else if (StepType == StepTypeEnm.StartWave)
                 res = "Wave " + Parent.CurrentFight.CurrentWaveCnt.ToString();
+            else if (StepType == StepTypeEnm.EndWave)
+                res = "Wave completed";
             else if (StepType == StepTypeEnm.Idle)
                 res = "Idle step(scenario completed?)";
             else if (StepType == StepTypeEnm.ExecuteAbility)
@@ -123,7 +127,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             UnitTurnEnded,
             UnitFollowUpAction,
             FinishCombat,
-            UnitTurnContinued
+            UnitTurnContinued,
+            EndWave
         }
 
 
@@ -193,21 +198,23 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             {
                 Events.Add(new PartyResourceGain(this, ability.Parent, ability.Parent.Parent) { ResType = Resource.ResourceType.SP, TargetUnit = ability.Parent.Parent, Val = ability.SpGain, AbilityValue = ability });
             }
-            
+
             //res spending
             if (ability.CostType == ResourceType.TP || ability.CostType == ResourceType.SP)
             {
-                Events.Add(new PartyResourceDrain(this, null, ability.Parent.Parent) { ResType = (ResourceType)ability.CostType, Val = ability.Cost , AbilityValue = ability});
+                //TP wasted before
+                if (ability.CostType != ResourceType.TP)
+                    Events.Add(new PartyResourceDrain(this, null, ability.Parent.Parent) { ResType = (ResourceType)ability.CostType, Val = ability.Cost, AbilityValue = ability });
             }
             else if (ability.CostType != null)
-                Events.Add(new ResourceDrain(this, null, ability.Parent.Parent) { TargetUnit =Actor, ResType = (ResourceType)ability.CostType, Val = ability.Cost, AbilityValue = ability});
+                Events.Add(new ResourceDrain(this, null, ability.Parent.Parent) { TargetUnit = Actor, ResType = (ResourceType)ability.CostType, Val = ability.Cost, AbilityValue = ability });
 
             //Energy regen
-            if (ability.EnergyGain>0)
-                Events.Add(new EnergyGain(this, null, ability.Parent.Parent) { Val = ability.EnergyGain , TargetUnit = ability.Parent.Parent, AbilityValue = ability});
+            if (ability.EnergyGain > 0)
+                Events.Add(new EnergyGain(this, null, ability.Parent.Parent) { Val = ability.EnergyGain, TargetUnit = ability.Parent.Parent, AbilityValue = ability });
 
             //clone events by targets
-            foreach (Event ent in ability.Events.Where(x => x.OnStepType == StepType || x.OnStepType == null) )
+            foreach (Event ent in ability.Events.Where(x => x.OnStepType == StepType || x.OnStepType == null))
             {
                 if (ent.CalculateTargets != null || ent.TargetUnit == null) //need set targets
                 {
@@ -233,7 +240,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                     Event unitEnt = (Event)ent.Clone();
                     unitEnt.ParentStep = this;
                     if ((unitEnt is DirectDamage) && (ability.ToughnessShred != 0 || ability.CalculateToughnessShred != null))
-                        UnitThgShred(ent.TargetUnit, ability,ent.CurentTargetType);
+                        UnitThgShred(ent.TargetUnit, ability, ent.CurentTargetType);
                     //then primary dmg
                     Events.Add(unitEnt);
                 }
@@ -363,12 +370,12 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 {
 
                     foreach (Ability ability in unit.Fighter.Abilities.Where(x => x.Priority == prio &&
-                                 (x.AbilityType.HasFlag(Ability.AbilityTypeEnm.FollowUpAction)|| x.AbilityType.HasFlag(Ability.AbilityTypeEnm.Ultimate)) && x.Available()))
+                                 (x.AbilityType.HasFlag(Ability.AbilityTypeEnm.FollowUpAction) || x.AbilityType.HasFlag(Ability.AbilityTypeEnm.Ultimate)) && x.Available()))
                     {
                         StepType = StepTypeEnm.UnitFollowUpAction;
                         Actor = unit;
                         ActorAbility = ability;
-                        ExecuteAbility(ability,ActorAbility.GetBestTarget());
+                        ExecuteAbility(ability, ActorAbility.GetBestTarget());
                         return true;
                     }
                 }
