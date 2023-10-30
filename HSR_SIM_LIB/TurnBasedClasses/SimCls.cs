@@ -298,6 +298,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             }
         }
 
+        //Total action value per run
+        public double TotalAv { get; set; } = 0;
+
         /// <summary>
         /// construcotor
         /// </summary>

@@ -54,6 +54,9 @@ namespace HSR_SIM_LIB
         public record RCombatResult
         {
             public bool Success = false;
+            public int Cycles = 0;
+            public double TotalAv = 0;
+
         }
 
         //TODO вообще надо сделать на старте выбор списка сценариев и количество итераций для каждого
@@ -76,6 +79,8 @@ namespace HSR_SIM_LIB
             RCombatResult res = new RCombatResult();
             MoveStep(false, -1);
             res.Success = sim.PartyTeam.Units.Any(x => x.IsAlive);
+            res.TotalAv = sim.TotalAv;
+            res.Cycles = sim.SpecialTeam.Units.FirstOrDefault(x => x.Name == "Forgotten Hall").Level;
             return res;
         }
         /// <summary>
