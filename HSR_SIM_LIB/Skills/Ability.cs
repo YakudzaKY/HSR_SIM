@@ -64,7 +64,7 @@ namespace HSR_SIM_LIB.Skills
             Ultimate,
             Low,
         }
-        [Flags]
+      
         public enum AbilityTypeEnm
         {
             None = 0,

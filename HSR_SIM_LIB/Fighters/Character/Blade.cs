@@ -101,7 +101,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             if (ent.TargetUnit == Parent
                  && (
                      (ent is ResourceDrain && ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal > 0)
-                     || ent is DirectDamage or ShieldBreak or DoTDamage
+                     || ent.IsDamageEvent
                      ))
             {
 

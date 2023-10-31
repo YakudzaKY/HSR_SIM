@@ -337,10 +337,8 @@ namespace HSR_SIM_LIB.Utils
                 {
                     j = 0;
                     foreach (Event ent in step.Events.Where(x => x.TargetUnit == unit &&
-                                                               (x is DirectDamage
-                                                               || x is ShieldBreak
+                                                               (x.IsDamageEvent
                                                                || x is Healing
-                                                               || x is DoTDamage
                                                                || (x is ResourceDrain && x.Val > 0 && ((ResourceDrain)x).ResType == ResourceType.HP)
                                                                || (x is ResourceGain && x.Val > 0 && ((ResourceGain)x).ResType == ResourceType.HP)
                                                                )))
@@ -355,6 +353,7 @@ namespace HSR_SIM_LIB.Utils
                         Bitmap dmgIcon = ent  switch
                         {
                             ShieldBreak=> Utl.LoadBitmap("BreakShield"),
+                            BreakShieldDoTDamage =>  Utl.LoadBitmap("BreakShieldDoT"),
                             DoTDamage =>  Utl.LoadBitmap("DoT"),
                             DirectDamage => Utl.LoadBitmap("Sword"),
                             ResourceDrain =>Utl.LoadBitmap("Blood"),
@@ -362,22 +361,14 @@ namespace HSR_SIM_LIB.Utils
                             Healing =>Utl.LoadBitmap("Healing"),
                             _ => null
                         };
-                        //replace image if Dot caused by shield break
-                        if (ent is DoTDamage dotDmg)
-                        {
-                            if (dotDmg.Modification.RefMod == dotDmg.SourceUnit.Fighter.ShieldBreakMod)
-                            {
-                                dmgIcon = Utl.LoadBitmap("BreakShieldDoT");
-                            }
 
-                        }
                         if (dmgIcon!=null)
                         {
                             gfx.DrawImage(new Bitmap(dmgIcon, DmgIconSize), new Point(portraitPoint.X,pointY+1));
                         }
 
                         Color nmbrColor;
-                        if (ent is ShieldBreak or DoTDamage or DirectDamage)
+                        if (ent.IsDamageEvent)
                         {
                             nmbrColor = Unit.GetColorByElem(ent.AbilityValue?.Element);
                         }

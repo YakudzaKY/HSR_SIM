@@ -29,7 +29,7 @@ namespace HSR_SIM_LIB.Fighters
         /// <returns></returns>
         public static double? CalculateShieldBrokeDmg(Event ent)
         {
-            if (!(ent is ShieldBreak) && !(ent is DoTDamage))
+            if (!(ent is ShieldBreak) && !(ent is BreakShieldDoTDamage))
             {
                 return 0;
             }
@@ -61,7 +61,7 @@ namespace HSR_SIM_LIB.Fighters
             }
             else
             {
-                 var modEnt = ent as DoTDamage;
+                 var modEnt = ent as BreakShieldDoTDamage;
                 if (modEnt.Modification.Effects.Any(x => x.EffType == Effect.EffectType.Bleed))
                 {
                     bool eliteFlag = defender.Fighter is DefaultNPCBossFIghter;

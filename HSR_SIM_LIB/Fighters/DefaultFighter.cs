@@ -165,7 +165,7 @@ namespace HSR_SIM_LIB.Fighters
             {
                 //sort by combat then cost. avalable for casting by cost
                 foreach (Ability ability in Abilities
-                            .Where(x =>x.Available() && x.AbilityType.HasFlag( Ability.AbilityTypeEnm.Technique) && x.Parent.Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= x.Cost)
+                            .Where(x =>x.Available() && x.AbilityType== Ability.AbilityTypeEnm.Technique && x.Parent.Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= x.Cost)
                             .OrderBy(x => x.Attack)
                             .ThenByDescending(x => x.Cost))
                 {
@@ -185,14 +185,14 @@ namespace HSR_SIM_LIB.Fighters
                                 || !GetFriends().Any(x => x != Parent
                                                            && ((((DefaultFighter)(x.Fighter)).GetWeaknessTargets().Any()
                                                            && x.Fighter.Abilities.Any(y =>
-                                                               y.AbilityType.HasFlag( Ability.AbilityTypeEnm.Technique)
+                                                               y.AbilityType== Ability.AbilityTypeEnm.Technique
                                                                && y.Attack)) || (x.Fighter.Abilities.Any(y =>
-                                                               y.AbilityType.HasFlag( Ability.AbilityTypeEnm.Technique)
+                                                               y.AbilityType== Ability.AbilityTypeEnm.Technique
                                                                && y.Attack && y.IgnoreWeakness)))
                                                            ) //or others cant penetrate  or otherc can ignore weaknesss
                                 )
                             && !(Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= ability.Cost + 1
-                                    && GetFriends().Any(x => x.Fighter.Abilities.Any(y => y.AbilityType.HasFlag( Ability.AbilityTypeEnm.Technique) && !y.Attack && x.ParentTeam.ParentSim.BeforeStartQueue.IndexOf(y) < 0)))// no unused buffers here when 2tp+
+                                    && GetFriends().Any(x => x.Fighter.Abilities.Any(y => y.AbilityType ==Ability.AbilityTypeEnm.Technique && !y.Attack && x.ParentTeam.ParentSim.BeforeStartQueue.IndexOf(y) < 0)))// no unused buffers here when 2tp+
                             )
                         {
                             return ability;
@@ -209,7 +209,7 @@ namespace HSR_SIM_LIB.Fighters
                             */
                             if (Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= ability.Cost + 1
                                || !GetFriends().Any(x => GetWeaknessTargets().Any() && x.Fighter.Abilities.Any(y =>
-                                   y.AbilityType.HasFlag(Ability.AbilityTypeEnm.Technique) && y.Cost > 0
+                                   y.AbilityType==Ability.AbilityTypeEnm.Technique && y.Cost > 0
                                    && y.Attack))
                                )
                                 return ability;
@@ -224,7 +224,7 @@ namespace HSR_SIM_LIB.Fighters
                 Parent.ParentTeam.ParentSim?.Parent.LogDebug("========What i can cast=====");
                 double freeSp = HowManySpICanSpend();
                 Parent.ParentTeam.ParentSim?.Parent.LogDebug($"I have {freeSp:f} SP");
-                chosenAbility = Abilities.Where(x => x.Available.Invoke()&&(x.Cost<=freeSp ||x.CostType!=Resource.ResourceType.SP)&& ((x.AbilityType.HasFlag(Ability.AbilityTypeEnm.Basic))|| (x.AbilityType.HasFlag (Ability.AbilityTypeEnm.Ability)))).MaxBy(x=>x.AbilityType);
+                chosenAbility = Abilities.Where(x => x.Available.Invoke()&&(x.Cost<=freeSp ||x.CostType!=Resource.ResourceType.SP)&& (x.AbilityType==Ability.AbilityTypeEnm.Basic|| x.AbilityType== Ability.AbilityTypeEnm.Ability)).MaxBy(x=>x.AbilityType);
                 Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Choose  {chosenAbility?.Name}");
                 return chosenAbility;
             }

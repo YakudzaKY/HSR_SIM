@@ -56,18 +56,24 @@ namespace HSR_SIM_LIB.Skills
         {
             //do some shit
             if (Type == ModType.Dot)
-                foreach (var dotProcEvent in Effects.Select(effect => new DoTDamage(step, this.Caster, Caster)
+                foreach (var effect in Effects)
                 {
-                    CalculateValue = effect.CalculateValue,
-                    TargetUnit = step.Actor,
-                    Modification = this,
-                    AbilityValue = AbilityValue
+                   
+                    if (RefMod == Caster.Fighter.ShieldBreakMod)
+                    {
+                         var dotProcEvent = new BreakShieldDoTDamage(step, this.Caster, Caster) { CalculateValue = effect.CalculateValue, TargetUnit = step.Actor, Modification = this, AbilityValue = AbilityValue };
+                         step.Events.Add(dotProcEvent);
+                    }
 
-
-                }))
-                {
-                    step.Events.Add(dotProcEvent);
+                    else
+                    {
+                        var dotProcEvent = new DoTDamage(step, this.Caster, Caster) { CalculateValue = effect.CalculateValue, TargetUnit = step.Actor, Modification = this, AbilityValue = AbilityValue };
+                        step.Events.Add(dotProcEvent); 
+                    }
+                    
+                   
                 }
+
             //only Mods aplied before turn started
             if (IsOld)
             {
@@ -106,21 +112,30 @@ namespace HSR_SIM_LIB.Skills
         public void ProceedExpire(Event ent)
         {
             //delayed damage
-            foreach (var dotProcEvent in Effects.Where(x => x.EffType is EffectType.Freeze or EffectType.Entanglement).Select(effect => new DoTDamage(ent.ParentStep, this.Caster, Caster)
+            foreach (var x in Effects)
             {
-                CalculateValue = effect.CalculateValue,
-                TargetUnit = ent.TargetUnit,
-                Modification = this,
-                AbilityValue = AbilityValue
-
-
-            }))
-            {
-                ent.ChildEvents.Add(dotProcEvent);
+                if (x.EffType is EffectType.Freeze or EffectType.Entanglement)
+                {
+                    if (RefMod == Caster.Fighter.ShieldBreakMod)
+                    {
+                        var dotProcEvent = new BreakShieldDoTDamage(ent.ParentStep, this.Caster, Caster)
+                        {
+                            CalculateValue = x.CalculateValue, TargetUnit = ent.TargetUnit, Modification = this,
+                            AbilityValue = AbilityValue
+                        };
+                        ent.ChildEvents.Add(dotProcEvent);
+                    }
+                    else
+                    {
+                        var dotProcEvent = new DoTDamage(ent.ParentStep, this.Caster, Caster)
+                        {
+                            CalculateValue = x.CalculateValue, TargetUnit = ent.TargetUnit, Modification = this,
+                            AbilityValue = AbilityValue
+                        };
+                        ent.ChildEvents.Add(dotProcEvent);
+                    }
+                }
             }
-
-
-
         }
         public int Stack { get; set; } = 1;
 

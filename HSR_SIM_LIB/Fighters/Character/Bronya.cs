@@ -14,6 +14,11 @@ namespace HSR_SIM_LIB.Fighters.Character
     {
         public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Harmony;
         public override Unit.ElementEnm Element { get;  } =Unit.ElementEnm.Wind;
+
+        public double? CalculateBasicDmg(Event ent)
+        {
+            return FighterUtils.CalculateDmgByBasicVal(Parent.GetAttack(null) *(0.4 + (Parent.Skills.FirstOrDefault(x=>x.Name=="Windrider Bullet").Level*0.1)), ent);
+        }
         public Bronya(Unit parent) : base(parent)
         {
             Parent.Stats.BaseMaxEnergy = 120;
@@ -30,6 +35,21 @@ namespace HSR_SIM_LIB.Fighters.Character
 
             Abilities.Add(ability);
 
+
+            Ability SystemWarning;
+            //System Warning
+            SystemWarning = new Ability(this) {   AbilityType = Ability.AbilityTypeEnm.Basic
+                , Name = "FIX THIS SHIT!!!"
+                , Element = Element
+                , AdjacentTargets = Ability.AdjacentTargetsEnm.None
+                , Attack=true
+                , ToughnessShred = 30
+                , EnergyGain = 20
+                , SpGain = 1
+            };
+            //dmg events
+            SystemWarning.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateBasicDmg,  AbilityValue = SystemWarning });
+            Abilities.Add(SystemWarning);
             //=====================
             //Ascended Traces
             //=====================

@@ -123,6 +123,12 @@ namespace HSR_SIM_LIB.Fighters.Character
             return Parent.Mods.Any(x => x.RefMod == uniqueBuff);
         }
 
+        public double? CalculateBasicDmg(Event ent)
+        {
+            return FighterUtils.CalculateDmgByBasicVal(Parent.GetAttack(null) *(0.4 + (Parent.Skills.FirstOrDefault(x=>x.Name=="Thorns of the Abyss").Level*0.1)), ent);
+        }
+
+
         //50-110
         public double? CalculatePrayerOfAbyssFlower(Event ent)
         {
@@ -231,7 +237,20 @@ namespace HSR_SIM_LIB.Fighters.Character
             Abilities.Add(PrayerOfAbyssFlower);
 
         
-
+            Ability SystemWarning;
+            //System Warning
+            SystemWarning = new Ability(this) {   AbilityType = Ability.AbilityTypeEnm.Basic
+                , Name = "FIX THOIS FUCKING ATTACK"
+                , Element = Element
+                , AdjacentTargets = Ability.AdjacentTargetsEnm.None
+                , Attack=true
+                , ToughnessShred = 30
+                , EnergyGain = 20
+                , SpGain = 1
+            };
+            //dmg events
+            SystemWarning.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateBasicDmg,  AbilityValue = SystemWarning });
+            Abilities.Add(SystemWarning);
             //Mercy of a Fool
             var ability = new Ability(this)
             {

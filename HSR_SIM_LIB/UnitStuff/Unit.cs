@@ -212,7 +212,7 @@ namespace HSR_SIM_LIB.UnitStuff
             {
                 foreach (Effect effect in mod.Effects.Where(y => y.EffType == modType
                                                                  && y.Element == elem
-                                                                 && (y.AbilityType == AbilityTypeEnm.None || (ent?.AbilityValue != null && y.AbilityType.HasFlag(ent.AbilityValue.AbilityType)))
+                                                                 && (y.AbilityType == AbilityTypeEnm.None || (ent?.AbilityValue != null && y.AbilityType==ent.AbilityValue.AbilityType))
                          )
                         )
                 {
@@ -240,7 +240,7 @@ namespace HSR_SIM_LIB.UnitStuff
         /// search avalable for unit condition mods(planars self or ally)
         /// </summary>
         /// <returns></returns>
-        public List<PassiveMod> GetConditionMods(Unit? targetForCondition, EffectType? effTypeToSearch)
+        public List<PassiveMod> GetConditionMods(Unit targetForCondition, EffectType? effTypeToSearch)
         {
             List<PassiveMod> res = new();
             if (ParentTeam == null)

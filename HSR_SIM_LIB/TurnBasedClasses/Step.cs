@@ -150,10 +150,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         public void ProcEvents(bool revert = false, bool replay = false)
         {
             //for all events saved in step
-            List<Event> events;
             proceedEvents = new List<Event>();
-
-
             Event ent = GetNextEvent(revert);
             //while because new events can occur by procs
             while (ent != null)
@@ -370,7 +367,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 {
 
                     foreach (Ability ability in unit.Fighter.Abilities.Where(x => x.Priority == prio &&
-                                 (x.AbilityType.HasFlag(Ability.AbilityTypeEnm.FollowUpAction) || x.AbilityType.HasFlag(Ability.AbilityTypeEnm.Ultimate)) && x.Available()))
+                                 (x.AbilityType==Ability.AbilityTypeEnm.FollowUpAction || x.AbilityType==Ability.AbilityTypeEnm.Ultimate) && x.Available()))
                     {
                         StepType = StepTypeEnm.UnitFollowUpAction;
                         Actor = unit;

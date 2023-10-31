@@ -26,6 +26,8 @@ using HSR_SIM_LIB.Utils;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
+using HSR_SIM_LIB.UnitStuff;
+using static HSR_SIM_LIB.Worker;
 
 namespace HSR_SIM_LIB
 {
@@ -44,20 +46,9 @@ namespace HSR_SIM_LIB
         private SimCls sim = null;
         public SimCls Sim { get => sim; set => sim = value; }//simulation class( combat ,fights etc in this shit)
         public bool Completed { get => completed; set => completed = value; }
-
-
-
-
         private bool replay = false;//is replay not new gen
         private bool completed = false;
 
-        public record RCombatResult
-        {
-            public bool Success = false;
-            public int Cycles = 0;
-            public double TotalAv = 0;
-
-        }
 
         //TODO вообще надо сделать на старте выбор списка сценариев и количество итераций для каждого
         //далее в несколько потоков собрать справочник СЦЕНАРИЙ:Результаты(агрегировать при выполнении каждой итерации)
@@ -74,13 +65,64 @@ namespace HSR_SIM_LIB
             LogText("Scenario  " + Sim.CurrentScenario.Name + " was loaded");
         }
 
-        public RCombatResult GetCombatResult()
+        
+        public record RCombatResult
         {
-            RCombatResult res = new RCombatResult();
+            public bool? Success;
+            public int Cycles = 0;
+            public double TotalAv = 0;
+            public List<RCombatant> Combatants =new List<RCombatant>();
+
+        }
+
+        public record RCombatant
+        {
+            public string CombatUnit;
+            public Dictionary<Type, double> Damages;
+        }
+        public RCombatResult GetCombatResult(RCombatResult inRslt=null)
+        {
+            RCombatResult res = inRslt??new RCombatResult();
             MoveStep(false, -1);
-            res.Success = sim.PartyTeam.Units.Any(x => x.IsAlive);
-            res.TotalAv = sim.TotalAv;
-            res.Cycles = sim.SpecialTeam.Units.FirstOrDefault(x => x.Name == "Forgotten Hall").Level;
+            if (sim.PartyTeam.Units.Any(x => x.IsAlive))
+            {
+                //fill combatants
+                foreach (Unit unit in sim.PartyTeam.Units)
+                {
+                    RCombatant combatant=new RCombatant();
+                    combatant.CombatUnit = unit.Name;
+                    combatant.Damages= new Dictionary<Type, double>
+                    {
+                        {
+                            typeof(DirectDamage),
+                            sim.Steps.Sum(x =>
+                                x.Events.Where(y =>
+                                    y is DirectDamage && y.SourceUnit == unit &&
+                                    unit.Friends.All(j => j != y.TargetUnit)).Sum(y => y.Val ?? 0))
+                        },
+                        {
+                            typeof(ShieldBreak),
+                            sim.Steps.Sum(x =>
+                                x.Events.Where(y =>
+                                    y is ShieldBreak && y.SourceUnit == unit &&
+                                    unit.Friends.All(j => j != y.TargetUnit)).Sum(y => y.Val ?? 0))
+                        },
+                        { typeof(DoTDamage), sim.Steps.Sum(x => x.Events.Where(y=>y is DoTDamage and not  BreakShieldDoTDamage && y.SourceUnit==unit && unit.Friends.All(j => j != y.TargetUnit)).Sum(y=>y.Val??0)) },
+                        { typeof(BreakShieldDoTDamage), sim.Steps.Sum(x => x.Events.Where(y=>y is BreakShieldDoTDamage&&y.SourceUnit==unit&& unit.Friends.All(j => j != y.TargetUnit)).Sum(y=>y.Val??0)) }
+                    };
+
+                    res.Combatants.Add(combatant);
+                }
+
+                res.TotalAv = sim.TotalAv;
+                res.Cycles = sim.SpecialTeam.Units.FirstOrDefault(x => x.Name == "Forgotten Hall").Level;
+                res.Success = true;
+            }
+            else
+            {
+                res.Success = false;
+            }
+
             return res;
         }
         /// <summary>
