@@ -71,13 +71,6 @@ namespace HSR_SIM_LIB.Utils
                 DrawStartQueue(gfx, new Point(LeftSideWithSpace, TopSideForQueue), sim.BeforeStartQueue);
                 //step
                 DrawCenterText(gfx, sim.CurrentStep.GetDescription());
-                /*//events
-                short i = 2;
-                foreach (Event ent in sim.CurrentStep.Events)
-                {
-                    DrawText((int)(CombatImgSize.Width / 3.5), CenterTextY + i * DefaultFontSize, gfx, ent.GetDescription(), new SolidBrush(clrDefault), new("Tahoma", (int)(DefaultFontSize * 0.6), FontStyle.Bold),true);
-                    i++;
-                }*/
                 DrawText(PartyResourceX, PartyResourceY - 3 * (int)(DefaultFontSize * 1.2), gfx, string.Format("Fight: {0:d}/{1:d}",
                         sim.CurrentFightStep, sim.CurrentScenario.Fights.Count));
                 if (sim.CurrentFight != null)
@@ -369,6 +362,15 @@ namespace HSR_SIM_LIB.Utils
                             Healing =>Utl.LoadBitmap("Healing"),
                             _ => null
                         };
+                        //replace image if Dot caused by shield break
+                        if (ent is DoTDamage dotDmg)
+                        {
+                            if (dotDmg.Modification.RefMod == dotDmg.SourceUnit.Fighter.ShieldBreakMod)
+                            {
+                                dmgIcon = Utl.LoadBitmap("BreakShieldDoT");
+                            }
+
+                        }
                         if (dmgIcon!=null)
                         {
                             gfx.DrawImage(new Bitmap(dmgIcon, DmgIconSize), new Point(portraitPoint.X,pointY+1));
