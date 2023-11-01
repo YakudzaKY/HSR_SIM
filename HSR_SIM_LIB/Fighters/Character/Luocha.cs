@@ -18,7 +18,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             ,{ 11, 0.62 }, { 12, 0.64 }
         };
 
-        private List<Unit> trackedUnits;
+        private List<Unit> trackedUnits = new List<Unit>();
 
         private readonly Dictionary<int, double> PoAFFix = new()
         {
@@ -44,13 +44,10 @@ namespace HSR_SIM_LIB.Fighters.Character
         public override void DefaultFighter_HandleEvent(Event ent)
         {
             //if unit consume hp or got attack then apply buff
-            if (ent is StartCombat )
-            {
-                trackedUnits = new List<Unit>();
-            }
+
             if (ent is FinishCombat )
             {
-                trackedUnits = null;
+                trackedUnits = new List<Unit>();
             }
             else if (ent is ResourceDrain or DamageEventTemplate or Healing or ResourceGain)
             {
