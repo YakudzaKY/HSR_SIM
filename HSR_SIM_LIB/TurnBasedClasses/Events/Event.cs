@@ -66,7 +66,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
         public Step ParentStep { get; set; } = null;
         public bool TriggersHandled { get; set; } = false;
 
-        public bool IsDamageEvent => (this is ShieldBreak or DoTDamage or DirectDamage or BreakShieldDoTDamage);
+        public bool IsDamageEvent => (this is ToughnessBreak or DoTDamage or DirectDamage or ToughnessBreakDoTDamage);
 
 
         public Event(Step parent, ICloneable source, Unit sourceUnit)

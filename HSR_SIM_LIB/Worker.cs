@@ -65,13 +65,22 @@ namespace HSR_SIM_LIB
             LogText("Scenario  " + Sim.CurrentScenario.Name + " was loaded");
         }
 
-        
+        //stat modififer
+
+        public record RStatMod
+        {
+            public string Character { get; set; }
+            public string Stat { get; set; }
+            public double Val { get; set; }
+            public int Step { get; set; }
+        }
+
         public record RCombatResult
         {
             public bool? Success;
             public int Cycles = 0;
             public double TotalAv = 0;
-            public List<RCombatant> Combatants =new List<RCombatant>();
+            public List<RCombatant> Combatants = new List<RCombatant>();
 
         }
 
@@ -80,18 +89,18 @@ namespace HSR_SIM_LIB
             public string CombatUnit;
             public Dictionary<Type, double> Damages;
         }
-        public RCombatResult GetCombatResult(RCombatResult inRslt=null)
+        public RCombatResult GetCombatResult(RCombatResult inRslt = null)
         {
-            RCombatResult res = inRslt??new RCombatResult();
+            RCombatResult res = inRslt ?? new RCombatResult();
             MoveStep(false, -1);
             if (sim.PartyTeam.Units.Any(x => x.IsAlive))
             {
                 //fill combatants
                 foreach (Unit unit in sim.PartyTeam.Units)
                 {
-                    RCombatant combatant=new RCombatant();
+                    RCombatant combatant = new RCombatant();
                     combatant.CombatUnit = unit.Name;
-                    combatant.Damages= new Dictionary<Type, double>
+                    combatant.Damages = new Dictionary<Type, double>
                     {
                         {
                             typeof(DirectDamage),
@@ -101,14 +110,14 @@ namespace HSR_SIM_LIB
                                     unit.Friends.All(j => j != y.TargetUnit)).Sum(y => y.Val ?? 0))
                         },
                         {
-                            typeof(ShieldBreak),
+                            typeof(ToughnessBreak),
                             sim.Steps.Sum(x =>
                                 x.Events.Where(y =>
-                                    y is ShieldBreak && y.SourceUnit == unit &&
+                                    y is ToughnessBreak && y.SourceUnit == unit &&
                                     unit.Friends.All(j => j != y.TargetUnit)).Sum(y => y.Val ?? 0))
                         },
-                        { typeof(DoTDamage), sim.Steps.Sum(x => x.Events.Where(y=>y is DoTDamage and not  BreakShieldDoTDamage && y.SourceUnit==unit && unit.Friends.All(j => j != y.TargetUnit)).Sum(y=>y.Val??0)) },
-                        { typeof(BreakShieldDoTDamage), sim.Steps.Sum(x => x.Events.Where(y=>y is BreakShieldDoTDamage&&y.SourceUnit==unit&& unit.Friends.All(j => j != y.TargetUnit)).Sum(y=>y.Val??0)) }
+                        { typeof(DoTDamage), sim.Steps.Sum(x => x.Events.Where(y=>y is DoTDamage and not  ToughnessBreakDoTDamage && y.SourceUnit==unit && unit.Friends.All(j => j != y.TargetUnit)).Sum(y=>y.Val??0)) },
+                        { typeof(ToughnessBreakDoTDamage), sim.Steps.Sum(x => x.Events.Where(y=>y is ToughnessBreakDoTDamage&&y.SourceUnit==unit&& unit.Friends.All(j => j != y.TargetUnit)).Sum(y=>y.Val??0)) }
                     };
 
                     res.Combatants.Add(combatant);
@@ -133,13 +142,13 @@ namespace HSR_SIM_LIB
             int stepndx = sim?.steps?.IndexOf(sim.CurrentStep) ?? 0;
             Step oldStep = sim?.CurrentStep;
             //delete future steps
-            if (forceNewSteps && sim != null && sim.steps?.Count()>1)
+            if (forceNewSteps && sim != null && sim.steps?.Count() > 1)
             {
-                for (int i = sim?.steps.Count()??0 ; i > stepndx+1; i--)
+                for (int i = sim?.steps.Count() ?? 0; i > stepndx + 1; i--)
                 {
-                    sim.steps[i-1] = null;
-                    sim.steps.Remove(sim.steps[i-1]);
-                    
+                    sim.steps[i - 1] = null;
+                    sim.steps.Remove(sim.steps[i - 1]);
+
                 }
             }
             if (goBack)
@@ -230,7 +239,7 @@ namespace HSR_SIM_LIB
         private void LogStepDescription(Step step, bool revert = false)
         {
             string OutText = "===================================\n";
-             OutText =OutText+ " Step# " + Sim.Steps.IndexOf(Sim.CurrentStep).ToString() + " [" + step.StepType.ToString() + "] " + step.GetDescription();
+            OutText = OutText + " Step# " + Sim.Steps.IndexOf(Sim.CurrentStep).ToString() + " [" + step.StepType.ToString() + "] " + step.GetDescription();
             if (revert)
                 OutText = "reverted: " + OutText;
             else if (replay)
@@ -248,11 +257,11 @@ namespace HSR_SIM_LIB
                     OutText = "reproduced: " + OutText;
                 LogText(OutText);
                 if (ent is ModEventTemplate)
-                if (((ModEventTemplate)ent).Modification != null)
-                {
-                    OutText = " * " + ((ModEventTemplate)ent).Modification.GetDescription();
-                    LogText(OutText);
-                }
+                    if (((ModEventTemplate)ent).Modification != null)
+                    {
+                        OutText = " * " + ((ModEventTemplate)ent).Modification.GetDescription();
+                        LogText(OutText);
+                    }
 
 
             }
@@ -301,6 +310,43 @@ namespace HSR_SIM_LIB
             LogText("lib loaded");
         }
 
-
+        //Apply modes(stats??) to sim elements
+        public void ApplyModes(List<RStatMod> taskStatMods)
+        {
+            if (taskStatMods==null)
+                return;
+        
+            foreach (RStatMod mod in taskStatMods)
+            {
+                Unit targetUnit = sim.CurrentScenario.Party.FirstOrDefault(x => String.Equals(x.Name, mod.Character));
+                if (targetUnit != null)
+                {
+                    if (mod.Stat == "spd")
+                        targetUnit.Stats.BaseSpeed += mod.Val;
+                    else if (mod.Stat == "hp")
+                        targetUnit.Stats.BaseMaxHp += mod.Val;
+                    else if (mod.Stat == "atk")
+                        targetUnit.Stats.BaseAttack += mod.Val;
+                    else if (mod.Stat == "def")
+                        targetUnit.Stats.BaseDef += mod.Val;
+                    else if (mod.Stat == "hp_prc")
+                        targetUnit.Stats.MaxHpPrc += mod.Val;
+                    else if (mod.Stat == "atk_prc")
+                        targetUnit.Stats.AttackPrc += mod.Val;
+                    else if (mod.Stat == "def_prc")
+                        targetUnit.Stats.DefPrc += mod.Val;
+                    else if (mod.Stat == "break_dmg_prc")
+                        targetUnit.Stats.BreakDmgPrc += mod.Val;
+                    else if (mod.Stat == "effect_hit_prc")
+                        targetUnit.Stats.EffectHitPrc += mod.Val;
+                    else if (mod.Stat == "effect_res_prc")
+                        targetUnit.Stats.EffectResPrc += mod.Val;
+                    else if (mod.Stat == "crit_rate_prc")
+                        targetUnit.Stats.CritRatePrc += mod.Val;
+                    else if (mod.Stat == "crit_dmg_prc")
+                        targetUnit.Stats.CritDmgPrc += mod.Val;
+                }
+            }
+        }
     }
 }

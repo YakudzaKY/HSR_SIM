@@ -64,25 +64,37 @@ namespace HSR_SIM_LIB.Utils
             //Profile
             if (profilePath != null)
             {
-                xDoc = new XmlDocument();
-                xDoc.Load(profilePath);
-                xRoot = xDoc.DocumentElement;
-                if (xRoot != null)
-                {
-
-                    //parse all items
-                    foreach (XmlElement xnode in xRoot)
-                    {
-
-                        if (xnode.Name == "Party")
-                        {
-                            Combat.CurrentScenario.Party = ExtractUnits(xnode);
-                        }
-                    }
-                }
+                Combat.CurrentScenario.Party = ExctractPartyFromXml(profilePath);
             }
 
             return Combat;
+        }
+
+        public static List<Unit> ExctractPartyFromXml(string profilePath)
+        {
+            List<Unit> res=null;
+            XmlDocument xDoc = new XmlDocument();
+            xDoc.Load(profilePath);
+            XmlElement xRoot = xDoc.DocumentElement;
+            if (xRoot != null)
+            {
+
+                //parse all items
+                foreach (XmlElement xnode in xRoot)
+                {
+
+                    if (xnode.Name == "Party")
+                    {
+                        res= ExtractUnits(xnode);
+                    }
+                }
+            }
+            else
+            {
+                res=new List<Unit>();
+            }
+
+            return res;
         }
 
         /// <summary>

@@ -29,7 +29,7 @@ namespace HSR_SIM_LIB.Fighters
         /// <returns></returns>
         public static double? CalculateShieldBrokeDmg(Event ent)
         {
-            if (!(ent is ShieldBreak) && !(ent is BreakShieldDoTDamage))
+            if (!(ent is ToughnessBreak) && !(ent is ToughnessBreakDoTDamage))
             {
                 return 0;
             }
@@ -43,7 +43,7 @@ namespace HSR_SIM_LIB.Fighters
             double baseDmg;
             double maxToughnessMult = 0.5 + (double)defender.Stats.MaxToughness / 120;
             //if this is direct shield break
-            if (ent is ShieldBreak)
+            if (ent is ToughnessBreak)
             {
                 
 
@@ -61,7 +61,7 @@ namespace HSR_SIM_LIB.Fighters
             }
             else
             {
-                 var modEnt = ent as BreakShieldDoTDamage;
+                 var modEnt = ent as ToughnessBreakDoTDamage;
                 if (modEnt.Modification.Effects.Any(x => x.EffType == Effect.EffectType.Bleed))
                 {
                     bool eliteFlag = defender.Fighter is DefaultNPCBossFIghter;

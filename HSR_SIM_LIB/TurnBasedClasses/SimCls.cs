@@ -190,7 +190,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
                     //temporary give back the THG for calculation break damage. will be reduce at the end
                     ent.TargetUnit.GetRes(((ResourceDrain)ent).ResType).ResVal += (double)ent.RealVal;
-                    ShieldBreak shieldBrkEvent = new(ent.ParentStep, ent.Source, ent.SourceUnit)
+                    ToughnessBreak shieldBrkEvent = new(ent.ParentStep, ent.Source, ent.SourceUnit)
                     {
 
                         AbilityValue = ent.AbilityValue,

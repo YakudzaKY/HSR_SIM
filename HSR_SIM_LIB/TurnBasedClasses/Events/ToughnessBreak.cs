@@ -8,10 +8,10 @@ using HSR_SIM_LIB.UnitStuff;
 namespace HSR_SIM_LIB.TurnBasedClasses.Events
 {
     //Break the shield
-    public class ShieldBreak:DamageEventTemplate
+    public class ToughnessBreak:DamageEventTemplate
     {
 
-        public ShieldBreak(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
+        public ToughnessBreak(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
         {
         }
 

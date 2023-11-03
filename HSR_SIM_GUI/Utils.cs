@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
 using Ini;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Windows.Forms.Design;
@@ -43,6 +44,45 @@ namespace HSR_SIM_GUI
             box.AppendText(line);
         }
 
+        public static void ApplyDarkLightTheme(Chart chart)
+        {
+            [DllImport("UXTheme.dll", SetLastError = true, EntryPoint = "#138")]
+            static extern bool ShouldSystemUseDarkMode();
+
+            if (ShouldSystemUseDarkMode())
+            {
+                chart.BackColor = Utils.Zcolor(45, 45, 48);
+                foreach (ChartArea chartArea in   chart.ChartAreas)
+                {
+                    chartArea.BackColor = Utils.Zcolor(104, 104, 104);
+                    chartArea.BorderColor =  Constant.clrDefault;
+                    chartArea.AxisX.LabelStyle.ForeColor =Constant.clrDefault;
+                    chartArea.AxisY.LabelStyle.ForeColor =Constant.clrDefault;
+                    chartArea.AxisX.TitleForeColor =Constant.clrDefault;
+                    chartArea.AxisY.TitleForeColor =Constant.clrDefault;
+                    foreach (var axis in chartArea.Axes)
+                    {
+                        axis.LineColor = Constant.clrDefault;
+                    }
+                }
+                foreach (Legend legend in   chart.Legends)
+                {
+                    legend.BackColor = Utils.Zcolor(104, 104, 104);
+                }
+                
+                foreach (var series in   chart.Series)
+                {
+                    series.LabelForeColor = Constant.clrDefault;
+                }
+             
+                foreach (var title in   chart.Titles)
+                {
+                    title.ForeColor = Constant.clrDefault;
+                }
+            }
+
+            
+        }
         public static void ApplyDarkLightTheme(Form form)
         {
             [DllImport("UXTheme.dll", SetLastError = true, EntryPoint = "#138")]
@@ -54,43 +94,60 @@ namespace HSR_SIM_GUI
             else
                 ApplyTheme(form, Color.White, Utils.Zcolor(240, 240, 240), Utils.Zcolor(181, 181, 181), Utils.Zcolor(110, 110, 110), Color.White, Color.Black);
         }
+
+
         static void ApplyTheme(Form form, Color back, Color pan, Color btn, Color tbox, Color combox, Color textColor)
         {
             form.BackColor = back;
 
             foreach (Control item in form.Controls)
             {
-                if (item is System.Windows.Forms.DataGridView)
-                {
-                    ((DataGridView)item).BackColor = btn;
-                    ((DataGridView)item).ForeColor = textColor;
-                    ((DataGridView)item).GridColor = btn;
-                    ((DataGridView)item).BackgroundColor = btn;
-                    ((DataGridView)item).ColumnHeadersDefaultCellStyle.BackColor = combox;
-                    ((DataGridView)item).ColumnHeadersDefaultCellStyle.ForeColor = textColor;
-                    ((DataGridView)item).EnableHeadersVisualStyles = false;
-                    foreach ( var col in  ((DataGridView)item).Columns)
-                    {
-                        ((DataGridViewTextBoxColumn)col).DefaultCellStyle.ForeColor = textColor;
-                        ((DataGridViewTextBoxColumn)col).DefaultCellStyle.BackColor = tbox;
-                    }
+                ApplyThemeToControl(item, back, pan, btn, tbox, combox, textColor);
 
-                }
-              
-                else if (!(item is System.Windows.Forms.Label))
-                {
-                    item.BackColor = btn;
-                    item.ForeColor = textColor;
-                }
-                else
-                {
-                    item.ForeColor = textColor;
-                }
 
             }
 
 
         }
+
+        private static void ApplyThemeToControl(Control item, Color back, Color pan, Color btn, Color tbox, Color combox, Color textColor)
+        {
+            if (item is System.Windows.Forms.DataGridView)
+            {
+                ((DataGridView)item).BackColor = btn;
+                ((DataGridView)item).ForeColor = textColor;
+                ((DataGridView)item).GridColor = btn;
+                ((DataGridView)item).BackgroundColor = btn;
+                ((DataGridView)item).ColumnHeadersDefaultCellStyle.BackColor = combox;
+                ((DataGridView)item).ColumnHeadersDefaultCellStyle.ForeColor = textColor;
+                ((DataGridView)item).EnableHeadersVisualStyles = false;
+                foreach ( var col in  ((DataGridView)item).Columns)
+                {
+                    ((DataGridViewTextBoxColumn)col).DefaultCellStyle.ForeColor = textColor;
+                    ((DataGridViewTextBoxColumn)col).DefaultCellStyle.BackColor = tbox;
+                }
+
+            }
+              
+            else if (!(item is System.Windows.Forms.Label))
+            {
+                item.BackColor = btn;
+                item.ForeColor = textColor;
+
+
+                
+            }
+            else
+            {
+                item.ForeColor = textColor;
+            }
+
+            foreach (Control subitem in item.Controls)
+            {
+                ApplyThemeToControl(subitem, back, pan, btn, tbox, combox, textColor);
+            }
+        }
+
         public static Color Zcolor(int r, int g, int b)
         {
             return Color.FromArgb(r, g, b);

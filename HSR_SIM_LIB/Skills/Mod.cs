@@ -61,7 +61,7 @@ namespace HSR_SIM_LIB.Skills
                    
                     if (RefMod == Caster.Fighter.ShieldBreakMod)
                     {
-                         var dotProcEvent = new BreakShieldDoTDamage(step, this.Caster, Caster) { CalculateValue = effect.CalculateValue, TargetUnit = step.Actor, Modification = this, AbilityValue = AbilityValue };
+                         var dotProcEvent = new ToughnessBreakDoTDamage(step, this.Caster, Caster) { CalculateValue = effect.CalculateValue, TargetUnit = step.Actor, Modification = this, AbilityValue = AbilityValue };
                          step.Events.Add(dotProcEvent);
                     }
 
@@ -118,7 +118,7 @@ namespace HSR_SIM_LIB.Skills
                 {
                     if (RefMod == Caster.Fighter.ShieldBreakMod)
                     {
-                        var dotProcEvent = new BreakShieldDoTDamage(ent.ParentStep, this.Caster, Caster)
+                        var dotProcEvent = new ToughnessBreakDoTDamage(ent.ParentStep, this.Caster, Caster)
                         {
                             CalculateValue = x.CalculateValue, TargetUnit = ent.TargetUnit, Modification = this,
                             AbilityValue = AbilityValue

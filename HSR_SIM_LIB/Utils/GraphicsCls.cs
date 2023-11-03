@@ -352,8 +352,8 @@ namespace HSR_SIM_LIB.Utils
                         }
                         Bitmap dmgIcon = ent  switch
                         {
-                            ShieldBreak=> Utl.LoadBitmap("BreakShield"),
-                            BreakShieldDoTDamage =>  Utl.LoadBitmap("BreakShieldDoT"),
+                            ToughnessBreak=> Utl.LoadBitmap("BreakShield"),
+                            ToughnessBreakDoTDamage =>  Utl.LoadBitmap("BreakShieldDoT"),
                             DoTDamage =>  Utl.LoadBitmap("DoT"),
                             DirectDamage => Utl.LoadBitmap("Sword"),
                             ResourceDrain =>Utl.LoadBitmap("Blood"),

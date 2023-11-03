@@ -7,7 +7,7 @@ using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events
 {
-    public class BreakShieldDoTDamage:DoTDamage
+    public class ToughnessBreakDoTDamage:DoTDamage
     {
         
         public override string GetDescription()
@@ -17,7 +17,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             
         }
      
-        public BreakShieldDoTDamage(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
+        public ToughnessBreakDoTDamage(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
         {
         }
     }
