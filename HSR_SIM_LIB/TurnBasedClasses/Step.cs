@@ -188,6 +188,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         public void ExecuteAbility(Ability ability, Unit target = null)
         {
             Actor = ability.Parent.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
+            Target = target;
             ActorAbility = ability;//WAT ABILITY is casting
 
             //res gaining
@@ -219,27 +220,12 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         (ent.CalculateTargets != null) ? ent.CalculateTargets() : ability.GetTargets(target, ent.TargetType, ent.CurentTargetType);
                     foreach (Unit unit in targetsUnits)
                     {
-                        Event unitEnt = (Event)ent.Clone();
-                        unitEnt.ParentStep = this;
-                        unitEnt.TargetUnit = unit;
-                        // shred toughness 
-                        if ((unitEnt is DirectDamage) &&
-                            (ability.ToughnessShred != 0 || ability.CalculateToughnessShred != null))
-                            UnitThgShred(unit, ability, ent.CurentTargetType);
-                        //then primary dmg
-                        Events.Add(unitEnt);
-
+                        CreateDamagesEvents(ability,ent,unit);
                     }
                 }
                 else
                 {
-
-                    Event unitEnt = (Event)ent.Clone();
-                    unitEnt.ParentStep = this;
-                    if ((unitEnt is DirectDamage) && (ability.ToughnessShred != 0 || ability.CalculateToughnessShred != null))
-                        UnitThgShred(ent.TargetUnit, ability, ent.CurentTargetType);
-                    //then primary dmg
-                    Events.Add(unitEnt);
+                    CreateDamagesEvents(ability,ent,null);
                 }
 
             }
@@ -259,30 +245,24 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             }
         }
 
-        private void UnitThgShred(Unit unit, Ability ability, AbilityCurrentTargetEnm? abilityCurrentTargetEnm)
-        {
-            if (unit == null) return;
-            if (ability == null) return;
-            double? shredVal = 0;
-            if (ability.CalculateToughnessShred != null)
-            {
-                shredVal = ability.CalculateToughnessShred(unit);
-            }
-            else
-            {
-                shredVal = abilityCurrentTargetEnm == AbilityCurrentTargetEnm.AbilityAdjacent ? ability.AdjacentToughnessShred : ability.ToughnessShred;
-            }
+        public Unit Target { get; set; }
 
-            if (unit.Fighter.Weaknesses.Any(x => x == (ability.Element)) || ability.IgnoreWeakness)
-                Events.Add(new ResourceDrain(null, null, ability.Parent.Parent)
-                {
-                    ParentStep = this,
-                    TargetUnit = unit,
-                    ResType = ResourceType.Toughness,
-                    Val = shredVal,
-                    AbilityValue = ability
-                });
+        /// <summary>
+        /// create weakness shred and directDamage events
+        /// </summary>
+        /// <param name="ability"></param>
+        /// <param name="ent"></param>
+        /// <param name="target"></param>
+        private void CreateDamagesEvents(Ability ability, Event ent, Unit target)
+        {
+            Event unitEnt = (Event)ent.Clone();
+            unitEnt.ParentStep = this;
+            unitEnt.TargetUnit = target??ent.TargetUnit;
+            Events.Add(unitEnt);
+          
         }
+
+
 
         //Cast all techniques before fights starts
         public void ExecuteAbilityFromQueue()

@@ -56,7 +56,7 @@ namespace HSR_SIM_LIB.Fighters
                 if (Parent.ParentTeam == Parent.ParentTeam.ParentSim.SpecialTeam)
                     return null;
                 var unitsToSearch = Parent.ParentTeam.Units.Where(x => x.IsAlive).OrderByDescending(x => x.Fighter.Cost)
-                    .ThenByDescending(x => x.GetAttack(null) * x.Stats.CritChance * x.Stats.CritDmg).ToList();
+                    .ThenByDescending(x => x.GetAttack(null) * x.Stats.BaseCritChance * x.Stats.BaseCritDmg).ToList();
                 if (Parent == unitsToSearch.First())
                     return UnitRole.MainDPS;
  

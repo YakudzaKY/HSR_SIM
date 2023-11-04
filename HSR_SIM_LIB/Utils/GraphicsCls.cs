@@ -339,7 +339,7 @@ namespace HSR_SIM_LIB.Utils
                     foreach (Event ent in step.Events.Where(x => x.TargetUnit == unit &&
                                                                (x.IsDamageEvent
                                                                || x is Healing
-                                                               || (x is ResourceDrain && x.Val > 0 && ((ResourceDrain)x).ResType == ResourceType.HP)
+                                                               || (x is ResourceDrain && x.Val > 0 && ((ResourceDrain)x).ResType is ResourceType.HP or ResourceType.Toughness)
                                                                || (x is ResourceGain && x.Val > 0 && ((ResourceGain)x).ResType == ResourceType.HP)
                                                                )))
                     {
@@ -356,7 +356,7 @@ namespace HSR_SIM_LIB.Utils
                             ToughnessBreakDoTDamage =>  Utl.LoadBitmap("BreakShieldDoT"),
                             DoTDamage =>  Utl.LoadBitmap("DoT"),
                             DirectDamage => Utl.LoadBitmap("Sword"),
-                            ResourceDrain =>Utl.LoadBitmap("Blood"),
+                            ResourceDrain rdr => (rdr.ResType==ResourceType.HP)?Utl.LoadBitmap("Blood"):Utl.LoadBitmap("Scratch"),
                             ResourceGain =>Utl.LoadBitmap("Blood"),
                             Healing =>Utl.LoadBitmap("Healing"),
                             _ => null
@@ -376,9 +376,13 @@ namespace HSR_SIM_LIB.Utils
                         {
                             nmbrColor = Color.GreenYellow;
                         }
+                        else if (ent is ResourceDrain rdr)
+                        {
+                            nmbrColor =  (rdr.ResType == ResourceType.HP)?Color.Red:Color.DarkGray;
+                        }
                         else
                         {
-                            nmbrColor = Color.Red;
+                            nmbrColor = Color.Gray;
                         }
 
                         DrawText(portraitPoint.X+ DmgIconSize.Width

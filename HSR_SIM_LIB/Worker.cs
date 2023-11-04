@@ -342,9 +342,9 @@ namespace HSR_SIM_LIB
                     else if (mod.Stat == "effect_res_prc")
                         targetUnit.Stats.EffectResPrc += mod.Val;
                     else if (mod.Stat == "crit_rate_prc")
-                        targetUnit.Stats.CritRatePrc += mod.Val;
+                        targetUnit.Stats.BaseCritChance += mod.Val;
                     else if (mod.Stat == "crit_dmg_prc")
-                        targetUnit.Stats.CritDmgPrc += mod.Val;
+                        targetUnit.Stats.BaseCritDmg += mod.Val;
                 }
             }
         }

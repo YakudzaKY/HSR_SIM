@@ -66,20 +66,20 @@ namespace HSR_SIM_LIB.Fighters
                 {
                     bool eliteFlag = defender.Fighter is DefaultNPCBossFIghter;
                     baseDmg = eliteFlag ? 0.07 : 0.16 * defender.GetMaxHp(ent);
-                    baseDmg = Math.Min(baseDmg, 2 * lvlMultiplier[defender.Level] * defender.Stats.MaxToughness);
+                    baseDmg = Math.Min(baseDmg, 2 * lvlMultiplier[attacker.Level] * defender.Stats.MaxToughness);
                 }
                 else if (modEnt.Modification.Effects.Any(x =>
                              x.EffType is Effect.EffectType.Burn or Effect.EffectType.Freeze))
-                    baseDmg = 1 * lvlMultiplier[defender.Level];
+                    baseDmg = 1 * lvlMultiplier[attacker.Level] * maxToughnessMult;
                 else if (modEnt.Modification.Effects.Any(x =>
                              x.EffType is Effect.EffectType.Shock))
-                    baseDmg = 2 * lvlMultiplier[defender.Level];
+                    baseDmg = 2 * lvlMultiplier[attacker.Level] * maxToughnessMult;
                 else if (modEnt.Modification.Effects.Any(x =>
                              x.EffType is Effect.EffectType.WindShear))
-                    baseDmg = 1* modEnt.Modification.Stack  * lvlMultiplier[defender.Level];
+                    baseDmg = 1* modEnt.Modification.Stack  * lvlMultiplier[attacker.Level] * maxToughnessMult;
                 else if (modEnt.Modification.Effects.Any(x =>
                              x.EffType is Effect.EffectType.Entanglement))
-                    baseDmg =0.6* modEnt.Modification.Stack  * lvlMultiplier[defender.Level] * maxToughnessMult;
+                    baseDmg =0.6* modEnt.Modification.Stack  * lvlMultiplier[attacker.Level] * maxToughnessMult;
                 else
                     baseDmg = 0;
             }
@@ -133,10 +133,11 @@ namespace HSR_SIM_LIB.Fighters
 
             double damageBoost = 1
                                  + attacker.GetElemBoostValue(attackElem, ent)
+                                 + attacker.GetAbilityTypeMultiplier(ent)
                                  + attacker.AllDmgBoost(ent)
                                  + dotMultiplier
                                  ;
-            double abilityTypeMultiplier = attacker.GetAbilityTypeMultiplier(ent);
+
             double def = defender.GetDef(ent);
             double defWithIgnore = def * (1 - attacker.DefIgnore(ent));
             double defMultiplier = 1 - (defWithIgnore / (defWithIgnore + 200 + (10 * attacker.Level)));
@@ -149,7 +150,7 @@ namespace HSR_SIM_LIB.Fighters
 
             double brokenMultiplier = defender.GetBrokenMultiplier();
 
-            double totalDmg = baseDmg * abilityTypeMultiplier * critMultiplier * damageBoost * defMultiplier * resPen * vulnMult *
+            double totalDmg = baseDmg * critMultiplier * damageBoost * defMultiplier * resPen * vulnMult *
                               dmgReduction * brokenMultiplier;
             ent.ParentStep.Parent.Parent?.LogDebug("=======================");
             ent.ParentStep.Parent.Parent?.LogDebug($"baseDmg={baseDmg:f} crit chance={ attacker.GetCritRate(ent):f} ");
@@ -157,7 +158,7 @@ namespace HSR_SIM_LIB.Fighters
             ent.ParentStep.Parent.Parent?.LogDebug($"damageBoost({damageBoost:f}) = 1+ GetElemBoostValue({attacker.GetElemBoostValue(attackElem, ent):f})  +AllDmgBoost({attacker.AllDmgBoost(ent):f}) + dotMultiplier({dotMultiplier:f})");
             ent.ParentStep.Parent.Parent?.LogDebug($"Def {def:f} -> ignored to {defWithIgnore:f} ");
             ent.ParentStep.Parent.Parent?.LogDebug($"defMultiplier({defMultiplier:f}) = 1-(defender.Stats.Def({defWithIgnore:f})/(defender.Stats.Def({defWithIgnore:f})+200+(10*attacker.Level({attacker.Level:d}))))");
-            ent.ParentStep.Parent.Parent?.LogDebug($"resPen= {resPen:f} ; vulnMult= {vulnMult:f} ; critMultiplier={critMultiplier:f} ; dmgReduction= {dmgReduction:f} ; brokenMultiplier= {brokenMultiplier:f} ; abilityTypeMultiplier {abilityTypeMultiplier:f}");
+            ent.ParentStep.Parent.Parent?.LogDebug($"resPen= {resPen:f} ; vulnMult= {vulnMult:f} ; critMultiplier={critMultiplier:f} ; dmgReduction= {dmgReduction:f} ; brokenMultiplier= {brokenMultiplier:f} ; abilityTypeMultiplier {attacker.GetAbilityTypeMultiplier(ent):f}");
             ent.ParentStep.Parent.Parent?.LogDebug($"TOTAL DAMAGE= {totalDmg:f}");
             return totalDmg;
         }

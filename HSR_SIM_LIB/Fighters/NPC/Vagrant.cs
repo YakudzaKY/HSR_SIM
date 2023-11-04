@@ -32,7 +32,6 @@ namespace HSR_SIM_LIB.Fighters.NPC
                 Cost = 1,
                 Cooldown=1,
                 Element = Element,
-                ToughnessShred = 60,
                 Attack = true
             };
             //dmg events

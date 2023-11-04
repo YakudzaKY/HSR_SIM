@@ -241,12 +241,12 @@ namespace HSR_SIM_LIB.Fighters.Character
                 , Element = Element
                 , AdjacentTargets = Ability.AdjacentTargetsEnm.None
                 , Attack=true
-                , ToughnessShred = 30
                 , EnergyGain = 20
                 , SpGain = 1
             };
             //dmg events
             SystemWarning.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateBasicDmg,  AbilityValue = SystemWarning });
+            SystemWarning.Events.Add(new ToughnessShred(null, this, this.Parent) { Val=30,  AbilityValue = SystemWarning });
             Abilities.Add(SystemWarning);
             //Mercy of a Fool
             var ability = new Ability(this)

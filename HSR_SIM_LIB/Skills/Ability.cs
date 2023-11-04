@@ -24,11 +24,6 @@ namespace HSR_SIM_LIB.Skills
         public AbilityTypeEnm AbilityType { get; set; }
 
         public IFighter Parent { get; set; }
-        public delegate double? DCalculateToughnessShred(Unit target);
-        public DCalculateToughnessShred CalculateToughnessShred { get; init; }
-        public double ToughnessShred { get; set; }
-        public double AdjacentToughnessShred { get; set; }
-
 
         public string Name { get; internal set; }
         public List<Event> Events { get; set; } = new List<Event>();
@@ -271,6 +266,12 @@ namespace HSR_SIM_LIB.Skills
             }
 
             return null;
+        }
+
+        public enum WeaknessBreakOrderEnm
+        {
+            ToughnessFirst,
+            DirectDamageFirst
         }
     }
 }

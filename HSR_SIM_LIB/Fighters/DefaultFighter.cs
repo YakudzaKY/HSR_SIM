@@ -136,7 +136,7 @@ namespace HSR_SIM_LIB.Fighters
             get
             {
                 if (!Parent.IsAlive) return null;
-                var unitsToSearch = Parent.ParentTeam.Units.Where(x => x.IsAlive).OrderByDescending(x => x.Fighter.Cost).ThenByDescending(x => x.GetAttack(null) * x.Stats.CritChance * x.Stats.CritDmg).ToList();
+                var unitsToSearch = Parent.ParentTeam.Units.Where(x => x.IsAlive).OrderByDescending(x => x.Fighter.Cost).ThenByDescending(x => x.GetAttack(null) * x.Stats.BaseCritChance * x.Stats.BaseCritDmg).ToList();
                 if (Parent == unitsToSearch.First())
                     return UnitRole.MainDPS;
                 //if second on list then second dps
@@ -362,13 +362,11 @@ namespace HSR_SIM_LIB.Fighters
                 ,
                 Element = Element
                 ,
-                ToughnessShred = 30
-                ,
                 AdjacentTargets = Ability.AdjacentTargetsEnm.All
                 ,
                 Attack = true
             };
-
+            defOpener.Events.Add(new ToughnessShred(null, this, this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Val = 30, AbilityValue = defOpener });
 
             Abilities.Add(defOpener);
 

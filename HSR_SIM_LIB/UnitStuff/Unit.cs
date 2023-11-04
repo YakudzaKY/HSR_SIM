@@ -204,7 +204,7 @@ namespace HSR_SIM_LIB.UnitStuff
             List<Mod> conditionsToCheck = new();
             //get all mods to check
             conditionsToCheck.AddRange(Mods);
-            foreach (PassiveMod pmode in GetConditionMods(ent?.TargetUnit, modType))
+            foreach (PassiveMod pmode in GetConditionMods(this, modType))
                 conditionsToCheck.Add(pmode.Mod);
 
 
@@ -528,7 +528,7 @@ namespace HSR_SIM_LIB.UnitStuff
         /// <returns></returns>
         public double GetAbilityTypeMultiplier(Event ent = null)
         {
-            return 1 + GetModsByType(EffectType.AbilityTypeBoost, ent: ent);
+            return GetModsByType(EffectType.AbilityTypeBoost, ent: ent);
         }
 
         public double GetOutgoingHealMultiplier(Event ent)
