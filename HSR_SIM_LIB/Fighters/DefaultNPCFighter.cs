@@ -18,7 +18,7 @@ namespace HSR_SIM_LIB.Fighters
     {
         public List<ConditionMod> ConditionMods { get; set; }=new List<ConditionMod>();
         public List<PassiveMod> PassiveMods { get; set; }= new List<PassiveMod>();
-        public Mod ShieldBreakMod { get; set; } = new Mod(null);
+        public Buff ShieldBreakMod { get; set; } = new Buff(null);
         public PathType? Path { get; set; } = null;
         public Unit.ElementEnm Element { get; set; }
         public List<Unit.ElementEnm> Weaknesses { get; set; } = new List<Unit.ElementEnm>();

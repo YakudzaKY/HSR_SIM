@@ -14,10 +14,12 @@ using static HSR_SIM_LIB.UnitStuff.Team;
 using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.UnitStuff;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.Skills.EffectList;
+using HSR_SIM_LIB.Skills.ReadyBuffs;
 using static HSR_SIM_LIB.TurnBasedClasses.CombatFight;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using static HSR_SIM_LIB.Skills.Effect;
-using static HSR_SIM_LIB.Skills.Mod;
+using static HSR_SIM_LIB.Skills.Buff;
 
 namespace HSR_SIM_LIB.TurnBasedClasses
 {/// <summary>
@@ -131,11 +133,11 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
             if (ent is DamageEventTemplate)
             {
-                List<Mod> toDispell = new List<Mod>();
+                List<Buff> toDispell = new List<Buff>();
                 toDispell.AddRange(ent.TargetUnit.Mods.Where(x =>
-                    x.Effects.Any(y => y.EffType == Effect.EffectType.Shield && y.Value <= 0)));
+                    x.Effects.Any(y => y is EffShield && y.Value <= 0)));
                 //dispell zero shields
-                foreach (Mod mod in toDispell)
+                foreach (Buff mod in toDispell)
                 {
                     ent.DispelMod(mod, true);
 
@@ -206,48 +208,26 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                     switch (ent.AbilityValue.Element)
                     {
                         case Unit.ElementEnm.Physical:
-                            ent.TryDebuff(new Mod(ent.SourceUnit,ent.SourceUnit.Fighter.ShieldBreakMod) { DoNotClone = true, Type = ModType.Dot, BaseDuration = 2, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Bleed, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
+                            ent.TryDebuff(new BuffBleedWB(ent.SourceUnit,ent.SourceUnit.Fighter.ShieldBreakMod), 1.5);
                             break;
                         case Unit.ElementEnm.Fire:
-                            ent.TryDebuff(new Mod(ent.SourceUnit,ent.SourceUnit.Fighter.ShieldBreakMod) { DoNotClone = true, Type = ModType.Dot, BaseDuration = 2, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Burn, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
+                            ent.TryDebuff(new BuffBurnWB(ent.SourceUnit,ent.SourceUnit.Fighter.ShieldBreakMod) , 1.5);
                             break;
                         case Unit.ElementEnm.Ice:
-                            ent.TryDebuff(new Mod(ent.SourceUnit,ent.SourceUnit.Fighter.ShieldBreakMod) { DoNotClone = true, Type = ModType.Debuff, BaseDuration = 1, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Freeze, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
+                            ent.TryDebuff(new BuffFreezeWB(ent.SourceUnit,ent.SourceUnit.Fighter.ShieldBreakMod) , 1.5);
                             break;
                         case Unit.ElementEnm.Lightning:
-                            ent.TryDebuff(new Mod(ent.SourceUnit, ent.SourceUnit.Fighter.ShieldBreakMod) { DoNotClone = true, Type = ModType.Dot, BaseDuration = 2, Effects = new List<Effect>() { new Effect() { EffType = EffectType.Shock, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
+                            ent.TryDebuff(new BuffShockWB(ent.SourceUnit, ent.SourceUnit.Fighter.ShieldBreakMod) , 1.5);
                             break;
                         case Unit.ElementEnm.Wind:
-                            ent.TryDebuff(new Mod(ent.SourceUnit, ent.SourceUnit.Fighter.ShieldBreakMod) { DoNotClone = true, Type = ModType.Dot,Stack = (ent.TargetUnit.Fighter is DefaultNPCBossFIghter)?3:1, BaseDuration = 2, MaxStack = 5, Effects = new List<Effect>() { new Effect() { EffType = EffectType.WindShear, CalculateValue = FighterUtils.CalculateShieldBrokeDmg } } }, 1.5);
+                            ent.TryDebuff(new BuffWindShearWB(ent.SourceUnit, ent.SourceUnit.Fighter.ShieldBreakMod){Stack = (ent.TargetUnit.Fighter is DefaultNPCBossFIghter)?3:1}, 1.5);
                             break;
                         case Unit.ElementEnm.Quantum:
-                            ent.TryDebuff(new Mod(ent.SourceUnit, ent.SourceUnit.Fighter.ShieldBreakMod)
-                            {
-                                Dispellable = true,
-                                DoNotClone = true,
-                                Type = ModType.Debuff,
-                                BaseDuration = 1,
-                                MaxStack = 5,
-                                Effects = new List<Effect>() {
-                                        new Effect(){EffType=EffectType.Entanglement,CalculateValue = FighterUtils.CalculateShieldBrokeDmg}
-                                        ,new Effect(){EffType=EffectType.Delay,Value = 0.20*(1+ent.SourceUnit.GetBreakDmg(ent)) ,StackAffectValue = false}
-                                    }
-                            }, 1.5);
+                            ent.TryDebuff(new BuffEntanglementWB(ent.SourceUnit, ent.SourceUnit.Fighter.ShieldBreakMod), 1.5);
 
                             break;
                         case Unit.ElementEnm.Imaginary:
-                            ent.TryDebuff(new Mod(ent.SourceUnit, ent.SourceUnit.Fighter.ShieldBreakMod)
-                            {
-                                Dispellable = true,
-                                DoNotClone = true,
-                                Type = ModType.Debuff,
-                                BaseDuration = 1,
-                                Effects = new List<Effect>() {
-                                            new Effect(){EffType=EffectType.Imprisonment,CalculateValue = FighterUtils.CalculateShieldBrokeDmg}
-                                            ,new Effect(){EffType=EffectType.Delay,Value = 0.30*(1+ent.SourceUnit.GetBreakDmg(ent))}
-                                            ,new Effect(){EffType=EffectType.ReduceSpdPrc,Value = 0.1}
-                                        }
-                            }, 1.5);
+                            ent.TryDebuff(new BuffImprisonmentWB(ent.SourceUnit, ent.SourceUnit.Fighter.ShieldBreakMod), 1.5);
                             break;
                         default:
                             throw new NotImplementedException();
@@ -264,7 +244,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             foreach (Unit unit in AllUnits)
             {
                 unit.Fighter.EventHandlerProc.Invoke(ent);
-                foreach (Mod mod in unit.Mods.Where(x => x.EventHandlerProc != null))
+                foreach (Buff mod in unit.Mods.Where(x => x.EventHandlerProc != null))
                 {
                     mod.EventHandlerProc?.Invoke(ent);
                 }
@@ -278,7 +258,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             foreach (Unit unit in AllUnits)
             {
                 unit.Fighter.StepHandlerProc.Invoke(CurrentStep);
-                foreach (Mod mod in unit.Mods.Where(x => x.EventHandlerProc != null))
+                foreach (Buff mod in unit.Mods.Where(x => x.StepHandlerProc != null))
                 {
                     mod.StepHandlerProc?.Invoke(step);
                 }
@@ -452,7 +432,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         mod.IsOld = true;
                     }
                     //dot proc
-                    foreach (var dot in currentFight.Turn.Actor.Mods.Where(x => x.Type == Mod.ModType.Dot || x.IsEarlyProc()))
+                    foreach (var dot in currentFight.Turn.Actor.Mods.Where(x => x.Type == Buff.ModType.Dot || x.IsEarlyProc()))
                     {
                         dot.Proceed(newStep);
                     }
@@ -509,15 +489,13 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         newStep.Actor = CurrentFight.Turn.Actor;
                         newStep.Events.Add(new ResetAV(newStep, this, null)
                         { TargetUnit = CurrentFight.Turn.Actor });
-                        //50% reduce av if frosted
-                        if (CurrentFight.Turn.Actor.Controlled && CurrentFight.Turn.Actor.Mods.Any(x => x.Effects.Any(y => y.EffType == Effect.EffectType.Freeze)))
-                            newStep.Events.Add(new ModActionValue(newStep, CurrentFight.Turn.Actor, CurrentFight.Turn.Actor) { AbilityValue = newStep.ActorAbility, TargetUnit = CurrentFight.Turn.Actor, Val = CurrentFight.Turn.Actor.GetBaseActionValue(null) * 0.5 });
+                       
 
 
 
 
                         //remove buffs
-                        foreach (var dot in currentFight.Turn.Actor.Mods.Where(x => x.Type != Mod.ModType.Dot && !x.IsEarlyProc()))
+                        foreach (var dot in currentFight.Turn.Actor.Mods.Where(x => x.Type != Buff.ModType.Dot && !x.IsEarlyProc()))
                         {
                             dot.Proceed(newStep);
                         }

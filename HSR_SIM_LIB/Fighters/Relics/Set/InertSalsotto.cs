@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.Skills.EffectList;
 
 namespace HSR_SIM_LIB.Fighters.Relics.Set
 {
@@ -13,10 +14,10 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
         {
             return new ConditionMod(Parent.Parent)
             {
-                Mod = new Mod(Parent.Parent)
+                Mod = new Buff(Parent.Parent)
                 {
-                    Effects = new List<Effect>() { new Effect() { EffType = Effect.EffectType.AbilityTypeBoost, Value = 0.15, AbilityType =  Ability.AbilityTypeEnm.Ultimate  } ,
-                                                    new Effect() { EffType = Effect.EffectType.AbilityTypeBoost, Value = 0.15, AbilityType =  Ability.AbilityTypeEnm.FollowUpAction  }},
+                    Effects = new List<Effect>() { new EffAbilityTypeBoost() {  Value = 0.15, AbilityType =  Ability.AbilityTypeEnm.Ultimate  } ,
+                                                    new EffAbilityTypeBoost() {  Value = 0.15, AbilityType =  Ability.AbilityTypeEnm.FollowUpAction  }},
                     CustomIconName = "gear\\" + GetType().ToString().Split('.').Last()
                 },
                 Target = Parent.Parent,

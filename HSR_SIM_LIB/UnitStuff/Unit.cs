@@ -18,9 +18,10 @@ using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Utils;
 using HSR_SIM_LIB.Fighters.Relics;
-using static HSR_SIM_LIB.Skills.Mod;
+using static HSR_SIM_LIB.Skills.Buff;
 using static HSR_SIM_LIB.Skills.Effect;
 using System.Reflection.Emit;
+using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 
 namespace HSR_SIM_LIB.UnitStuff
@@ -59,7 +60,7 @@ namespace HSR_SIM_LIB.UnitStuff
                 portrait ??= GraphicsCls.ResizeBitmap(Utl.LoadBitmap(UnitType.ToString() + "\\" + Name), PortraitSize.Height, PortraitSize.Width);
             set => portrait = value;
         }
-        public List<Mod> Mods { get; set; } = new List<Mod>();
+        public List<Buff> Mods { get; set; } = new List<Buff>();
         private List<Resource> resources = null;
 
         public string Name { get => name; set => name = value; }
@@ -122,22 +123,22 @@ namespace HSR_SIM_LIB.UnitStuff
 
         public double AllDmgBoost(Event ent = null)
         {
-            return GetModsByType(EffectType.AllDamageBoost, ent: ent);
+            return GetModsByType(typeof(EffAllDamageBoost), ent: ent);
         }
 
         public double AdditiveShieldBonus(Event ent = null)
         {
-            return GetModsByType(EffectType.AdditiveShieldBonus, ent: ent);
+            return GetModsByType(typeof(EffAdditiveShieldBonus), ent: ent);
         }
 
         public double PrcShieldBonus(Event ent = null)
         {
-            return GetModsByType(EffectType.PrcShieldBonus, ent: ent);
+            return GetModsByType(typeof(EffPrcShieldBonus), ent: ent);
         }
 
         public double ResistsPenetration(ElementEnm elem, Event ent = null)
         {
-            return GetModsByType(EffectType.ElementalPenetration, elem, ent: ent);
+            return GetModsByType(typeof(EffElementalPenetration), elem, ent: ent);
         }
 
         /// <summary>
@@ -154,11 +155,11 @@ namespace HSR_SIM_LIB.UnitStuff
                 res += Fighter.Resists.First(x => x.ResistType == elem).ResistVal;
             }
 
-            res += GetModsByType(EffectType.ElementalResist, elem, ent: ent);
+            res += GetModsByType(typeof(EffElementalResist), elem, ent: ent);
             return res;
         }
 
-        public double GetDebuffResists(EffectType debuff, Event ent = null)
+        public double GetDebuffResists(Type debuff, Event ent = null)
         {
             double res = 0;
             if (Fighter.DebuffResists.Any(x => x.Debuff == debuff))
@@ -166,17 +167,17 @@ namespace HSR_SIM_LIB.UnitStuff
                 res += Fighter.DebuffResists.First(x => x.Debuff == debuff).ResistVal;
             }
 
-            res += GetModsByType(EffectType.DebufResist, ent: ent);
+            res += GetModsByType(typeof(EffDebufResist), ent: ent);
             return res;
         }
         public double DotBoost(Event ent = null)
         {
-            return GetModsByType(EffectType.DoTBoost, ent: ent);
+            return GetModsByType(typeof(EffDoTBoost), ent: ent);
         }
 
         public double DefIgnore(Event ent = null)
         {
-            return GetModsByType(EffectType.DefIgnore, ent: ent);
+            return GetModsByType(typeof(EffDefIgnore), ent: ent);
         }
         /// <summary>
         /// Get elem  boost
@@ -191,28 +192,28 @@ namespace HSR_SIM_LIB.UnitStuff
         }
         public double GetElemBoostValue(ElementEnm elem, Event ent = null)
         {
-            return GetElemBoost(elem).Value + GetModsByType(EffectType.ElementalBoost, elem, ent: ent);
+            return GetElemBoost(elem).Value + GetModsByType(typeof(EffElementalBoost), elem, ent: ent);
         }
 
         /// <summary>
         /// Get total stat by Mods by type
         /// </summary>
         /// <returns></returns>
-        public double GetModsByType(EffectType modType, ElementEnm? elem = null, Event ent = null)
+        public double GetModsByType(Type modType, ElementEnm? elem = null, Event ent = null)
         {
             double res = 0;
-            List<Mod> conditionsToCheck = new();
+            List<Buff> conditionsToCheck = new();
             //get all mods to check
             conditionsToCheck.AddRange(Mods);
             foreach (PassiveMod pmode in GetConditionMods(this, modType))
                 conditionsToCheck.Add(pmode.Mod);
 
 
-            foreach (Mod mod in conditionsToCheck)
+            foreach (Buff mod in conditionsToCheck)
             {
-                foreach (Effect effect in mod.Effects.Where(y => y.EffType == modType
-                                                                 && y.Element == elem
-                                                                 && (y.AbilityType == AbilityTypeEnm.None || (ent?.AbilityValue != null && y.AbilityType==ent.AbilityValue.AbilityType))
+                foreach (Effect effect in mod.Effects.Where(y => y.GetType() == modType
+                                                                 && (y is not EffElementalTemplate eft || eft.Element == elem)
+                                                                 && (y is not EffAbilityTypeBoost efAbility|| (ent?.AbilityValue != null && efAbility.AbilityType==ent.AbilityValue.AbilityType))
                          )
                         )
                 {
@@ -240,7 +241,7 @@ namespace HSR_SIM_LIB.UnitStuff
         /// search avalable for unit condition mods(planars self or ally)
         /// </summary>
         /// <returns></returns>
-        public List<PassiveMod> GetConditionMods(Unit targetForCondition, EffectType? effTypeToSearch)
+        public List<PassiveMod> GetConditionMods(Unit targetForCondition, Type? effTypeToSearch)
         {
             List<PassiveMod> res = new();
             if (ParentTeam == null)
@@ -251,7 +252,7 @@ namespace HSR_SIM_LIB.UnitStuff
             foreach (Unit unit in ParentTeam.Units.Where(x => x.IsAlive))
             {
                 if (unit.fighter.ConditionMods.Concat(unit.fighter.PassiveMods).Any())
-                    res.AddRange(from cmod in unit.fighter.ConditionMods.Where(x => x.Mod.Effects.Any(x => effTypeToSearch == null || x.EffType == effTypeToSearch)).Concat(unit.fighter.PassiveMods)
+                    res.AddRange(from cmod in unit.fighter.ConditionMods.Where(x => x.Mod.Effects.Any(x => effTypeToSearch == null || x.GetType() == effTypeToSearch)).Concat(unit.fighter.PassiveMods)
                                  where (cmod.Target == this || cmod.Target == this.ParentTeam) && (cmod is not ConditionMod mod || mod.Truly(targetForCondition))
                                  select cmod);
                 if (unit.Fighter is DefaultFighter unitFighter)
@@ -259,13 +260,13 @@ namespace HSR_SIM_LIB.UnitStuff
                     //LC
 
                     if (unitFighter.LightCone != null)
-                        res.AddRange(from cmod in unitFighter.LightCone.ConditionMods.Where(x => x.Mod.Effects.Any(x => effTypeToSearch == null || x.EffType == effTypeToSearch)).Concat(unitFighter.LightCone.PassiveMods)
+                        res.AddRange(from cmod in unitFighter.LightCone.ConditionMods.Where(x => x.Mod.Effects.Any(x => effTypeToSearch == null || x.GetType() == effTypeToSearch)).Concat(unitFighter.LightCone.PassiveMods)
                                      where (cmod.Target == this || cmod.Target == this.ParentTeam) && (cmod is not ConditionMod mod || mod.Truly(targetForCondition))
                                      select cmod);
                     //GEAR
                     foreach (IRelicSet relic in unitFighter.Relics)
                     {
-                        res.AddRange(from cmod in relic.ConditionMods.Where(x => x.Mod.Effects.Any(x => effTypeToSearch == null || x.EffType == effTypeToSearch)).Concat(relic.PassiveMods)
+                        res.AddRange(from cmod in relic.ConditionMods.Where(x => x.Mod.Effects.Any(x => effTypeToSearch == null || x.GetType() == effTypeToSearch)).Concat(relic.PassiveMods)
                                      where (cmod.Target == this || cmod.Target == this.ParentTeam) && (cmod is not ConditionMod mod || mod.Truly(targetForCondition))
                                      select cmod);
                     }
@@ -324,9 +325,9 @@ namespace HSR_SIM_LIB.UnitStuff
         /// </summary>
         /// <param name="mod"></param>
         /// <param name="abilityValue"></param>
-        public void ApplyMod(Mod mod)
+        public void ApplyBuff(Buff mod)
         {
-            Mod srchMod = Mods.FirstOrDefault(x => ((x.RefMod == (mod.RefMod ?? mod) ||(mod.SourceObject!=null&& mod.SourceObject==x.SourceObject ))
+            Buff srchMod = Mods.FirstOrDefault(x => ((x.RefMod == (mod.RefMod ?? mod) ||(mod.SourceObject!=null&& mod.SourceObject==x.SourceObject ))
                                                    && (mod.UniqueUnit == null || x.UniqueUnit == mod.UniqueUnit))
                                                   || ((!String.IsNullOrEmpty(mod.UniqueStr) && String.Equals(x.UniqueStr, mod.UniqueStr))));
 
@@ -336,14 +337,14 @@ namespace HSR_SIM_LIB.UnitStuff
             if (srchMod != null)
             {
                 //add stack
-                srchMod.Stack = Math.Min(srchMod.MaxStack, srchMod.Stack + 1);
+                srchMod.Stack = Math.Min(srchMod.MaxStack, srchMod.Stack + mod.Stack);
             }
             else
             {
                 //or add new
                 if (!mod.DoNotClone)
                 {
-                    srchMod = (Mod)mod.Clone();
+                    srchMod = (Buff)mod.Clone();
                 }
                 else
                 {
@@ -369,7 +370,7 @@ namespace HSR_SIM_LIB.UnitStuff
         /// remove mod by ref
         /// </summary>
         /// <param name="mod"></param>
-        public void RemoveMod(Mod mod)
+        public void RemoveBuff(Buff mod)
         {
             if (Mods.Any(x => x.RefMod == (mod.RefMod ?? mod)))
             {
@@ -464,19 +465,19 @@ namespace HSR_SIM_LIB.UnitStuff
         /// <returns></returns>
         public double GetElemVulnerability(ElementEnm attackElem, Event ent = null)
         {
-            return GetModsByType(EffectType.ElementalVulnerability, attackElem, ent: ent);
+            return GetModsByType(typeof(EffElementalVulnerability), attackElem, ent: ent);
 
         }
 
         public double GetAllDamageVulnerability(Event ent = null)
         {
-            return GetModsByType(EffectType.AllDamageVulnerability, ent: ent);
+            return GetModsByType(typeof(EffAllDamageVulnerability), ent: ent);
 
         }
 
         public double GetDotVulnerability(Event ent = null)
         {
-            return GetModsByType(EffectType.DoTVulnerability, ent: ent);
+            return GetModsByType(typeof(EffDoTVulnerability), ent: ent);
 
         }
         /// <summary>
@@ -489,18 +490,18 @@ namespace HSR_SIM_LIB.UnitStuff
 
             //MODS
             if (Mods != null)
-                foreach (Mod mod in Mods)
+                foreach (Buff mod in Mods)
                 {
-                    foreach (Effect effect in mod.Effects.Where(x => x.EffType == EffectType.DamageReduction))
+                    foreach (Effect effect in mod.Effects.Where(x => x is EffDamageReduction))
                     {
                         for (int i = 0; i < mod.Stack; i++)
                             res *= 1 - effect.Value ?? 0;
                     }
                 }
             //Condition
-            foreach (PassiveMod pmod in GetConditionMods(targetForCondition, EffectType.DamageReduction))
+            foreach (PassiveMod pmod in GetConditionMods(targetForCondition, typeof(EffDamageReduction)))
             {
-                foreach (Effect effect in pmod.Mod.Effects.Where(x => x.EffType == EffectType.DamageReduction))
+                foreach (Effect effect in pmod.Mod.Effects.Where(x => x is EffDamageReduction))
                 {
                     for (int i = 0; i < pmod.Mod.Stack; i++)
                         res *= 1 - effect.Value ?? 0;
@@ -528,42 +529,42 @@ namespace HSR_SIM_LIB.UnitStuff
         /// <returns></returns>
         public double GetAbilityTypeMultiplier(Event ent = null)
         {
-            return GetModsByType(EffectType.AbilityTypeBoost, ent: ent);
+            return GetModsByType(typeof(EffAbilityTypeBoost), ent: ent);
         }
 
         public double GetOutgoingHealMultiplier(Event ent)
         {
-            return 1 + Stats.HealRate + GetModsByType(EffectType.OutgoingHealingPrc, ent: ent);
+            return 1 + Stats.HealRate + GetModsByType(typeof(EffOutgoingHealingPrc), ent: ent);
         }
 
         public double GetIncomingHealMultiplier(Event ent)
         {
-            return 1 + GetModsByType(EffectType.IncomeHealingPrc, ent: ent);
+            return 1 + GetModsByType(typeof(EffIncomeHealingPrc), ent: ent);
         }
 
         public double GetCritRate(Event ent)
         {
-            return Stats.CritChance + GetModsByType(EffectType.CritPrc, ent: ent);
+            return Stats.CritChance + GetModsByType(typeof(EffCritPrc), ent: ent);
         }
 
         public double GetCritDamage(Event ent)
         {
-            return Stats.CritDmg + GetModsByType(EffectType.CritDmg, ent: ent);
+            return Stats.CritDmg + GetModsByType(typeof(EffCritDmg), ent: ent);
         }
         public double GetMaxHp(Event ent)
         {
-            return Stats.BaseMaxHp * (1 + GetModsByType(EffectType.MaxHpPrc) + Stats.MaxHpPrc) + GetModsByType(EffectType.MaxHp) + Stats.MaxHpFix;
+            return Stats.BaseMaxHp * (1 + GetModsByType(typeof(EffMaxHpPrc)) + Stats.MaxHpPrc) + GetModsByType(typeof(EffMaxHp)) + Stats.MaxHpFix;
         }
 
         public double GetActionValue(Event ent)
         {
-            return GetBaseActionValue(ent) * (1 - GetModsByType(EffectType.Advance, ent: ent) + GetModsByType(EffectType.Delay, ent: ent)) - Stats.PerformedActionValue;
+            return GetBaseActionValue(ent) * (1 - GetModsByType(typeof(EffAdvance), ent: ent) + GetModsByType(typeof(EffDelay), ent: ent)) - Stats.PerformedActionValue;
 
         }
 
         public double GetBaseActionValue(Event ent)
         {
-            return GetInitialBaseActionValue(ent) - GetModsByType(EffectType.ReduceBAV, ent: ent);
+            return GetInitialBaseActionValue(ent) - GetModsByType(typeof(EffReduceBAV), ent: ent);
 
         }
 
@@ -574,9 +575,9 @@ namespace HSR_SIM_LIB.UnitStuff
 
         public double GetSpeed(Event ent)
         {
-            return Stats.BaseSpeed * (1 + GetModsByType(EffectType.SpeedPrc, ent: ent) -
-                       GetModsByType(EffectType.ReduceSpdPrc, ent: ent) + Stats.SpeedPrc) +
-                   GetModsByType(EffectType.Speed, ent: ent) +
+            return Stats.BaseSpeed * (1 + GetModsByType(typeof(EffSpeedPrc), ent: ent) -
+                       GetModsByType(typeof(EffReduceSpdPrc), ent: ent) + Stats.SpeedPrc) +
+                   GetModsByType(typeof(EffSpeed), ent: ent) +
                    Stats.SpeedFix;
         }
 
@@ -589,41 +590,41 @@ namespace HSR_SIM_LIB.UnitStuff
 
         public double GetEffectRes(Event ent)
         {
-            return GetModsByType(EffectType.EffectResPrc, ent: ent) + Stats.EffectResPrc + Stats.BaseEffectRes + GetModsByType(EffectType.EffectRes, ent: ent);
+            return GetModsByType(typeof(EffEffectResPrc), ent: ent) + Stats.EffectResPrc + Stats.BaseEffectRes + GetModsByType(typeof(EffEffectRes), ent: ent);
         }
 
         public double GetEffectHit(Event ent)
         {
-            return GetModsByType(EffectType.EffectHitPrc, ent: ent) + Stats.EffectHitPrc + Stats.BaseEffectHit +
-                   GetModsByType(EffectType.EffectHit, ent: ent);
+            return GetModsByType(typeof(EffEffectHitPrc), ent: ent) + Stats.EffectHitPrc + Stats.BaseEffectHit +
+                   GetModsByType(typeof(EffEffectHit), ent: ent);
         }
 
         public double EnergyRegenPrc(Event ent)
         {
-            return (1 + GetModsByType(EffectType.EnergyRatePrc, ent: ent) + Stats.BaseEnergyResPrc + Stats.BaseEnergyRes);
+            return (1 + GetModsByType(typeof(EffEnergyRatePrc), ent: ent) + Stats.BaseEnergyResPrc + Stats.BaseEnergyRes);
         }
 
         public double GetDef(Event ent)
         {
-            return Stats.BaseDef * (1 + GetModsByType(EffectType.DefPrc, ent: ent) + Stats.DefPrc) +
-                   GetModsByType(EffectType.Def, ent: ent);
+            return Stats.BaseDef * (1 + GetModsByType(typeof(EffDefPrc), ent: ent) + Stats.DefPrc) +
+                   GetModsByType(typeof(EffDef), ent: ent);
         }
 
         public double GetAggro(Event ent)
         {
-            return Stats.BaseAggro * (1 + GetModsByType(EffectType.BaseAgrroPrc, ent: ent)) *
-                   (1 + GetModsByType(EffectType.AgrroPrc, ent: ent));
+            return Stats.BaseAggro * (1 + GetModsByType(typeof(EffBaseAgrroPrc), ent: ent)) *
+                   (1 + GetModsByType(typeof(EffAgrroPrc), ent: ent));
         }
 
         public double GetAttack(Event ent)
         {
-            return Stats.BaseAttack * (1 + GetModsByType(EffectType.AtkPrc, ent: ent) + Stats.AttackPrc) +
-                   GetModsByType(EffectType.Atk, ent: ent) + Stats.AttackFix;
+            return Stats.BaseAttack * (1 + GetModsByType(typeof(EffAtkPrc), ent: ent) + Stats.AttackPrc) +
+                   GetModsByType(typeof(EffAtk), ent: ent) + Stats.AttackFix;
         }
 
         public double GetBreakDmg(Event ent)
         {
-            return GetModsByType(EffectType.BreakDmgPrc, ent: ent) + Stats.BreakDmgPrc;
+            return GetModsByType(typeof(EffBreakDmgPrc), ent: ent) + Stats.BreakDmgPrc;
         }
 
         public double CurrentEnergy

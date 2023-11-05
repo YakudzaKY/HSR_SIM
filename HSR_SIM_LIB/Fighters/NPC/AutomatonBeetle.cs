@@ -29,7 +29,7 @@ namespace HSR_SIM_LIB.Fighters.NPC
                     {
                         BaseDuration = 2,
                         Type = Mod.ModType.Buff,
-                        Effects = new List<Effect>(){new Effect(){Value = FighterUtils.CalculateShield(4000,ent,Parent),EffType = Effect.EffectType.Shield}}
+                        Effects = new List<Effect>(){new EffShield(){Value = FighterUtils.CalculateShield(4000,ent,Parent),EffType = Effect.EffectType.Shield}}
                         
                         
                     }
@@ -46,7 +46,7 @@ namespace HSR_SIM_LIB.Fighters.NPC
                     {
                         BaseDuration = 2,
                         Type = Mod.ModType.Buff,
-                        Effects = new List<Effect>(){new Effect(){Value = FighterUtils.CalculateShield(16000,ent,Parent),EffType = Effect.EffectType.Shield}}
+                        Effects = new List<Effect>(){new EffShield(){Value = FighterUtils.CalculateShield(16000,ent,Parent),EffType = Effect.EffectType.Shield}}
                         
                         
                     }

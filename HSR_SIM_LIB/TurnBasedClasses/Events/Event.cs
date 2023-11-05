@@ -15,10 +15,11 @@ using HSR_SIM_LIB.UnitStuff;
 using HSR_SIM_LIB.Skills;
 using static HSR_SIM_LIB.Skills.Effect;
 using System.Runtime.Intrinsics.X86;
+using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.Utils;
-using static HSR_SIM_LIB.Skills.Mod;
-using Mod = HSR_SIM_LIB.Skills.Mod;
+using static HSR_SIM_LIB.Skills.Buff;
+using Buff = HSR_SIM_LIB.Skills.Buff;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events
 {
@@ -113,16 +114,16 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
         /// <param name="mod">Modification</param>
         /// <param name="naturalFinish">If true - MOD exceed by duratiuon. If false - dispeleed by ability</param>
         /// <exception cref="NotImplementedException"></exception>
-        public void DispelMod(Mod mod, bool naturalFinish)
+        public void DispelMod(Buff mod, bool naturalFinish)
         {
             if (naturalFinish)
             {
-                mod.ProceedExpire(this);
+                mod.ProceedNaturalExpire(this);
             }
             RemoveMod dispell = new RemoveMod(ParentStep, AbilityValue, SourceUnit)
             {  AbilityValue = AbilityValue, Modification = mod, TargetUnit = TargetUnit };
             ChildEvents.Add(dispell);
-
+            mod.ProceedExpired(this);
         }
 
 
@@ -136,7 +137,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
         /// <param name="maxStack">max stacks</param>
         /// <param name="uniqueStr">Unique buff per battle</param>
         /// <param name="uniqueUnit">Unique buff per unit</param>
-        public void TryDebuff(Mod mod, double baseChance)
+        public void TryDebuff(Buff mod, double baseChance)
         {
             //add Dots and debuffs
             ApplyMod dotEvent = new(ParentStep, Source, SourceUnit)
@@ -152,8 +153,6 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             {
                 ChildEvents.Add(dotEvent);
                 //subscription to events(need calc stacks at attacks)
-                if (dotEvent.Modification.Effects.Any(x => x.EffType == EffectType.Entanglement))
-                    dotEvent.Modification.EventHandlerProc += dotEvent.Modification.EntanglementEventHandler;
                 dotEvent.Modification.AbilityValue = AbilityValue;
             }
             else

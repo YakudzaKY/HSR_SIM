@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
@@ -29,7 +30,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             //buff apply
             ApplyMod eventBuff = new(null, this,this.Parent)
                 { OnStepType = Step.StepTypeEnm.ExecuteAbility,  AbilityValue = ability,
-                    Modification = (new Mod(Parent){Type=Mod.ModType.Buff,Effects = new List<Effect>(){new Effect() { EffType=Effect.EffectType.AtkPrc,Value = 0.15}} ,BaseDuration= 2,Dispellable = true})
+                    Modification = (new Buff(Parent){Type=Buff.ModType.Buff,Effects = new List<Effect>(){new EffAtkPrc() { Value = 0.15}} ,BaseDuration= 2,Dispellable = true})
                 };
             ability.Events.Add(eventBuff);
 
@@ -58,8 +59,8 @@ namespace HSR_SIM_LIB.Fighters.Character
             {
                 PassiveMods.Add(new PassiveMod(Parent)
                 {
-                    Mod = new Mod(Parent)
-                    { Effects =  new List<Effect>() { new Effect(){ EffType = Effect.EffectType.AllDamageBoost, Value = 0.10 }} },
+                    Mod = new Buff(Parent)
+                    { Effects =  new List<Effect>() { new EffAllDamageBoost(){  Value = 0.10 }} },
                     Target = Parent.ParentTeam
                    
                 });

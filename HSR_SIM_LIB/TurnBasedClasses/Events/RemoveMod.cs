@@ -26,9 +26,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
 
 
             if (!revert)
-                TargetUnit.RemoveMod(Modification);
+                TargetUnit.RemoveBuff(Modification);
             else
-                TargetUnit.ApplyMod(Modification);
+                TargetUnit.ApplyBuff(Modification);
 
             base.ProcEvent(revert);
         }

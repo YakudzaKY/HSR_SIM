@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Fighters.Relics.Set
@@ -15,8 +16,8 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
             if (num >= 2)
                 PassiveMods.Add(new PassiveMod(Parent.Parent)
                 {
-                    Mod = new Mod(Parent.Parent)
-                    { Effects = new List<Effect>() { new Effect() { EffType = Effect.EffectType.DefIgnore, Value = 0.10 } } },
+                    Mod = new Buff(Parent.Parent)
+                    { Effects = new List<Effect>() { new EffDefIgnore() {  Value = 0.10 } } },
                     Target = Parent.Parent
 
                 });
@@ -24,7 +25,7 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
             if (num >= 4)
                 ConditionMods.Add(new ConditionMod(parent.Parent)
                 {
-                    Mod = new Mod(Parent.Parent) { Effects = new List<Effect>() { new Effect() { EffType = Effect.EffectType.DefIgnore, Value = 0.10 } } }
+                    Mod = new Buff(Parent.Parent) { Effects = new List<Effect>() { new EffDefIgnore() { Value = 0.10 } } }
                     ,
                     IsTargetCheck = true
                     ,

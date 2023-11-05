@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
@@ -27,10 +28,10 @@ namespace HSR_SIM_LIB.Fighters.Character
                     {
                       
                         TargetUnit = ent.TargetUnit,
-                        Modification = new Mod(Parent)
+                        Modification = new Buff(Parent)
                         {
-                            Type = Mod.ModType.Debuff, 
-                            Effects= new (){new (){EffType = Effect.EffectType.EffectResPrc, Value = -0.20}}
+                            Type = Buff.ModType.Debuff, 
+                            Effects= new (){new EffEffectResPrc(){ Value = -0.20}}
                         }
                     };
 
@@ -61,7 +62,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             double debufs = 0;
         
             
-                debufs += ent.TargetUnit.Mods.Count(x => x.Type == Mod.ModType.Debuff||x.Type == Mod.ModType.Dot);
+                debufs += ent.TargetUnit.Mods.Count(x => x.Type == Buff.ModType.Debuff||x.Type == Buff.ModType.Dot);
                 if (debufs > maxDebufs)
                 {
                     debufs = maxDebufs;
@@ -119,8 +120,8 @@ namespace HSR_SIM_LIB.Fighters.Character
             {
                 PassiveMods.Add(new PassiveMod(Parent)
                 {
-                    Mod = new Mod(Parent)
-                        { Effects = new List<Effect>() { new Effect() { EffType = Effect.EffectType.AllDamageBoost, CalculateValue = CalculateE6 } } },
+                    Mod = new Buff(Parent)
+                        { Effects = new List<Effect>() { new EffAllDamageBoost() {  CalculateValue = CalculateE6 } } },
                     Target = Parent,
                     IsTargetCheck = true
 

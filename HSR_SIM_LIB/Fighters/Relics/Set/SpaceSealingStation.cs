@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.Skills.EffectList;
 
 namespace HSR_SIM_LIB.Fighters.Relics.Set
 {
@@ -13,9 +14,9 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
         {
             return new ConditionMod(Parent.Parent)
             {
-                Mod = new Mod(Parent.Parent)
+                Mod = new Buff(Parent.Parent)
                 {
-                    Effects = new List<Effect>() { new Effect() { EffType = Effect.EffectType.AtkPrc, Value = 0.12 } },
+                    Effects = new List<Effect>() { new EffAtkPrc() { Value = 0.12 } },
                     CustomIconName = "gear\\" + GetType().ToString().Split('.').Last()
                 },
                 Target = Parent.Parent,

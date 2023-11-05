@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using static HSR_SIM_LIB.Skills.Ability;
@@ -34,10 +35,10 @@ namespace HSR_SIM_LIB.Fighters.Special
             IncreaseCycle.Events.Add(new ApplyMod(null, this, this.Parent)
             {
                 AbilityValue = IncreaseCycle,
-                Modification = (new Mod(Parent)
+                Modification = (new Buff(Parent)
                 {
-                    Type = Mod.ModType.Buff,
-                    Effects = new List<Effect>() { new Effect() { EffType = Effect.EffectType.ReduceBAV, Value = 50 } },
+                    Type = Buff.ModType.Buff,
+                    Effects = new List<Effect>() { new EffReduceBAV() { Value = 50 } },
                     BaseDuration = 1,
                     Dispellable = false
                 })

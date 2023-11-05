@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Xml.Linq;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
@@ -27,12 +28,12 @@ namespace HSR_SIM_LIB.Fighters.Character
         };
         public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Abundance;
         public sealed override Unit.ElementEnm Element { get; } = Unit.ElementEnm.Imaginary;
-        private readonly Mod uniqueBuff = null;
+        private readonly Buff uniqueBuff = null;
         private Ability cycleOfLife;
         private readonly double cycleOfLifeMaxCnt = 2;
         private Ability PrayerOfAbyssFlowerAuto;
         private Ability PrayerOfAbyssFlower;
-        private readonly Mod triggerCDBuff = null;
+        private readonly Buff triggerCDBuff = null;
 
         //If unit hp<=50% for Luocha follow up heals
         private bool UnitAtLowHpForAuto(Unit unit)
@@ -144,17 +145,17 @@ namespace HSR_SIM_LIB.Fighters.Character
         {
             Parent.Stats.BaseMaxEnergy = 100;
 
-            uniqueBuff = new Mod(Parent)
+            uniqueBuff = new Buff(Parent)
             {
-                Type = Mod.ModType.Buff,
+                Type = Buff.ModType.Buff,
                 BaseDuration = 2,
                 MaxStack = 1,
                 CustomIconName = "Icon_Abyss_Flower"
             };
 
-            triggerCDBuff = new Mod(Parent)
+            triggerCDBuff = new Buff(Parent)
             {
-                Type = Mod.ModType.Buff,
+                Type = Buff.ModType.Buff,
                 BaseDuration = 2,
                 MaxStack = 1,
                 CustomIconName = "Abyss_Flower_CD"
@@ -268,7 +269,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             ConditionMods.Add(new ConditionMod(Parent)
             {
 
-                Mod = new Mod(Parent) { Effects = new List<Effect>() { new Effect() { EffType = Effect.EffectType.AtkPrc, Value = 0.08 } }, CustomIconName = uniqueBuff.CustomIconName }
+                Mod = new Buff(Parent) { Effects = new List<Effect>() { new EffAtkPrc() { Value = 0.08 } }, CustomIconName = uniqueBuff.CustomIconName }
                 ,
                 Target = Parent.ParentTeam
                 ,

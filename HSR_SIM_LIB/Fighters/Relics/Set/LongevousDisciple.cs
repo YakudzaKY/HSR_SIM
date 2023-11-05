@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
@@ -12,14 +13,14 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
 {
     internal class LongevousDisciple : DefaultRelicSet
     {
-        private readonly Mod uniqueBuff = null;
+        private readonly Buff uniqueBuff = null;
 
         public LongevousDisciple(IFighter parent,int num) : base(parent,num)
         {
-            uniqueBuff = new Mod(Parent.Parent)
+            uniqueBuff = new Buff(Parent.Parent)
             {
-                Type = Mod.ModType.Buff, BaseDuration = 2, MaxStack = 2, 
-                Effects= new (){new (){EffType = Effect.EffectType.CritPrc, Value = 0.08}}
+                Type = Buff.ModType.Buff, BaseDuration = 2, MaxStack = 2, 
+                Effects= new (){new EffCritPrc(){ Value = 0.08}}
             };
         }
 

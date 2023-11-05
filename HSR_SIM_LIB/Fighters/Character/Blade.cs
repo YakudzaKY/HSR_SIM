@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
@@ -77,11 +78,11 @@ namespace HSR_SIM_LIB.Fighters.Character
         private readonly double shuHuMaxCnt;
         private readonly Ability shuhuGift;
         private readonly Ability deathSentence;
-        private readonly Mod hellscapeBuff = null;
+        private readonly Buff hellscapeBuff = null;
         private readonly Ability forestOfSwords;
         public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Destruction;
         public sealed override Unit.ElementEnm Element { get; } = Unit.ElementEnm.Wind;
-
+        public Buff e4Buff { get; set; }
         public override Ability ChoseAbilityToCast(Step step)
         {
             Ability watAbility = null;
@@ -91,18 +92,27 @@ namespace HSR_SIM_LIB.Fighters.Character
 
         public override void DefaultFighter_HandleEvent(Event ent)
         {
-            //if unit consume hp or got attack then apply buff
-            if (Mechanics.Values[shuhuGift] < shuHuMaxCnt && ent.TargetUnit == Parent 
+            //if unit consume hp or got attack 
+            if (ent.TargetUnit == Parent
                                                           && (
                                                               (ent is ResourceDrain && ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal > 0)
-                                                              ||(ent is DamageEventTemplate && ent.RealVal > 0)
+                                                              || (ent is DamageEventTemplate && ent.RealVal > 0)
                                                               )
                                                           )
             {
+                if (Mechanics.Values[shuhuGift] < shuHuMaxCnt)
+                {
+                    ent.ChildEvents.Add(new MechanicValChg(ent.ParentStep, this, Parent)
+                        { TargetUnit = Parent, Val = 1, AbilityValue = shuhuGift });
+                }
 
-                MechanicValChg sgProc = new MechanicValChg(ent.ParentStep, this, Parent)
-                { TargetUnit = Parent, Val = 1, AbilityValue = shuhuGift };
-                ent.ChildEvents.Add(sgProc);
+                double bladeHalfHp = Parent.GetMaxHp(ent) * 0.5;
+                //if hp<=50% but was 50%+ then apply hp buff
+                if (Parent.Rank>=4&&Parent.GetRes(Resource.ResourceType.HP).ResVal<=bladeHalfHp &&Parent.GetRes(Resource.ResourceType.HP).ResVal+ent.RealVal>bladeHalfHp)
+                {
+                    ent.ChildEvents.Add(new ApplyMod(ent.ParentStep, this, Parent)
+                        { TargetUnit = Parent, AbilityValue = shuhuGift,Modification =e4Buff});
+                }
             }
             //buffering Lost hp pull
             if (ent.TargetUnit == Parent
@@ -117,25 +127,9 @@ namespace HSR_SIM_LIB.Fighters.Character
                 ent.ChildEvents.Add(dsValCharge);
             }
 
-
-
             base.DefaultFighter_HandleEvent(ent);
         }
 
-        public override void DefaultFighter_HandleStep(Step step)
-        {
-            
-            ///Healing only from main target
-            if (Atraces.HasFlag(ATracesEnm.A4) && step.StepType==Step.StepTypeEnm.UnitTurnStarted
-                                               && step.ActorAbility == forestOfSwords
-                                               && step.Actor==Parent
-                                               && step.Target.GetRes(Resource.ResourceType.Toughness).ResVal == 0)
-            {
-                step.Events.Add(new Healing(step, this, this.Parent)
-                    { TargetUnit = Parent, CalculateValue = CalculateForestHeal, AbilityValue = forestOfSwords });
-            }
-            base.DefaultFighter_HandleStep(step);
-        }
 
         public double? CalculateKarmaSelfDmg(Event ent)
         {
@@ -157,19 +151,19 @@ namespace HSR_SIM_LIB.Fighters.Character
         {
             int skillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Shuhu's Gift").Level;
             double attackPart = Parent.GetAttack(ent) * sgAtkMods[skillLvl];
-            double maxHpPart = (Parent.GetMaxHp(ent) * sgHpMods[skillLvl]) +(Parent.Rank>=6?0.5* Parent.GetMaxHp(ent) :0);
+            double maxHpPart = (Parent.GetMaxHp(ent) * sgHpMods[skillLvl]) + (Parent.Rank >= 6 ? 0.5 * Parent.GetMaxHp(ent) : 0);
             return attackPart + maxHpPart;
 
         }
         public double? CalculateSGDmg_033(Event ent)
         {
 
-            return FighterUtils.CalculateDmgByBasicVal(getSgBasicDmg(ent) * 0.33000000030733645, ent); 
+            return FighterUtils.CalculateDmgByBasicVal(getSgBasicDmg(ent) * 0.33000000030733645, ent);
         }
 
         public double? CalculateSGDmg_034(Event ent)
         {
-            return FighterUtils.CalculateDmgByBasicVal(getSgBasicDmg(ent) * 0.3400000003166497, ent); 
+            return FighterUtils.CalculateDmgByBasicVal(getSgBasicDmg(ent) * 0.3400000003166497, ent);
 
         }
 
@@ -194,7 +188,7 @@ namespace HSR_SIM_LIB.Fighters.Character
         //50-110
         public double? CalculateBasicDmg(Event ent)
         {
-            return FighterUtils.CalculateDmgByBasicVal((Parent.GetAttack(null) * (0.4 + (Parent.Skills.FirstOrDefault(x => x.Name == "Shard Sword").Level * 0.1)))*0.5, ent);
+            return FighterUtils.CalculateDmgByBasicVal((Parent.GetAttack(null) * (0.4 + (Parent.Skills.FirstOrDefault(x => x.Name == "Shard Sword").Level * 0.1))) * 0.5, ent);
         }
 
         public double getDsMaxLostHp(Event ent)
@@ -209,6 +203,9 @@ namespace HSR_SIM_LIB.Fighters.Character
             double attackPart = Parent.GetAttack(null) * dsMainAtkMods[skillLvl];
             double maxHpPart = Parent.GetMaxHp(ent) * dsMainHpMods[skillLvl];
             double hpLossPart = Math.Min(Mechanics.Values[deathSentence], getDsMaxLostHp(ent)) * dsMainHpMods[skillLvl];
+            //E1 ultimate buff
+            if (Parent.Rank >= 1)
+                hpLossPart += Math.Min(Mechanics.Values[deathSentence], getDsMaxLostHp(ent)) * 1.5;
             return FighterUtils.CalculateDmgByBasicVal(attackPart + maxHpPart + hpLossPart, ent);
         }
 
@@ -230,7 +227,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             double attackPart = Parent.GetAttack(ent) * (0.16 +
                                                          (skillLvl * 0.04));
             double maxHpPart = Parent.GetMaxHp(ent) * (0.4 + (skillLvl * 0.1));
-            return FighterUtils.CalculateDmgByBasicVal((attackPart + maxHpPart)*0.5, ent);
+            return FighterUtils.CalculateDmgByBasicVal((attackPart + maxHpPart) * 0.5, ent);
         }
 
         //damage for adjacent target
@@ -241,11 +238,13 @@ namespace HSR_SIM_LIB.Fighters.Character
             double maxHpPart = Parent.GetMaxHp(ent) * (0.16 + (skillLvl * 0.04));
             return FighterUtils.CalculateDmgByBasicVal(attackPart + maxHpPart, ent);
         }
-        //a4
+        //a4 if main target have 0 toughness then heal
         public double? CalculateForestHeal(Event ent)
         {
-            return FighterUtils.CalculateHealByBasicVal(Parent.GetMaxHp(ent) * 0.05 + 100, ent);
-
+            if (ent.ParentStep.Target.GetRes(Resource.ResourceType.Toughness).ResVal > 0)
+                return null;
+            else
+                return FighterUtils.CalculateHealByBasicVal(Parent.GetMaxHp(ent) * 0.05 + 100, ent);
         }
 
         public double? CalculateDsSelfDmg(Event ent)
@@ -287,13 +286,13 @@ namespace HSR_SIM_LIB.Fighters.Character
 
             Parent.Stats.BaseMaxEnergy = 130;
 
-            hellscapeBuff = new Mod(Parent)
+            hellscapeBuff = new Buff(Parent)
             {
-                Type = Mod.ModType.Buff,
+                Type = Buff.ModType.Buff,
                 BaseDuration = 3,
                 MaxStack = 1,
                 CustomIconName = "Hellscape",
-                Effects = new List<Effect>() { new Effect() { EffType = Effect.EffectType.AllDamageBoost, Value = 0.4 } }
+                Effects = new List<Effect>() { new EffAllDamageBoost() {  Value = 0.4 } }
 
             };
 
@@ -326,18 +325,18 @@ namespace HSR_SIM_LIB.Fighters.Character
                 ,
                 Priority = PriorityEnm.Medium
             };
-            shuHuMaxCnt = (parent.Rank == 6) ? 4 : 5;//4 stacks on 6 eidolon 
+            shuHuMaxCnt = (parent.Rank >= 6) ? 4 : 5;//4 stacks on 6 eidolon 
             for (int i = 0; i < 2; i++)
             {
                 shuhuGift.Events.Add(new DirectDamage(null, this, this.Parent)
-                    { CalculateValue = CalculateSGDmg_033, AbilityValue = shuhuGift });
+                { CalculateValue = CalculateSGDmg_033, AbilityValue = shuhuGift });
                 shuhuGift.Events.Add(new ToughnessShred(null, this, this.Parent)
-                    { Val = 30 * 0.33000000030733645, AbilityValue = shuhuGift });
+                { Val = 30 * 0.33000000030733645, AbilityValue = shuhuGift });
             }
             shuhuGift.Events.Add(new DirectDamage(null, this, this.Parent)
-                { CalculateValue = CalculateSGDmg_034, AbilityValue = shuhuGift });
+            { CalculateValue = CalculateSGDmg_034, AbilityValue = shuhuGift });
             shuhuGift.Events.Add(new ToughnessShred(null, this, this.Parent)
-                { Val = 30 * 0.3400000003166497, AbilityValue = shuhuGift });
+            { Val = 30 * 0.3400000003166497, AbilityValue = shuhuGift });
 
 
             shuhuGift.Events.Add(new Healing(null, this, this.Parent) { TargetUnit = Parent, CalculateValue = CalculateSgHeal, AbilityValue = shuhuGift });
@@ -372,14 +371,14 @@ namespace HSR_SIM_LIB.Fighters.Character
             for (int i = 0; i < 2; i++)
             {
                 shardSword.Events.Add(new DirectDamage(null, this, this.Parent)
-                    { CalculateValue = CalculateBasicDmg, AbilityValue = shardSword });
+                { CalculateValue = CalculateBasicDmg, AbilityValue = shardSword });
                 shardSword.Events.Add(new ToughnessShred(null, this, this.Parent)
-                    { Val = 30 * 0.5, AbilityValue = shardSword });
+                { Val = 30 * 0.5, AbilityValue = shardSword });
             }
 
             Abilities.Add(shardSword);
 
-
+            //Forest of swords
             forestOfSwords = new Ability(this)
             {
                 AbilityType = Ability.AbilityTypeEnm.Basic
@@ -403,10 +402,13 @@ namespace HSR_SIM_LIB.Fighters.Character
             forestOfSwords.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateForestDmg, AbilityValue = forestOfSwords, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
             forestOfSwords.Events.Add(new ToughnessShred(null, this, this.Parent) { Val = 30, AbilityValue = forestOfSwords, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
             forestOfSwords.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateForestDmg, AbilityValue = forestOfSwords, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
-            forestOfSwords.Events.Add(new ToughnessShred(null, this, this.Parent) { Val =30, AbilityValue = forestOfSwords, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
+            forestOfSwords.Events.Add(new ToughnessShred(null, this, this.Parent) { Val = 30, AbilityValue = forestOfSwords, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
+            if (Atraces.HasFlag(ATracesEnm.A4))
+                forestOfSwords.Events.Add(new Healing(null, this, this.Parent)
+                { TargetUnit = Parent, CalculateValue = CalculateForestHeal, AbilityValue = forestOfSwords });
 
             forestOfSwords.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateForestDmgAdj, AbilityValue = forestOfSwords, CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
-            forestOfSwords.Events.Add(new ToughnessShred(null, this, this.Parent) { Val =30, AbilityValue = forestOfSwords, CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
+            forestOfSwords.Events.Add(new ToughnessShred(null, this, this.Parent) { Val = 30, AbilityValue = forestOfSwords, CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
 
 
             Abilities.Add(forestOfSwords);
@@ -439,7 +441,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             deathSentence.Events.Add(new ResourceDrain(null, this, this.Parent) { ResType = Resource.ResourceType.HP, TargetUnit = Parent, CanSetToZero = false, CalculateValue = CalculateDsSelfDmg, AbilityValue = deathSentence, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
             deathSentence.Events.Add(new ResourceGain(null, this, this.Parent) { ResType = Resource.ResourceType.HP, TargetUnit = Parent, CalculateValue = CalculateDsSelfHeal, AbilityValue = deathSentence, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
             deathSentence.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateDsDmg, AbilityValue = deathSentence, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
-            deathSentence.Events.Add(new ToughnessShred(null, this, this.Parent) {Val=60, AbilityValue = deathSentence, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
+            deathSentence.Events.Add(new ToughnessShred(null, this, this.Parent) { Val = 60, AbilityValue = deathSentence, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
             deathSentence.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateDstDmgAdj, AbilityValue = deathSentence, CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
             deathSentence.Events.Add(new ToughnessShred(null, this, this.Parent) { Val = 60, AbilityValue = deathSentence, CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
             deathSentence.Events.Add(new MechanicValChg(null, this, this.Parent) { TargetUnit = Parent, AbilityValue = deathSentence, CalculateValue = CalcResetDsCharge });
@@ -517,7 +519,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             {
                 ConditionMods.Add(new ConditionMod(Parent)
                 {
-                    Mod = new Mod(Parent) { Effects = new List<Effect>() { new Effect() { EffType = Effect.EffectType.IncomeHealingPrc, Value = 0.20 } }, CustomIconName = "Traces\\A2" }
+                    Mod = new Buff(Parent) { Effects = new List<Effect>() { new EffIncomeHealingPrc() { Value = 0.20 } }, CustomIconName = "Traces\\A2" }
                     ,
                     Target = Parent
                     ,
@@ -529,16 +531,17 @@ namespace HSR_SIM_LIB.Fighters.Character
             {
                 PassiveMods.Add(new PassiveMod(Parent)
                 {
-                    Mod = new Mod(Parent)
+                    Mod = new Buff(Parent)
                     {
-                        Effects = new List<Effect>() { new Effect(){ EffType = Effect.EffectType.AbilityTypeBoost, Value = 0.20, AbilityType =  Ability.AbilityTypeEnm.FollowUpAction },
+                        Effects = new List<Effect>() { new EffAbilityTypeBoost(){  Value = 0.20, AbilityType =  Ability.AbilityTypeEnm.FollowUpAction },
                        }
                     },
                     Target = Parent
 
                 });
             }
-
+            
+            e4Buff=new Buff(Parent,null) { MaxStack = 2, Dispellable = false,Effects = new List<Effect>() {new EffMaxHpPrc(){Value = 0.2}}};
 
 
 

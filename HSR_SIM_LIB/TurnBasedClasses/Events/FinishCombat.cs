@@ -13,7 +13,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
     //Combat was finished
     internal class FinishCombat : Event
     {
-        private Dictionary<Unit, List<Mod>> removedMods= new Dictionary<Unit, List<Mod>>();
+        private Dictionary<Unit, List<Buff>> removedMods= new Dictionary<Unit, List<Buff>>();
         private CombatFight oldCombatFight = null;
         private Dictionary<Unit,MechDictionary> oldMechDictionary = null;
         public FinishCombat(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
@@ -59,7 +59,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
 
                     }
                     unit.Fighter.Reset();
-                    unit.Mods = new List<Mod>();
+                    unit.Mods = new List<Buff>();
                     
                 }
                 ParentStep.Parent.CurrentFight = null;

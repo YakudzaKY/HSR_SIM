@@ -21,7 +21,7 @@ namespace HSR_SIM_LIB.Fighters
     /// </summary>
     public abstract class DefaultFighter : IFighter
     {
-        public Mod ShieldBreakMod { get; set; } = new Mod(null);
+        public Buff ShieldBreakMod { get; set; } = new Buff(null);
         public List<ConditionMod> ConditionMods { get; set; } = new List<ConditionMod>();
         public List<PassiveMod> PassiveMods { get; set; } = new List<PassiveMod>();
         public abstract PathType? Path { get; } 

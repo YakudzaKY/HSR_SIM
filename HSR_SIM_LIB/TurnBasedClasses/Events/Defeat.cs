@@ -11,7 +11,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
     // unit defeated( usefull for geppard etc)
     public class Defeat : Event
     {
-        public List<Mod> RemovedMods { get; set; } = new List<Mod>();
+        public List<Buff> RemovedMods { get; set; } = new List<Buff>();
         public Defeat(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
         {
         }
@@ -31,14 +31,14 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             TargetUnit.IsAlive = revert;
 
             if (!revert)
-                foreach (Mod mod in RemovedMods)
+                foreach (Buff mod in RemovedMods)
                 {
-                    TargetUnit.RemoveMod(mod);
+                    TargetUnit.RemoveBuff(mod);
                 }
             else
-                foreach (Mod mod in RemovedMods)
+                foreach (Buff mod in RemovedMods)
                 {
-                    TargetUnit.ApplyMod(mod);
+                    TargetUnit.ApplyBuff(mod);
                 }
 
             base.ProcEvent(revert);

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
@@ -16,7 +17,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
         public sealed override FighterUtils.PathType Path { get; } = FighterUtils.PathType.Destruction;
 
         private readonly Dictionary<int, double> modifiers = new() { { 1, 0.24 }, { 2, 0.28 }, { 3, 0.32 }, { 4, 0.36 }, { 5, 0.40 } };
-        private readonly Mod uniqueBuff = null;
+        private readonly Buff uniqueBuff = null;
 
         //add buff when attacked or loose hp
         public override void DefaultLightCone_HandleEvent(Event ent)
@@ -58,12 +59,13 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
         public TheUnreachableSide(IFighter parent, int rank) : base(parent, rank)
         {
             if (Path == Parent.Path)
-                uniqueBuff = new Mod(Parent.Parent)
+                uniqueBuff = new Buff(Parent.Parent)
                 {
-                    Type = Mod.ModType.Buff,
+                    Dispellable = false,
+                    Type = Buff.ModType.Buff,
                     BaseDuration = null,
                     MaxStack = 1,
-                    Effects = new List<Effect>() { new Effect() { EffType = Effect.EffectType.AllDamageBoost, Value = modifiers[rank] } }
+                    Effects = new List<Effect>() { new EffAllDamageBoost() {  Value = modifiers[rank] } }
                 };
         }
     }

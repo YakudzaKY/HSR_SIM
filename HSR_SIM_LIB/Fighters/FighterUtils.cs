@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using HSR_SIM_LIB.Utils.Utils;
@@ -62,23 +63,23 @@ namespace HSR_SIM_LIB.Fighters
             else
             {
                  var modEnt = ent as ToughnessBreakDoTDamage;
-                if (modEnt.Modification.Effects.Any(x => x.EffType == Effect.EffectType.Bleed))
+                if (modEnt.Modification.Effects.Any(x => x is EffBleed))
                 {
                     bool eliteFlag = defender.Fighter is DefaultNPCBossFIghter;
                     baseDmg = eliteFlag ? 0.07 : 0.16 * defender.GetMaxHp(ent);
                     baseDmg = Math.Min(baseDmg, 2 * lvlMultiplier[attacker.Level] * defender.Stats.MaxToughness);
                 }
                 else if (modEnt.Modification.Effects.Any(x =>
-                             x.EffType is Effect.EffectType.Burn or Effect.EffectType.Freeze))
+                             x is EffBurn or EffFreeze))
                     baseDmg = 1 * lvlMultiplier[attacker.Level] * maxToughnessMult;
                 else if (modEnt.Modification.Effects.Any(x =>
-                             x.EffType is Effect.EffectType.Shock))
+                             x is EffShock))
                     baseDmg = 2 * lvlMultiplier[attacker.Level] * maxToughnessMult;
                 else if (modEnt.Modification.Effects.Any(x =>
-                             x.EffType is Effect.EffectType.WindShear))
+                             x is EffWindShear))
                     baseDmg = 1* modEnt.Modification.Stack  * lvlMultiplier[attacker.Level] * maxToughnessMult;
                 else if (modEnt.Modification.Effects.Any(x =>
-                             x.EffType is Effect.EffectType.Entanglement))
+                             x is EffEntanglement))
                     baseDmg =0.6* modEnt.Modification.Stack  * lvlMultiplier[attacker.Level] * maxToughnessMult;
                 else
                     baseDmg = 0;
@@ -281,16 +282,16 @@ namespace HSR_SIM_LIB.Fighters
             Unit attacker = ent.SourceUnit;
             Unit defender = ent.TargetUnit;
 
-            Effect.EffectType mod = ent.Modification.Effects.First().EffType;
+            Effect mod = ent.Modification.Effects.First();
             bool isCC = ent.Modification.CrowdControl;
             double baseChance = ent.BaseChance;
             double effectHitRate = attacker.GetEffectHit(ent);
             double effectRes = defender.GetEffectRes(ent);
-            double debuffRes = defender.GetDebuffResists(mod,ent);
+            double debuffRes = defender.GetDebuffResists(mod.GetType(),ent);
             double ccRes = 0;
             if (isCC)
             {
-                ccRes = defender.GetDebuffResists(Effect.EffectType.CrowControl);
+                ccRes = defender.GetDebuffResists(typeof(EffCrowControl));
             }
             double realChance = baseChance * (1 + effectHitRate) * (1 - effectRes) * (1 - debuffRes) * (1 - ccRes);
 

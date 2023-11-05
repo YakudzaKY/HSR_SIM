@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events
@@ -12,7 +13,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
     {
         public double? RealBarrierVal { get => realBarrierVal; set => realBarrierVal = value; }
         private double? realBarrierVal;
-        public Mod Modification { get; set; }
+        public Buff Modification { get; set; }
         public bool CanSetToZero { get; init; } = true;
 
         public DamageEventTemplate(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
@@ -27,9 +28,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
                 //find the all shields and max value
                 double maxShieldval = 0;
                 double srchVal;
-                foreach (Mod mod in TargetUnit.Mods.Where(x => x.Effects.Any(y => y.EffType == Effect.EffectType.Shield)))
+                foreach (Buff mod in TargetUnit.Mods.Where(x => x.Effects.Any(y => y is EffShield)))
                 {
-                    foreach (Effect eff in mod.Effects.Where(x => x.EffType == Effect.EffectType.Shield))
+                    foreach (Effect eff in mod.Effects.Where(x => x is EffShield))
                     {
                         srchVal = eff.Value ?? 0;
                         if (srchVal > maxShieldval)
@@ -50,9 +51,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             }
 
             //reduce all shields
-            foreach (Mod mod in TargetUnit.Mods.Where(x => x.Effects.Any(y => y.EffType == Effect.EffectType.Shield)))
+            foreach (Buff mod in TargetUnit.Mods.Where(x => x.Effects.Any(y => y is EffShield)))
             {
-                foreach (Effect eff in mod.Effects.Where(x => x.EffType == Effect.EffectType.Shield))
+                foreach (Effect eff in mod.Effects.Where(x => x is EffShield))
                 {
                     eff.Value -= revert ? -RealBarrierVal : RealBarrierVal;
                 }

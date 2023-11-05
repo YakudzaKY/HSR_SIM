@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.JavaScript;
 using HSR_SIM_LIB.Fighters;
+using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
@@ -10,7 +11,7 @@ using static HSR_SIM_LIB.Skills.Effect;
 
 namespace HSR_SIM_LIB.Skills
 {
-    public class Mod : CloneClass
+    public class Buff : CloneClass
     {
 
         public ModType Type { get; init; }
@@ -19,7 +20,7 @@ namespace HSR_SIM_LIB.Skills
         public List<Effect> Effects { get; init; } = new List<Effect>();
 
         //dot will be auto on start
-        public static List<EffectType> EarlyProcMods = new List<EffectType>() { EffectType.Entanglement };
+        public static List<Type> EarlyProcMods = new List<Type>() { typeof(EffEntanglement) };
         public Ability AbilityValue { get; set; }
         public bool IsOld { get; set; } = false;
 
@@ -29,9 +30,8 @@ namespace HSR_SIM_LIB.Skills
 
             foreach (Effect effect in Effects)
             {
-                if (EarlyProcMods.Contains(effect.EffType))
+                if (EarlyProcMods.Contains(effect.GetType()))
                     return true;
-
 
             }
 
@@ -43,11 +43,11 @@ namespace HSR_SIM_LIB.Skills
             get
             {
                 return Effects.Any(x =>
-                    x.EffType is EffectType.Entanglement
-                    or EffectType.Freeze
-                    or EffectType.Imprisonment
-                    or EffectType.Dominated
-                    or EffectType.Outrage);
+                    x is EffEntanglement
+                    or EffFreeze
+                    or EffImprisonment
+                    or EffDominated
+                    or EffOutrage);
             }
         }
 
@@ -92,49 +92,24 @@ namespace HSR_SIM_LIB.Skills
         public delegate void EventHandler(Event ent);
         public delegate void StepHandler(Step step);
 
-        public void EntanglementEventHandler(Event ent)
-        {
-            if (ent is DirectDamage && ent.TargetUnit == this.Owner)
-                Stack = Math.Min(Stack + 1, MaxStack);
 
-        }
 
         public Unit Owner { get; set; }
 
+        
         public IFighter.EventHandler EventHandlerProc { get; set; }
         public IFighter.StepHandler StepHandlerProc { get; set; }
-
 
         /// <summary>
         /// handle the Buff 
         /// </summary>
         /// <param name="ent"></param>
-        public void ProceedExpire(Event ent)
+        public void ProceedNaturalExpire(Event ent)
         {
             //delayed damage
             foreach (var x in Effects)
             {
-                if (x.EffType is EffectType.Freeze or EffectType.Entanglement)
-                {
-                    if (RefMod == Caster.Fighter.ShieldBreakMod)
-                    {
-                        var dotProcEvent = new ToughnessBreakDoTDamage(ent.ParentStep, this.Caster, Caster)
-                        {
-                            CalculateValue = x.CalculateValue, TargetUnit = ent.TargetUnit, Modification = this,
-                            AbilityValue = AbilityValue
-                        };
-                        ent.ChildEvents.Add(dotProcEvent);
-                    }
-                    else
-                    {
-                        var dotProcEvent = new DoTDamage(ent.ParentStep, this.Caster, Caster)
-                        {
-                            CalculateValue = x.CalculateValue, TargetUnit = ent.TargetUnit, Modification = this,
-                            AbilityValue = AbilityValue
-                        };
-                        ent.ChildEvents.Add(dotProcEvent);
-                    }
-                }
+                x.OnNaturalExpire(ent,this);
             }
         }
         public int Stack { get; set; } = 1;
@@ -147,9 +122,9 @@ namespace HSR_SIM_LIB.Skills
 
         public string UniqueStr { get; set; }
 
-        public Mod RefMod { get; set; }
+        public Buff RefMod { get; set; }
 
-        public bool? Dispellable { get; init; }
+        public bool Dispellable { get; init; } = true;
         public Unit UniqueUnit { get; set; }
         public bool DoNotClone { get; set; } = false;
 
@@ -164,18 +139,10 @@ namespace HSR_SIM_LIB.Skills
 
 
 
-        public Mod(Unit caster, Mod reference = null)
+        public Buff(Unit caster, Buff reference = null)
         {
             RefMod = reference;
             Caster = caster;
-            //auto set dispellable
-            Dispellable ??= Type switch
-            {
-                ModType.Buff => false,
-                ModType.Debuff => true,
-                ModType.Dot => true,
-                _ => false
-            };
 
         }
 
@@ -185,13 +152,20 @@ namespace HSR_SIM_LIB.Skills
             string modsStr = "";
             foreach (var eff in Effects)
             {
-                modsStr += $"{eff.EffType.ToString():s} val= {eff.Value:f} ; ";
+                modsStr += $"{eff.GetType().Name:s} val= {eff.Value:f} ; ";
             }
 
             return
                 $">> {Type.ToString():s} for {modsStr:s} duration={BaseDuration.ToString():D} dispellable={Dispellable.ToString():s}";
         }
 
-
+        public void ProceedExpired(Event ent)
+        {
+            foreach (var x in Effects)
+            {
+                x.OnExpired(ent,this);
+                
+            }
+        }
     }
 }

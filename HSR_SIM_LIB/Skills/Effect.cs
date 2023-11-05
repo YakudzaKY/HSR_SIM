@@ -11,65 +11,25 @@ namespace HSR_SIM_LIB.Skills
     public class Effect
     {
         public Event.CalculateValuePrc CalculateValue { get; init; }
-        public EffectType EffType { get; set; }
 
         public double? Value { get; set; }
         public bool StackAffectValue { get; set; } = true;// do we multiply final value by stack count ?
-        public Ability.AbilityTypeEnm AbilityType { get; set; } 
-        public Unit.ElementEnm? Element { get; init; }
-        public enum EffectType
+        /// <summary>
+        /// on natural (by timer) expire but not expired
+        /// </summary>
+        public virtual void OnNaturalExpire(Event ent,Buff mod)
         {
-            AtkPrc,
-            Atk,
-            DefPrc,
-            Def,
-            MaxHpPrc,
-            MaxHp,
-            BreakDmgPrc,
-            SpeedPrc,
-            Speed,
-            CritPrc,
-            CritDmg,
-            EffectResPrc,
-            EffectRes,
-            EffectHitPrc,
-            EffectHit,
-            ElementalBoost,
-            AllDamageBoost,
-            ElementalPenetration,
-            DoTBoost,
-            DamageReduction,
-            AllDamageVulnerability,
-            ElementalVulnerability,
-            DoTVulnerability,
-            ElementalResist,
-            DebufResist,
-            AbilityTypeBoost,
-            IncomeHealingPrc,
-            OutgoingHealingPrc,
-            EnergyRatePrc,
-            Bleed,
-            Imprisonment,
-            Delay,
-            Entanglement,
-            Burn,
-            Freeze,
-            Shock,
-            WindShear,
-            Dominated,
-            Outrage,
-            CrowControl,
-            ReduceSpdPrc,
-            Advance,
-            DefIgnore,
-            BaseAgrroPrc,
-            AgrroPrc,
-            Shield,//its a barrier
-            AdditiveShieldBonus//+ to shield value when cast
-            ,
-            PrcShieldBonus//+%shieldVal buff .
-            ,
-            ReduceBAV
+
+        }
+
+
+        /// <summary>
+        /// On expired and dispelled(no buff at this moment)
+        /// </summary>
+        /// <exception cref="NotImplementedException"></exception>
+        public void OnExpired(Event ent,Buff mod)
+        {
+           
         }
     }
 }

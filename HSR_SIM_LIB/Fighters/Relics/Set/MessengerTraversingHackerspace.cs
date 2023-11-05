@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
@@ -30,12 +31,12 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
                                 AbilityValue = step.ActorAbility,
                                 ParentStep = step,
                                 TargetUnit = unit,
-                                Modification = (new Mod(Parent.Parent)
+                                Modification = (new Buff(Parent.Parent)
                                 {
                                     UniqueStr=this.GetType().ToString(),
-                                    Type = Mod.ModType.Buff,
+                                    Type = Buff.ModType.Buff,
                                     Effects = new List<Effect>()
-                                        { new Effect() { EffType = Effect.EffectType.SpeedPrc, Value = 0.12 }  },
+                                        { new EffSpeedPrc() { Value = 0.12 }  },
                                     BaseDuration = 1, Dispellable = true
                                 })
                             };

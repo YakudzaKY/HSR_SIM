@@ -14,6 +14,7 @@ using static HSR_SIM_LIB.Utils.Constant;
 using static HSR_SIM_LIB.UnitStuff.Resource;
 using static HSR_SIM_LIB.UnitStuff.Unit;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 
 namespace HSR_SIM_LIB.Utils
@@ -403,8 +404,8 @@ namespace HSR_SIM_LIB.Utils
                 {
                     var buffPoint = new Point(portraitPoint.X + PortraitSize.Width,
                         portraitPoint.Y + j * ElemSizeMini.Height);
-                    gfx.DrawImage(new Bitmap(Utl.LoadBitmap(buff.CustomIconName ?? buff.Effects.First().EffType.ToString()), ElemSizeMini), buffPoint);
-                    gfx.DrawRectangle(new Pen(buff.Type == Mod.ModType.Buff ? Color.Aquamarine : buff.Type == Mod.ModType.Debuff ? Color.Brown : Color.Violet, 1), buffPoint.X, buffPoint.Y, ElemSizeMini.Width, ElemSizeMini.Height);
+                    gfx.DrawImage(new Bitmap(Utl.LoadBitmap(buff.CustomIconName ?? buff.Effects.First().GetType().Name), ElemSizeMini), buffPoint);
+                    gfx.DrawRectangle(new Pen(buff.Type == Buff.ModType.Buff ? Color.Aquamarine : buff.Type == Buff.ModType.Debuff ? Color.Brown : Color.Violet, 1), buffPoint.X, buffPoint.Y, ElemSizeMini.Width, ElemSizeMini.Height);
 
                     //duration
                     DrawText(buffPoint.X
@@ -415,7 +416,7 @@ namespace HSR_SIM_LIB.Utils
                         , new Font("Tahoma", (int)Math.Round(BarFontSize * 0.8), FontStyle.Bold), true);
                     //shield val
                     double? shieldVal =
-                        (buff.Effects.FirstOrDefault(x => x.EffType == Effect.EffectType.Shield)?.Value);
+                        (buff.Effects.FirstOrDefault(x => x is EffShield)?.Value);
                     if (shieldVal > 0)
                         DrawText(buffPoint.X
                             , buffPoint.Y + (int)(ElemSizeMini.Height * 0.1)
@@ -443,7 +444,7 @@ namespace HSR_SIM_LIB.Utils
                 {
                     var buffPoint = new Point(portraitPoint.X + (j * ElemSizeMini.Width),
                         portraitPoint.Y + PortraitSize.Height - ElemSizeMini.Width);
-                    gfx.DrawImage(new Bitmap(Utl.LoadBitmap(buff.Mod.CustomIconName ?? buff.Mod.Effects.First().EffType.ToString()), ElemSizeMini), buffPoint);
+                    gfx.DrawImage(new Bitmap(Utl.LoadBitmap(buff.Mod.CustomIconName ?? buff.Mod.Effects.First().GetType().Name), ElemSizeMini), buffPoint);
                     gfx.DrawRectangle(new Pen(Color.Blue, 1), buffPoint.X, buffPoint.Y, ElemSizeMini.Width, ElemSizeMini.Height);
 
 

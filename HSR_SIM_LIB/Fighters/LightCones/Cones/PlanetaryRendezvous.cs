@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.Skills.EffectList;
 
 namespace HSR_SIM_LIB.Fighters.LightCones.Cones
 {
@@ -16,8 +17,8 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
             if (Path == Parent.Path)
                 PassiveMods.Add(new PassiveMod(Parent.Parent)
                 {
-                    Mod = new Mod(Parent.Parent)
-                    { Effects = new() { new() { EffType = Effect.EffectType.ElementalBoost, Element = parent.Element, Value = modifiers[rank] } } },
+                    Mod = new Buff(Parent.Parent)
+                    { Effects = new() { new EffElementalBoost() {  Element = parent.Element, Value = modifiers[rank] } } },
                     Target = Parent.Parent.ParentTeam
 
                 });
