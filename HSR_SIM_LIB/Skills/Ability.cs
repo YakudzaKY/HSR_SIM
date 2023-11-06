@@ -34,6 +34,7 @@ namespace HSR_SIM_LIB.Skills
 
         public bool Attack { get; set; }
         public double EnergyGain { get; set; }
+        public double EnergyGive { get; set; }
         public bool IgnoreWeakness { get; set; }
 
         public int Cooldown { get; set; }
@@ -44,6 +45,7 @@ namespace HSR_SIM_LIB.Skills
 
         public DCanUsePrc Available { get; init; } = DefaultAbilityAvailable;
         public int SpGain { get; set; } = 0;
+
 
         public Ability(IFighter parent)
         {

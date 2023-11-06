@@ -202,14 +202,14 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             {
                 //TP wasted before
                 if (ability.CostType != ResourceType.TP)
-                    Events.Add(new PartyResourceDrain(this, null, ability.Parent.Parent) { ResType = (ResourceType)ability.CostType, Val = ability.Cost, AbilityValue = ability });
+                    Events.Add(new PartyResourceDrain(this, ability.Parent, ability.Parent.Parent) { ResType = (ResourceType)ability.CostType, Val = ability.Cost, AbilityValue = ability });
             }
             else if (ability.CostType != null)
-                Events.Add(new ResourceDrain(this, null, ability.Parent.Parent) { TargetUnit = Actor, ResType = (ResourceType)ability.CostType, Val = ability.Cost, AbilityValue = ability });
+                Events.Add(new ResourceDrain(this, ability, ability.Parent.Parent) { TargetUnit = Actor, ResType = (ResourceType)ability.CostType, Val = ability.Cost, AbilityValue = ability });
 
             //Energy regen
             if (ability.EnergyGain > 0)
-                Events.Add(new EnergyGain(this, null, ability.Parent.Parent) { Val = ability.EnergyGain, TargetUnit = ability.Parent.Parent, AbilityValue = ability });
+                Events.Add(new EnergyGain(this, ability, ability.Parent.Parent) { Val = ability.EnergyGain, TargetUnit = ability.Parent.Parent, AbilityValue = ability });
 
             //clone events by targets
             foreach (Event ent in ability.Events.Where(x => x.OnStepType == StepType || x.OnStepType == null))
@@ -258,6 +258,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             Event unitEnt = (Event)ent.Clone();
             unitEnt.ParentStep = this;
             unitEnt.TargetUnit = target??ent.TargetUnit;
+            if (ability.EnergyGive > 0)
+                Events.Add(new EnergyGain(this, ability, ability.Parent.Parent) { Val = ability.EnergyGive, TargetUnit = unitEnt.TargetUnit, AbilityValue = ability });
             Events.Add(unitEnt);
           
         }
