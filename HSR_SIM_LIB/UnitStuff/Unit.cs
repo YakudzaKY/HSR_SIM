@@ -393,6 +393,14 @@ namespace HSR_SIM_LIB.UnitStuff
             }
         }
 
+        public Team EnemyTeam
+        {
+            get
+            {
+                return ParentTeam.ParentSim.Teams
+                    .First(x => x != ParentTeam && x.TeamType != Team.TeamTypeEnm.Special);
+            }
+        }
         /// <summary>
         /// Enemies
         /// </summary>

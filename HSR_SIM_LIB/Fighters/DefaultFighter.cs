@@ -9,6 +9,7 @@ using HSR_SIM_LIB.Fighters.Relics;
 using HSR_SIM_LIB.UnitStuff;
 using static HSR_SIM_LIB.Utils.CallBacks;
 using static HSR_SIM_LIB.Fighters.FighterUtils;
+using static HSR_SIM_LIB.UnitStuff.Resource;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.Skills;
 using static HSR_SIM_LIB.Fighters.IFighter;
@@ -24,9 +25,9 @@ namespace HSR_SIM_LIB.Fighters
         public Buff ShieldBreakMod { get; set; } = new Buff(null);
         public List<ConditionMod> ConditionMods { get; set; } = new List<ConditionMod>();
         public List<PassiveMod> PassiveMods { get; set; } = new List<PassiveMod>();
-        public abstract PathType? Path { get; } 
+        public abstract PathType? Path { get; }
         public abstract Unit.ElementEnm Element { get; }
-        public List<Unit.ElementEnm> Weaknesses { get; set; } =  new List<Unit.ElementEnm>();
+        public List<Unit.ElementEnm> Weaknesses { get; set; } = new List<Unit.ElementEnm>();
         public List<DebuffResist> DebuffResists { get; set; }
         public List<Resist> Resists { get; set; } = new List<Resist>();
         public Unit Parent { get; set; }
@@ -83,7 +84,7 @@ namespace HSR_SIM_LIB.Fighters
         }
 
 
-   
+
 
         //all alive enemies
         public IEnumerable<Unit> GetAoeTargets()
@@ -103,10 +104,10 @@ namespace HSR_SIM_LIB.Fighters
         {
             return Parent.Friends.Where(x => x.IsAlive);
         }
-        
+
         public bool UltimateAvailable()
         {
-            return Parent.CurrentEnergy>=Parent.Stats.BaseMaxEnergy;
+            return Parent.CurrentEnergy >= Parent.Stats.BaseMaxEnergy;
         }
         public double Cost
         {
@@ -165,7 +166,7 @@ namespace HSR_SIM_LIB.Fighters
             {
                 //sort by combat then cost. avalable for casting by cost
                 foreach (Ability ability in Abilities
-                            .Where(x =>x.Available() && x.AbilityType== Ability.AbilityTypeEnm.Technique && x.Parent.Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= x.Cost)
+                            .Where(x => x.Available() && x.AbilityType == Ability.AbilityTypeEnm.Technique && x.Parent.Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= x.Cost)
                             .OrderBy(x => x.Attack)
                             .ThenByDescending(x => x.Cost))
                 {
@@ -185,14 +186,14 @@ namespace HSR_SIM_LIB.Fighters
                                 || !GetFriends().Any(x => x != Parent
                                                            && ((((DefaultFighter)(x.Fighter)).GetWeaknessTargets().Any()
                                                            && x.Fighter.Abilities.Any(y =>
-                                                               y.AbilityType== Ability.AbilityTypeEnm.Technique
+                                                               y.AbilityType == Ability.AbilityTypeEnm.Technique
                                                                && y.Attack)) || (x.Fighter.Abilities.Any(y =>
-                                                               y.AbilityType== Ability.AbilityTypeEnm.Technique
+                                                               y.AbilityType == Ability.AbilityTypeEnm.Technique
                                                                && y.Attack && y.IgnoreWeakness)))
                                                            ) //or others cant penetrate  or otherc can ignore weaknesss
                                 )
                             && !(Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= ability.Cost + 1
-                                    && GetFriends().Any(x => x.Fighter.Abilities.Any(y => y.AbilityType ==Ability.AbilityTypeEnm.Technique && !y.Attack && x.ParentTeam.ParentSim.BeforeStartQueue.IndexOf(y) < 0)))// no unused buffers here when 2tp+
+                                    && GetFriends().Any(x => x.Fighter.Abilities.Any(y => y.AbilityType == Ability.AbilityTypeEnm.Technique && !y.Attack && x.ParentTeam.ParentSim.BeforeStartQueue.IndexOf(y) < 0)))// no unused buffers here when 2tp+
                             )
                         {
                             return ability;
@@ -209,7 +210,7 @@ namespace HSR_SIM_LIB.Fighters
                             */
                             if (Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= ability.Cost + 1
                                || !GetFriends().Any(x => GetWeaknessTargets().Any() && x.Fighter.Abilities.Any(y =>
-                                   y.AbilityType==Ability.AbilityTypeEnm.Technique && y.Cost > 0
+                                   y.AbilityType == Ability.AbilityTypeEnm.Technique && y.Cost > 0
                                    && y.Attack))
                                )
                                 return ability;
@@ -224,13 +225,13 @@ namespace HSR_SIM_LIB.Fighters
                 Parent.ParentTeam.ParentSim?.Parent.LogDebug("========What i can cast=====");
                 double freeSp = HowManySpICanSpend();
                 Parent.ParentTeam.ParentSim?.Parent.LogDebug($"I have {freeSp:f} SP");
-                chosenAbility = Abilities.Where(x => x.Available.Invoke()&&(x.Cost<=freeSp ||x.CostType!=Resource.ResourceType.SP)&& (x.AbilityType==Ability.AbilityTypeEnm.Basic|| x.AbilityType== Ability.AbilityTypeEnm.Ability)).MaxBy(x=>x.AbilityType);
+                chosenAbility = Abilities.Where(x => x.Available.Invoke() && (x.Cost <= freeSp || x.CostType != Resource.ResourceType.SP) && (x.AbilityType == Ability.AbilityTypeEnm.Basic || x.AbilityType == Ability.AbilityTypeEnm.Ability)).MaxBy(x => x.AbilityType);
                 Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Choose  {chosenAbility?.Name}");
                 return chosenAbility;
             }
 
             return null;
-            
+
         }
 
         public virtual string GetSpecialText()
@@ -288,7 +289,7 @@ namespace HSR_SIM_LIB.Fighters
 
             }
             Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Resource: {res} .My friends reserve {reservedSp:f} Sp. My reserve is {myReserve:f} Sp");
-            
+
             if (Role is UnitRole.MainDPS)
             {
                 //Cut Free  res to total-reserve
@@ -298,7 +299,7 @@ namespace HSR_SIM_LIB.Fighters
             else if (Role is UnitRole.Support)
             {
                 double addSpenders = GetFriendSpender(UnitRole.MainDPS);
-                res -= ( addSpenders);
+                res -= (addSpenders);
                 //Cut Free  res to total-reserve
                 res = Math.Min(res, totalRes - reservedSp);
                 Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Im {Role},I care about reserve+ MainDps spenders({addSpenders})");
@@ -306,12 +307,12 @@ namespace HSR_SIM_LIB.Fighters
             else if (Role is UnitRole.SecondDPS or UnitRole.ThirdDPS)
             {
                 double addSpenders = GetFriendSpender(UnitRole.MainDPS) + GetFriendSpender(UnitRole.Support);
-                res -= (addSpenders );
+                res -= (addSpenders);
                 //Cut Free  res to total-reserve
                 res = Math.Min(res, totalRes - reservedSp);
                 Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Im {Role},I care about reserve+ MainDps+Support spenders({addSpenders})");
             }
-            else if  (Role is  UnitRole.Healer)
+            else if (Role is UnitRole.Healer)
             {
                 Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Im {Role},i don't care about SP");
             }
@@ -326,9 +327,9 @@ namespace HSR_SIM_LIB.Fighters
             }
 
             Parent.ParentTeam.ParentSim?.Parent.LogDebug("----");
-    
 
-            return Math.Max(res,0 );
+
+            return Math.Max(res, 0);
         }
 
         /// <summary>
@@ -372,6 +373,75 @@ namespace HSR_SIM_LIB.Fighters
 
         }
 
+
+        public virtual Unit GetBestTarget(Ability ability)
+        {
+            Unit leader = Parent.ParentTeam.Units.FirstOrDefault(x => x.Fighter.Role == FighterUtils.UnitRole.MainDPS);
+            if (ability.TargetType == Ability.TargetTypeEnm.Self)
+                return Parent;
+            else if (ability.TargetType == Ability.TargetTypeEnm.Enemy)
+            {
+                /*
+                 * MainDD,SecondDD focus on massive dmg, pref max weakness targets
+                 * Others- shield breaking
+                 *
+                 */
+
+                if (ability.AdjacentTargets == Ability.AdjacentTargetsEnm.None)
+                {
+                    //Support,Healer focus on Shield shred. 
+                    if (Role is FighterUtils.UnitRole.Support or FighterUtils.UnitRole.Healer or FighterUtils.UnitRole.SecondDPS)
+                        return Parent.GetTargetsForUnit(ability.TargetType).OrderByDescending(x => x.Fighter.Weaknesses.Contains(Element)).ThenBy(x => x.GetRes(ResourceType.Toughness).ResVal * (leader?.Fighter.Path is FighterUtils.PathType.Destruction or FighterUtils.PathType.Erudition ? -1 : 1)).ThenBy(x => x.GetRes(ResourceType.HP).ResVal * (leader?.Fighter.Path is FighterUtils.PathType.Destruction or FighterUtils.PathType.Erudition ? -1 : 1)).FirstOrDefault();
+
+                    else
+                        // focus on High hp if main dps Destruction,Erudition. Other- low hp
+                        return Parent.GetTargetsForUnit(ability.TargetType).OrderByDescending(x => x.Fighter.Weaknesses.Contains(Element)).ThenBy(x => x.GetRes(ResourceType.HP).ResVal * (leader?.Fighter.Path is FighterUtils.PathType.Destruction or FighterUtils.PathType.Erudition ? -1 : 1)).FirstOrDefault();
+
+                }
+                else if (ability.AdjacentTargets == Ability.AdjacentTargetsEnm.Blast)
+                {
+                    Unit bestTarget = null;
+                    double bestScore = -1;
+                    foreach (Unit unit in Parent.GetTargetsForUnit(ability.TargetType))
+                    {
+                        double score = 0;
+                        List<Unit> targets = ability.GetAffectedTargets(unit);
+                        score = 10 * targets.Count;
+                        score += 5 * targets.Count(x => x == unit && x.GetRes(ResourceType.Toughness).ResVal == 0);
+                        score += 3 * targets.Count(x => x == unit && x.Fighter.Weaknesses.Any(x => x == Element));
+                        score += 2 * targets.Count(x => x.Fighter is DefaultNPCBossFIghter);
+                        //if equal but hp diff go focus big target
+                        if ((score > bestScore) || (score == bestScore && unit.GetHpPrc(null) > bestTarget.GetHpPrc(null)))
+                        {
+
+                            bestTarget = unit;
+                            bestScore = score;
+                        }
+
+                    }
+                    return bestTarget;
+                }
+                if (ability.AdjacentTargets == Ability.AdjacentTargetsEnm.All)
+                {
+
+                    return null;
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+            }
+            else if (ability.TargetType == Ability.TargetTypeEnm.Friend)
+            {
+                return Parent.Friends.Where(x => x.IsAlive).OrderBy(x => x.Fighter.Role).First();
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+
+            return null;
+        }
 
         public virtual void DefaultFighter_HandleEvent(Event ent)
         {

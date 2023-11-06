@@ -352,7 +352,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         StepType = StepTypeEnm.UnitFollowUpAction;
                         Actor = unit;
                         ActorAbility = ability;
-                        ExecuteAbility(ability, ActorAbility.GetBestTarget());
+                        ExecuteAbility(ability, Actor.Fighter.GetBestTarget(ability));
                         return true;
                     }
                 }

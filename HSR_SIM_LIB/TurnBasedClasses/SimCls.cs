@@ -27,10 +27,6 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 /// </summary>
     public class SimCls : ICloneable
     {
-        Scenario currentScenario;
-
-        Step currentStep = null;
-        int currentFightStep = 0;
         public delegate void EventHandler(Event ent);
         public delegate void StepHandler(Step step);
         public IFighter.EventHandler EventHandlerProc { get; set; }
@@ -65,21 +61,20 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         }
 
 
-        public Step CurrentStep { get => currentStep; set => currentStep = value; }
-        internal Scenario CurrentScenario { get => currentScenario; set => currentScenario = value; }
+        public Step CurrentStep { get; set; } = null;
+        internal Scenario CurrentScenario { get; set; }
+
         public List<Step> steps = new();
         public List<Step> Steps { get => steps; set => steps = value; }
         internal CombatFight CurrentFight { get => currentFight; set => currentFight = value; }
-        public int CurrentFightStep { get => currentFightStep; set => currentFightStep = value; }
+        public int CurrentFightStep { get; set; } = 0;
+
         /// <summary>
         /// Do enter combat on next step proc
         /// </summary>
         public bool DoEnterCombat { get; internal set; }
 
-
-
-        private List<Ability> beforeStartQueue = new();
-        public List<Ability> BeforeStartQueue { get => beforeStartQueue; set => beforeStartQueue = value; }
+        public List<Ability> BeforeStartQueue { get; set; } = new();
 
         public Fight NextFight
         {
@@ -462,7 +457,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         Ability chooseAbility = CurrentFight.Turn.Actor.Fighter.ChoseAbilityToCast(newStep);
                         if (chooseAbility != null)
                         {
-                            newStep.ExecuteAbility(chooseAbility, chooseAbility.GetBestTarget());
+                            newStep.ExecuteAbility(chooseAbility, CurrentFight.Turn.Actor.Fighter.GetBestTarget(chooseAbility));
                             //reset turn
                             if (!chooseAbility.EndTheTurn)
                             {
@@ -490,9 +485,6 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         { TargetUnit = CurrentFight.Turn.Actor });
                        
 
-
-
-
                         //remove buffs
                         foreach (var dot in currentFight.Turn.Actor.Buffs.Where(x => x.Type != Buff.ModType.Dot && !x.IsEarlyProc()))
                         {
@@ -507,17 +499,10 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 }
             }
 
-
-
-
+            
             //if we doing somethings then need proced the events
             CurrentStep = newStep;
             Steps.Add(CurrentStep);
-
-            //WHO WANNA MOVE STEP
-
-
-
 
 
             if (!CurrentStep.TriggersHandled)

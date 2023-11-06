@@ -15,6 +15,7 @@ namespace HSR_SIM_LIB.Fighters
     public interface IFighter:ICloneable
     {
         public List<ConditionMod> ConditionMods { get; set; }
+        public Unit GetBestTarget(Ability ability);
         public List<PassiveMod> PassiveMods { get; set; }
         //need of unique effect on shield break
         public Buff ShieldBreakMod { get; set; } 

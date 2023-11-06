@@ -7,6 +7,7 @@ using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
+using HSR_SIM_LIB.Utils.Utils;
 using static HSR_SIM_LIB.Fighters.FighterUtils;
 
 namespace HSR_SIM_LIB.Fighters
@@ -17,6 +18,21 @@ namespace HSR_SIM_LIB.Fighters
     public class DefaultNPCFighter : IFighter
     {
         public List<ConditionMod> ConditionMods { get; set; }=new List<ConditionMod>();
+        public Unit GetBestTarget(Ability ability)
+        {
+            double totalEnemyAggro = Parent.EnemyTeam.TeamAggro;
+            double aggroRandomed = new MersenneTwister().NextDouble();
+            double counter = 1;
+            foreach (Unit unit in  GetAoeTargets())
+            {
+                counter -= (unit.GetAggro(null)/ Parent.EnemyTeam.TeamAggro);
+                if (counter <= aggroRandomed)
+                    return unit;
+            }
+
+            throw new Exception($"no enemy will be chosen by AGGRO counter={counter}");
+        }
+
         public List<PassiveMod> PassiveMods { get; set; }= new List<PassiveMod>();
         public Buff ShieldBreakMod { get; set; } = new Buff(null);
         public PathType? Path { get; set; } = null;

@@ -5,9 +5,9 @@
 	<Fights>
 		<Fight name="First fight">				
 			<Wave>	
-				<Unit template="NPC\Automaton Beetle"  level="74"/>
-				<Unit template="NPC\Automaton Beetle"  level="74"/>
-				<Unit template="NPC\Automaton Beetle"  level="74"/>
+				<Unit template="NPC\Automaton Beetle"  level="90"/>
+				<Unit template="NPC\Automaton Beetle"  level="90"/>
+				<Unit template="NPC\Automaton Beetle"  level="90"/>
 				<!--<Unit template="NPC\Vagrant"  level="74"/>
 				<Unit template="NPC\Automaton Beetle"  level="74"/>
 				<Unit template="NPC\Vagrant"  level="74"/>
