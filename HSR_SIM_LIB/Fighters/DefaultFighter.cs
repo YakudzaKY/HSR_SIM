@@ -315,6 +315,7 @@ namespace HSR_SIM_LIB.Fighters
             else if (Role is UnitRole.Healer)
             {
                 Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Im {Role},i don't care about SP");
+                res = myReserve;
             }
 
 
@@ -338,6 +339,13 @@ namespace HSR_SIM_LIB.Fighters
         /// <returns></returns>
         public virtual double HowManySpIReserve()
         {
+            if (Role == UnitRole.Healer)
+            {
+                //if hp <=50% or hp<=70% and <=2500(at 80 lvl)
+                if (GetFriends().Any(x => x.GetHpPrc(null) <= 0.5 || 
+                                         ( x.GetHpPrc(null) <= 0.7&&x.GetRes(ResourceType.HP).ResVal<= x.Level*31.25 ) ))
+                    return 1;
+            }
             return 0;
         }
 

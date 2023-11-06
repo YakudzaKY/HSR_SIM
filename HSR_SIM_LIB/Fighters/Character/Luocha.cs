@@ -216,7 +216,8 @@ namespace HSR_SIM_LIB.Fighters.Character
             //TODO DISPELL BULLSHIT
             Abilities.Add(PrayerOfAbyssFlowerAuto);
 
-            //Prayer of Abyss Flower(auto)
+
+            //Prayer of Abyss Flower
             PrayerOfAbyssFlower = new Ability(this)
             {
                 AbilityType = Ability.AbilityTypeEnm.Ability
@@ -226,12 +227,14 @@ namespace HSR_SIM_LIB.Fighters.Character
                 Element = Element
                 ,
                 TargetType = Ability.TargetTypeEnm.Friend
-                ,Cost = 300
+                ,CostType = Resource.ResourceType.SP
+                ,Cost = 1
                 ,
                 EnergyGain = 30
             };
 
             //todo fullfill events
+            PrayerOfAbyssFlower.Events.Add(new Healing(null, this, this.Parent) { CalculateTargets = CalcFollowPoAFTarget, CalculateValue = CalculatePrayerOfAbyssFlower, AbilityValue = PrayerOfAbyssFlowerAuto });
             Abilities.Add(PrayerOfAbyssFlower);
 
         

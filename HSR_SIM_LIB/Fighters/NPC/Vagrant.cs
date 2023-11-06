@@ -37,7 +37,7 @@ namespace HSR_SIM_LIB.Fighters.NPC
                 Cooldown=2
             };
             //dmg events
-            ability.Events.Add(new ApplyBuff(null, this,Parent) { AbilityValue = ability , BuffToApply = new Buff(Parent,null) {AbilityValue = ability,BaseDuration = 1,Effects = new List<Effect>() {new EffAtkPrc() {Value = 0.3}}}});
+            ability.Events.Add(new ApplyBuff(null, this,Parent) { AbilityValue = ability , BuffToApply = new Buff(Parent,null) {AbilityValue = ability,BaseDuration = 2,Effects = new List<Effect>() {new EffAtkPrc() {Value = 0.3}}}});
             ability.Events.Add(new AdvanceAV(null, this,Parent) { AbilityValue = ability });
             Ability myAttackAbility;
 
