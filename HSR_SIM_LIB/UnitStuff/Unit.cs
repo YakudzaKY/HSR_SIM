@@ -213,7 +213,7 @@ namespace HSR_SIM_LIB.UnitStuff
             {
                 foreach (Effect effect in mod.Effects.Where(y => y.GetType() == modType
                                                                  && (y is not EffElementalTemplate eft || eft.Element == elem)
-                                                                 && (y is not EffAbilityTypeBoost efAbility|| (ent?.AbilityValue != null && efAbility.AbilityType==ent.AbilityValue.AbilityType))
+                                                                 && (y is not EffAbilityTypeBoost efAbility || (ent?.AbilityValue != null && efAbility.AbilityType == ent.AbilityValue.AbilityType))
                          )
                         )
                 {
@@ -327,7 +327,7 @@ namespace HSR_SIM_LIB.UnitStuff
         /// <param name="abilityValue"></param>
         public void ApplyBuff(Buff mod)
         {
-            Buff srchMod = Mods.FirstOrDefault(x => ((x.RefMod == (mod.RefMod ?? mod) ||(mod.SourceObject!=null&& mod.SourceObject==x.SourceObject ))
+            Buff srchMod = Mods.FirstOrDefault(x => ((x.RefMod == (mod.RefMod ?? mod) || (mod.SourceObject != null && mod.SourceObject == x.SourceObject))
                                                    && (mod.UniqueUnit == null || x.UniqueUnit == mod.UniqueUnit))
                                                   || ((!String.IsNullOrEmpty(mod.UniqueStr) && String.Equals(x.UniqueStr, mod.UniqueStr))));
 
@@ -350,7 +350,7 @@ namespace HSR_SIM_LIB.UnitStuff
                 {
                     srchMod = mod;
                 }
-                srchMod.Stack = Math.Min(srchMod.MaxStack, srchMod.Stack );
+                srchMod.Stack = Math.Min(srchMod.MaxStack, srchMod.Stack);
                 srchMod.RefMod = mod.RefMod ?? mod;
                 srchMod.Owner = this;
                 Mods.Add(srchMod);
@@ -612,8 +612,13 @@ namespace HSR_SIM_LIB.UnitStuff
 
         public double GetAggro(Event ent)
         {
-            return Stats.BaseAggro * (1 + GetModsByType(typeof(EffBaseAgrroPrc), ent: ent)) *
-                   (1 + GetModsByType(typeof(EffAgrroPrc), ent: ent));
+            if (IsAlive)
+                return Stats.BaseAggro * (1 + GetModsByType(typeof(EffBaseAgrroPrc), ent: ent)) *
+                       (1 + GetModsByType(typeof(EffAgrroPrc), ent: ent));
+            else
+            {
+                return 0;
+            }
         }
 
         public double GetAttack(Event ent)
