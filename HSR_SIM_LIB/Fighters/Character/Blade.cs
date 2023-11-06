@@ -110,8 +110,8 @@ namespace HSR_SIM_LIB.Fighters.Character
                 //if hp<=50% but was 50%+ then apply hp buff
                 if (Parent.Rank>=4&&Parent.GetRes(Resource.ResourceType.HP).ResVal<=bladeHalfHp &&Parent.GetRes(Resource.ResourceType.HP).ResVal+ent.RealVal>bladeHalfHp)
                 {
-                    ent.ChildEvents.Add(new ApplyMod(ent.ParentStep, this, Parent)
-                        { TargetUnit = Parent, AbilityValue = shuhuGift,Modification =e4Buff});
+                    ent.ChildEvents.Add(new ApplyBuff(ent.ParentStep, this, Parent)
+                        { TargetUnit = Parent, AbilityValue = shuhuGift,BuffToApply =e4Buff});
                 }
             }
             //buffering Lost hp pull
@@ -500,11 +500,11 @@ namespace HSR_SIM_LIB.Fighters.Character
             };
             //dmg events
             Hellscape.Events.Add(new ResourceDrain(null, this, this.Parent) { ResType = Resource.ResourceType.HP, TargetType = TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateHellscapeSelfDmg, AbilityValue = Hellscape, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
-            Hellscape.Events.Add(new ApplyMod(null, this, Parent)
+            Hellscape.Events.Add(new ApplyBuff(null, this, Parent)
             {
                 AbilityValue = Hellscape,
                 TargetUnit = Parent,
-                Modification = hellscapeBuff
+                BuffToApply = hellscapeBuff
             });
 
             Abilities.Add(Hellscape);

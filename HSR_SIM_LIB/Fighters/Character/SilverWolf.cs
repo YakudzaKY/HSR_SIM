@@ -24,11 +24,11 @@ namespace HSR_SIM_LIB.Fighters.Character
                 //if enemy enter combat need debuff
                 if (Parent.Enemies.Any(x => x == ent.TargetUnit))
                 {
-                    ApplyMod newEvent = new(ent.ParentStep, this,Parent)
+                    ApplyBuff newEvent = new(ent.ParentStep, this,Parent)
                     {
                       
                         TargetUnit = ent.TargetUnit,
-                        Modification = new Buff(Parent)
+                        BuffToApply = new Buff(Parent)
                         {
                             Type = Buff.ModType.Debuff, 
                             Effects= new (){new EffEffectResPrc(){ Value = -0.20}}

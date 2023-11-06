@@ -190,6 +190,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             Actor = ability.Parent.Parent;//WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
             Target = target;
             ActorAbility = ability;//WAT ABILITY is casting
+            //set ability on CD
+            ability.CooldownTimer = ability.Cooldown;
 
             //res gaining
             if (ability.SpGain > 0)

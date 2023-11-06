@@ -25,13 +25,13 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
 
                         foreach (Unit unit in step.Actor.GetTargetsForUnit(Ability.TargetTypeEnm.Friend))
                         {
-                            ApplyMod eventBuff = new(null, this,Parent.Parent)
+                            ApplyBuff eventBuff = new(null, this,Parent.Parent)
                             {
                                 OnStepType = Step.StepTypeEnm.ExecuteAbility,
                                 AbilityValue = step.ActorAbility,
                                 ParentStep = step,
                                 TargetUnit = unit,
-                                Modification = (new Buff(Parent.Parent)
+                                BuffToApply = (new Buff(Parent.Parent)
                                 {
                                     UniqueStr=this.GetType().ToString(),
                                     Type = Buff.ModType.Buff,

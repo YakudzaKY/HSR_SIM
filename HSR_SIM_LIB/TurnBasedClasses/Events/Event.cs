@@ -111,7 +111,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
         /// <summary>
         /// Remove modifictaion
         /// </summary>
-        /// <param name="mod">Modification</param>
+        /// <param name="mod">BuffToApply</param>
         /// <param name="naturalFinish">If true - MOD exceed by duratiuon. If false - dispeleed by ability</param>
         /// <exception cref="NotImplementedException"></exception>
         public void DispelMod(Buff mod, bool naturalFinish)
@@ -121,7 +121,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
                 mod.ProceedNaturalExpire(this);
             }
             RemoveMod dispell = new RemoveMod(ParentStep, AbilityValue, SourceUnit)
-            {  AbilityValue = AbilityValue, Modification = mod, TargetUnit = TargetUnit };
+            {  AbilityValue = AbilityValue, BuffToApply = mod, TargetUnit = TargetUnit };
             ChildEvents.Add(dispell);
    
         }
@@ -140,12 +140,12 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
         public void TryDebuff(Buff mod, double baseChance)
         {
             //add Dots and debuffs
-            ApplyMod dotEvent = new(ParentStep, Source, SourceUnit)
+            ApplyBuff dotEvent = new(ParentStep, Source, SourceUnit)
             {
                 AbilityValue = AbilityValue,
                 TargetUnit = TargetUnit,
                 BaseChance = baseChance,
-                Modification = mod
+                BuffToApply = mod
             };
 
 
@@ -153,7 +153,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             {
                 ChildEvents.Add(dotEvent);
                 //subscription to events(need calc stacks at attacks)
-                dotEvent.Modification.AbilityValue = AbilityValue;
+                dotEvent.BuffToApply.AbilityValue = AbilityValue;
             }
             else
             {
@@ -162,7 +162,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
                 {
                     AbilityValue = AbilityValue,
                     TargetUnit = TargetUnit,
-                    Modification = dotEvent.Modification
+                    BuffToApply = dotEvent.BuffToApply
 
                 };
                 ChildEvents.Add(failEvent);

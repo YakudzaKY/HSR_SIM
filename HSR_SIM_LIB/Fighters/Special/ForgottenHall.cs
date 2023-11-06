@@ -32,10 +32,10 @@ namespace HSR_SIM_LIB.Fighters.Special
             //dmg events
             IncreaseCycle.Events.Add(new IncreaseLevel(null, this, this.Parent) { Val = 1, TargetType = TargetTypeEnm.Self, AbilityValue = IncreaseCycle });
 
-            IncreaseCycle.Events.Add(new ApplyMod(null, this, this.Parent)
+            IncreaseCycle.Events.Add(new ApplyBuff(null, this, this.Parent)
             {
                 AbilityValue = IncreaseCycle,
-                Modification = (new Buff(Parent)
+                BuffToApply = (new Buff(Parent)
                 {
                     Type = Buff.ModType.Buff,
                     Effects = new List<Effect>() { new EffReduceBAV() { Value = 50 } },

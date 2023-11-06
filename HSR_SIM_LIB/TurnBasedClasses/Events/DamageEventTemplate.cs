@@ -25,29 +25,42 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
      
             if (RealVal == null)
             {
-                //find the all shields and max value
-                double maxShieldval = 0;
-                double srchVal;
-                foreach (Buff mod in TargetUnit.Buffs.Where(x => x.Effects.Any(y => y is EffShield)))
+                //check for barrier 
+                if (this is DirectDamage && TargetUnit.Buffs.Any(x => x.Effects.Any(y => y is EffBarrier)))
                 {
-                    foreach (Effect eff in mod.Effects.Where(x => x is EffShield))
+                    Val = 0;
+                    RealVal = 0;
+                }
+                else
+                {
+
+
+                    //find the all shields and max value
+                    double maxShieldval = 0;
+                    double srchVal;
+                    foreach (Buff mod in TargetUnit.Buffs.Where(x => x.Effects.Any(y => y is EffShield)))
                     {
-                        srchVal = eff.Value ?? 0;
-                        if (srchVal > maxShieldval)
+                        foreach (Effect eff in mod.Effects.Where(x => x is EffShield))
                         {
-                            maxShieldval = srchVal;
+                            srchVal = eff.Value ?? 0;
+                            if (srchVal > maxShieldval)
+                            {
+                                maxShieldval = srchVal;
+                            }
                         }
+
                     }
 
+                    //cant hit more than val
+                    RealBarrierVal = Math.Min((double)maxShieldval,
+                        (double)Val);
+                    //get current hp
+                    var resVal = TargetUnit.GetRes(Resource.ResourceType.HP).ResVal;
+                    //same shit here
+                    RealVal = Math.Min((double)resVal,
+                        (double)Val - (double)RealBarrierVal);
+
                 }
-                //cant hit more than val
-                RealBarrierVal = Math.Min((double)maxShieldval,
-                    (double)Val);
-                //get current hp
-                var resVal = TargetUnit.GetRes(Resource.ResourceType.HP).ResVal;
-                //same shit here
-                RealVal = Math.Min((double)resVal,
-                    (double)Val - (double)RealBarrierVal);
             }
 
             //reduce all shields

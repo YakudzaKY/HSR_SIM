@@ -28,9 +28,9 @@ namespace HSR_SIM_LIB.Fighters.Character
                 new Ability(this) { AbilityType = Ability.AbilityTypeEnm.Technique, Name = "Banner of Command", Cost = 1, CostType = Resource.ResourceType.TP, Element = Element , AdjacentTargets = Ability.AdjacentTargetsEnm.All,TargetType = Ability.TargetTypeEnm.Friend};
 
             //buff apply
-            ApplyMod eventBuff = new(null, this,this.Parent)
+            ApplyBuff eventBuff = new(null, this,this.Parent)
                 { OnStepType = Step.StepTypeEnm.ExecuteAbility,  AbilityValue = ability,
-                    Modification = (new Buff(Parent){Type=Buff.ModType.Buff,Effects = new List<Effect>(){new EffAtkPrc() { Value = 0.15}} ,BaseDuration= 2,Dispellable = true})
+                    BuffToApply = (new Buff(Parent){Type=Buff.ModType.Buff,Effects = new List<Effect>(){new EffAtkPrc() { Value = 0.15}} ,BaseDuration= 2,Dispellable = true})
                 };
             ability.Events.Add(eventBuff);
 

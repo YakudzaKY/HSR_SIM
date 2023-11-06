@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events
@@ -21,7 +22,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
         {
             if (!TriggersHandled)
             {
-                if (TargetUnit.Fighter.Weaknesses.Any(x => x == (AbilityValue.Element)) || AbilityValue.IgnoreWeakness)
+                if (TargetUnit.Buffs.All(x => x.Effects.All(y => y  is not EffBarrier)) &&TargetUnit.Fighter.Weaknesses.Any(x => x == (AbilityValue.Element)) || AbilityValue.IgnoreWeakness)
                     ChildEvents.Add(new ResourceDrain(null, null, AbilityValue.Parent.Parent)
                     {
                         ParentStep = ParentStep,

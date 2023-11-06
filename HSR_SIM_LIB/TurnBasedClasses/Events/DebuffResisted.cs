@@ -16,7 +16,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
 
         public override string GetDescription()
         {
-            return $"{TargetUnit.Name} debuff resisted: {Modification.Effects.First().GetType()}";
+            return $"{TargetUnit.Name} debuff resisted: {BuffToApply.Effects.First().GetType()}";
             
         }
     }

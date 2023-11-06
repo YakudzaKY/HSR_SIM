@@ -41,10 +41,7 @@ namespace HSR_SIM_GUI
             public static void ProcWork(Object links)
             {
                 RLinksToOjbects rLinks = links as RLinksToOjbects;
-
-
                 Worker wrk = new Worker();
-
                 wrk.LoadScenarioFromXml(AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\" + rLinks.Task.Scenario, AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\" + rLinks.Task.Profile);
                 wrk.ApplyModes(rLinks.Task.StatMods);
                 wrk.GetCombatResult(rLinks.Result);

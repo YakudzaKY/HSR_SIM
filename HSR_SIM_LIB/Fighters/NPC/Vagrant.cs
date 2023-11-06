@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
@@ -9,7 +11,10 @@ namespace HSR_SIM_LIB.Fighters.NPC
     public class Vagrant: DefaultNPCFighter
     {
 
-
+        public double? CalcMyAttack(Event ent)
+        {
+            return FighterUtils.CalculateDmgByBasicVal(Parent.GetAttack(ent) *2.5, ent);
+        }
         public Vagrant(Unit parent) : base(parent)
         {    
             //Elemenet
@@ -28,15 +33,34 @@ namespace HSR_SIM_LIB.Fighters.NPC
             {
                 AbilityType = Ability.AbilityTypeEnm.Ability,
                 TargetType = Ability.TargetTypeEnm.Friend,
-                Name = "Test",
-                Cost = 1,
-                Cooldown=1,
-                Element = Element,
-                Attack = true
+                Name = "Inspire",
+                Cooldown=2
             };
             //dmg events
-            ability.Events.Add(new DirectDamage(null, this,Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility,  CanSetToZero = false, Val=1, AbilityValue = ability });
+            ability.Events.Add(new ApplyBuff(null, this,Parent) { AbilityValue = ability , BuffToApply = new Buff(Parent,null) {AbilityValue = ability,BaseDuration = 1,Effects = new List<Effect>() {new EffAtkPrc() {Value = 0.3}}}});
+            ability.Events.Add(new AdvanceAV(null, this,Parent) { AbilityValue = ability });
+            Ability myAttackAbility;
 
+            //Deals minor Physical DMG (250% ATK) to a single target.
+            myAttackAbility = new Ability(this)
+            {
+                AbilityType = Ability.AbilityTypeEnm.Basic
+                ,
+                Name = "Shovel Attack"
+                ,
+                Element = Element
+                ,
+                AdjacentTargets = Ability.AdjacentTargetsEnm.None
+                ,
+                Attack = true
+                ,
+                EnergyGive = 10
+                ,
+                SpGain = 1
+            };
+            //dmg events
+            myAttackAbility.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalcMyAttack, AbilityValue = myAttackAbility });
+            Abilities.Add(myAttackAbility);
 
             Abilities.Add(ability);
 

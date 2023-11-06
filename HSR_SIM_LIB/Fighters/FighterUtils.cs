@@ -277,13 +277,13 @@ namespace HSR_SIM_LIB.Fighters
         }
 
         //debuff is resisted?
-        public static bool CalculateDebuffResisted(ApplyMod ent)
+        public static bool CalculateDebuffResisted(ApplyBuff ent)
         {
             Unit attacker = ent.SourceUnit;
             Unit defender = ent.TargetUnit;
 
-            Effect mod = ent.Modification.Effects.First();
-            bool isCC = ent.Modification.CrowdControl;
+            Effect mod = ent.BuffToApply.Effects.First();
+            bool isCC = ent.BuffToApply.CrowdControl;
             double baseChance = ent.BaseChance;
             double effectHitRate = attacker.GetEffectHit(ent);
             double effectRes = defender.GetEffectRes(ent);

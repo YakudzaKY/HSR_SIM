@@ -27,10 +27,10 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             //reduce MOD turns durationleft
 
 
-            Modification.DurationLeft -= !revert ? 1 : -1;
-            if (!TriggersHandled && Modification.DurationLeft <= 0)
+            BuffToApply.DurationLeft -= !revert ? 1 : -1;
+            if (!TriggersHandled && BuffToApply.DurationLeft <= 0)
             {
-                DispelMod(Modification, true);
+                DispelMod(BuffToApply, true);
 
             }
 

@@ -17,23 +17,43 @@ namespace HSR_SIM_LIB.Fighters
     /// </summary>
     public class DefaultNPCFighter : IFighter
     {
-        public List<ConditionMod> ConditionMods { get; set; }=new List<ConditionMod>();
+        public List<ConditionMod> ConditionMods { get; set; } = new List<ConditionMod>();
         public Unit GetBestTarget(Ability ability)
         {
-            double totalEnemyAggro = Parent.EnemyTeam.TeamAggro;
-            double aggroRandomed = new MersenneTwister().NextDouble();
-            double counter = 1;
-            foreach (Unit unit in  GetAoeTargets())
+            if (ability.TargetType == Ability.TargetTypeEnm.Friend)
             {
-                counter -= (unit.GetAggro(null)/ Parent.EnemyTeam.TeamAggro);
-                if (counter <= aggroRandomed)
-                    return unit;
+                return Parent.Friends.Where(x => x.IsAlive).OrderBy(x => x.Fighter.Role).First();
             }
+            else
+            {
+                double totalEnemyAggro = Parent.EnemyTeam.TeamAggro;
+                double aggroRandomed = new MersenneTwister().NextDouble();
+                double counter = 1;
+                if (totalEnemyAggro > 0)
+                    foreach (Unit unit in GetAoeTargets())
+                    {
+                        counter -= (unit.GetAggro(null) / Parent.EnemyTeam.TeamAggro);
+                        if (counter <= aggroRandomed)
+                            return unit;
+                    }
+                else
+                {
+                    //enemies have NPC? not typycal scenario  go random target then
+                    List<Unit> enemyTargetList = GetAoeTargets().ToList();
+                    foreach (Unit unit in enemyTargetList)
+                    {
+                        // ReSharper disable once PossibleLossOfFraction
+                        counter -= 1 / enemyTargetList.Count;
+                        if (counter <= aggroRandomed)
+                            return unit;
+                    }
+                }
 
-            throw new Exception($"no enemy will be chosen by AGGRO counter={counter}");
+                throw new Exception($"no enemy will be chosen by AGGRO counter={counter}");
+            }
         }
 
-        public List<PassiveMod> PassiveMods { get; set; }= new List<PassiveMod>();
+        public List<PassiveMod> PassiveMods { get; set; } = new List<PassiveMod>();
         public Buff ShieldBreakMod { get; set; } = new Buff(null);
         public PathType? Path { get; set; } = null;
         public Unit.ElementEnm Element { get; set; }
@@ -58,7 +78,7 @@ namespace HSR_SIM_LIB.Fighters
 
         public virtual double Cost
         {
-            get => Parent.GetAttack(null) /(Parent.Fighter.Abilities.Count(x=>x.TargetType==Ability.TargetTypeEnm.Friend)+1);
+            get => Parent.GetAttack(null) / (Parent.Fighter.Abilities.Count(x => x.TargetType == Ability.TargetTypeEnm.Friend) + 1);
         }
 
 
@@ -75,7 +95,7 @@ namespace HSR_SIM_LIB.Fighters
                     .ThenByDescending(x => x.GetAttack(null) * x.Stats.BaseCritChance * x.Stats.BaseCritDmg).ToList();
                 if (Parent == unitsToSearch.First())
                     return UnitRole.MainDPS;
- 
+
                 else if (Parent == unitsToSearch.ElementAt(1))
                 {
                     return UnitRole.SecondDPS;
@@ -88,15 +108,15 @@ namespace HSR_SIM_LIB.Fighters
 
         public void Reset()
         {
-            
+
         }
 
         public Ability ChoseAbilityToCast(Step step)
         {
             Ability chosenAbility = null;
             Parent.ParentTeam.ParentSim?.Parent.LogDebug("========What i can cast=====");
-          //TODO :cooldown
-            chosenAbility = Abilities.Where(x => x.Available.Invoke() && (x.AbilityType== Ability.AbilityTypeEnm.Basic || x.AbilityType==Ability.AbilityTypeEnm.Ability )).MaxBy(x=>x.AbilityType);
+            //TODO :cooldown
+            chosenAbility = Abilities.Where(x => x.Available.Invoke()&&x.CooldownTimer==0 && x.AbilityType is Ability.AbilityTypeEnm.Basic or   Ability.AbilityTypeEnm.Ability).MaxBy(x => x.AbilityType);
             Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Choose  {chosenAbility?.Name}");
             return chosenAbility;
         }
@@ -118,11 +138,11 @@ namespace HSR_SIM_LIB.Fighters
 
         public virtual void DefaultFighter_HandleEvent(Event ent)
         {
-         
+
         }
         public virtual void DefaultFighter_HandleStep(Step step)
         {
-           
+
         }
 
         public object Clone()

@@ -37,7 +37,8 @@ namespace HSR_SIM_LIB.Skills
         public double EnergyGive { get; set; }
         public bool IgnoreWeakness { get; set; }
 
-        public int Cooldown { get; set; }
+        public int Cooldown { get; set; } = 0;
+        public int CooldownTimer { get; set; } = 0;
         public bool EndTheTurn { get; set; } = true;//If ability used - end the turn
         public delegate bool DCanUsePrc();
 

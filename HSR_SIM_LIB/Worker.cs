@@ -257,9 +257,9 @@ namespace HSR_SIM_LIB
                     OutText = "reproduced: " + OutText;
                 LogText(OutText);
                 if (ent is ModEventTemplate)
-                    if (((ModEventTemplate)ent).Modification != null)
+                    if (((ModEventTemplate)ent).BuffToApply != null)
                     {
-                        OutText = " * " + ((ModEventTemplate)ent).Modification.GetDescription();
+                        OutText = " * " + ((ModEventTemplate)ent).BuffToApply.GetDescription();
                         LogText(OutText);
                     }
 

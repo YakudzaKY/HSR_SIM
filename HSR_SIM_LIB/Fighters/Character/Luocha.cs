@@ -180,11 +180,11 @@ namespace HSR_SIM_LIB.Fighters.Character
                 TargetType = Ability.TargetTypeEnm.Self
             };
             cycleOfLife.Events.Add(new MechanicValChg(null, this, this.Parent) { TargetUnit = Parent, AbilityValue = cycleOfLife, Val = -cycleOfLifeMaxCnt });
-            cycleOfLife.Events.Add(new ApplyMod(null, this, Parent)
+            cycleOfLife.Events.Add(new ApplyBuff(null, this, Parent)
             {
                 AbilityValue = cycleOfLife,
                 TargetUnit = Parent,
-                Modification = uniqueBuff
+                BuffToApply = uniqueBuff
             });
             Mechanics.AddVal(cycleOfLife);
             Abilities.Add(cycleOfLife);
@@ -207,11 +207,11 @@ namespace HSR_SIM_LIB.Fighters.Character
                 EnergyGain = 30
             };
             PrayerOfAbyssFlowerAuto.Events.Add(new Healing(null, this, this.Parent) { CalculateTargets = CalcFollowPoAFTarget, CalculateValue = CalculatePrayerOfAbyssFlower, AbilityValue = PrayerOfAbyssFlowerAuto });
-            PrayerOfAbyssFlowerAuto.Events.Add(new ApplyMod(null, this, Parent)
+            PrayerOfAbyssFlowerAuto.Events.Add(new ApplyBuff(null, this, Parent)
             {
                 AbilityValue = PrayerOfAbyssFlowerAuto,
                 TargetUnit = Parent,
-                Modification = triggerCDBuff
+                BuffToApply = triggerCDBuff
             });
             //TODO DISPELL BULLSHIT
             Abilities.Add(PrayerOfAbyssFlowerAuto);

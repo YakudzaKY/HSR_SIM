@@ -81,7 +81,7 @@ namespace HSR_SIM_LIB.Skills
                 Event reduceModDuration = new ReduceDuration(step, this.Caster, Caster)
                 {
 
-                    Modification = this,
+                    BuffToApply = this,
                     TargetUnit = step.Actor,
 
                 };

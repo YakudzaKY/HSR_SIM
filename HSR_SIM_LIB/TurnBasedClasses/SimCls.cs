@@ -484,7 +484,12 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         newStep.Events.Add(new ResetAV(newStep, this, null)
                         { TargetUnit = CurrentFight.Turn.Actor });
                        
-
+                        //reset CD
+                        foreach (Ability ability in  CurrentFight.Turn.Actor.Fighter.Abilities.Where(x=>x.CooldownTimer>0) )
+                        {
+                            ability.CooldownTimer -= 1;
+                        }
+                        
                         //remove buffs
                         foreach (var dot in currentFight.Turn.Actor.Buffs.Where(x => x.Type != Buff.ModType.Dot && !x.IsEarlyProc()))
                         {

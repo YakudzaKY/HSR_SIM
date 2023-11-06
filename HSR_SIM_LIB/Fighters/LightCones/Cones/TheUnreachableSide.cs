@@ -27,11 +27,11 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
                 ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal != 0)
                 || (ent.TargetUnit == Parent.Parent && ent is DirectDamage)) && uniqueBuff != null)
             {
-                ApplyMod newEvent = new(ent.ParentStep, this, Parent.Parent)
+                ApplyBuff newEvent = new(ent.ParentStep, this, Parent.Parent)
                 {
                     
                     TargetUnit = Parent.Parent,
-                    Modification = uniqueBuff
+                    BuffToApply = uniqueBuff
                 };
                 ent.ChildEvents.Add(newEvent);
             }
@@ -43,12 +43,12 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
         {
             if (step.StepType is Step.StepTypeEnm.ExecuteAbility or  Step.StepTypeEnm.UnitFollowUpAction
                               or Step.StepTypeEnm.UnitTurnContinued or   Step.StepTypeEnm.UnitTurnStarted
-                && step.Actor == Parent.Parent && (step.ActorAbility?.Attack??false) && uniqueBuff != null)
+                && step.Actor == Parent.Parent && (step.ActorAbility?.Attack??false) && uniqueBuff != null )
             {
                 RemoveMod newEvent = new(step, this, Parent.Parent)
                 {
                     TargetUnit = Parent.Parent,
-                    Modification = uniqueBuff
+                    BuffToApply = uniqueBuff
                 };
           
                 step.Events.Add(newEvent);
