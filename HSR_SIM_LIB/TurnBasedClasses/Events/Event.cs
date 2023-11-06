@@ -36,12 +36,12 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
         private double? val;//Theoretical value
         private double? realVal;//Real hit value(cant exceed)
 
-    
-   
-   
+
+
+
         public ICloneable Source { get; }
         public Ability.TargetTypeEnm? TargetType { get; set; }
-        public List<Event> ChildEvents= new List<Event>();
+        public List<Event> ChildEvents = new List<Event>();
 
         public Ability.AbilityCurrentTargetEnm? CurentTargetType { get; set; }
         public Unit SourceUnit { get; set; }
@@ -59,7 +59,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
                 return val;
             }
 
-            set => val = value; }
+            set => val = value;
+        }
         public double? RealVal { get => realVal; set => realVal = value; }
 
 
@@ -93,7 +94,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             if (!TriggersHandled)
             {
                 TriggersHandled = true;
-                ParentStep.Parent.EventHandlerProc?.Invoke(this);
+                //proc events only in battle
+                if (ParentStep.Parent.CurrentFight != null)
+                    ParentStep.Parent.EventHandlerProc?.Invoke(this);
 
             }
             //Child events
@@ -105,8 +108,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
         }
 
 
-  
-       
+
+
 
         /// <summary>
         /// Remove modifictaion
@@ -121,9 +124,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
                 mod.ProceedNaturalExpire(this);
             }
             RemoveMod dispell = new RemoveMod(ParentStep, AbilityValue, SourceUnit)
-            {  AbilityValue = AbilityValue, BuffToApply = mod, TargetUnit = TargetUnit };
+            { AbilityValue = AbilityValue, BuffToApply = mod, TargetUnit = TargetUnit };
             ChildEvents.Add(dispell);
-   
+
         }
 
 

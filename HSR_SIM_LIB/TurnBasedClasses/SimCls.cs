@@ -87,8 +87,6 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                     return null;
                 }
                 
-
-          
             }
         }
 
