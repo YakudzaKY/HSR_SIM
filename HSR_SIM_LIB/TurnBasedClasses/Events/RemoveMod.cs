@@ -21,14 +21,11 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
 
         public override void ProcEvent(bool revert)
         {
-           
             //remove mod
-
-
             if (!revert)
-                TargetUnit.RemoveBuff(Modification);
+                TargetUnit.RemoveBuff(this, Modification);
             else
-                TargetUnit.ApplyBuff(Modification);
+                TargetUnit.ApplyBuff(this, Modification);
 
             base.ProcEvent(revert);
         }

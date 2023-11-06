@@ -242,7 +242,7 @@ namespace HSR_SIM_LIB.Fighters.Character
         public double? CalculateForestHeal(Event ent)
         {
             if (ent.ParentStep.Target.GetRes(Resource.ResourceType.Toughness).ResVal > 0)
-                return null;
+                return 0;
             else
                 return FighterUtils.CalculateHealByBasicVal(Parent.GetMaxHp(ent) * 0.05 + 100, ent);
         }
@@ -267,11 +267,11 @@ namespace HSR_SIM_LIB.Fighters.Character
 
         public bool HellscapeActive()
         {
-            return Parent.Mods.Any(x => x.RefMod == hellscapeBuff);
+            return Parent.Buffs.Any(x => x.RefMod == hellscapeBuff);
         }
         public bool HellscapeNotActive()
         {
-            return Parent.Mods.All(x => x.RefMod != hellscapeBuff);
+            return Parent.Buffs.All(x => x.RefMod != hellscapeBuff);
         }
 
         public double? CalculateSgHeal(Event ent)

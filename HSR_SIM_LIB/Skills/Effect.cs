@@ -22,14 +22,44 @@ namespace HSR_SIM_LIB.Skills
 
         }
 
+        /// <summary>
+        /// After buff applied
+        /// </summary>
+        /// <param name="ent"></param>
+        /// <param name="buff"></param>
+        public virtual void OnApply(Event ent, Buff buff)
+        {
+            
+        }
 
         /// <summary>
-        /// On expired and dispelled(no buff at this moment)
+        /// Before buff applied. buff.Owner will be null
         /// </summary>
-        /// <exception cref="NotImplementedException"></exception>
-        public void OnExpired(Event ent,Buff mod)
+        /// <param name="ent"></param>
+        /// <param name="buff"></param>
+        public virtual void BeforeApply(Event ent, Buff buff)
         {
-           
+            
         }
+        /// <summary>
+        /// after buff removed. buff.Owner can be null
+        /// </summary>
+        /// <param name="ent"></param>
+        /// <param name="buff"></param>
+        public virtual void OnRemove(Event ent, Buff buff)
+        {
+
+        }
+
+        /// <summary>
+        /// Before buff removed
+        /// </summary>
+        /// <param name="ent"></param>
+        /// <param name="buff"></param>
+        public virtual void BeforeRemove(Event ent, Buff buff)
+        {
+            
+        }
+
     }
 }

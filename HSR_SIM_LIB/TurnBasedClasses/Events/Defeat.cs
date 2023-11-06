@@ -33,12 +33,12 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             if (!revert)
                 foreach (Buff mod in RemovedMods)
                 {
-                    TargetUnit.RemoveBuff(mod);
+                    TargetUnit.RemoveBuff(this,mod);
                 }
             else
                 foreach (Buff mod in RemovedMods)
                 {
-                    TargetUnit.ApplyBuff(mod);
+                    TargetUnit.ApplyBuff(this, mod);
                 }
 
             base.ProcEvent(revert);

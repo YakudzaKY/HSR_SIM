@@ -81,7 +81,6 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         private List<Ability> beforeStartQueue = new();
         public List<Ability> BeforeStartQueue { get => beforeStartQueue; set => beforeStartQueue = value; }
 
-        private Fight nextFight;
         public Fight NextFight
         {
             get
@@ -134,7 +133,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             if (ent is DamageEventTemplate)
             {
                 List<Buff> toDispell = new List<Buff>();
-                toDispell.AddRange(ent.TargetUnit.Mods.Where(x =>
+                toDispell.AddRange(ent.TargetUnit.Buffs.Where(x =>
                     x.Effects.Any(y => y is EffShield && y.Value <= 0)));
                 //dispell zero shields
                 foreach (Buff mod in toDispell)
@@ -155,7 +154,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
                     };
                     //remove all buffs and debuffs
-                    defeatEvent.RemovedMods.AddRange(ent.TargetUnit.Mods);
+                    defeatEvent.RemovedMods.AddRange(ent.TargetUnit.Buffs);
                     ent.ChildEvents.Add(defeatEvent);
 
 
@@ -179,7 +178,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
                     };
                     //remove all buffs and debuffs
-                    defeatEvent.RemovedMods.AddRange(ent.TargetUnit.Mods);
+                    defeatEvent.RemovedMods.AddRange(ent.TargetUnit.Buffs);
                     ent.ChildEvents.Add(defeatEvent);
 
 
@@ -244,7 +243,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             foreach (Unit unit in AllUnits)
             {
                 unit.Fighter.EventHandlerProc.Invoke(ent);
-                foreach (Buff mod in unit.Mods.Where(x => x.EventHandlerProc != null))
+                foreach (Buff mod in unit.Buffs.Where(x => x.EventHandlerProc != null))
                 {
                     mod.EventHandlerProc?.Invoke(ent);
                 }
@@ -258,7 +257,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             foreach (Unit unit in AllUnits)
             {
                 unit.Fighter.StepHandlerProc.Invoke(CurrentStep);
-                foreach (Buff mod in unit.Mods.Where(x => x.StepHandlerProc != null))
+                foreach (Buff mod in unit.Buffs.Where(x => x.StepHandlerProc != null))
                 {
                     mod.StepHandlerProc?.Invoke(step);
                 }
@@ -426,13 +425,13 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                     newStep.Actor = CurrentFight.Turn.Actor;
                     newStep.Events.Add(new ModActionValue(newStep, this, null)
                     { Val = currentFight.Turn.Actor.GetActionValue(null) });
-                    //set all Mods are "old"
-                    foreach (var mod in currentFight.Turn.Actor.Mods)
+                    //set all Buffs are "old"
+                    foreach (var mod in currentFight.Turn.Actor.Buffs)
                     {
                         mod.IsOld = true;
                     }
                     //dot proc
-                    foreach (var dot in currentFight.Turn.Actor.Mods.Where(x => x.Type == Buff.ModType.Dot || x.IsEarlyProc()))
+                    foreach (var dot in currentFight.Turn.Actor.Buffs.Where(x => x.Type == Buff.ModType.Dot || x.IsEarlyProc()))
                     {
                         dot.Proceed(newStep);
                     }
@@ -495,7 +494,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
 
                         //remove buffs
-                        foreach (var dot in currentFight.Turn.Actor.Mods.Where(x => x.Type != Buff.ModType.Dot && !x.IsEarlyProc()))
+                        foreach (var dot in currentFight.Turn.Actor.Buffs.Where(x => x.Type != Buff.ModType.Dot && !x.IsEarlyProc()))
                         {
                             dot.Proceed(newStep);
                         }

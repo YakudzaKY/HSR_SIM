@@ -113,12 +113,12 @@ namespace HSR_SIM_LIB.Fighters.Character
 
         public bool PoAFAvailable()
         {
-            return  Parent.Mods.All(x => x.RefMod != triggerCDBuff) && (trackedUnits?.Any(x => x.IsAlive)??false);
+            return  Parent.Buffs.All(x => x.RefMod != triggerCDBuff) && (trackedUnits?.Any(x => x.IsAlive)??false);
         }
 
         public bool ColBuffAvailable()
         {
-            return Parent.Mods.Any(x => x.RefMod == uniqueBuff);
+            return Parent.Buffs.Any(x => x.RefMod == uniqueBuff);
         }
 
         public double? CalculateBasicDmg(Event ent)

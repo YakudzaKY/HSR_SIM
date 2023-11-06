@@ -74,7 +74,7 @@ namespace HSR_SIM_LIB.Skills
                    
                 }
 
-            //only Mods aplied before turn started
+            //only Buffs aplied before turn started
             if (IsOld)
             {
                 //minus duration
@@ -159,13 +159,5 @@ namespace HSR_SIM_LIB.Skills
                 $">> {Type.ToString():s} for {modsStr:s} duration={BaseDuration.ToString():D} dispellable={Dispellable.ToString():s}";
         }
 
-        public void ProceedExpired(Event ent)
-        {
-            foreach (var x in Effects)
-            {
-                x.OnExpired(ent,this);
-                
-            }
-        }
     }
 }

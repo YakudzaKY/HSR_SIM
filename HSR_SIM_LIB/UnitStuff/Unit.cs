@@ -60,7 +60,7 @@ namespace HSR_SIM_LIB.UnitStuff
                 portrait ??= GraphicsCls.ResizeBitmap(Utl.LoadBitmap(UnitType.ToString() + "\\" + Name), PortraitSize.Height, PortraitSize.Width);
             set => portrait = value;
         }
-        public List<Buff> Mods { get; set; } = new List<Buff>();
+        public List<Buff> Buffs { get; set; } = new List<Buff>();
         private List<Resource> resources = null;
 
         public string Name { get => name; set => name = value; }
@@ -196,7 +196,7 @@ namespace HSR_SIM_LIB.UnitStuff
         }
 
         /// <summary>
-        /// Get total stat by Mods by type
+        /// Get total stat by Buffs by type
         /// </summary>
         /// <returns></returns>
         public double GetModsByType(Type modType, ElementEnm? elem = null, Event ent = null)
@@ -204,7 +204,7 @@ namespace HSR_SIM_LIB.UnitStuff
             double res = 0;
             List<Buff> conditionsToCheck = new();
             //get all mods to check
-            conditionsToCheck.AddRange(Mods);
+            conditionsToCheck.AddRange(Buffs);
             foreach (PassiveMod pmode in GetConditionMods(this, modType))
                 conditionsToCheck.Add(pmode.Mod);
 
@@ -325,14 +325,17 @@ namespace HSR_SIM_LIB.UnitStuff
         /// </summary>
         /// <param name="mod"></param>
         /// <param name="abilityValue"></param>
-        public void ApplyBuff(Buff mod)
+        public void ApplyBuff(Event ent,Buff mod)
         {
-            Buff srchMod = Mods.FirstOrDefault(x => ((x.RefMod == (mod.RefMod ?? mod) || (mod.SourceObject != null && mod.SourceObject == x.SourceObject))
+            Buff srchMod = Buffs.FirstOrDefault(x => ((x.RefMod == (mod.RefMod ?? mod) || (mod.SourceObject != null && mod.SourceObject == x.SourceObject))
                                                    && (mod.UniqueUnit == null || x.UniqueUnit == mod.UniqueUnit))
                                                   || ((!String.IsNullOrEmpty(mod.UniqueStr) && String.Equals(x.UniqueStr, mod.UniqueStr))));
 
 
-
+            foreach (Effect effect in mod.Effects)
+            {
+                effect.BeforeApply(ent,mod);
+            }
             //find existing by ref, or by UNIQUE tag
             if (srchMod != null)
             {
@@ -353,13 +356,16 @@ namespace HSR_SIM_LIB.UnitStuff
                 srchMod.Stack = Math.Min(srchMod.MaxStack, srchMod.Stack);
                 srchMod.RefMod = mod.RefMod ?? mod;
                 srchMod.Owner = this;
-                Mods.Add(srchMod);
+                Buffs.Add(srchMod);
 
 
 
 
             }
-
+            foreach (Effect effect in srchMod.Effects)
+            {
+                effect.OnApply(ent,srchMod);
+            }
             //reset duration
             srchMod.IsOld = false;//renew the flag
             srchMod.DurationLeft = srchMod.BaseDuration;
@@ -370,11 +376,20 @@ namespace HSR_SIM_LIB.UnitStuff
         /// remove mod by ref
         /// </summary>
         /// <param name="mod"></param>
-        public void RemoveBuff(Buff mod)
+        public void RemoveBuff(Event ent,Buff mod)
         {
-            if (Mods.Any(x => x.RefMod == (mod.RefMod ?? mod)))
+            if (Buffs.Any(x => x.RefMod == (mod.RefMod ?? mod)))
             {
-                Mods.Remove(Mods.First(x => x.RefMod == (mod.RefMod ?? mod)));
+                Buff foundBuff = Buffs.First(x => x.RefMod == (mod.RefMod ?? mod));
+                foreach (Effect effect in foundBuff.Effects)
+                {
+                    effect.BeforeRemove(ent,foundBuff);
+                }
+                Buffs.Remove(foundBuff);
+                foreach (Effect effect in foundBuff.Effects)
+                {
+                    effect.OnRemove(ent,foundBuff);
+                }
             }
         }
 
@@ -442,7 +457,7 @@ namespace HSR_SIM_LIB.UnitStuff
         {
             get
             {
-                return Mods.Any(x => x.CrowdControl);
+                return Buffs.Any(x => x.CrowdControl);
             }
 
         }
@@ -489,8 +504,8 @@ namespace HSR_SIM_LIB.UnitStuff
             double res = 1;
 
             //MODS
-            if (Mods != null)
-                foreach (Buff mod in Mods)
+            if (Buffs != null)
+                foreach (Buff mod in Buffs)
                 {
                     foreach (Effect effect in mod.Effects.Where(x => x is EffDamageReduction))
                     {

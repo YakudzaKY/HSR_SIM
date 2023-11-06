@@ -400,7 +400,7 @@ namespace HSR_SIM_LIB.Utils
 
                 //Buffs
                 j = 0;
-                foreach (var buff in unit.Mods)
+                foreach (var buff in unit.Buffs)
                 {
                     var buffPoint = new Point(portraitPoint.X + PortraitSize.Width,
                         portraitPoint.Y + j * ElemSizeMini.Height);

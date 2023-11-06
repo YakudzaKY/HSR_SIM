@@ -13,9 +13,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
     //Combat was finished
     internal class FinishCombat : Event
     {
-        private Dictionary<Unit, List<Buff>> removedMods= new Dictionary<Unit, List<Buff>>();
+        private Dictionary<Unit, List<Buff>> removedBuffs = new Dictionary<Unit, List<Buff>>();
         private CombatFight oldCombatFight = null;
-        private Dictionary<Unit,MechDictionary> oldMechDictionary = null;
+        private Dictionary<Unit, MechDictionary> oldMechDictionary = null;
         public FinishCombat(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
         {
         }
@@ -37,50 +37,78 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
                     oldCombatFight = ParentStep.Parent.CurrentFight;
                     oldMechDictionary = new Dictionary<Unit, MechDictionary>();
                     //set sp to 0
-                    ChildEvents.Add(new PartyResourceDrain(ParentStep,this,null){Val=ParentStep.Parent.PartyTeam.GetRes(Resource.ResourceType.SP).ResVal ,TargetTeam = ParentStep.Parent.PartyTeam,ResType = Resource.ResourceType.SP});
-                    
+                    ChildEvents.Add(new PartyResourceDrain(ParentStep, this, null) { Val = ParentStep.Parent.PartyTeam.GetRes(Resource.ResourceType.SP).ResVal, TargetTeam = ParentStep.Parent.PartyTeam, ResType = Resource.ResourceType.SP });
+
                 }
 
-               
+
 
                 //save each buff
                 foreach (Unit unit in ParentStep.Parent.PartyTeam.Units)
                 {
+
+
                     if (!TriggersHandled)
                     {
-                        removedMods.Add(unit, unit.Mods);
+                        removedBuffs.Add(unit, unit.Buffs);
                         MechDictionary md = new MechDictionary();
                         foreach (var mch in ((DefaultFighter)unit.Fighter).Mechanics.Values)
                         {
                             md.AddVal(mch.Key);
-                            md.Values[mch.Key]= mch.Value;
+                            md.Values[mch.Key] = mch.Value;
                         }
                         oldMechDictionary.Add(unit, md);
 
                     }
                     unit.Fighter.Reset();
-                    unit.Mods = new List<Buff>();
-                    
+
+                    foreach (Buff buff in removedBuffs[unit])
+                        foreach (Effect effect in buff.Effects)
+                        {
+                            effect.BeforeRemove(this, buff);
+                        }
+
+                    unit.Buffs = new List<Buff>();
+
+                    foreach (Buff buff in removedBuffs[unit])
+                        foreach (Effect effect in buff.Effects)
+                        {
+                            effect.OnRemove(this, buff);
+                        }
+
+
                 }
                 ParentStep.Parent.CurrentFight = null;
-                
+
 
             }
             else
             {
                 ParentStep.Parent.CurrentFight = oldCombatFight;
                 //restore each buff
-                foreach (var unitWBuffs in removedMods)
+                foreach (var unitWBuffs in removedBuffs)
                 {
 
-                    unitWBuffs.Key.Mods = unitWBuffs.Value;
+                    foreach (Buff buff in unitWBuffs.Value)
+                        foreach (Effect effect in buff.Effects)
+                        {
+                            effect.BeforeApply(this, buff);
+                        }
+
+                    unitWBuffs.Key.Buffs = unitWBuffs.Value;
+
+                    foreach (Buff buff in unitWBuffs.Value)
+                        foreach (Effect effect in buff.Effects)
+                        {
+                            effect.OnApply(this, buff);
+                        }
                 }
                 foreach (var omd in oldMechDictionary)
                 {
 
                     foreach (var mec in omd.Value.Values)
                     {
-                        ((DefaultFighter)omd.Key.Fighter).Mechanics.Values[mec.Key]=mec.Value;
+                        ((DefaultFighter)omd.Key.Fighter).Mechanics.Values[mec.Key] = mec.Value;
                     }
                 }
             }

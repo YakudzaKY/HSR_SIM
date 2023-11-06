@@ -123,7 +123,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             RemoveMod dispell = new RemoveMod(ParentStep, AbilityValue, SourceUnit)
             {  AbilityValue = AbilityValue, Modification = mod, TargetUnit = TargetUnit };
             ChildEvents.Add(dispell);
-            mod.ProceedExpired(this);
+   
         }
 
 

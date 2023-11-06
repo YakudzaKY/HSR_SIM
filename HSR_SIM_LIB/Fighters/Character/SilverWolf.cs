@@ -62,7 +62,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             double debufs = 0;
         
             
-                debufs += ent.TargetUnit.Mods.Count(x => x.Type == Buff.ModType.Debuff||x.Type == Buff.ModType.Dot);
+                debufs += ent.TargetUnit.Buffs.Count(x => x.Type == Buff.ModType.Debuff||x.Type == Buff.ModType.Dot);
                 if (debufs > maxDebufs)
                 {
                     debufs = maxDebufs;

@@ -28,7 +28,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
                 //find the all shields and max value
                 double maxShieldval = 0;
                 double srchVal;
-                foreach (Buff mod in TargetUnit.Mods.Where(x => x.Effects.Any(y => y is EffShield)))
+                foreach (Buff mod in TargetUnit.Buffs.Where(x => x.Effects.Any(y => y is EffShield)))
                 {
                     foreach (Effect eff in mod.Effects.Where(x => x is EffShield))
                     {
@@ -51,7 +51,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             }
 
             //reduce all shields
-            foreach (Buff mod in TargetUnit.Mods.Where(x => x.Effects.Any(y => y is EffShield)))
+            foreach (Buff mod in TargetUnit.Buffs.Where(x => x.Effects.Any(y => y is EffShield)))
             {
                 foreach (Effect eff in mod.Effects.Where(x => x is EffShield))
                 {
