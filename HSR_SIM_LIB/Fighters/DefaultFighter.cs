@@ -87,7 +87,7 @@ namespace HSR_SIM_LIB.Fighters
 
 
         //all alive enemies
-        public IEnumerable<Unit> GetAoeTargets()
+        public IEnumerable<Unit> GetAliveEnemies()
         {
             return Parent.Enemies?.Where(x => x.IsAlive);
         }
@@ -100,7 +100,7 @@ namespace HSR_SIM_LIB.Fighters
         }
 
         //alive friends
-        public IEnumerable<Unit> GetFriends()
+        public IEnumerable<Unit> GetAliveFriends()
         {
             return Parent.Friends.Where(x => x.IsAlive);
         }
@@ -115,12 +115,12 @@ namespace HSR_SIM_LIB.Fighters
             {
                 int totalCost = Path switch
                 {
-                    PathType.Hunt => 7 * (GetAoeTargets()?.Count() == 1 ? 2 : 1) //x2 if 1 target on battlefield
+                    PathType.Hunt => 7 * (GetAliveEnemies()?.Count() == 1 ? 2 : 1) //x2 if 1 target on battlefield
                     ,
                     PathType.Destruction =>
-                        6 * (GetAoeTargets()?.Count() >= 2 ? 2 : 1) //x2 if 2+ targets on battlefield
+                        6 * (GetAliveEnemies()?.Count() >= 2 ? 2 : 1) //x2 if 2+ targets on battlefield
                     ,
-                    PathType.Erudition => 5 * (GetAoeTargets()?.Count() >= 3 ? 3 : 1) //x3 if 3+ targets on battlefield
+                    PathType.Erudition => 5 * (GetAliveEnemies()?.Count() >= 3 ? 3 : 1) //x3 if 3+ targets on battlefield
                     ,
                     PathType.Nihility => 4,
                     PathType.Harmony => 3,
@@ -183,7 +183,7 @@ namespace HSR_SIM_LIB.Fighters
                         if (Parent.ParentTeam.ParentSim.BeforeStartQueue.IndexOf(ability) ==
                             -1 //check for existing in queue 
                             && ((GetWeaknessTargets().Any() || ability.IgnoreWeakness) //We can penetrate shield 
-                                || !GetFriends().Any(x => x != Parent
+                                || !GetAliveFriends().Any(x => x != Parent
                                                            && ((((DefaultFighter)(x.Fighter)).GetWeaknessTargets().Any()
                                                            && x.Fighter.Abilities.Any(y =>
                                                                y.AbilityType == Ability.AbilityTypeEnm.Technique
@@ -193,7 +193,7 @@ namespace HSR_SIM_LIB.Fighters
                                                            ) //or others cant penetrate  or otherc can ignore weaknesss
                                 )
                             && !(Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= ability.Cost + 1
-                                    && GetFriends().Any(x => x.Fighter.Abilities.Any(y => y.AbilityType == Ability.AbilityTypeEnm.Technique && !y.Attack && x.ParentTeam.ParentSim.BeforeStartQueue.IndexOf(y) < 0)))// no unused buffers here when 2tp+
+                                    && GetAliveFriends().Any(x => x.Fighter.Abilities.Any(y => y.AbilityType == Ability.AbilityTypeEnm.Technique && !y.Attack && x.ParentTeam.ParentSim.BeforeStartQueue.IndexOf(y) < 0)))// no unused buffers here when 2tp+
                             )
                         {
                             return ability;
@@ -209,7 +209,7 @@ namespace HSR_SIM_LIB.Fighters
                              we have NOT friend who can penetrate weakness through  cost=1 ability
                             */
                             if (Parent.ParentTeam.GetRes(Resource.ResourceType.TP).ResVal >= ability.Cost + 1
-                               || !GetFriends().Any(x => GetWeaknessTargets().Any() && x.Fighter.Abilities.Any(y =>
+                               || !GetAliveFriends().Any(x => GetWeaknessTargets().Any() && x.Fighter.Abilities.Any(y =>
                                    y.AbilityType == Ability.AbilityTypeEnm.Technique && y.Cost > 0
                                    && y.Attack))
                                )
@@ -265,7 +265,7 @@ namespace HSR_SIM_LIB.Fighters
 
         public double GetFriendSpender(UnitRole role)
         {
-            DefaultFighter fhgt = (DefaultFighter)GetFriends().FirstOrDefault(x => x != this.Parent && x.Fighter.Role == role)?.Fighter;
+            DefaultFighter fhgt = (DefaultFighter)GetAliveFriends().FirstOrDefault(x => x != this.Parent && x.Fighter.Role == role)?.Fighter;
             if (fhgt != null)
                 return fhgt.WillSpend();
             else
@@ -283,7 +283,7 @@ namespace HSR_SIM_LIB.Fighters
             double reservedSp = 0;
             double myReserve = HowManySpIReserve();
             //get friends reserved SP
-            foreach (Unit friend in this.GetFriends().Where(x => x != this.Parent))
+            foreach (Unit friend in this.GetAliveFriends().Where(x => x != this.Parent))
             {
                 reservedSp += ((DefaultFighter)friend.Fighter).HowManySpIReserve();
 
@@ -342,7 +342,7 @@ namespace HSR_SIM_LIB.Fighters
             if (Role == UnitRole.Healer)
             {
                 //if hp <=50% or hp<=70% and <=2500(at 80 lvl)
-                if (GetFriends().Any(x => x.GetHpPrc(null) <= 0.5 || 
+                if (GetAliveFriends().Any(x => x.GetHpPrc(null) <= 0.5 || 
                                          ( x.GetHpPrc(null) <= 0.7&&x.GetRes(ResourceType.HP).ResVal<= x.Level*31.25 ) ))
                     return 1;
             }

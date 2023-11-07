@@ -71,7 +71,7 @@ namespace HSR_SIM_LIB.Fighters.Character
                     trackedUnits.Add(entTargetUnit);
                     Parent.ParentTeam.ParentSim.Parent.LogDebug($"{Parent.Name} add {entTargetUnit.Name} to track list");
                 }
-                else if (trackedUnits.Any(x => x == entTargetUnit) && !UnitAtLowHpForAuto(entTargetUnit))
+                else if (trackedUnits.Any(x => x == entTargetUnit) && (!UnitAtLowHpForAuto(entTargetUnit)||!entTargetUnit.IsAlive))
                 {
                     //remove high hp unit from track
                     trackedUnits.Remove(entTargetUnit);
