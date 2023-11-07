@@ -30,16 +30,16 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             if (!revert)
             {
                 if (!TriggersHandled)
-                    UnloadedUnits = ParentStep.Parent.HostileTeam.Units;
+                    UnloadedUnits = Parent.Parent.HostileTeam.Units;
 
-                ParentStep.Parent.HostileTeam.UnBindUnits();
-                ParentStep.Parent.CurrentFight.CurrentWave = null;
+                Parent.Parent.HostileTeam.UnBindUnits();
+                Parent.Parent.CurrentFight.CurrentWave = null;
 
             }
             else
             {
-                ParentStep.Parent.CurrentFight.CurrentWave = ParentStep.Parent.CurrentFight.ReferenceFight.Waves[ParentStep.Parent.CurrentFight.CurrentWaveCnt - 1];
-                ParentStep.Parent.HostileTeam.BindUnits(UnloadedUnits);
+                Parent.Parent.CurrentFight.CurrentWave = Parent.Parent.CurrentFight.ReferenceFight.Waves[Parent.Parent.CurrentFight.CurrentWaveCnt - 1];
+                Parent.Parent.HostileTeam.BindUnits(UnloadedUnits);
 
             }
             base.ProcEvent(revert);

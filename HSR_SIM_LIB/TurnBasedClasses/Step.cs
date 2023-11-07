@@ -242,7 +242,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 Events.Add(new CombatStartSkillDeQueue(this, null, ability.Parent.Parent)
                 {
 
-                    ParentStep = this,
+                    Parent = this,
                     AbilityValue = ability
 
                 });
@@ -260,7 +260,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         private void CreateDamagesEvents(Ability ability, Event ent, Unit target)
         {
             Event unitEnt = (Event)ent.Clone();
-            unitEnt.ParentStep = this;
+            unitEnt.Reference = ent;
+            unitEnt.Parent = this;
             unitEnt.TargetUnit = target??ent.TargetUnit;
             if (ability.EnergyGive > 0)
                 Events.Add(new EnergyGain(this, ability, ability.Parent.Parent) { Val = ability.EnergyGive, TargetUnit = unitEnt.TargetUnit, AbilityValue = ability });
@@ -289,14 +290,14 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 Events.Add(new CombatStartSkillQueue(this, null, ability.Parent.Parent)
                 {
 
-                    ParentStep = this,
+                    Parent = this,
                     AbilityValue = ability
 
                 });
                 if (ability.Attack)
                     Events.Add(new EnterCombat(this, null, ability.Parent.Parent)
                     {
-                        ParentStep = this,
+                        Parent = this,
                         AbilityValue = ability
 
                     });
@@ -307,7 +308,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             {
 
                 Event unitEnt = (Event)ent.Clone();
-                unitEnt.ParentStep = this;
+                unitEnt.Parent = this;
                 Events.Add(unitEnt);
 
 

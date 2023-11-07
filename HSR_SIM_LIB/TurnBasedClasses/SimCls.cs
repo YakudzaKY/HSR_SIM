@@ -120,7 +120,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             if (ent is StartWave)
                 foreach (Unit unit in AllUnits)
                 {
-                    ent.ChildEvents.Add(new UnitEnteringBattle(ent.ParentStep, this, unit) { TargetUnit = unit });
+                    ent.ChildEvents.Add(new UnitEnteringBattle(ent.Parent, this, unit) { TargetUnit = unit });
                 }
 
             if (ent is DamageEventTemplate)
@@ -139,7 +139,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 if (ent.RealVal != 0 && ent.TargetUnit.GetRes(Resource.ResourceType.HP).ResVal == 0)
                 {
 
-                    Defeat defeatEvent = new(ent.ParentStep, ent.Source, ent.SourceUnit)
+                    Defeat defeatEvent = new(ent.Parent, ent.Source, ent.SourceUnit)
                     {
 
                         AbilityValue = ent.AbilityValue,
@@ -163,7 +163,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 if (((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal != 0 && ent.TargetUnit.GetRes(((ResourceDrain)ent).ResType).ResVal == 0)
                 {
 
-                    Defeat defeatEvent = new(ent.ParentStep, ent.Source, ent.SourceUnit)
+                    Defeat defeatEvent = new(ent.Parent, ent.Source, ent.SourceUnit)
                     {
 
                         AbilityValue = ent.AbilityValue,
@@ -184,7 +184,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
                     //temporary give back the THG for calculation break damage. will be reduce at the end
                     ent.TargetUnit.GetRes(((ResourceDrain)ent).ResType).ResVal += (double)ent.RealVal;
-                    ToughnessBreak shieldBrkEvent = new(ent.ParentStep, ent.Source, ent.SourceUnit)
+                    ToughnessBreak shieldBrkEvent = new(ent.Parent, ent.Source, ent.SourceUnit)
                     {
 
                         AbilityValue = ent.AbilityValue,
@@ -194,7 +194,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                     shieldBrkEvent.Val = FighterUtils.CalculateShieldBrokeDmg(shieldBrkEvent);
                     ent.ChildEvents.Add(shieldBrkEvent);
 
-                    ModActionValue delayAV = new(ent.ParentStep, ent.Source, ent.SourceUnit) { AbilityValue = ent.AbilityValue, TargetUnit = ent.TargetUnit, Val = -ent.TargetUnit.GetBaseActionValue(ent) * 0.25 };//default delay
+                    ModActionValue delayAV = new(ent.Parent, ent.Source, ent.SourceUnit) { AbilityValue = ent.AbilityValue, TargetUnit = ent.TargetUnit, Val = -ent.TargetUnit.GetBaseActionValue(ent) * 0.25 };//default delay
                     ent.ChildEvents.Add(delayAV);
                     // https://honkai-star-rail.fandom.com/wiki/Toughness
                     switch (ent.AbilityValue.Element)

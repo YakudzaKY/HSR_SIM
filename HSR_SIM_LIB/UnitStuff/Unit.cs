@@ -327,7 +327,7 @@ namespace HSR_SIM_LIB.UnitStuff
         /// <param name="abilityValue"></param>
         public void ApplyBuff(Event ent,Buff mod)
         {
-            Buff srchMod = Buffs.FirstOrDefault(x => ((x.RefMod == (mod.RefMod ?? mod) || (mod.SourceObject != null && mod.SourceObject == x.SourceObject))
+            Buff srchMod = Buffs.FirstOrDefault(x => ((x.Reference == (mod.Reference ?? mod) || (mod.SourceObject != null && mod.SourceObject == x.SourceObject))
                                                    && (mod.UniqueUnit == null || x.UniqueUnit == mod.UniqueUnit))
                                                   || ((!String.IsNullOrEmpty(mod.UniqueStr) && String.Equals(x.UniqueStr, mod.UniqueStr))));
 
@@ -354,7 +354,7 @@ namespace HSR_SIM_LIB.UnitStuff
                     srchMod = mod;
                 }
                 srchMod.Stack = Math.Min(srchMod.MaxStack, srchMod.Stack);
-                srchMod.RefMod = mod.RefMod ?? mod;
+                srchMod.Reference = mod.Reference ?? mod;
                 srchMod.Owner = this;
                 Buffs.Add(srchMod);
 
@@ -378,9 +378,9 @@ namespace HSR_SIM_LIB.UnitStuff
         /// <param name="mod"></param>
         public void RemoveBuff(Event ent,Buff mod)
         {
-            if (Buffs.Any(x => x.RefMod == (mod.RefMod ?? mod)))
+            if (Buffs.Any(x => x.Reference == (mod.Reference ?? mod)))
             {
-                Buff foundBuff = Buffs.First(x => x.RefMod == (mod.RefMod ?? mod));
+                Buff foundBuff = Buffs.First(x => x.Reference == (mod.Reference ?? mod));
                 foreach (Effect effect in foundBuff.Effects)
                 {
                     effect.BeforeRemove(ent,foundBuff);

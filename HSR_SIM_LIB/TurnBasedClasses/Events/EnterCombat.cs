@@ -23,7 +23,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
         {
             
             //entering combat
-            ParentStep.Parent.DoEnterCombat = !revert;
+            Parent.Parent.DoEnterCombat = !revert;
             base.ProcEvent(revert);
         }
     }

@@ -27,7 +27,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
                 ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal != 0)
                 || (ent.TargetUnit == Parent.Parent && ent is DirectDamage)) && uniqueBuff != null)
             {
-                ApplyBuff newEvent = new(ent.ParentStep, this, Parent.Parent)
+                ApplyBuff newEvent = new(ent.Parent, this, Parent.Parent)
                 {
                     
                     TargetUnit = Parent.Parent,

@@ -59,7 +59,7 @@ namespace HSR_SIM_LIB.Skills
                 foreach (var effect in Effects)
                 {
                    
-                    if (RefMod == Caster.Fighter.ShieldBreakMod)
+                    if (Reference == Caster.Fighter.ShieldBreakMod)
                     {
                          var dotProcEvent = new ToughnessBreakDoTDamage(step, this.Caster, Caster) { CalculateValue = effect.CalculateValue, TargetUnit = step.Actor, Modification = this, AbilityValue = AbilityValue };
                          step.Events.Add(dotProcEvent);
@@ -122,7 +122,7 @@ namespace HSR_SIM_LIB.Skills
 
         public string UniqueStr { get; set; }
 
-        public Buff RefMod { get; set; }
+        public Buff Reference { get; set; }
 
         public bool Dispellable { get; init; } = true;
         public Unit UniqueUnit { get; set; }
@@ -141,7 +141,7 @@ namespace HSR_SIM_LIB.Skills
 
         public Buff(Unit caster, Buff reference = null)
         {
-            RefMod = reference;
+            Reference = reference;
             Caster = caster;
 
         }

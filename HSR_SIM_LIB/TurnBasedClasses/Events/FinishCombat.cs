@@ -34,17 +34,17 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
 
                 if (!TriggersHandled)
                 {
-                    oldCombatFight = ParentStep.Parent.CurrentFight;
+                    oldCombatFight = Parent.Parent.CurrentFight;
                     oldMechDictionary = new Dictionary<Unit, MechDictionary>();
                     //set sp to 0
-                    ChildEvents.Add(new PartyResourceDrain(ParentStep, this, null) { Val = ParentStep.Parent.PartyTeam.GetRes(Resource.ResourceType.SP).ResVal, TargetTeam = ParentStep.Parent.PartyTeam, ResType = Resource.ResourceType.SP });
+                    ChildEvents.Add(new PartyResourceDrain(Parent, this, null) { Val = Parent.Parent.PartyTeam.GetRes(Resource.ResourceType.SP).ResVal, TargetTeam = Parent.Parent.PartyTeam, ResType = Resource.ResourceType.SP });
 
                 }
 
 
 
                 //save each buff
-                foreach (Unit unit in ParentStep.Parent.PartyTeam.Units)
+                foreach (Unit unit in Parent.Parent.PartyTeam.Units)
                 {
 
 
@@ -78,13 +78,13 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
 
 
                 }
-                ParentStep.Parent.CurrentFight = null;
+                Parent.Parent.CurrentFight = null;
 
 
             }
             else
             {
-                ParentStep.Parent.CurrentFight = oldCombatFight;
+                Parent.Parent.CurrentFight = oldCombatFight;
                 //restore each buff
                 foreach (var unitWBuffs in removedBuffs)
                 {

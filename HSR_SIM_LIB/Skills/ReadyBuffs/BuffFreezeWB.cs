@@ -24,7 +24,7 @@ namespace HSR_SIM_LIB.Skills.ReadyBuffs
         public void FreezeEventHandler(Event ent)
         {
             if (ent is ResetAV && ent.TargetUnit == this.Owner) //50% reduce av if frosted
-                ent.ChildEvents.Add(new ModActionValue(ent.ParentStep, Owner, Owner) { AbilityValue = ent.ParentStep.ActorAbility, TargetUnit = this.Owner, Val = this.Owner.GetBaseActionValue(null) * 0.5 });
+                ent.ChildEvents.Add(new ModActionValue(ent.Parent, Owner, Owner) { AbilityValue = ent.Parent.ActorAbility, TargetUnit = this.Owner, Val = this.Owner.GetBaseActionValue(null) * 0.5 });
 
         }
     }

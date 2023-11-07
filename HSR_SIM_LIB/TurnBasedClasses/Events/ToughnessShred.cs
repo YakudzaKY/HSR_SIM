@@ -25,7 +25,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
                 if (TargetUnit.Buffs.All(x => x.Effects.All(y => y  is not EffBarrier)) &&TargetUnit.Fighter.Weaknesses.Any(x => x == (AbilityValue.Element)) || AbilityValue.IgnoreWeakness)
                     ChildEvents.Add(new ResourceDrain(null, null, AbilityValue.Parent.Parent)
                     {
-                        ParentStep = ParentStep,
+                        Parent = Parent,
                         TargetUnit = TargetUnit,
                         ResType = Resource.ResourceType.Toughness,
                         Val = Val,

@@ -32,13 +32,13 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             else
             {
 
-                foreach (Unit unit in ParentStep.Parent.CurrentFight.AllAliveUnits)
+                foreach (Unit unit in Parent.Parent.CurrentFight.AllAliveUnits)
                 {
                     unit.Stats.PerformedActionValue += (double)(revert ? -Val : Val);
            
                 }
                 if (!TriggersHandled)
-                    ParentStep.Parent.TotalAv += (double)Val;
+                    Parent.Parent.TotalAv += (double)Val;
             }
             base.ProcEvent(revert);
         }

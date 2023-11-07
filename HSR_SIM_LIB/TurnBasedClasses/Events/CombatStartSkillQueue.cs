@@ -24,9 +24,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             
             //party buffs or opening
             if (!revert)
-                ParentStep.Parent.BeforeStartQueue.Add(AbilityValue);
+                Parent.Parent.BeforeStartQueue.Add(AbilityValue);
             else
-                ParentStep.Parent.BeforeStartQueue.Remove(AbilityValue);
+                Parent.Parent.BeforeStartQueue.Remove(AbilityValue);
             base.ProcEvent(revert);
         }
     }

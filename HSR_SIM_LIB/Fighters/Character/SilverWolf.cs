@@ -24,7 +24,7 @@ namespace HSR_SIM_LIB.Fighters.Character
                 //if enemy enter combat need debuff
                 if (Parent.Enemies.Any(x => x == ent.TargetUnit))
                 {
-                    ApplyBuff newEvent = new(ent.ParentStep, this,Parent)
+                    ApplyBuff newEvent = new(ent.Parent, this,Parent)
                     {
                       
                         TargetUnit = ent.TargetUnit,

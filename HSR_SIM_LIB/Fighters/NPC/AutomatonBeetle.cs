@@ -24,12 +24,12 @@ namespace HSR_SIM_LIB.Fighters.NPC
         {
             if (ent is DirectDamage && ent.TargetUnit == Parent&& ent.TargetUnit.Buffs.Any(x=>x.Effects.Any(y=>y is EffBarrier)))
             {
-                RemoveMod newEvent = new(ent.ParentStep, this, Parent)
+                RemoveMod newEvent = new(ent.Parent, this, Parent)
                 {
                     TargetUnit = Parent,
                     BuffToApply = barierBuff
                 };
-                ent.ParentStep.Events.Add(newEvent);
+                ent.Parent.Events.Add(newEvent);
             }
 
         }

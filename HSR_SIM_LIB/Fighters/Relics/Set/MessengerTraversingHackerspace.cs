@@ -29,7 +29,7 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
                             {
                                 OnStepType = Step.StepTypeEnm.ExecuteAbility,
                                 AbilityValue = step.ActorAbility,
-                                ParentStep = step,
+                                Parent = step,
                                 TargetUnit = unit,
                                 BuffToApply = (new Buff(Parent.Parent)
                                 {

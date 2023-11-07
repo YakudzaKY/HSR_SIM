@@ -55,7 +55,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             {
                 //calc value first
                 if (CalculateValue != null && val == null)
-                    val = CalculateValue(this);
+                    val = CalculateValue(this)*CalculateProportion;
                 return val;
             }
 
@@ -63,17 +63,19 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
         }
         public double? RealVal { get => realVal; set => realVal = value; }
 
+        //after calc Val will be multiplied by this number
+        public double CalculateProportion { get; set; } = 1;
 
-
-        public Step ParentStep { get; set; } = null;
+        public Step Parent { get; set; } = null;
         public bool TriggersHandled { get; set; } = false;
 
         public bool IsDamageEvent => (this is ToughnessBreak or DoTDamage or DirectDamage or ToughnessBreakDoTDamage);
+        public Event Reference { get; set; }
 
 
         public Event(Step parent, ICloneable source, Unit sourceUnit)
         {
-            ParentStep = parent;
+            Parent = parent;
             Source = source;
             SourceUnit = sourceUnit;
         }
@@ -88,15 +90,15 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
         /// <param name="revert"></param>
         public virtual void ProcEvent(bool revert)
         {
-            ParentStep.ProceedEvents.Add(this);
+            Parent.ProceedEvents.Add(this);
 
             //call handlers
             if (!TriggersHandled)
             {
                 TriggersHandled = true;
                 //proc events only in battle
-                if (ParentStep.Parent.CurrentFight != null)
-                    ParentStep.Parent.EventHandlerProc?.Invoke(this);
+                if (Parent.Parent.CurrentFight != null)
+                    Parent.Parent.EventHandlerProc?.Invoke(this);
 
             }
             //Child events
@@ -123,7 +125,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             {
                 mod.ProceedNaturalExpire(this);
             }
-            RemoveMod dispell = new RemoveMod(ParentStep, AbilityValue, SourceUnit)
+            RemoveMod dispell = new RemoveMod(Parent, AbilityValue, SourceUnit)
             { AbilityValue = AbilityValue, BuffToApply = mod, TargetUnit = TargetUnit };
             ChildEvents.Add(dispell);
 
@@ -143,7 +145,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
         public void TryDebuff(Buff mod, double baseChance)
         {
             //add Dots and debuffs
-            ApplyBuff dotEvent = new(ParentStep, Source, SourceUnit)
+            ApplyBuff dotEvent = new(Parent, Source, SourceUnit)
             {
                 AbilityValue = AbilityValue,
                 TargetUnit = TargetUnit,
@@ -161,7 +163,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             else
             {
                 //debuff apply failed
-                DebuffResisted failEvent = new(ParentStep, Source, SourceUnit)
+                DebuffResisted failEvent = new(Parent, Source, SourceUnit)
                 {
                     AbilityValue = AbilityValue,
                     TargetUnit = TargetUnit,

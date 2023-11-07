@@ -35,7 +35,7 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
                       && ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal != 0)
                     || (ent.TargetUnit == Parent.Parent && ent is DirectDamage))
                 {
-                    ApplyBuff newEvent = new (ent.ParentStep, this, Parent.Parent)
+                    ApplyBuff newEvent = new (ent.Parent, this, Parent.Parent)
                     {
                         TargetUnit = Parent.Parent,
                         BuffToApply = uniqueBuff

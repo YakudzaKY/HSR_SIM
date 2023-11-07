@@ -14,7 +14,7 @@ namespace HSR_SIM_LIB.Skills.EffectList
 
             if (mod == mod.Caster.Fighter.ShieldBreakMod)
             {
-                var dotProcEvent = new ToughnessBreakDoTDamage(ent.ParentStep, mod.Caster, mod.Caster)
+                var dotProcEvent = new ToughnessBreakDoTDamage(ent.Parent, mod.Caster, mod.Caster)
                 {
                     CalculateValue = this.CalculateValue,
                     TargetUnit = ent.TargetUnit,
@@ -25,7 +25,7 @@ namespace HSR_SIM_LIB.Skills.EffectList
             }
             else
             {
-                var dotProcEvent = new DoTDamage(ent.ParentStep, mod.Caster, mod.Caster)
+                var dotProcEvent = new DoTDamage(ent.Parent, mod.Caster, mod.Caster)
                 {
                     CalculateValue = this.CalculateValue,
                     TargetUnit = ent.TargetUnit,
