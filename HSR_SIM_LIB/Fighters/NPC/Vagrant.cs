@@ -39,8 +39,9 @@ namespace HSR_SIM_LIB.Fighters.NPC
             //dmg events
             ability.Events.Add(new ApplyBuff(null, this,Parent) { AbilityValue = ability , BuffToApply = new Buff(Parent,null) {AbilityValue = ability,BaseDuration = 2,Effects = new List<Effect>() {new EffAtkPrc() {Value = 0.3}}}});
             ability.Events.Add(new AdvanceAV(null, this,Parent) { AbilityValue = ability });
-            Ability myAttackAbility;
+            Abilities.Add(ability);
 
+            Ability myAttackAbility;
             //Deals minor Physical DMG (250% ATK) to a single target.
             myAttackAbility = new Ability(this)
             {
@@ -62,7 +63,7 @@ namespace HSR_SIM_LIB.Fighters.NPC
             myAttackAbility.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalcMyAttack, AbilityValue = myAttackAbility });
             Abilities.Add(myAttackAbility);
 
-            Abilities.Add(ability);
+            
 
 
         }

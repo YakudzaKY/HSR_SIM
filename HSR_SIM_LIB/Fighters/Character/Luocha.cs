@@ -234,7 +234,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             };
 
             //todo fullfill events
-            PrayerOfAbyssFlower.Events.Add(new Healing(null, this, this.Parent) { CalculateTargets = CalcFollowPoAFTarget, CalculateValue = CalculatePrayerOfAbyssFlower, AbilityValue = PrayerOfAbyssFlowerAuto });
+            PrayerOfAbyssFlower.Events.Add(new Healing(null, this, this.Parent) { CalculateValue = CalculatePrayerOfAbyssFlower, AbilityValue = PrayerOfAbyssFlowerAuto });
             Abilities.Add(PrayerOfAbyssFlower);
 
         

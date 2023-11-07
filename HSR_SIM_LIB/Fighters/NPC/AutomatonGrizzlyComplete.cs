@@ -5,12 +5,18 @@ using System.Text;
 using System.Threading.Tasks;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
+using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Fighters.NPC
 {
     internal class AutomatonGrizzlyComplete:DefaultNPCBossFIghter
     {
+        public double? CalcMyAttack(Event ent)
+        {
+            return FighterUtils.CalculateDmgByBasicVal(Parent.GetAttack(ent) *2.5, ent);
+        }
+
         public AutomatonGrizzlyComplete(Unit parent) : base(parent)
         {  //Elemenet
             Element = Unit.ElementEnm.Physical;
@@ -25,6 +31,29 @@ namespace HSR_SIM_LIB.Fighters.NPC
             DebuffResists.Add(new DebuffResist(){Debuff =typeof(EffFreeze),ResistVal = 0.5});
             DebuffResists.Add(new DebuffResist(){Debuff =typeof(EffImprisonment),ResistVal = 0.5});
             DebuffResists.Add(new DebuffResist(){Debuff =typeof(EffEntanglement),ResistVal = 0.5});
+
+            Ability myAttackAbility;
+            //Deals minor Physical DMG (250% ATK) to a single target.
+            myAttackAbility = new Ability(this)
+            {
+                AbilityType = Ability.AbilityTypeEnm.Basic
+                ,
+                Name = "Shovel Attack"
+                ,
+                Element = Element
+                ,
+                AdjacentTargets = Ability.AdjacentTargetsEnm.None
+                ,
+                Attack = true
+                ,
+                EnergyGive = 10
+                ,
+                SpGain = 1
+            };
+            //dmg events
+            myAttackAbility.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalcMyAttack, AbilityValue = myAttackAbility });
+            Abilities.Add(myAttackAbility);
+
         }
     }
 }
