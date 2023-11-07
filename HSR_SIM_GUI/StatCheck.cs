@@ -542,7 +542,7 @@ namespace HSR_SIM_GUI
 
                     var statMod = subtask.StatMods.First();
                     newChart.Series[statMod.Stat].Points.AddXY(statMod.Step, subtask.Data.avgDPAV - task.Data.avgDPAV);
-                    newChart.Series[statMod.Stat].Points.Last().Label = $"+{statMod.Val:f}";
+                    newChart.Series[statMod.Stat].Points.Last().Label = $"wr:{subtask.Data.WinRate:f}%";
 
 
 

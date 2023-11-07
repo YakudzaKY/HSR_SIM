@@ -215,6 +215,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             if (ability.EnergyGain > 0)
                 Events.Add(new EnergyGain(this, ability, ability.Parent.Parent) { Val = ability.EnergyGain, TargetUnit = ability.Parent.Parent, AbilityValue = ability });
 
+               
             //clone events by targets
             foreach (Event ent in ability.Events.Where(x => x.OnStepType == StepType || x.OnStepType == null))
             {
@@ -224,12 +225,13 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                         (ent.CalculateTargets != null) ? ent.CalculateTargets() : ability.GetTargets(target, ent.TargetType, ent.CurentTargetType);
                     foreach (Unit unit in targetsUnits)
                     {
-                        CreateDamagesEvents(ability,ent,unit);
+                        CloneEvent(ability,ent,unit);
                     }
+
                 }
                 else
                 {
-                    CreateDamagesEvents(ability,ent,null);
+                    CloneEvent(ability,ent,null);
                 }
 
             }
@@ -257,14 +259,12 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         /// <param name="ability"></param>
         /// <param name="ent"></param>
         /// <param name="target"></param>
-        private void CreateDamagesEvents(Ability ability, Event ent, Unit target)
+        private void CloneEvent(Ability ability, Event ent, Unit target)
         {
             Event unitEnt = (Event)ent.Clone();
             unitEnt.Reference = ent;
             unitEnt.Parent = this;
             unitEnt.TargetUnit = target??ent.TargetUnit;
-            if (ability.EnergyGive > 0)
-                Events.Add(new EnergyGain(this, ability, ability.Parent.Parent) { Val = ability.EnergyGive, TargetUnit = unitEnt.TargetUnit, AbilityValue = ability });
             Events.Add(unitEnt);
           
         }

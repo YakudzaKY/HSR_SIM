@@ -46,12 +46,11 @@ namespace HSR_SIM_LIB.Fighters.NPC
                 ,
                 Attack = true
                 ,
-                EnergyGive = 10
-                ,
                 SpGain = 1
             };
             //dmg events
             myAttackAbility.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalcMyAttack, AbilityValue = myAttackAbility });
+            myAttackAbility.Events.Add(new EnergyGain(null, this, this.Parent) { Val = 10, AbilityValue = myAttackAbility });
             Abilities.Add(myAttackAbility);
 
         }

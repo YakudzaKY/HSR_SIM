@@ -34,7 +34,6 @@ namespace HSR_SIM_LIB.Skills
 
         public bool Attack { get; set; }
         public double EnergyGain { get; set; }
-        public double EnergyGive { get; set; }
         public bool IgnoreWeakness { get; set; }
 
         public int Cooldown { get; set; } = 0;
