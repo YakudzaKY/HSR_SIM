@@ -239,25 +239,65 @@ namespace HSR_SIM_GUI
                 chkProfiles.Items.Add(Path.GetFileName(file));
             }
         }
+
+        private Dictionary<string, string> subStatsUpgrades = new Dictionary<string, string>()
+        {
+            { "spd_fix", "2,3" }
+            ,{ "hp_fix", "38,103755" }
+            ,{ "atk_fix", "19,051877" }
+            ,{ "def", "19,051877" }
+            ,{ "hp_prc", "0,03888" }
+            ,{ "atk_prc", "0,03888" }
+            ,{ "def_prc", "0,0486" }
+            ,{ "break_dmg_prc", "0,05832" }
+            ,{ "effect_hit_prc", "0,03888" }
+            ,{ "effect_res_prc", "0,03888" }
+            ,{ "crit_rate_prc", "0,02916" }
+            ,{ "crit_dmg_prc", "0,05832" }
+
+        };
+
+        private Dictionary<string, string> mainStatsUpgrades = new Dictionary<string, string>()
+        {
+            { "spd_fix", "1,4" }
+            ,{ "hp_fix", "39,5136" }
+            ,{ "atk_fix", "19,7568" }
+            ,{ "hp_prc", "0,024192" }
+            ,{ "atk_prc", "0,024192" }
+            ,{ "def_prc", "0,03024" }
+            ,{ "break_dmg_prc", "0,036277" }
+            ,{ "effect_hit_prc", "0,024192" }
+            ,{ "sp_rate_prc", "0,010886" }
+            ,{ "heal_rate_prc", "0,019354" }
+            ,{ "crit_rate_prc", "0,018144" }
+            ,{ "crit_dmg_prc", "0,036288" }
+            //elements
+            ,{ "wind_dmg_prc", "0,021773" }
+            ,{ "physical_dmg_prc", "0,021773" }
+            ,{ "fire_dmg_prc", "0,021773" }
+            ,{ "ice_dmg_prc", "0,021773" }
+            ,{ "lightning_dmg_prc", "0,021773" }
+            ,{ "quantum_dmg_prc", "0,021773" }
+            ,{ "imaginary_dmg_prc", "0,021773" }
+        };
+
+        private void LoadStatTable(Dictionary<string, string> table)
+        {
+            cbStatToReplace.Items.Clear();
+            dgStatUpgrades.Rows.Clear();
+            chkStats.Items.Clear();
+
+            foreach (KeyValuePair<string, string> item in table)
+            {
+                dgStatUpgrades.Rows.Add(new DataGridViewRow() { Cells = { new DataGridViewTextBoxCell() { Value = item.Key }, new DataGridViewTextBoxCell() { Value = item.Value } } });
+                chkStats.Items.Add(item.Key.ToString());
+                cbStatToReplace.Items.Add(item.Key);
+            }
+        }
         private void StatCheck_Load(object sender, EventArgs e)
         {
-            dgStatUpgrades.Rows.Add(new DataGridViewRow() { Cells = { new DataGridViewTextBoxCell() { Value = "spd" }, new DataGridViewTextBoxCell() { Value = "2,3" } } });
-            dgStatUpgrades.Rows.Add(new DataGridViewRow() { Cells = { new DataGridViewTextBoxCell() { Value = "hp" }, new DataGridViewTextBoxCell() { Value = "38,103755" } } });
-            dgStatUpgrades.Rows.Add(new DataGridViewRow() { Cells = { new DataGridViewTextBoxCell() { Value = "atk" }, new DataGridViewTextBoxCell() { Value = "19,051877" } } });
-            dgStatUpgrades.Rows.Add(new DataGridViewRow() { Cells = { new DataGridViewTextBoxCell() { Value = "def" }, new DataGridViewTextBoxCell() { Value = "19,051877" } } });
-            dgStatUpgrades.Rows.Add(new DataGridViewRow() { Cells = { new DataGridViewTextBoxCell() { Value = "hp_prc" }, new DataGridViewTextBoxCell() { Value = "0,03888" } } });
-            dgStatUpgrades.Rows.Add(new DataGridViewRow() { Cells = { new DataGridViewTextBoxCell() { Value = "atk_prc" }, new DataGridViewTextBoxCell() { Value = "0,03888" } } });
-            dgStatUpgrades.Rows.Add(new DataGridViewRow() { Cells = { new DataGridViewTextBoxCell() { Value = "def_prc" }, new DataGridViewTextBoxCell() { Value = "0,0486" } } });
-            dgStatUpgrades.Rows.Add(new DataGridViewRow() { Cells = { new DataGridViewTextBoxCell() { Value = "break_dmg_prc" }, new DataGridViewTextBoxCell() { Value = "0,05832" } } });
-            dgStatUpgrades.Rows.Add(new DataGridViewRow() { Cells = { new DataGridViewTextBoxCell() { Value = "effect_hit_prc" }, new DataGridViewTextBoxCell() { Value = "0,03888" } } });
-            dgStatUpgrades.Rows.Add(new DataGridViewRow() { Cells = { new DataGridViewTextBoxCell() { Value = "effect_res_prc" }, new DataGridViewTextBoxCell() { Value = "0,03888" } } });
-            dgStatUpgrades.Rows.Add(new DataGridViewRow() { Cells = { new DataGridViewTextBoxCell() { Value = "crit_rate_prc" }, new DataGridViewTextBoxCell() { Value = "0,02916" } } });
-            dgStatUpgrades.Rows.Add(new DataGridViewRow() { Cells = { new DataGridViewTextBoxCell() { Value = "crit_dmg_prc" }, new DataGridViewTextBoxCell() { Value = "0,05832" } } });
+            LoadStatTable(subStatsUpgrades);
 
-            for (int i = 0; i < dgStatUpgrades.Rows.Count; i++)
-            {
-                chkStats.Items.Add(dgStatUpgrades.Rows[i].Cells[0].Value.ToString());
-            }
 
             RefreshCbs();
             cbScenario.Text = IniF.IniReadValue("form", "Scenario");
@@ -282,7 +322,7 @@ namespace HSR_SIM_GUI
 
             for (int i = 0; i < dgStatUpgrades.RowCount; i++)
             {
-                if (dgStatUpgrades.Rows[i].Cells[0].Value == item)
+                if (dgStatUpgrades.Rows[i].Cells[0].Value.Equals(item))
                 {
                     return Double.Parse(dgStatUpgrades.Rows[i].Cells[1].Value.ToString());
                 }
@@ -291,11 +331,13 @@ namespace HSR_SIM_GUI
         }
 
         //get Stat mods by checked item(one mod atm)
-        private List<Worker.RStatMod> GetStatMods(string character, string item, int step)
+        private List<Worker.RStatMod> GetStatMods(string character, string item, int step, string minusItem)
         {
-            List<Worker.RStatMod> res = new List<Worker.RStatMod>() { new Worker.RStatMod() { Character = character, Step = step, Stat = item, Val = SearchStatDeltaByName(item) * step } };
 
-
+            List<Worker.RStatMod> res = new List<Worker.RStatMod>();
+            res.Add(new Worker.RStatMod() { Character = character, Step = step, Stat = item, Val = SearchStatDeltaByName(item) * step });
+            if (!String.IsNullOrEmpty(minusItem))
+                res.Add(new Worker.RStatMod() { Character = character, Step = step, Stat = minusItem, Val = -SearchStatDeltaByName(minusItem) * step });
             return res;
         }
 
@@ -313,7 +355,7 @@ namespace HSR_SIM_GUI
                             Scenario = cbScenario.Text,
                             Profile = profile,
                             Iterations = (int)NmbIterations.Value,
-                            StatMods = GetStatMods(cbCharacter.Text, (string)item, i * (int)nmbUpgradesPerStep.Value)
+                            StatMods = GetStatMods(cbCharacter.Text, (string)item, i * (int)nmbUpgradesPerStep.Value, cbStatToReplace.Text)
                         });
                 }
             return res;
@@ -477,8 +519,8 @@ namespace HSR_SIM_GUI
                 //create series 
 
                 var mainQuery = (from p in task.Subtasks
-                                 from c in p.StatMods
-                                 select c.Stat)
+                                     // from c in p.StatMods                               
+                                 select p.StatMods.First().Stat)
                     .Distinct();
 
                 foreach (var stat in mainQuery)
@@ -498,11 +540,10 @@ namespace HSR_SIM_GUI
                 foreach (var subtask in task.Subtasks)
                 {
 
-                    foreach (var statMod in subtask.StatMods)
-                    {
-                        newChart.Series[statMod.Stat].Points.AddXY(statMod.Step, subtask.Data.avgDPAV - task.Data.avgDPAV);
-                        newChart.Series[statMod.Stat].Points.Last().Label = $"+{statMod.Val:f}";
-                    }
+                    var statMod = subtask.StatMods.First();
+                    newChart.Series[statMod.Stat].Points.AddXY(statMod.Step, subtask.Data.avgDPAV - task.Data.avgDPAV);
+                    newChart.Series[statMod.Stat].Points.Last().Label = $"+{statMod.Val:f}";
+
 
 
                 }
@@ -536,6 +577,25 @@ namespace HSR_SIM_GUI
         }
 
         private void dgStatUpgrades_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void btnLoadSubstats_Click(object sender, EventArgs e)
+        {
+            nmbSteps.Value = 4;
+            nmbUpgradesPerStep.Value = 4;
+            LoadStatTable(subStatsUpgrades);
+        }
+
+        private void btnMainStats_Click(object sender, EventArgs e)
+        {
+            nmbSteps.Value = 1;
+            nmbUpgradesPerStep.Value = 15;
+            LoadStatTable(mainStatsUpgrades);
+        }
+
+        private void label7_Click(object sender, EventArgs e)
         {
 
         }

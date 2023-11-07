@@ -28,6 +28,7 @@ using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using static HSR_SIM_LIB.Worker;
+using static HSR_SIM_LIB.UnitStuff.Unit;
 
 namespace HSR_SIM_LIB
 {
@@ -321,12 +322,12 @@ namespace HSR_SIM_LIB
                 Unit targetUnit = sim.CurrentScenario.Party.FirstOrDefault(x => String.Equals(x.Name, mod.Character));
                 if (targetUnit != null)
                 {
-                    if (mod.Stat == "spd")
-                        targetUnit.Stats.BaseSpeed += mod.Val;
-                    else if (mod.Stat == "hp")
-                        targetUnit.Stats.BaseMaxHp += mod.Val;
-                    else if (mod.Stat == "atk")
-                        targetUnit.Stats.BaseAttack += mod.Val;
+                    if (mod.Stat == "spd_fix")
+                        targetUnit.Stats.SpeedFix += mod.Val;
+                    else if (mod.Stat == "hp_fix")
+                        targetUnit.Stats.MaxHpFix += mod.Val;
+                    else if (mod.Stat == "atk_fix")
+                        targetUnit.Stats.AttackFix += mod.Val;
                     else if (mod.Stat == "def")
                         targetUnit.Stats.BaseDef += mod.Val;
                     else if (mod.Stat == "hp_prc")
@@ -345,8 +346,20 @@ namespace HSR_SIM_LIB
                         targetUnit.Stats.BaseCritChance += mod.Val;
                     else if (mod.Stat == "crit_dmg_prc")
                         targetUnit.Stats.BaseCritDmg += mod.Val;
+                    else if (mod.Stat == "sp_rate_prc")
+                        targetUnit.Stats.BaseEnergyResPrc += mod.Val;
+                    else if (mod.Stat.EndsWith( "_dmg_prc"))
+                    {
+                        string elem = mod.Stat.Split("_").First();
+                        targetUnit.GetElemBoost( (ElementEnm)Enum.Parse(typeof(ElementEnm), elem, true)).Value += mod.Val;
+                    }
+
+
                 }
             }
+
+            
+
         }
     }
 }

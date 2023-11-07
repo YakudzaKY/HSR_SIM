@@ -47,6 +47,10 @@ namespace HSR_SIM_GUI
             valClmn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             chkProfiles = new System.Windows.Forms.CheckedListBox();
             groupBox1 = new System.Windows.Forms.GroupBox();
+            cbStatToReplace = new System.Windows.Forms.ComboBox();
+            label7 = new System.Windows.Forms.Label();
+            btnMainStats = new System.Windows.Forms.Button();
+            btnLoadSubstats = new System.Windows.Forms.Button();
             label6 = new System.Windows.Forms.Label();
             nmbSteps = new System.Windows.Forms.NumericUpDown();
             label5 = new System.Windows.Forms.Label();
@@ -55,6 +59,7 @@ namespace HSR_SIM_GUI
             label1 = new System.Windows.Forms.Label();
             chkStats = new System.Windows.Forms.CheckedListBox();
             BtnGo = new System.Windows.Forms.Button();
+            label8 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)NmbIterations).BeginInit();
             ((System.ComponentModel.ISupportInitialize)NmbThreadsCount).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dgStatUpgrades).BeginInit();
@@ -120,7 +125,7 @@ namespace HSR_SIM_GUI
             PB1.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             PB1.Location = new System.Drawing.Point(12, 166);
             PB1.Name = "PB1";
-            PB1.Size = new System.Drawing.Size(776, 29);
+            PB1.Size = new System.Drawing.Size(954, 29);
             PB1.TabIndex = 18;
             // 
             // pnlCharts
@@ -129,7 +134,7 @@ namespace HSR_SIM_GUI
             pnlCharts.AutoScroll = true;
             pnlCharts.Location = new System.Drawing.Point(12, 201);
             pnlCharts.Name = "pnlCharts";
-            pnlCharts.Size = new System.Drawing.Size(776, 607);
+            pnlCharts.Size = new System.Drawing.Size(954, 607);
             pnlCharts.TabIndex = 20;
             // 
             // dgStatUpgrades
@@ -138,7 +143,7 @@ namespace HSR_SIM_GUI
             dgStatUpgrades.AllowUserToDeleteRows = false;
             dgStatUpgrades.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgStatUpgrades.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { propClmn, valClmn });
-            dgStatUpgrades.Location = new System.Drawing.Point(291, 15);
+            dgStatUpgrades.Location = new System.Drawing.Point(487, 15);
             dgStatUpgrades.Name = "dgStatUpgrades";
             dgStatUpgrades.RowHeadersVisible = false;
             dgStatUpgrades.RowTemplate.Height = 25;
@@ -167,6 +172,11 @@ namespace HSR_SIM_GUI
             // 
             // groupBox1
             // 
+            groupBox1.Controls.Add(label8);
+            groupBox1.Controls.Add(cbStatToReplace);
+            groupBox1.Controls.Add(label7);
+            groupBox1.Controls.Add(btnMainStats);
+            groupBox1.Controls.Add(btnLoadSubstats);
             groupBox1.Controls.Add(dgStatUpgrades);
             groupBox1.Controls.Add(label6);
             groupBox1.Controls.Add(nmbSteps);
@@ -177,10 +187,49 @@ namespace HSR_SIM_GUI
             groupBox1.Controls.Add(chkStats);
             groupBox1.Location = new System.Drawing.Point(260, 6);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new System.Drawing.Size(528, 151);
+            groupBox1.Size = new System.Drawing.Size(713, 151);
             groupBox1.TabIndex = 23;
             groupBox1.TabStop = false;
             groupBox1.Text = "Stat weight calc";
+            // 
+            // cbStatToReplace
+            // 
+            cbStatToReplace.FormattingEnabled = true;
+            cbStatToReplace.Items.AddRange(new object[] { "character" });
+            cbStatToReplace.Location = new System.Drawing.Point(128, 80);
+            cbStatToReplace.Name = "cbStatToReplace";
+            cbStatToReplace.Size = new System.Drawing.Size(111, 23);
+            cbStatToReplace.TabIndex = 35;
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new System.Drawing.Point(128, 62);
+            label7.Name = "label7";
+            label7.Size = new System.Drawing.Size(82, 15);
+            label7.TabIndex = 34;
+            label7.Text = "Stat to replace";
+            label7.Click += label7_Click;
+            // 
+            // btnMainStats
+            // 
+            btnMainStats.Location = new System.Drawing.Point(242, 63);
+            btnMainStats.Name = "btnMainStats";
+            btnMainStats.Size = new System.Drawing.Size(111, 23);
+            btnMainStats.TabIndex = 33;
+            btnMainStats.Text = "mainstats";
+            btnMainStats.UseVisualStyleBackColor = true;
+            btnMainStats.Click += btnMainStats_Click;
+            // 
+            // btnLoadSubstats
+            // 
+            btnLoadSubstats.Location = new System.Drawing.Point(242, 34);
+            btnLoadSubstats.Name = "btnLoadSubstats";
+            btnLoadSubstats.Size = new System.Drawing.Size(111, 23);
+            btnLoadSubstats.TabIndex = 32;
+            btnLoadSubstats.Text = "substats";
+            btnLoadSubstats.UseVisualStyleBackColor = true;
+            btnLoadSubstats.Click += btnLoadSubstats_Click;
             // 
             // label6
             // 
@@ -223,7 +272,7 @@ namespace HSR_SIM_GUI
             cbCharacter.Items.AddRange(new object[] { "character" });
             cbCharacter.Location = new System.Drawing.Point(6, 36);
             cbCharacter.Name = "cbCharacter";
-            cbCharacter.Size = new System.Drawing.Size(128, 23);
+            cbCharacter.Size = new System.Drawing.Size(230, 23);
             cbCharacter.TabIndex = 25;
             // 
             // label1
@@ -238,7 +287,7 @@ namespace HSR_SIM_GUI
             // chkStats
             // 
             chkStats.FormattingEnabled = true;
-            chkStats.Location = new System.Drawing.Point(153, 15);
+            chkStats.Location = new System.Drawing.Point(359, 15);
             chkStats.Name = "chkStats";
             chkStats.Size = new System.Drawing.Size(122, 130);
             chkStats.TabIndex = 23;
@@ -248,17 +297,26 @@ namespace HSR_SIM_GUI
             BtnGo.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             BtnGo.Location = new System.Drawing.Point(351, 169);
             BtnGo.Name = "BtnGo";
-            BtnGo.Size = new System.Drawing.Size(84, 23);
+            BtnGo.Size = new System.Drawing.Size(262, 23);
             BtnGo.TabIndex = 24;
             BtnGo.Text = "GO";
             BtnGo.UseVisualStyleBackColor = true;
             BtnGo.Click += BtnGo_Click;
             // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new System.Drawing.Point(242, 15);
+            label8.Name = "label8";
+            label8.Size = new System.Drawing.Size(87, 15);
+            label8.TabIndex = 36;
+            label8.Text = "Load stat table:";
+            // 
             // StatCheck
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(800, 816);
+            ClientSize = new System.Drawing.Size(978, 816);
             Controls.Add(BtnGo);
             Controls.Add(groupBox1);
             Controls.Add(chkProfiles);
@@ -307,5 +365,10 @@ namespace HSR_SIM_GUI
         private System.Windows.Forms.DataGridView dgStatUpgrades;
         private System.Windows.Forms.DataGridViewTextBoxColumn propClmn;
         private System.Windows.Forms.DataGridViewTextBoxColumn valClmn;
+        private System.Windows.Forms.Button btnLoadSubstats;
+        private System.Windows.Forms.Button btnMainStats;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.ComboBox cbStatToReplace;
+        private System.Windows.Forms.Label label8;
     }
 }
