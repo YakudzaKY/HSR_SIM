@@ -797,12 +797,21 @@ namespace HSR_SIM_GUI
         private void btnImport_Click(object sender, EventArgs e)
         {
             Dictionary<int, KeyValuePair<string, string>> keyVal = GetValuesFromScreen();
+            foreach (Control ctrl in gbPlus.Controls)
+            {
+                ctrl.Text = string.Empty;
+            }
+            foreach (Control ctrl in gbMinus.Controls)
+            {
+                ctrl.Text = string.Empty;
+            }
             for (int i = 0; i < keyVal.Count; i++)
             {
                 gbMinus.Controls.Find($"cbMinusStat{i}", false).First().Text = keyVal[i].Key;
                 gbMinus.Controls.Find($"txtMinusStat{i}", false).First().Text = keyVal[i].Value;
             }
 
+            return;
             for (int i = 0; i < keyVal.Count; i++)
             {
                 gbPlus.Controls.Find($"cbPlusStat{i}", false).First().Text = keyVal[i].Key;
