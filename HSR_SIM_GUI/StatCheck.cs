@@ -19,18 +19,83 @@ using static HSR_SIM_GUI.StatCheck;
 using static HSR_SIM_GUI.Utils;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Collections;
+using System.Drawing.Imaging;
 using System.Drawing.Text;
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using HSR_SIM_LIB.Utils;
 using ImageMagick;
 using HSR_SIM_LIB.TurnBasedClasses;
+using Tesseract;
 using static HSR_SIM_LIB.Worker;
-
-
 namespace HSR_SIM_GUI
 {
 
     public partial class StatCheck : Form
     {
+        [DllImport("user32.dll")]
+        static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
+        [StructLayout(LayoutKind.Sequential)]
+        struct CURSORINFO
+        {
+            public Int32 cbSize;
+            public Int32 flags;
+            public IntPtr hCursor;
+            public POINTAPI ptScreenPos;
+        }
+        [StructLayout(LayoutKind.Sequential)]
+        struct POINTAPI
+        {
+            public int x;
+            public int y;
+        }
+
+        [DllImport("user32.dll")]
+        static extern bool GetCursorInfo(out CURSORINFO pci);
+
+        [DllImport("user32.dll")]
+        static extern bool DrawIcon(IntPtr hDC, int X, int Y, IntPtr hIcon);
+
+        const Int32 CURSOR_SHOWING = 0x00000001;
+
+        public static Bitmap CaptureScreen(bool CaptureMouse)
+        {
+            Bitmap result = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height, PixelFormat.Format24bppRgb);
+
+            try
+            {
+                using (Graphics g = Graphics.FromImage(result))
+                {
+                    g.CopyFromScreen(0, 0, 0, 0, Screen.PrimaryScreen.Bounds.Size, CopyPixelOperation.SourceCopy);
+
+                    if (CaptureMouse)
+                    {
+                        CURSORINFO pci;
+                        pci.cbSize = System.Runtime.InteropServices.Marshal.SizeOf(typeof(CURSORINFO));
+
+                        if (GetCursorInfo(out pci))
+                        {
+                            if (pci.flags == CURSOR_SHOWING)
+                            {
+                                DrawIcon(g.GetHdc(), pci.ptScreenPos.x, pci.ptScreenPos.y, pci.hCursor);
+                                g.ReleaseHdc();
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                result = null;
+            }
+
+            return result;
+        }
+
         public class ThreadWork
         {
 
@@ -281,6 +346,13 @@ namespace HSR_SIM_GUI
             ,{ "imaginary_dmg_prc", "0,021773" }
         };
 
+        private bool isDown;
+        private int initialX;
+        private int initialY;
+        private Rectangle selectRect;
+
+        System.Drawing.Graphics formGraphics;
+
         private void LoadStatTable(Dictionary<string, string> table)
         {
             cbStatToReplace.Items.Clear();
@@ -313,6 +385,45 @@ namespace HSR_SIM_GUI
             NmbThreadsCount.Value = Environment.ProcessorCount - 2;
             mainThread = null;
             reloadProfileCharacters();
+
+
+
+            //replace calc items
+            var mainQuery = (from p in subStatsUpgrades.Keys select p)
+                .Union(from p in mainStatsUpgrades.Keys select p)
+                .Distinct();
+            List<string> stats = mainQuery.ToList();
+            int startX = 10;
+            int startY = 15;
+            for (int i = 0; i < 5; i++)
+            {
+                foreach (string str in new ArrayList() { "Minus", "Plus" })
+                {
+                    ComboBox newCb = new ComboBox()
+                    { Name = $"cb{str}Stat{i:d}", Location = new Point(startX, startY + 20 * i), Width = 100 };
+                    TextBox tbBox = new TextBox()
+                    {
+                        Name = $"txt{str}Stat{i:d}",
+                        Location = new Point(startX + newCb.Width + 10, startY + 20 * i),
+                        Width = 50
+                    };
+                    foreach (string statItem in stats)
+                    {
+                        newCb.Items.Add(statItem);
+                    }
+                    newCb.Text = IniF.IniReadValue("StatCheckForm", newCb.Name);
+                    newCb.TabIndex = i;
+                    tbBox.Text = IniF.IniReadValue("StatCheckForm", tbBox.Name);
+                    tbBox.TabIndex = i;
+                    gbGearReplace.Controls.Find($"gb{str}", false).First().Controls.Add(newCb);
+                    gbGearReplace.Controls.Find($"gb{str}", false).First().Controls.Add(tbBox);
+
+                }
+
+
+
+            }
+
             Utils.ApplyDarkLightTheme(this);
         }
 
@@ -330,8 +441,15 @@ namespace HSR_SIM_GUI
             return 0;
         }
 
+        private double ExctractDoubleVal(string inputStr)
+        {
+            inputStr = inputStr.Replace(".", ",");
+            return inputStr.EndsWith("%") ?
+                double.Parse(inputStr.Substring(0, inputStr.Length - 1)) / 100 : double.Parse(inputStr);
+
+        }
         //get Stat mods by checked item(one mod atm)
-        private List<Worker.RStatMod> GetStatMods(string character, string item, int step, string minusItem)
+        private List<Worker.RStatMod> GetStatMods(string character, string item, int step, string minusItem = null)
         {
 
             List<Worker.RStatMod> res = new List<Worker.RStatMod>();
@@ -346,22 +464,60 @@ namespace HSR_SIM_GUI
         private List<RTask> getStatsSubTasks(string profile)
         {
             List<RTask> res = new List<RTask>();
-            if (!String.IsNullOrEmpty(cbCharacter.Text))
-                foreach (var item in chkStats.CheckedItems)
+            if (rbStatImpcat.Checked)
+            {
+                if (!String.IsNullOrEmpty(cbCharacter.Text))
+                    foreach (var item in chkStats.CheckedItems)
+                    {
+                        for (int i = 1; i <= nmbSteps.Value; i++)
+                            res.Add(new RTask()
+                            {
+                                Scenario = cbScenario.Text,
+                                Profile = profile,
+                                Iterations = (int)NmbIterations.Value,
+                                StatMods = GetStatMods(cbCharacter.Text, (string)item,
+                                    i * (int)nmbUpgradesPerStep.Value, cbStatToReplace.Text)
+                            });
+                    }
+            }
+            else if (rbGearReplace.Checked)
+            {
+                if (!String.IsNullOrEmpty(cbCharacterGrp.Text))
                 {
-                    for (int i = 1; i <= nmbSteps.Value; i++)
+                    List<RStatMod> statModList = new List<RStatMod>();
+                    for (int i = 0; i < 5; i++)
+                    {
+                        string statName = gbMinus.Controls.Find($"cbMinusStat{i}", false).First().Text;
+                        string statVal = gbMinus.Controls.Find($"txtMinusStat{i}", false).First().Text;
+                        if (!string.IsNullOrEmpty(statName) && !string.IsNullOrEmpty(statVal))
+                            statModList.Add(new RStatMod() { Character = cbCharacterGrp.Text, Stat = statName, Step = 1, Val = -ExctractDoubleVal(statVal) });
+                    }
+                    for (int i = 0; i < 5; i++)
+                    {
+                        string statName = gbPlus.Controls.Find($"cbPlusStat{i}", false).First().Text;
+                        string statVal = gbPlus.Controls.Find($"txtPlusStat{i}", false).First().Text;
+                        if (!string.IsNullOrEmpty(statName) && !string.IsNullOrEmpty(statVal))
+                            statModList.Add(new RStatMod() { Character = cbCharacterGrp.Text, Stat = statName, Step = 1, Val = ExctractDoubleVal(statVal) });
+                    }
+
+                    if (statModList.Count > 0)
+                    {
+                        statModList.Insert(0, new RStatMod() { Stat = "NEW GEAR", Step = 1 });
                         res.Add(new RTask()
                         {
                             Scenario = cbScenario.Text,
                             Profile = profile,
                             Iterations = (int)NmbIterations.Value,
-                            StatMods = GetStatMods(cbCharacter.Text, (string)item, i * (int)nmbUpgradesPerStep.Value, cbStatToReplace.Text)
+                            StatMods = statModList
                         });
+                    }
                 }
+            }
             return res;
         }
         private void BtnGo_Click(object sender, EventArgs e)
         {
+            SaveGearReplaceValues();
             if (mainThread?.IsAlive ?? false)
                 return;
             BtnGo.Enabled = false;
@@ -559,6 +715,7 @@ namespace HSR_SIM_GUI
         public void reloadProfileCharacters()
         {
             cbCharacter.Items.Clear();
+            cbCharacterGrp.Items.Clear();
             foreach (var item in chkProfiles.CheckedItems)
             {
 
@@ -567,6 +724,12 @@ namespace HSR_SIM_GUI
                 cbCharacter.Items.AddRange(units.Where(x => !cbCharacter.Items.Contains(x.Name)).Select(x => x.Name).ToArray());
 
             }
+
+            for (int i = 0; i < cbCharacter.Items.Count; i++)
+            {
+                cbCharacterGrp.Items.Add(cbCharacter.Items[i]);
+            }
+
         }
 
         private void chkProfiles_ItemCheck(object sender, ItemCheckEventArgs e)
@@ -598,6 +761,143 @@ namespace HSR_SIM_GUI
         private void label7_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void setCalcVisible()
+        {
+            gbStatImpcat.Visible = rbStatImpcat.Checked;
+            gbGearReplace.Visible = !gbStatImpcat.Visible;
+        }
+        private void radioButton2_CheckedChanged(object sender, EventArgs e)
+        {
+            setCalcVisible();
+        }
+
+        private void radioButton1_CheckedChanged(object sender, EventArgs e)
+        {
+            setCalcVisible();
+        }
+
+        private void SaveGearReplaceValues()
+        {
+            foreach (Control ctrl in gbMinus.Controls)
+            {
+                IniF.IniWriteValue("StatCheckForm", ctrl.Name, ctrl.Text);
+            }
+            foreach (Control ctrl in gbPlus.Controls)
+            {
+                IniF.IniWriteValue("StatCheckForm", ctrl.Name, ctrl.Text);
+            }
+        }
+        private void StatCheck_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            SaveGearReplaceValues();
+        }
+
+        private void btnImport_Click(object sender, EventArgs e)
+        {
+            Dictionary<int, KeyValuePair<string, string>> keyVal = GetValuesFromScreen();
+            for (int i = 0; i < keyVal.Count; i++)
+            {
+                gbMinus.Controls.Find($"cbMinusStat{i}", false).First().Text = keyVal[i].Key;
+                gbMinus.Controls.Find($"txtMinusStat{i}", false).First().Text = keyVal[i].Value;
+            }
+
+            for (int i = 0; i < keyVal.Count; i++)
+            {
+                gbPlus.Controls.Find($"cbPlusStat{i}", false).First().Text = keyVal[i].Key;
+                gbPlus.Controls.Find($"txtPlusStat{i}", false).First().Text = keyVal[i].Value;
+            }
+        }
+
+        private Dictionary<int, KeyValuePair<string, string>> GetValuesFromScreen()
+        {
+            Dictionary<int, KeyValuePair<string, string>> res = new Dictionary<int, KeyValuePair<string, string>>();
+            SetForegroundWindow(FindWindow(null, "Honkai: Star Rail"));
+
+            Bitmap hsrScreen = CaptureScreen(false);
+            using (var form = new Form())
+            {
+                form.Size = hsrScreen.Size;
+                PictureBox pictureBox1 = new PictureBox();
+                using Graphics gfx = Graphics.FromImage(hsrScreen);
+                gfx.DrawString("SELECT TEXT PARSE AREA(HOLD DOWN MOUSE AND MOVE)", new("Tahoma", 13, FontStyle.Bold), new SolidBrush(Color.Red), new PointF(hsrScreen.Width / 3, 150));
+                pictureBox1.Size = hsrScreen.Size;
+                pictureBox1.Image = hsrScreen;
+
+
+                form.Controls.Add(pictureBox1);
+
+
+
+                form.FormBorderStyle = FormBorderStyle.None;
+                pictureBox1.MouseMove += PictureBox_MouseMove;
+                pictureBox1.MouseDown += PictureBox_MouseDown;
+                pictureBox1.MouseUp += PictureBox_MouseUp;
+                SetForegroundWindow(form.Handle);
+                form.ShowDialog();
+                hsrScreen = hsrScreen.Clone(selectRect, hsrScreen.PixelFormat);
+                SetForegroundWindow(this.Handle);
+
+                //todo clear stats values and names
+                using (var engine = new TesseractEngine(AppDomain.CurrentDomain.BaseDirectory + "tessdata", "rus", EngineMode.Default))
+                {
+                    using (var img = PixConverter.ToPix(hsrScreen))
+                    {
+                        using (var page = engine.Process(img))
+                        {
+                            var text = page.GetText();
+                            text = text.Replace("\n\n", "\n");
+                            if (text.EndsWith("\n"))
+                                text = text.Substring(0, text.Length - 1);
+
+                            List<string> strings = text.Split('\n').ToList();
+                            int halfOfStrings = (int)(Math.Floor((double)strings.Count / 2));
+                            for (int i = 0; i < halfOfStrings; i++)
+                            {
+                                res.Add(i, new KeyValuePair<string, string>(strings[i], strings[i + halfOfStrings]));
+                            }
+                            // text variable contains a string with all words found
+                        }
+                    }
+                }
+
+            }
+
+            return res;
+        }
+
+        private void PictureBox_MouseUp(object sender, MouseEventArgs e)
+        {
+            isDown = false;
+
+
+            if (selectRect.Height > 0 && selectRect.Width > 0)
+                ((Form)((Control)sender).Parent)?.Close();
+        }
+
+        private void PictureBox_MouseDown(object sender, MouseEventArgs e)
+        {
+            isDown = true;
+            initialX = e.X;
+            initialY = e.Y;
+        }
+
+        private void PictureBox_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (isDown == true)
+            {
+                ((Control)sender).Refresh();
+                Pen drwaPen = new Pen(Color.Red, 3);
+                int width = e.X - initialX, height = e.Y - initialY;
+                selectRect = new Rectangle(Math.Min(e.X, initialX),
+                   Math.Min(e.Y, initialY),
+                   Math.Abs(e.X - initialX),
+                   Math.Abs(e.Y - initialY));
+
+                formGraphics = ((Control)sender).CreateGraphics();
+                formGraphics.DrawRectangle(drwaPen, selectRect);
+            }
         }
     }
 }

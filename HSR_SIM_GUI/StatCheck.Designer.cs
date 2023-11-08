@@ -42,15 +42,18 @@ namespace HSR_SIM_GUI
             label4 = new System.Windows.Forms.Label();
             PB1 = new System.Windows.Forms.ProgressBar();
             pnlCharts = new System.Windows.Forms.Panel();
-            dgStatUpgrades = new System.Windows.Forms.DataGridView();
-            propClmn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            valClmn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             chkProfiles = new System.Windows.Forms.CheckedListBox();
-            groupBox1 = new System.Windows.Forms.GroupBox();
+            BtnGo = new System.Windows.Forms.Button();
+            flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+            gbStatImpcat = new System.Windows.Forms.GroupBox();
+            label8 = new System.Windows.Forms.Label();
             cbStatToReplace = new System.Windows.Forms.ComboBox();
             label7 = new System.Windows.Forms.Label();
             btnMainStats = new System.Windows.Forms.Button();
             btnLoadSubstats = new System.Windows.Forms.Button();
+            dgStatUpgrades = new System.Windows.Forms.DataGridView();
+            propClmn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            valClmn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             label6 = new System.Windows.Forms.Label();
             nmbSteps = new System.Windows.Forms.NumericUpDown();
             label5 = new System.Windows.Forms.Label();
@@ -58,14 +61,24 @@ namespace HSR_SIM_GUI
             cbCharacter = new System.Windows.Forms.ComboBox();
             label1 = new System.Windows.Forms.Label();
             chkStats = new System.Windows.Forms.CheckedListBox();
-            BtnGo = new System.Windows.Forms.Button();
-            label8 = new System.Windows.Forms.Label();
+            gbGearReplace = new System.Windows.Forms.GroupBox();
+            gbPlus = new System.Windows.Forms.GroupBox();
+            gbMinus = new System.Windows.Forms.GroupBox();
+            cbCharacterGrp = new System.Windows.Forms.ComboBox();
+            label9 = new System.Windows.Forms.Label();
+            panel1 = new System.Windows.Forms.Panel();
+            rbGearReplace = new System.Windows.Forms.RadioButton();
+            rbStatImpcat = new System.Windows.Forms.RadioButton();
+            btnImport = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)NmbIterations).BeginInit();
             ((System.ComponentModel.ISupportInitialize)NmbThreadsCount).BeginInit();
+            flowLayoutPanel1.SuspendLayout();
+            gbStatImpcat.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgStatUpgrades).BeginInit();
-            groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nmbSteps).BeginInit();
             ((System.ComponentModel.ISupportInitialize)nmbUpgradesPerStep).BeginInit();
+            gbGearReplace.SuspendLayout();
+            panel1.SuspendLayout();
             SuspendLayout();
             // 
             // label2
@@ -125,7 +138,7 @@ namespace HSR_SIM_GUI
             PB1.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             PB1.Location = new System.Drawing.Point(12, 166);
             PB1.Name = "PB1";
-            PB1.Size = new System.Drawing.Size(954, 29);
+            PB1.Size = new System.Drawing.Size(1141, 29);
             PB1.TabIndex = 18;
             // 
             // pnlCharts
@@ -134,8 +147,106 @@ namespace HSR_SIM_GUI
             pnlCharts.AutoScroll = true;
             pnlCharts.Location = new System.Drawing.Point(12, 201);
             pnlCharts.Name = "pnlCharts";
-            pnlCharts.Size = new System.Drawing.Size(954, 607);
+            pnlCharts.Size = new System.Drawing.Size(1141, 607);
             pnlCharts.TabIndex = 20;
+            // 
+            // chkProfiles
+            // 
+            chkProfiles.FormattingEnabled = true;
+            chkProfiles.Location = new System.Drawing.Point(134, 9);
+            chkProfiles.Name = "chkProfiles";
+            chkProfiles.Size = new System.Drawing.Size(120, 148);
+            chkProfiles.TabIndex = 21;
+            chkProfiles.ItemCheck += chkProfiles_ItemCheck;
+            // 
+            // BtnGo
+            // 
+            BtnGo.Location = new System.Drawing.Point(12, 137);
+            BtnGo.Name = "BtnGo";
+            BtnGo.Size = new System.Drawing.Size(116, 23);
+            BtnGo.TabIndex = 24;
+            BtnGo.Text = "GO";
+            BtnGo.UseVisualStyleBackColor = true;
+            BtnGo.Click += BtnGo_Click;
+            // 
+            // flowLayoutPanel1
+            // 
+            flowLayoutPanel1.AutoSize = true;
+            flowLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            flowLayoutPanel1.Controls.Add(gbStatImpcat);
+            flowLayoutPanel1.Controls.Add(gbGearReplace);
+            flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            flowLayoutPanel1.Location = new System.Drawing.Point(433, 0);
+            flowLayoutPanel1.Name = "flowLayoutPanel1";
+            flowLayoutPanel1.Size = new System.Drawing.Size(729, 314);
+            flowLayoutPanel1.TabIndex = 25;
+            // 
+            // gbStatImpcat
+            // 
+            gbStatImpcat.Controls.Add(label8);
+            gbStatImpcat.Controls.Add(cbStatToReplace);
+            gbStatImpcat.Controls.Add(label7);
+            gbStatImpcat.Controls.Add(btnMainStats);
+            gbStatImpcat.Controls.Add(btnLoadSubstats);
+            gbStatImpcat.Controls.Add(dgStatUpgrades);
+            gbStatImpcat.Controls.Add(label6);
+            gbStatImpcat.Controls.Add(nmbSteps);
+            gbStatImpcat.Controls.Add(label5);
+            gbStatImpcat.Controls.Add(nmbUpgradesPerStep);
+            gbStatImpcat.Controls.Add(cbCharacter);
+            gbStatImpcat.Controls.Add(label1);
+            gbStatImpcat.Controls.Add(chkStats);
+            gbStatImpcat.Location = new System.Drawing.Point(3, 3);
+            gbStatImpcat.Name = "gbStatImpcat";
+            gbStatImpcat.Size = new System.Drawing.Size(723, 151);
+            gbStatImpcat.TabIndex = 24;
+            gbStatImpcat.TabStop = false;
+            gbStatImpcat.Text = "Stat impact calc";
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new System.Drawing.Point(242, 15);
+            label8.Name = "label8";
+            label8.Size = new System.Drawing.Size(87, 15);
+            label8.TabIndex = 36;
+            label8.Text = "Load stat table:";
+            // 
+            // cbStatToReplace
+            // 
+            cbStatToReplace.FormattingEnabled = true;
+            cbStatToReplace.Items.AddRange(new object[] { "character" });
+            cbStatToReplace.Location = new System.Drawing.Point(128, 80);
+            cbStatToReplace.Name = "cbStatToReplace";
+            cbStatToReplace.Size = new System.Drawing.Size(111, 23);
+            cbStatToReplace.TabIndex = 35;
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new System.Drawing.Point(128, 62);
+            label7.Name = "label7";
+            label7.Size = new System.Drawing.Size(82, 15);
+            label7.TabIndex = 34;
+            label7.Text = "Stat to replace";
+            // 
+            // btnMainStats
+            // 
+            btnMainStats.Location = new System.Drawing.Point(242, 63);
+            btnMainStats.Name = "btnMainStats";
+            btnMainStats.Size = new System.Drawing.Size(111, 23);
+            btnMainStats.TabIndex = 33;
+            btnMainStats.Text = "mainstats";
+            btnMainStats.UseVisualStyleBackColor = true;
+            // 
+            // btnLoadSubstats
+            // 
+            btnLoadSubstats.Location = new System.Drawing.Point(242, 34);
+            btnLoadSubstats.Name = "btnLoadSubstats";
+            btnLoadSubstats.Size = new System.Drawing.Size(111, 23);
+            btnLoadSubstats.TabIndex = 32;
+            btnLoadSubstats.Text = "substats";
+            btnLoadSubstats.UseVisualStyleBackColor = true;
             // 
             // dgStatUpgrades
             // 
@@ -160,76 +271,6 @@ namespace HSR_SIM_GUI
             // 
             valClmn.HeaderText = "Value";
             valClmn.Name = "valClmn";
-            // 
-            // chkProfiles
-            // 
-            chkProfiles.FormattingEnabled = true;
-            chkProfiles.Location = new System.Drawing.Point(134, 9);
-            chkProfiles.Name = "chkProfiles";
-            chkProfiles.Size = new System.Drawing.Size(120, 148);
-            chkProfiles.TabIndex = 21;
-            chkProfiles.ItemCheck += chkProfiles_ItemCheck;
-            // 
-            // groupBox1
-            // 
-            groupBox1.Controls.Add(label8);
-            groupBox1.Controls.Add(cbStatToReplace);
-            groupBox1.Controls.Add(label7);
-            groupBox1.Controls.Add(btnMainStats);
-            groupBox1.Controls.Add(btnLoadSubstats);
-            groupBox1.Controls.Add(dgStatUpgrades);
-            groupBox1.Controls.Add(label6);
-            groupBox1.Controls.Add(nmbSteps);
-            groupBox1.Controls.Add(label5);
-            groupBox1.Controls.Add(nmbUpgradesPerStep);
-            groupBox1.Controls.Add(cbCharacter);
-            groupBox1.Controls.Add(label1);
-            groupBox1.Controls.Add(chkStats);
-            groupBox1.Location = new System.Drawing.Point(260, 6);
-            groupBox1.Name = "groupBox1";
-            groupBox1.Size = new System.Drawing.Size(713, 151);
-            groupBox1.TabIndex = 23;
-            groupBox1.TabStop = false;
-            groupBox1.Text = "Stat weight calc";
-            // 
-            // cbStatToReplace
-            // 
-            cbStatToReplace.FormattingEnabled = true;
-            cbStatToReplace.Items.AddRange(new object[] { "character" });
-            cbStatToReplace.Location = new System.Drawing.Point(128, 80);
-            cbStatToReplace.Name = "cbStatToReplace";
-            cbStatToReplace.Size = new System.Drawing.Size(111, 23);
-            cbStatToReplace.TabIndex = 35;
-            // 
-            // label7
-            // 
-            label7.AutoSize = true;
-            label7.Location = new System.Drawing.Point(128, 62);
-            label7.Name = "label7";
-            label7.Size = new System.Drawing.Size(82, 15);
-            label7.TabIndex = 34;
-            label7.Text = "Stat to replace";
-            label7.Click += label7_Click;
-            // 
-            // btnMainStats
-            // 
-            btnMainStats.Location = new System.Drawing.Point(242, 63);
-            btnMainStats.Name = "btnMainStats";
-            btnMainStats.Size = new System.Drawing.Size(111, 23);
-            btnMainStats.TabIndex = 33;
-            btnMainStats.Text = "mainstats";
-            btnMainStats.UseVisualStyleBackColor = true;
-            btnMainStats.Click += btnMainStats_Click;
-            // 
-            // btnLoadSubstats
-            // 
-            btnLoadSubstats.Location = new System.Drawing.Point(242, 34);
-            btnLoadSubstats.Name = "btnLoadSubstats";
-            btnLoadSubstats.Size = new System.Drawing.Size(111, 23);
-            btnLoadSubstats.TabIndex = 32;
-            btnLoadSubstats.Text = "substats";
-            btnLoadSubstats.UseVisualStyleBackColor = true;
-            btnLoadSubstats.Click += btnLoadSubstats_Click;
             // 
             // label6
             // 
@@ -292,33 +333,108 @@ namespace HSR_SIM_GUI
             chkStats.Size = new System.Drawing.Size(122, 130);
             chkStats.TabIndex = 23;
             // 
-            // BtnGo
+            // gbGearReplace
             // 
-            BtnGo.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            BtnGo.Location = new System.Drawing.Point(351, 169);
-            BtnGo.Name = "BtnGo";
-            BtnGo.Size = new System.Drawing.Size(262, 23);
-            BtnGo.TabIndex = 24;
-            BtnGo.Text = "GO";
-            BtnGo.UseVisualStyleBackColor = true;
-            BtnGo.Click += BtnGo_Click;
+            gbGearReplace.Controls.Add(btnImport);
+            gbGearReplace.Controls.Add(gbPlus);
+            gbGearReplace.Controls.Add(gbMinus);
+            gbGearReplace.Controls.Add(cbCharacterGrp);
+            gbGearReplace.Controls.Add(label9);
+            gbGearReplace.Location = new System.Drawing.Point(3, 160);
+            gbGearReplace.Name = "gbGearReplace";
+            gbGearReplace.Size = new System.Drawing.Size(723, 151);
+            gbGearReplace.TabIndex = 25;
+            gbGearReplace.TabStop = false;
+            gbGearReplace.Text = "Gear repleace calc";
+            gbGearReplace.Visible = false;
             // 
-            // label8
+            // gbPlus
             // 
-            label8.AutoSize = true;
-            label8.Location = new System.Drawing.Point(242, 15);
-            label8.Name = "label8";
-            label8.Size = new System.Drawing.Size(87, 15);
-            label8.TabIndex = 36;
-            label8.Text = "Load stat table:";
+            gbPlus.Location = new System.Drawing.Point(434, 6);
+            gbPlus.Name = "gbPlus";
+            gbPlus.Size = new System.Drawing.Size(200, 139);
+            gbPlus.TabIndex = 29;
+            gbPlus.TabStop = false;
+            gbPlus.Text = "STATS EQUIP";
+            // 
+            // gbMinus
+            // 
+            gbMinus.Location = new System.Drawing.Point(198, 6);
+            gbMinus.Name = "gbMinus";
+            gbMinus.Size = new System.Drawing.Size(200, 139);
+            gbMinus.TabIndex = 28;
+            gbMinus.TabStop = false;
+            gbMinus.Text = "STATS UNEQUIP";
+            // 
+            // cbCharacterGrp
+            // 
+            cbCharacterGrp.FormattingEnabled = true;
+            cbCharacterGrp.Items.AddRange(new object[] { "character" });
+            cbCharacterGrp.Location = new System.Drawing.Point(9, 38);
+            cbCharacterGrp.Name = "cbCharacterGrp";
+            cbCharacterGrp.Size = new System.Drawing.Size(165, 23);
+            cbCharacterGrp.TabIndex = 27;
+            // 
+            // label9
+            // 
+            label9.AutoSize = true;
+            label9.Location = new System.Drawing.Point(9, 20);
+            label9.Name = "label9";
+            label9.Size = new System.Drawing.Size(58, 15);
+            label9.TabIndex = 26;
+            label9.Text = "Character";
+            // 
+            // panel1
+            // 
+            panel1.Controls.Add(rbGearReplace);
+            panel1.Controls.Add(rbStatImpcat);
+            panel1.Location = new System.Drawing.Point(264, 6);
+            panel1.Name = "panel1";
+            panel1.Size = new System.Drawing.Size(163, 154);
+            panel1.TabIndex = 26;
+            // 
+            // rbGearReplace
+            // 
+            rbGearReplace.AutoSize = true;
+            rbGearReplace.Location = new System.Drawing.Point(20, 47);
+            rbGearReplace.Name = "rbGearReplace";
+            rbGearReplace.Size = new System.Drawing.Size(120, 19);
+            rbGearReplace.TabIndex = 1;
+            rbGearReplace.Text = "Gear repleace calc";
+            rbGearReplace.UseVisualStyleBackColor = true;
+            rbGearReplace.CheckedChanged += radioButton2_CheckedChanged;
+            // 
+            // rbStatImpcat
+            // 
+            rbStatImpcat.AutoSize = true;
+            rbStatImpcat.Checked = true;
+            rbStatImpcat.Location = new System.Drawing.Point(20, 19);
+            rbStatImpcat.Name = "rbStatImpcat";
+            rbStatImpcat.Size = new System.Drawing.Size(109, 19);
+            rbStatImpcat.TabIndex = 0;
+            rbStatImpcat.TabStop = true;
+            rbStatImpcat.Text = "Stat impact calc";
+            rbStatImpcat.UseVisualStyleBackColor = true;
+            rbStatImpcat.CheckedChanged += radioButton1_CheckedChanged;
+            // 
+            // btnImport
+            // 
+            btnImport.Location = new System.Drawing.Point(40, 110);
+            btnImport.Name = "btnImport";
+            btnImport.Size = new System.Drawing.Size(152, 35);
+            btnImport.TabIndex = 31;
+            btnImport.Text = "Import from screen>>";
+            btnImport.UseVisualStyleBackColor = true;
+            btnImport.Click += btnImport_Click;
             // 
             // StatCheck
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(978, 816);
+            ClientSize = new System.Drawing.Size(1165, 816);
+            Controls.Add(panel1);
+            Controls.Add(flowLayoutPanel1);
             Controls.Add(BtnGo);
-            Controls.Add(groupBox1);
             Controls.Add(chkProfiles);
             Controls.Add(pnlCharts);
             Controls.Add(PB1);
@@ -330,14 +446,20 @@ namespace HSR_SIM_GUI
             Controls.Add(cbScenario);
             Name = "StatCheck";
             Text = "Stat check";
+            FormClosing += StatCheck_FormClosing;
             Load += StatCheck_Load;
             ((System.ComponentModel.ISupportInitialize)NmbIterations).EndInit();
             ((System.ComponentModel.ISupportInitialize)NmbThreadsCount).EndInit();
+            flowLayoutPanel1.ResumeLayout(false);
+            gbStatImpcat.ResumeLayout(false);
+            gbStatImpcat.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgStatUpgrades).EndInit();
-            groupBox1.ResumeLayout(false);
-            groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)nmbSteps).EndInit();
             ((System.ComponentModel.ISupportInitialize)nmbUpgradesPerStep).EndInit();
+            gbGearReplace.ResumeLayout(false);
+            gbGearReplace.PerformLayout();
+            panel1.ResumeLayout(false);
+            panel1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -353,7 +475,17 @@ namespace HSR_SIM_GUI
         private System.Windows.Forms.ProgressBar PB1;
         private System.Windows.Forms.Panel pnlCharts;
         private System.Windows.Forms.CheckedListBox chkProfiles;
-        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Button BtnGo;
+        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
+        private System.Windows.Forms.GroupBox gbStatImpcat;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.ComboBox cbStatToReplace;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Button btnMainStats;
+        private System.Windows.Forms.Button btnLoadSubstats;
+        private System.Windows.Forms.DataGridView dgStatUpgrades;
+        private System.Windows.Forms.DataGridViewTextBoxColumn propClmn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn valClmn;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.NumericUpDown nmbSteps;
         private System.Windows.Forms.Label label5;
@@ -361,14 +493,14 @@ namespace HSR_SIM_GUI
         private System.Windows.Forms.ComboBox cbCharacter;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckedListBox chkStats;
-        private System.Windows.Forms.Button BtnGo;
-        private System.Windows.Forms.DataGridView dgStatUpgrades;
-        private System.Windows.Forms.DataGridViewTextBoxColumn propClmn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn valClmn;
-        private System.Windows.Forms.Button btnLoadSubstats;
-        private System.Windows.Forms.Button btnMainStats;
-        private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.ComboBox cbStatToReplace;
-        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.GroupBox gbGearReplace;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.RadioButton rbGearReplace;
+        private System.Windows.Forms.RadioButton rbStatImpcat;
+        private System.Windows.Forms.ComboBox cbCharacterGrp;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.GroupBox gbPlus;
+        private System.Windows.Forms.GroupBox gbMinus;
+        private System.Windows.Forms.Button btnImport;
     }
 }
