@@ -10,6 +10,416 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="DATA\api.txt" />
+    <None Remove="DATA\Images\Abyss_Flower_CD.webp" />
+    <None Remove="DATA\Images\Blood.png" />
+    <None Remove="DATA\Images\BreakShield.png" />
+    <None Remove="DATA\Images\BreakShieldDot.png" />
+    <None Remove="DATA\Images\CC.png" />
+    <None Remove="DATA\Images\Character\Arlan.webp" />
+    <None Remove="DATA\Images\Character\Asta.webp" />
+    <None Remove="DATA\Images\Character\Blade.webp" />
+    <None Remove="DATA\Images\Character\Bronya.webp" />
+    <None Remove="DATA\Images\Character\Clara.webp" />
+    <None Remove="DATA\Images\Character\Dan Heng • Imbibitor Lunae.webp" />
+    <None Remove="DATA\Images\Character\Dan Heng.webp" />
+    <None Remove="DATA\Images\Character\Gepard.webp" />
+    <None Remove="DATA\Images\Character\Herta.webp" />
+    <None Remove="DATA\Images\Character\Himeko.webp" />
+    <None Remove="DATA\Images\Character\Hook.webp" />
+    <None Remove="DATA\Images\Character\Jing Yuan.webp" />
+    <None Remove="DATA\Images\Character\Jingliu.webp" />
+    <None Remove="DATA\Images\Character\Kafka.webp" />
+    <None Remove="DATA\Images\Character\Luka.webp" />
+    <None Remove="DATA\Images\Character\Luocha.webp" />
+    <None Remove="DATA\Images\Character\Lynx.webp" />
+    <None Remove="DATA\Images\Character\March 7th.webp" />
+    <None Remove="DATA\Images\Character\Natasha.webp" />
+    <None Remove="DATA\Images\Character\Pela.webp" />
+    <None Remove="DATA\Images\Character\Qingque.webp" />
+    <None Remove="DATA\Images\Character\Sampo.webp" />
+    <None Remove="DATA\Images\Character\Serval.webp" />
+    <None Remove="DATA\Images\Character\Silver Wolf.webp" />
+    <None Remove="DATA\Images\Character\Sushang.webp" />
+    <None Remove="DATA\Images\Character\Tingyun.webp" />
+    <None Remove="DATA\Images\Character\Trailblazer %28Destruction%29.webp" />
+    <None Remove="DATA\Images\Character\Welt.webp" />
+    <None Remove="DATA\Images\Character\Yanqing.webp" />
+    <None Remove="DATA\Images\Character\Yukong.webp" />
+    <None Remove="DATA\Images\defeat.png" />
+    <None Remove="DATA\Images\DoT.png" />
+    <None Remove="DATA\Images\EffAbilityTypeBoost.webp" />
+    <None Remove="DATA\Images\EffAllDamageBoost.webp" />
+    <None Remove="DATA\Images\EffAtkPrc.webp" />
+    <None Remove="DATA\Images\EffBarrier.webp" />
+    <None Remove="DATA\Images\EffBleed.webp" />
+    <None Remove="DATA\Images\EffBurn.webp" />
+    <None Remove="DATA\Images\EffCritPrc.webp" />
+    <None Remove="DATA\Images\EffEffectResPrc.webp" />
+    <None Remove="DATA\Images\EffEntanglement.webp" />
+    <None Remove="DATA\Images\EffFreeze.webp" />
+    <None Remove="DATA\Images\EffImprisonment.webp" />
+    <None Remove="DATA\Images\EffMaxHpPrc.webp" />
+    <None Remove="DATA\Images\EffReduceBAV.webp" />
+    <None Remove="DATA\Images\EffShield.webp" />
+    <None Remove="DATA\Images\EffShock.webp" />
+    <None Remove="DATA\Images\EffSpeedPrc.webp" />
+    <None Remove="DATA\Images\EffWindShear.webp" />
+    <None Remove="DATA\Images\fire.webp" />
+    <None Remove="DATA\Images\Gear\BelobogoftheArchitects.webp" />
+    <None Remove="DATA\Images\Gear\BrokenKeel.webp" />
+    <None Remove="DATA\Images\Gear\CelestialDifferentiator.webp" />
+    <None Remove="DATA\Images\Gear\FleetoftheAgeless.webp" />
+    <None Remove="DATA\Images\Gear\InertSalsotto.webp" />
+    <None Remove="DATA\Images\Gear\PanCosmicCommercialEnterprise.webp" />
+    <None Remove="DATA\Images\Gear\RutilantArena.webp" />
+    <None Remove="DATA\Images\Gear\SpaceSealingStation.webp" />
+    <None Remove="DATA\Images\Gear\SprightlyVonwacq.webp" />
+    <None Remove="DATA\Images\Gear\TaliaKingdomofBanditry.webp" />
+    <None Remove="DATA\Images\healing.png" />
+    <None Remove="DATA\Images\Hellscape.webp" />
+    <None Remove="DATA\Images\ice.webp" />
+    <None Remove="DATA\Images\Icon_Abyss_Flower.webp" />
+    <None Remove="DATA\Images\imaginary.webp" />
+    <None Remove="DATA\Images\lightning.webp" />
+    <None Remove="DATA\Images\next.png" />
+    <None Remove="DATA\Images\None.png" />
+    <None Remove="DATA\Images\NPC\Automaton Beetle.png" />
+    <None Remove="DATA\Images\NPC\AutomatonGrizzlyComplete.png" />
+    <None Remove="DATA\Images\NPC\Mara Struck Soldier.png" />
+    <None Remove="DATA\Images\NPC\Vagrant.png" />
+    <None Remove="DATA\Images\physical.webp" />
+    <None Remove="DATA\Images\quantum.webp" />
+    <None Remove="DATA\Images\replay.png" />
+    <None Remove="DATA\Images\roleHealer.png" />
+    <None Remove="DATA\Images\roleMainDPS.png" />
+    <None Remove="DATA\Images\roleSecondDps.png" />
+    <None Remove="DATA\Images\roleSupport.png" />
+    <None Remove="DATA\Images\roleThirdDps.png" />
+    <None Remove="DATA\Images\Scratch.png" />
+    <None Remove="DATA\Images\Special\Forgotten Hall.png" />
+    <None Remove="DATA\Images\Sword.png" />
+    <None Remove="DATA\Images\Traces\A2.png" />
+    <None Remove="DATA\Images\Traces\A4.png" />
+    <None Remove="DATA\Images\Traces\A6.png" />
+    <None Remove="DATA\Images\wind.webp" />
+    <None Remove="DATA\Other\GenerateLevelMultiplier.ods" />
+    <None Remove="DATA\Other\GenerateStats.ods" />
+    <None Remove="DATA\Scenario\Scenario1.xml" />
+    <None Remove="DATA\WarGear\NPC\Automaton Beetle.xml" />
+    <None Remove="DATA\WarGear\NPC\AutomatonGrizzlyComplete.xml" />
+    <None Remove="DATA\WarGear\NPC\Mara Struck Soldier.xml" />
+    <None Remove="DATA\WarGear\NPC\Vagrant.xml" />
+    <None Remove="DATA\WarGear\Special\Forgotten Hall.xml" />
+    <None Remove="tessdata\rus.traineddata" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="DATA\api.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Abyss_Flower_CD.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Blood.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\BreakShield.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\BreakShieldDot.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\CC.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Arlan.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Asta.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Blade.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Bronya.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Clara.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Dan Heng • Imbibitor Lunae.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Dan Heng.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Gepard.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Herta.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Himeko.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Hook.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Jing Yuan.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Jingliu.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Kafka.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Luka.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Luocha.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Lynx.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\March 7th.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Natasha.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Pela.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Qingque.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Sampo.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Serval.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Silver Wolf.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Sushang.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Tingyun.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Trailblazer (Destruction).webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Welt.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Yanqing.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Character\Yukong.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\defeat.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\DoT.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\EffAbilityTypeBoost.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\EffAllDamageBoost.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\EffAtkPrc.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\EffBarrier.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\EffBleed.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\EffBurn.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\EffCritPrc.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\EffEffectResPrc.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\EffEntanglement.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\EffFreeze.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\EffImprisonment.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\EffMaxHpPrc.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\EffReduceBAV.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\EffShield.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\EffShock.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\EffSpeedPrc.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\EffWindShear.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\fire.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Gear\BelobogoftheArchitects.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Gear\BrokenKeel.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Gear\CelestialDifferentiator.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Gear\FleetoftheAgeless.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Gear\InertSalsotto.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Gear\PanCosmicCommercialEnterprise.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Gear\RutilantArena.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Gear\SpaceSealingStation.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Gear\SprightlyVonwacq.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Gear\TaliaKingdomofBanditry.webp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\healing.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Hellscape.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\ice.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Icon_Abyss_Flower.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\imaginary.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\lightning.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\next.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\None.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\NPC\Automaton Beetle.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\NPC\AutomatonGrizzlyComplete.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\NPC\Mara Struck Soldier.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\NPC\Vagrant.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\physical.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\quantum.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\replay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\roleHealer.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\roleMainDPS.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\roleSecondDps.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\roleSupport.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\roleThirdDps.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Scratch.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Special\Forgotten Hall.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Sword.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Traces\A2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Traces\A4.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\Traces\A6.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Images\wind.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Other\GenerateLevelMultiplier.ods">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\Other\GenerateStats.ods" />
+    <Content Include="DATA\Scenario\Scenario1.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\WarGear\NPC\Automaton Beetle.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\WarGear\NPC\AutomatonGrizzlyComplete.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\WarGear\NPC\Mara Struck Soldier.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\WarGear\NPC\Vagrant.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DATA\WarGear\Special\Forgotten Hall.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="tessdata\rus.traineddata">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\HSR_SIM_LIB\HSR_SIM_LIB.csproj" />
   </ItemGroup>
   <ItemGroup>

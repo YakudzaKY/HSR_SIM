@@ -62,6 +62,8 @@ namespace HSR_SIM_GUI
             label1 = new System.Windows.Forms.Label();
             chkStats = new System.Windows.Forms.CheckedListBox();
             gbGearReplace = new System.Windows.Forms.GroupBox();
+            button1 = new System.Windows.Forms.Button();
+            btnImport = new System.Windows.Forms.Button();
             gbPlus = new System.Windows.Forms.GroupBox();
             gbMinus = new System.Windows.Forms.GroupBox();
             cbCharacterGrp = new System.Windows.Forms.ComboBox();
@@ -69,7 +71,6 @@ namespace HSR_SIM_GUI
             panel1 = new System.Windows.Forms.Panel();
             rbGearReplace = new System.Windows.Forms.RadioButton();
             rbStatImpcat = new System.Windows.Forms.RadioButton();
-            btnImport = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)NmbIterations).BeginInit();
             ((System.ComponentModel.ISupportInitialize)NmbThreadsCount).BeginInit();
             flowLayoutPanel1.SuspendLayout();
@@ -335,6 +336,7 @@ namespace HSR_SIM_GUI
             // 
             // gbGearReplace
             // 
+            gbGearReplace.Controls.Add(button1);
             gbGearReplace.Controls.Add(btnImport);
             gbGearReplace.Controls.Add(gbPlus);
             gbGearReplace.Controls.Add(gbMinus);
@@ -347,6 +349,26 @@ namespace HSR_SIM_GUI
             gbGearReplace.TabStop = false;
             gbGearReplace.Text = "Gear repleace calc";
             gbGearReplace.Visible = false;
+            // 
+            // button1
+            // 
+            button1.Location = new System.Drawing.Point(41, 119);
+            button1.Name = "button1";
+            button1.Size = new System.Drawing.Size(151, 26);
+            button1.TabIndex = 32;
+            button1.Text = "refresh rect";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
+            // 
+            // btnImport
+            // 
+            btnImport.Location = new System.Drawing.Point(41, 83);
+            btnImport.Name = "btnImport";
+            btnImport.Size = new System.Drawing.Size(151, 35);
+            btnImport.TabIndex = 31;
+            btnImport.Text = "Import from screen>>";
+            btnImport.UseVisualStyleBackColor = true;
+            btnImport.Click += btnImport_Click;
             // 
             // gbPlus
             // 
@@ -416,16 +438,6 @@ namespace HSR_SIM_GUI
             rbStatImpcat.Text = "Stat impact calc";
             rbStatImpcat.UseVisualStyleBackColor = true;
             rbStatImpcat.CheckedChanged += radioButton1_CheckedChanged;
-            // 
-            // btnImport
-            // 
-            btnImport.Location = new System.Drawing.Point(40, 110);
-            btnImport.Name = "btnImport";
-            btnImport.Size = new System.Drawing.Size(152, 35);
-            btnImport.TabIndex = 31;
-            btnImport.Text = "Import from screen>>";
-            btnImport.UseVisualStyleBackColor = true;
-            btnImport.Click += btnImport_Click;
             // 
             // StatCheck
             // 
@@ -502,5 +514,6 @@ namespace HSR_SIM_GUI
         private System.Windows.Forms.GroupBox gbPlus;
         private System.Windows.Forms.GroupBox gbMinus;
         private System.Windows.Forms.Button btnImport;
+        private System.Windows.Forms.Button button1;
     }
 }

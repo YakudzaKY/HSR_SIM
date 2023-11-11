@@ -21,8 +21,10 @@ using System.Windows.Forms.DataVisualization.Charting;
 using System.Collections;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Xml;
 using HSR_SIM_LIB.Utils;
 using ImageMagick;
 using HSR_SIM_LIB.TurnBasedClasses;
@@ -349,6 +351,8 @@ namespace HSR_SIM_GUI
         private bool isDown;
         private int initialX;
         private int initialY;
+        private int finishX;
+        private int finishY;
         private Rectangle selectRect;
 
         System.Drawing.Graphics formGraphics;
@@ -423,6 +427,11 @@ namespace HSR_SIM_GUI
 
 
             }
+
+            int.TryParse(IniF.IniReadValue("StatCheckForm", "initialX"), out initialX);
+            int.TryParse(IniF.IniReadValue("StatCheckForm", "initialY"), out initialY);
+            int.TryParse(IniF.IniReadValue("StatCheckForm", "finishX"), out finishX);
+            int.TryParse(IniF.IniReadValue("StatCheckForm", "finishY"), out finishY);
 
             Utils.ApplyDarkLightTheme(this);
         }
@@ -796,7 +805,7 @@ namespace HSR_SIM_GUI
 
         private void btnImport_Click(object sender, EventArgs e)
         {
-            Dictionary<int, KeyValuePair<string, string>> keyVal = GetValuesFromScreen();
+            Dictionary<int, RStatWordRec> keyVal = GetValuesFromScreen();
             foreach (Control ctrl in gbPlus.Controls)
             {
                 ctrl.Text = string.Empty;
@@ -811,7 +820,7 @@ namespace HSR_SIM_GUI
                 gbMinus.Controls.Find($"txtMinusStat{i}", false).First().Text = keyVal[i].Value;
             }
 
-            return;
+
             for (int i = 0; i < keyVal.Count; i++)
             {
                 gbPlus.Controls.Find($"cbPlusStat{i}", false).First().Text = keyVal[i].Key;
@@ -819,54 +828,110 @@ namespace HSR_SIM_GUI
             }
         }
 
-        private Dictionary<int, KeyValuePair<string, string>> GetValuesFromScreen()
+        private record RStatWordRec
         {
-            Dictionary<int, KeyValuePair<string, string>> res = new Dictionary<int, KeyValuePair<string, string>>();
+            public string Key { get; set; }
+            public string Value { get; set; }
+            public int listNum { get; set; }
+
+        }
+        private Dictionary<int, RStatWordRec> GetValuesFromScreen()
+        {
+            Dictionary<int, RStatWordRec> res = new Dictionary<int, RStatWordRec>();
             SetForegroundWindow(FindWindow(null, "Honkai: Star Rail"));
 
             Bitmap hsrScreen = CaptureScreen(false);
             using (var form = new Form())
             {
-                form.Size = hsrScreen.Size;
-                PictureBox pictureBox1 = new PictureBox();
-                using Graphics gfx = Graphics.FromImage(hsrScreen);
-                gfx.DrawString("SELECT TEXT PARSE AREA(HOLD DOWN MOUSE AND MOVE)", new("Tahoma", 13, FontStyle.Bold), new SolidBrush(Color.Red), new PointF(hsrScreen.Width / 3, 150));
-                pictureBox1.Size = hsrScreen.Size;
-                pictureBox1.Image = hsrScreen;
+                if (finishX > 0 && finishY > 0 && finishX > initialX && finishY > initialY)
+                {
+                    selectRect = new Rectangle(initialX, initialY, finishX - initialX, finishY - initialY);
+                }
+                else
+                {
+                    form.Size = hsrScreen.Size;
+                    PictureBox pictureBox1 = new PictureBox();
+                    using Graphics gfx = Graphics.FromImage(hsrScreen);
+                    gfx.DrawString("SELECT TEXT PARSE AREA(HOLD DOWN MOUSE AND MOVE)",
+                        new("Tahoma", 13, FontStyle.Bold), new SolidBrush(Color.Red),
+                        new PointF(hsrScreen.Width / 3, 150));
+                    pictureBox1.Size = hsrScreen.Size;
+                    pictureBox1.Image = hsrScreen;
+                    form.Controls.Add(pictureBox1);
+                    form.FormBorderStyle = FormBorderStyle.None;
+                    pictureBox1.MouseMove += PictureBox_MouseMove;
+                    pictureBox1.MouseDown += PictureBox_MouseDown;
+                    pictureBox1.MouseUp += PictureBox_MouseUp;
+                    SetForegroundWindow(form.Handle);
+                    form.ShowDialog();
+                }
 
-
-                form.Controls.Add(pictureBox1);
-
-
-
-                form.FormBorderStyle = FormBorderStyle.None;
-                pictureBox1.MouseMove += PictureBox_MouseMove;
-                pictureBox1.MouseDown += PictureBox_MouseDown;
-                pictureBox1.MouseUp += PictureBox_MouseUp;
-                SetForegroundWindow(form.Handle);
-                form.ShowDialog();
+                string loc = "rus";
                 hsrScreen = hsrScreen.Clone(selectRect, hsrScreen.PixelFormat);
                 SetForegroundWindow(this.Handle);
 
                 //todo clear stats values and names
-                using (var engine = new TesseractEngine(AppDomain.CurrentDomain.BaseDirectory + "tessdata", "rus", EngineMode.Default))
+                using (var engine = new TesseractEngine(AppDomain.CurrentDomain.BaseDirectory + "tessdata", loc, EngineMode.TesseractAndLstm))
                 {
                     using (var img = PixConverter.ToPix(hsrScreen))
                     {
                         using (var page = engine.Process(img))
                         {
+                            // hsrScreen.Save("test.jpeg");
+                            
                             var text = page.GetText();
                             text = text.Replace("\n\n", "\n");
                             if (text.EndsWith("\n"))
                                 text = text.Substring(0, text.Length - 1);
 
                             List<string> strings = text.Split('\n').ToList();
-                            int halfOfStrings = (int)(Math.Floor((double)strings.Count / 2));
-                            for (int i = 0; i < halfOfStrings; i++)
+
+                            //replace some shit into stat words
+                            XmlDocument xDoc = new XmlDocument();
+                            xDoc.Load($"{AppDomain.CurrentDomain.BaseDirectory}\\tessdata\\{loc}.xml");
+                            XmlElement xRoot = xDoc.DocumentElement;
+                            int toList = 0;
+                            int stringNumberIndex = 0;
+                            int stringNumber = 0;
+                            if (xRoot != null)
                             {
-                                res.Add(i, new KeyValuePair<string, string>(strings[i], strings[i + halfOfStrings]));
+                                //parse all items
+                                foreach (XmlElement xnode in xRoot)
+                                {
+                                    if (xnode.Name == "replacer")
+                                    {
+                                        string wordFrom = xnode.Attributes.GetNamedItem("from").Value.Trim();
+                                        string wordTo = xnode.Attributes.GetNamedItem("to")?.Value.Trim();
+                                        for (int i = 0; i < strings.Count; i++)
+                                        {
+                                            if (strings[i].IndexOf(wordFrom) > 0)
+                                                strings[i] = wordTo;
+                                            //we detect number string. So first item stat ends
+                                            if (stringNumberIndex == 0 && int.TryParse(strings[i].Substring(0, 1), out stringNumber))
+                                                stringNumberIndex = i;
+
+                                        }
+                                    }
+                                }
                             }
-                            // text variable contains a string with all words found
+
+                            for (int i = 0; i < stringNumberIndex; i++)
+                            {
+
+                                string val = strings[i + stringNumberIndex];
+                                string key = strings[i] + (val.EndsWith("%") ? "_prc" : "_fix");
+                                res.Add(res.Count, new RStatWordRec() { listNum = 0, Key = key, Value = val });
+                            }
+
+                            for (int i = (res.Count * 2); i < (strings.Count / 2 - res.Count); i++)
+                            {
+
+                                string val = strings[i + stringNumberIndex];
+                                string key = strings[i] + (val.EndsWith("%") ? "_prc" : "_fix");
+                                res.Add(res.Count, new RStatWordRec() { listNum = 0, Key = key, Value = val });
+                            }
+
+
                         }
                     }
                 }
@@ -879,8 +944,10 @@ namespace HSR_SIM_GUI
         private void PictureBox_MouseUp(object sender, MouseEventArgs e)
         {
             isDown = false;
-
-
+            finishX = e.X;
+            finishY = e.Y;
+            IniF.IniWriteValue("StatCheckForm", "finishX", finishX.ToString());
+            IniF.IniWriteValue("StatCheckForm", "finishY", finishY.ToString());
             if (selectRect.Height > 0 && selectRect.Width > 0)
                 ((Form)((Control)sender).Parent)?.Close();
         }
@@ -890,6 +957,8 @@ namespace HSR_SIM_GUI
             isDown = true;
             initialX = e.X;
             initialY = e.Y;
+            IniF.IniWriteValue("StatCheckForm", "initialX", initialX.ToString());
+            IniF.IniWriteValue("StatCheckForm", "initialY", initialY.ToString());
         }
 
         private void PictureBox_MouseMove(object sender, MouseEventArgs e)
@@ -903,10 +972,17 @@ namespace HSR_SIM_GUI
                    Math.Min(e.Y, initialY),
                    Math.Abs(e.X - initialX),
                    Math.Abs(e.Y - initialY));
-
                 formGraphics = ((Control)sender).CreateGraphics();
                 formGraphics.DrawRectangle(drwaPen, selectRect);
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            initialX = 0;
+            initialY = 0;
+            finishX = 0;
+            finishY = 0;
         }
     }
 }
