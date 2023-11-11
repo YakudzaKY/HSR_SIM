@@ -115,6 +115,9 @@ namespace HSR_SIM_GUI
             {
                 cbScenario.Items.Add(Path.GetFileName(file));
             }
+
+            string profilePath=AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\";
+            System.IO.Directory.CreateDirectory(profilePath);
             files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\");
 
             foreach (string file in files)

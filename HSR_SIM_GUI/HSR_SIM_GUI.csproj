@@ -114,9 +114,6 @@
     <None Remove="tessdata\rus.traineddata" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="DATA\api.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="DATA\Images\Abyss_Flower_CD.webp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

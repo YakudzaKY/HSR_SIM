@@ -86,21 +86,8 @@
 /WargearEditor/obj/WargearEditor.csproj.nuget.g.props
 /WargearEditor/obj/WargearEditor.csproj.nuget.g.targets
 /WargearEditor/obj/project.assets.json
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/DATA/Images/Automaton Beetle.png
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/DATA/Images/Blade.webp
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/DATA/Images/Bronya.webp
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/DATA/Images/Forgotten Hall.png
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/DATA/Images/Luocha.webp
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/DATA/Images/Silver Wolf.webp
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/DATA/Images/Vagrant.png
+/HSR_SIM_GUI/bin/
+/HSR_SIM_GUI/obj/
+/HSR_SIM_LIB/bin/
+/HSR_SIM_LIB/obj/
 /HSR_SIM.sln.DotSettings
-/HSR_SIM_GUI/obj/Debug/net7.0-windows/*.resources
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/DATA/api.txt
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/DATA/WarGear/Blade_712767509.xml
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/DATA/WarGear/Bronya_712767509.xml
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/DATA/WarGear/Luocha_712767509.xml
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/DATA/WarGear/Silver Wolf_712767509.xml
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/DATA/Profile/UID_712767509.xml
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/DATA/Profile/UID_700233266.xml
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/DATA/WarGear/Blade_fun.xml
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/DATA/Profile/NO_BLADE.xml
