@@ -21,6 +21,7 @@ using System.Windows.Forms.DataVisualization.Charting;
 using System.Collections;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
+using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -30,6 +31,8 @@ using ImageMagick;
 using HSR_SIM_LIB.TurnBasedClasses;
 using Tesseract;
 using static HSR_SIM_LIB.Worker;
+using Label = System.Windows.Forms.Label;
+
 namespace HSR_SIM_GUI
 {
 
@@ -348,14 +351,48 @@ namespace HSR_SIM_GUI
             ,{ "imaginary_dmg_prc", "0,021773" }
         };
 
+        private Dictionary<string, string> mainStatsBase = new Dictionary<string, string>()
+        {
+            { "spd_fix", "4,032" }
+            ,{ "hp_fix", "112,896" }
+            ,{ "atk_fix", "56,448" }
+            ,{ "hp_prc", "0,069120" }
+            ,{ "atk_prc", "0,069120" }
+            ,{ "def_prc", "0,0864" }
+            ,{ "break_dmg_prc", "0,103680" }
+            ,{ "effect_hit_prc", "0,069120" }
+            ,{ "sp_rate_prc", "0,031104" }
+            ,{ "heal_rate_prc", "0,055296" }
+            ,{ "crit_rate_prc", "0,05184" }
+            ,{ "crit_dmg_prc", "0,10368" }
+            //elements
+            ,{ "wind_dmg_prc", "0,062208" }
+            ,{ "physical_dmg_prc", "0,062208" }
+            ,{ "fire_dmg_prc", "0,062208" }
+            ,{ "ice_dmg_prc", "0,062208" }
+            ,{ "lightning_dmg_prc", "0,062208" }
+            ,{ "quantum_dmg_prc", "0,062208" }
+            ,{ "imaginary_dmg_prc", "0,062208" }
+        };
+
         private bool isDown;
         private int initialX;
         private int initialY;
         private int finishX;
         private int finishY;
+        private RectModeEnm rectMode;
         private Rectangle selectRect;
 
+
+        private enum RectModeEnm
+        {
+            Minus,
+            Plus
+
+        }
+
         System.Drawing.Graphics formGraphics;
+        private bool forceNewRect;
 
         private void LoadStatTable(Dictionary<string, string> table)
         {
@@ -401,23 +438,46 @@ namespace HSR_SIM_GUI
             int startY = 15;
             for (int i = 0; i < 5; i++)
             {
-                foreach (string str in new ArrayList() { "Minus", "Plus" })
+                foreach (RectModeEnm str in (RectModeEnm[])Enum.GetValues(typeof(RectModeEnm)))
+
                 {
                     ComboBox newCb = new ComboBox()
-                    { Name = $"cb{str}Stat{i:d}", Location = new Point(startX, startY + 20 * i), Width = 100 };
-                    TextBox tbBox = new TextBox()
+                    { Name = $"cb{str}Stat{i:d}", Location = new Point(startX, startY + 22 * i), Width = 100 };
+                    Control tbBox;
+                    if (i == 0)
                     {
-                        Name = $"txt{str}Stat{i:d}",
-                        Location = new Point(startX + newCb.Width + 10, startY + 20 * i),
-                        Width = 50
-                    };
+
+                        tbBox = new Label()
+                        {
+                            Name = $"lbl{str}Stat{i:d}",
+                            Location = new Point(startX + newCb.Width + 10, startY + 22 * i),
+                            Width = 50,
+                            Text = "MAX."
+
+                        };
+
+                    }
+                    else
+                    {
+                        tbBox = new TextBox()
+                        {
+                            Name = $"txt{str}Stat{i:d}",
+                            Location = new Point(startX + newCb.Width + 10, startY + 22 * i),
+                            Width = 50
+                        };
+                    }
+
                     foreach (string statItem in stats)
                     {
                         newCb.Items.Add(statItem);
                     }
                     newCb.Text = IniF.IniReadValue("StatCheckForm", newCb.Name);
                     newCb.TabIndex = i;
-                    tbBox.Text = IniF.IniReadValue("StatCheckForm", tbBox.Name);
+                    if (i > 0)
+                    {
+                        tbBox.Text = IniF.IniReadValue("StatCheckForm", tbBox.Name);
+                    }
+
                     tbBox.TabIndex = i;
                     gbGearReplace.Controls.Find($"gb{str}", false).First().Controls.Add(newCb);
                     gbGearReplace.Controls.Find($"gb{str}", false).First().Controls.Add(tbBox);
@@ -428,10 +488,6 @@ namespace HSR_SIM_GUI
 
             }
 
-            int.TryParse(IniF.IniReadValue("StatCheckForm", "initialX"), out initialX);
-            int.TryParse(IniF.IniReadValue("StatCheckForm", "initialY"), out initialY);
-            int.TryParse(IniF.IniReadValue("StatCheckForm", "finishX"), out finishX);
-            int.TryParse(IniF.IniReadValue("StatCheckForm", "finishY"), out finishY);
 
             Utils.ApplyDarkLightTheme(this);
         }
@@ -448,6 +504,17 @@ namespace HSR_SIM_GUI
                 }
             }
             return 0;
+        }
+
+        private double SearchStatDeltaByNameInMainStats(string item)
+        {
+            return ExctractDoubleVal(mainStatsUpgrades.First(x => x.Key.Equals(item)).Value);
+
+        }
+        private double SearchStatBaseByNameInMainStats(string item)
+        {
+            return ExctractDoubleVal(mainStatsBase.First(x => x.Key.Equals(item)).Value);
+
         }
 
         private double ExctractDoubleVal(string inputStr)
@@ -494,20 +561,29 @@ namespace HSR_SIM_GUI
                 if (!String.IsNullOrEmpty(cbCharacterGrp.Text))
                 {
                     List<RStatMod> statModList = new List<RStatMod>();
-                    for (int i = 0; i < 5; i++)
+                    foreach (RectModeEnm str in (RectModeEnm[])Enum.GetValues(typeof(RectModeEnm)))
                     {
-                        string statName = gbMinus.Controls.Find($"cbMinusStat{i}", false).First().Text;
-                        string statVal = gbMinus.Controls.Find($"txtMinusStat{i}", false).First().Text;
-                        if (!string.IsNullOrEmpty(statName) && !string.IsNullOrEmpty(statVal))
-                            statModList.Add(new RStatMod() { Character = cbCharacterGrp.Text, Stat = statName, Step = 1, Val = -ExctractDoubleVal(statVal) });
+                        for (int i = 0; i < 5; i++)
+                        {
+                            string statName = this.Controls.Find($"cb{str}Stat{i}", true).First().Text;
+                            if (!string.IsNullOrEmpty(statName))
+                            {
+                                string statVal = (i > 0)
+                                    ? this.Controls.Find($"txt{str}Stat{i}", true).First().Text
+                                    : (SearchStatBaseByNameInMainStats(statName) +
+                                       (15 * SearchStatDeltaByNameInMainStats(statName))).ToString();
+                                if (!string.IsNullOrEmpty(statName) && !string.IsNullOrEmpty(statVal))
+                                    statModList.Add(new RStatMod()
+                                    {
+                                        Character = cbCharacterGrp.Text,
+                                        Stat = statName,
+                                        Step = 1,
+                                        Val = ((str == RectModeEnm.Minus) ? -1 : 1) * ExctractDoubleVal(statVal)
+                                    });
+                            }
+                        }
                     }
-                    for (int i = 0; i < 5; i++)
-                    {
-                        string statName = gbPlus.Controls.Find($"cbPlusStat{i}", false).First().Text;
-                        string statVal = gbPlus.Controls.Find($"txtPlusStat{i}", false).First().Text;
-                        if (!string.IsNullOrEmpty(statName) && !string.IsNullOrEmpty(statVal))
-                            statModList.Add(new RStatMod() { Character = cbCharacterGrp.Text, Stat = statName, Step = 1, Val = ExctractDoubleVal(statVal) });
-                    }
+
 
                     if (statModList.Count > 0)
                     {
@@ -808,92 +884,148 @@ namespace HSR_SIM_GUI
             Dictionary<int, RStatWordRec> keyVal = GetValuesFromScreen();
             foreach (Control ctrl in gbPlus.Controls)
             {
-                ctrl.Text = string.Empty;
+                if (ctrl is not Label)
+                    ctrl.Text = string.Empty;
             }
             foreach (Control ctrl in gbMinus.Controls)
             {
-                ctrl.Text = string.Empty;
-            }
-            for (int i = 0; i < keyVal.Count; i++)
-            {
-                gbMinus.Controls.Find($"cbMinusStat{i}", false).First().Text = keyVal[i].Key;
-                gbMinus.Controls.Find($"txtMinusStat{i}", false).First().Text = keyVal[i].Value;
+                if (ctrl is not Label)
+                    ctrl.Text = string.Empty;
             }
 
-
-            for (int i = 0; i < keyVal.Count; i++)
+            int i = 0;
+            foreach (KeyValuePair<int, RStatWordRec> item in keyVal.Where(x => x.Value.StatMode == RectModeEnm.Minus))
             {
-                gbPlus.Controls.Find($"cbPlusStat{i}", false).First().Text = keyVal[i].Key;
-                gbPlus.Controls.Find($"txtPlusStat{i}", false).First().Text = keyVal[i].Value;
+                gbMinus.Controls.Find($"cbMinusStat{i}", false).First().Text = item.Value.Key;
+                if (i > 0)
+                    gbMinus.Controls.Find($"txtMinusStat{i}", false).First().Text = item.Value.Value;
+                i++;
             }
+            i = 0;
+            foreach (KeyValuePair<int, RStatWordRec> item in keyVal.Where(x => x.Value.StatMode == RectModeEnm.Plus))
+            {
+                gbPlus.Controls.Find($"cbPlusStat{i}", false).First().Text = item.Value.Key;
+                if (i > 0)
+                    gbPlus.Controls.Find($"txtPlusStat{i}", false).First().Text = item.Value.Value;
+                i++;
+            }
+
         }
 
         private record RStatWordRec
         {
             public string Key { get; set; }
             public string Value { get; set; }
-            public int listNum { get; set; }
+            public RectModeEnm StatMode { get; set; }
 
         }
+
+        [DllImport("user32.dll")]
+        static extern IntPtr GetForegroundWindow();
+        public static int WaitForActiveWindow(nint windowHandle, int seconds)
+        {
+            DateTime startTime;
+            string activeTitle = "";
+
+            startTime = DateTime.Now;
+            IntPtr activefForegroundWindow = GetForegroundWindow();
+
+            while (windowHandle != activefForegroundWindow)
+            {
+                //Check for timeout
+                if ((DateTime.Now - startTime).TotalSeconds > seconds) //greater than here
+                    return 1;
+
+                //Check every 0.2 seconds
+                Thread.Sleep(200);
+                activefForegroundWindow = GetForegroundWindow();
+            }
+
+            return 0;
+        }
+
+        private Rectangle LoadRectFromConfig(RectModeEnm rectModeEnm)
+        {
+            int.TryParse(IniF.IniReadValue("StatCheckForm", rectModeEnm + "initialX"), out initialX);
+            int.TryParse(IniF.IniReadValue("StatCheckForm", rectModeEnm + "initialY"), out initialY);
+            int.TryParse(IniF.IniReadValue("StatCheckForm", rectModeEnm + "finishX"), out finishX);
+            int.TryParse(IniF.IniReadValue("StatCheckForm", rectModeEnm + "finishY"), out finishY);
+            Rectangle res = new Rectangle(initialX, initialY, finishX - initialX, finishY - initialY);
+            return res;
+        }
+
+
+
         private Dictionary<int, RStatWordRec> GetValuesFromScreen()
         {
             Dictionary<int, RStatWordRec> res = new Dictionary<int, RStatWordRec>();
-            SetForegroundWindow(FindWindow(null, "Honkai: Star Rail"));
+            nint hsrWindow = FindWindow(null, "Honkai: Star Rail");
+            SetForegroundWindow(hsrWindow);
+            WaitForActiveWindow(hsrWindow, 5);
+            Bitmap hsrScreen = GraphicsCls.ConvertBlackAndWhite(CaptureScreen(false));
+            string loc = "rus";
+            //init engines LSTM for text, Legacy for numbers
+            var engine = new TesseractEngine(AppDomain.CurrentDomain.BaseDirectory + "tessdata", loc, EngineMode.LstmOnly);
+            var engineNumbers = new TesseractEngine(AppDomain.CurrentDomain.BaseDirectory + "tessdata", loc, EngineMode.TesseractOnly);
+            engine.DefaultPageSegMode = PageSegMode.SingleBlock;
+            engineNumbers.DefaultPageSegMode = PageSegMode.SingleBlock;
 
-            Bitmap hsrScreen = CaptureScreen(false);
-            using (var form = new Form())
+
+            foreach (RectModeEnm itemRectMode in (RectModeEnm[])Enum.GetValues(typeof(RectModeEnm)))
             {
-                if (finishX > 0 && finishY > 0 && finishX > initialX && finishY > initialY)
+                rectMode = itemRectMode;
+                using (var form = new Form())
                 {
-                    selectRect = new Rectangle(initialX, initialY, finishX - initialX, finishY - initialY);
-                }
-                else
-                {
-                    form.Size = hsrScreen.Size;
-                    PictureBox pictureBox1 = new PictureBox();
-                    using Graphics gfx = Graphics.FromImage(hsrScreen);
-                    gfx.DrawString("SELECT TEXT PARSE AREA(HOLD DOWN MOUSE AND MOVE)",
-                        new("Tahoma", 13, FontStyle.Bold), new SolidBrush(Color.Red),
-                        new PointF(hsrScreen.Width / 3, 150));
-                    pictureBox1.Size = hsrScreen.Size;
-                    pictureBox1.Image = hsrScreen;
-                    form.Controls.Add(pictureBox1);
-                    form.FormBorderStyle = FormBorderStyle.None;
-                    pictureBox1.MouseMove += PictureBox_MouseMove;
-                    pictureBox1.MouseDown += PictureBox_MouseDown;
-                    pictureBox1.MouseUp += PictureBox_MouseUp;
-                    SetForegroundWindow(form.Handle);
-                    form.ShowDialog();
-                }
-
-                string loc = "rus";
-                hsrScreen = hsrScreen.Clone(selectRect, hsrScreen.PixelFormat);
-                SetForegroundWindow(this.Handle);
-
-                //todo clear stats values and names
-                using (var engine = new TesseractEngine(AppDomain.CurrentDomain.BaseDirectory + "tessdata", loc, EngineMode.TesseractAndLstm))
-                {
-                    using (var img = PixConverter.ToPix(hsrScreen))
+                    selectRect = LoadRectFromConfig(itemRectMode);
+                    if (selectRect.Height == 0 || selectRect.Width == 0 || forceNewRect)
                     {
-                        using (var page = engine.Process(img))
+                        form.Size = hsrScreen.Size;
+                        PictureBox pictureBox1 = new PictureBox();
+
+                        pictureBox1.Size = hsrScreen.Size;
+                        pictureBox1.Image = (Bitmap)hsrScreen.Clone();
+                        using Graphics gfx = Graphics.FromImage(pictureBox1.Image);
+                        gfx.DrawString($"SELECT STAT NAMES({itemRectMode}) PARSE AREA(HOLD DOWN MOUSE AND MOVE)",
+                            new("Tahoma", 13, FontStyle.Bold), new SolidBrush(itemRectMode == RectModeEnm.Minus ? Color.Red : Color.YellowGreen),
+                            new PointF(hsrScreen.Width / 3, 150));
+                        form.Controls.Add(pictureBox1);
+                        form.FormBorderStyle = FormBorderStyle.None;
+                        pictureBox1.MouseMove += PictureBox_MouseMove;
+                        pictureBox1.MouseDown += PictureBox_MouseDown;
+                        pictureBox1.MouseUp += PictureBox_MouseUp;
+                        SetForegroundWindow(form.Handle);
+                        form.ShowDialog();
+
+
+                    }
+
+
+                    Bitmap miniHsrScreen = hsrScreen.Clone(selectRect, hsrScreen.PixelFormat);
+                    SetForegroundWindow(this.Handle);
+
+                    using (var img = PixConverter.ToPix(miniHsrScreen))
+                    {
+                        var page = engine.Process(img);
+                        var pageNumbers = engineNumbers.Process(img);
+                        var text = page.GetText();
+                        var textNumbers = pageNumbers.GetText();
+                        text = text.Replace("\n\n", "\n");
+                        textNumbers = textNumbers.Replace("\n\n", "\n");
+                        if (text.EndsWith("\n"))
+                            text = text[..^1];
+                        if (textNumbers.EndsWith("\n"))
+                            textNumbers = textNumbers[..^1];
+                        List<string> strings = text.Split('\n').ToList();
+                        List<string> stringsNumbers = textNumbers.Split('\n').ToList();
+                        //replace some shit into stat words
+                        XmlDocument xDoc = new XmlDocument();
+                        xDoc.Load($"{AppDomain.CurrentDomain.BaseDirectory}\\tessdata\\{loc}.xml");
+                        XmlElement xRoot = xDoc.DocumentElement;
+                        int toList = 0;
+
+                        if (xRoot != null)
                         {
-                            // hsrScreen.Save("test.jpeg");
-                            
-                            var text = page.GetText();
-                            text = text.Replace("\n\n", "\n");
-                            if (text.EndsWith("\n"))
-                                text = text.Substring(0, text.Length - 1);
-
-                            List<string> strings = text.Split('\n').ToList();
-
-                            //replace some shit into stat words
-                            XmlDocument xDoc = new XmlDocument();
-                            xDoc.Load($"{AppDomain.CurrentDomain.BaseDirectory}\\tessdata\\{loc}.xml");
-                            XmlElement xRoot = xDoc.DocumentElement;
-                            int toList = 0;
-                            int stringNumberIndex = 0;
-                            int stringNumber = 0;
-                            if (xRoot != null)
+                            for (int i = 0; i < strings.Count; i++)
                             {
                                 //parse all items
                                 foreach (XmlElement xnode in xRoot)
@@ -902,42 +1034,41 @@ namespace HSR_SIM_GUI
                                     {
                                         string wordFrom = xnode.Attributes.GetNamedItem("from").Value.Trim();
                                         string wordTo = xnode.Attributes.GetNamedItem("to")?.Value.Trim();
-                                        for (int i = 0; i < strings.Count; i++)
-                                        {
-                                            if (strings[i].IndexOf(wordFrom) > 0)
-                                                strings[i] = wordTo;
-                                            //we detect number string. So first item stat ends
-                                            if (stringNumberIndex == 0 && int.TryParse(strings[i].Substring(0, 1), out stringNumber))
-                                                stringNumberIndex = i;
 
+                                        int wordNdx = strings[i].IndexOf(wordFrom);
+                                        if (wordNdx >= 0)
+                                        {
+                                            Regex rx = new Regex("[0-9]");
+                                            string val = "";
+                                            int ndx = rx.Matches(stringsNumbers[i])
+                                                .FirstOrDefault(x => x.Index > wordNdx)?.Index ?? 0;
+                                            if (ndx > 0)
+                                                val = stringsNumbers[i].Substring(ndx).Replace(" ", string.Empty);
+                                            else
+                                                val = strings[i].Substring(rx.Matches(strings[i]).First(x => x.Index > wordNdx).Index).Replace(" ", string.Empty);
+                                            string key = wordTo + (val.EndsWith("%") ? "_prc" : "_fix");
+                                            res.Add(res.Count, new RStatWordRec() { Key = key, Value = val, StatMode = itemRectMode });
+                                            break;
                                         }
+
+
+
                                     }
                                 }
                             }
-
-                            for (int i = 0; i < stringNumberIndex; i++)
-                            {
-
-                                string val = strings[i + stringNumberIndex];
-                                string key = strings[i] + (val.EndsWith("%") ? "_prc" : "_fix");
-                                res.Add(res.Count, new RStatWordRec() { listNum = 0, Key = key, Value = val });
-                            }
-
-                            for (int i = (res.Count * 2); i < (strings.Count / 2 - res.Count); i++)
-                            {
-
-                                string val = strings[i + stringNumberIndex];
-                                string key = strings[i] + (val.EndsWith("%") ? "_prc" : "_fix");
-                                res.Add(res.Count, new RStatWordRec() { listNum = 0, Key = key, Value = val });
-                            }
-
-
                         }
-                    }
-                }
 
+                        page.Dispose();
+                        pageNumbers.Dispose();
+
+                    }
+
+                }
             }
 
+            forceNewRect = false;
+            engine.Dispose();
+            engineNumbers.Dispose();
             return res;
         }
 
@@ -946,9 +1077,9 @@ namespace HSR_SIM_GUI
             isDown = false;
             finishX = e.X;
             finishY = e.Y;
-            IniF.IniWriteValue("StatCheckForm", "finishX", finishX.ToString());
-            IniF.IniWriteValue("StatCheckForm", "finishY", finishY.ToString());
-            if (selectRect.Height > 0 && selectRect.Width > 0)
+            IniF.IniWriteValue("StatCheckForm", rectMode + "finishX", finishX.ToString());
+            IniF.IniWriteValue("StatCheckForm", rectMode + "finishY", finishY.ToString());
+            if (selectRect is { Height: > 0, Width: > 0 })
                 ((Form)((Control)sender).Parent)?.Close();
         }
 
@@ -957,8 +1088,8 @@ namespace HSR_SIM_GUI
             isDown = true;
             initialX = e.X;
             initialY = e.Y;
-            IniF.IniWriteValue("StatCheckForm", "initialX", initialX.ToString());
-            IniF.IniWriteValue("StatCheckForm", "initialY", initialY.ToString());
+            IniF.IniWriteValue("StatCheckForm", rectMode + "initialX", initialX.ToString());
+            IniF.IniWriteValue("StatCheckForm", rectMode + "initialY", initialY.ToString());
         }
 
         private void PictureBox_MouseMove(object sender, MouseEventArgs e)
@@ -966,7 +1097,7 @@ namespace HSR_SIM_GUI
             if (isDown == true)
             {
                 ((Control)sender).Refresh();
-                Pen drwaPen = new Pen(Color.Red, 3);
+                Pen drwaPen = new Pen(rectMode == RectModeEnm.Minus ? Color.Red : Color.Green, 3);
                 int width = e.X - initialX, height = e.Y - initialY;
                 selectRect = new Rectangle(Math.Min(e.X, initialX),
                    Math.Min(e.Y, initialY),
@@ -979,10 +1110,7 @@ namespace HSR_SIM_GUI
 
         private void button1_Click(object sender, EventArgs e)
         {
-            initialX = 0;
-            initialY = 0;
-            finishX = 0;
-            finishY = 0;
+            forceNewRect = true;
         }
     }
 }
