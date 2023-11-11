@@ -16,28 +16,6 @@
 *.dylib
 *.bin
 *.user
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/HSR_SIM_GUI.deps.json
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/HSR_SIM_GUI.dll.config
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/HSR_SIM_GUI.exe
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/HSR_SIM_GUI.pdb
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/HSR_SIM_GUI.runtimeconfig.json
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/HSR_SIM_LIB.pdb
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/runtimes/linux-arm64/native/Magick.Native-Q16-arm64.dll.so
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/runtimes/linux-musl-x64/native/Magick.Native-Q16-x64.dll.so
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/runtimes/linux-x64/native/Magick.Native-Q16-x64.dll.so
-/HSR_SIM_GUI/obj/Debug/net7.0-windows/.NETCoreApp,Version=v7.0.AssemblyAttributes.cs
-/HSR_SIM_GUI/obj/Debug/net7.0-windows/HSR_SIM_GUI.Main.resources
-/HSR_SIM_GUI/obj/Debug/net7.0-windows/HSR_SIM_GUI.Properties.Resources.resources
-/HSR_SIM_GUI/obj/Debug/net7.0-windows/HSR_SIM_GUI.csproj.BuildWithSkipAnalyzers
-/HSR_SIM_GUI/obj/Debug/net7.0-windows/HSR_SIM_GUI.csproj.CopyComplete
-/HSR_SIM_GUI/obj/Debug/net7.0-windows/HSR_SIM_GUI.csproj.FileListAbsolute.txt
-/HSR_SIM_GUI/obj/Debug/net7.0-windows/HSR_SIM_GUI.designer.deps.json
-/HSR_SIM_GUI/obj/Debug/net7.0-windows/HSR_SIM_GUI.designer.runtimeconfig.json
-/HSR_SIM_GUI/obj/Debug/net7.0-windows/HSR_SIM_GUI.pdb
-/HSR_SIM_GUI/obj/Debug/net7.0-windows/apphost.exe
-/HSR_SIM_GUI/obj/HSR_SIM_GUI.csproj.nuget.dgspec.json
-/HSR_SIM_GUI/obj/HSR_SIM_GUI.csproj.nuget.g.props
-/HSR_SIM_GUI/obj/HSR_SIM_GUI.csproj.nuget.g.targets
 /packages/Magick.NET-Q16-AnyCPU.13.3.0/.signature.p7s
 /packages/Magick.NET-Q16-AnyCPU.13.3.0/Magick.NET-Q16-AnyCPU.13.3.0.nupkg
 /packages/Magick.NET-Q16-AnyCPU.13.3.0/Magick.NET.icon.png
@@ -52,40 +30,6 @@
 /packages/Magick.NET-Q16-AnyCPU.13.3.0/runtimes/linux-arm64/native/Magick.Native-Q16-arm64.dll.so
 /packages/Magick.NET-Q16-AnyCPU.13.3.0/runtimes/linux-musl-x64/native/Magick.Native-Q16-x64.dll.so
 /packages/Magick.NET-Q16-AnyCPU.13.3.0/runtimes/linux-x64/native/Magick.Native-Q16-x64.dll.so
-/HSR_SIM_LIB/obj/HSR_SIM_LIB.csproj.nuget.dgspec.json
-/HSR_SIM_LIB/obj/HSR_SIM_LIB.csproj.nuget.g.props
-/HSR_SIM_LIB/obj/HSR_SIM_LIB.csproj.nuget.g.targets
-/HSR_SIM_LIB/obj/project.assets.json
-/HSR_SIM_LIB/bin/Debug/Magick.NET-Q16-AnyCPU.xml
-/HSR_SIM_LIB/bin/Debug/Magick.NET.Core.xml
-/HSR_SIM_LIB/bin/Debug/net7.0/HSR_SIM_LIB.deps.json
-/HSR_SIM_LIB/bin/Debug/net7.0/HSR_SIM_LIB.pdb
-/HSR_SIM_LIB/obj/Debug/HSR_SIM_LIB.csproj.CopyComplete
-/HSR_SIM_LIB/obj/Debug/net7.0/.NETCoreApp,Version=v7.0.AssemblyAttributes.cs
-/HSR_SIM_LIB/obj/Debug/net7.0/HSR_SIM_LIB.csproj.BuildWithSkipAnalyzers
-/HSR_SIM_LIB/obj/Debug/net7.0/HSR_SIM_LIB.csproj.FileListAbsolute.txt
-/HSR_SIM_LIB/obj/Debug/net7.0/HSR_SIM_LIB.pdb
-/HSR_SIM_GUI/obj/project.assets.json
-/HSR_SIM_GUI/bin/Debug/net7.0-windows/config.ini
-/HSR_SIM_GUI/obj/Debug/net7.0-windows/HSR_SIM_GUI.WarGear.resources
-/WarGear editor/obj/Debug/net6.0-windows/.NETCoreApp,Version=v6.0.AssemblyAttributes.cs
-/WarGear editor/obj/Debug/net6.0-windows/WarGear editor.AssemblyInfo.cs
-/WarGear editor/obj/Debug/net6.0-windows/WarGear editor.GlobalUsings.g.cs
-/WarGear editor/obj/Debug/net6.0-windows/WarGear editor.designer.deps.json
-/WarGear editor/obj/Debug/net6.0-windows/WarGear editor.designer.runtimeconfig.json
-/WarGear editor/obj/WarGear editor.csproj.nuget.dgspec.json
-/WarGear editor/obj/WarGear editor.csproj.nuget.g.props
-/WarGear editor/obj/WarGear editor.csproj.nuget.g.targets
-/WarGear editor/obj/project.assets.json
-/WargearEditor/obj/Debug/net6.0-windows/.NETCoreApp,Version=v6.0.AssemblyAttributes.cs
-/WargearEditor/obj/Debug/net6.0-windows/WargearEditor.AssemblyInfo.cs
-/WargearEditor/obj/Debug/net6.0-windows/WargearEditor.GlobalUsings.g.cs
-/WargearEditor/obj/Debug/net6.0-windows/WargearEditor.designer.deps.json
-/WargearEditor/obj/Debug/net6.0-windows/WargearEditor.designer.runtimeconfig.json
-/WargearEditor/obj/WargearEditor.csproj.nuget.dgspec.json
-/WargearEditor/obj/WargearEditor.csproj.nuget.g.props
-/WargearEditor/obj/WargearEditor.csproj.nuget.g.targets
-/WargearEditor/obj/project.assets.json
 /HSR_SIM_GUI/bin/
 /HSR_SIM_GUI/obj/
 /HSR_SIM_LIB/bin/
