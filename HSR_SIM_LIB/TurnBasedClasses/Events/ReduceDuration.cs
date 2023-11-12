@@ -10,7 +10,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
     /// <summary>
     /// reduce duration of dot,buff etc
     /// </summary>
-    public class ReduceDuration : ModEventTemplate
+    public class ReduceDuration : BuffEventTemplate
     {
         public ReduceDuration(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
         {

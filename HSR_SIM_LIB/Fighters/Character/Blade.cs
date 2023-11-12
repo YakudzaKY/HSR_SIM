@@ -292,6 +292,7 @@ namespace HSR_SIM_LIB.Fighters.Character
                 BaseDuration = 3,
                 MaxStack = 1,
                 CustomIconName = "Hellscape",
+                Dispellable = false,
                 Effects = new List<Effect>() { new EffAllDamageBoost() {  Value = 0.4 } }
 
             };

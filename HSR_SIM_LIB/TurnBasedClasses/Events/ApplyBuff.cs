@@ -9,7 +9,7 @@ using HSR_SIM_LIB.UnitStuff;
 namespace HSR_SIM_LIB.TurnBasedClasses.Events
 {
     //apply buff debuff dot etc
-    public class ApplyBuff : ModEventTemplate
+    public class ApplyBuff : BuffEventTemplate
     {
      
         public ApplyBuff(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)

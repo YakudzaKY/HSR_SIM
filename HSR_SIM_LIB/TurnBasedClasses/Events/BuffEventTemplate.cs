@@ -8,10 +8,10 @@ using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events
 {
-    public  abstract class ModEventTemplate: Event
+    public  abstract class BuffEventTemplate: Event
     {
         public Buff BuffToApply { get; set; }
-        protected ModEventTemplate(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
+        protected BuffEventTemplate(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
         {
         }
     }

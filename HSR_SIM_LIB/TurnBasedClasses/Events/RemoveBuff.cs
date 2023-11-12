@@ -8,9 +8,9 @@ using HSR_SIM_LIB.UnitStuff;
 namespace HSR_SIM_LIB.TurnBasedClasses.Events
 {
     // dispell buff or dot
-    public class RemoveMod : ModEventTemplate
+    public class RemoveBuff : BuffEventTemplate
     {
-        public RemoveMod(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
+        public RemoveBuff(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
         {
         }
 

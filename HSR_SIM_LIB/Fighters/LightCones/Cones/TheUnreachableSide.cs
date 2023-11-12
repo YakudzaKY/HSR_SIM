@@ -45,7 +45,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
                               or Step.StepTypeEnm.UnitTurnContinued or   Step.StepTypeEnm.UnitTurnStarted
                 && step.Actor == Parent.Parent && (step.ActorAbility?.Attack??false) && uniqueBuff != null )
             {
-                RemoveMod newEvent = new(step, this, Parent.Parent)
+                RemoveBuff newEvent = new(step, this, Parent.Parent)
                 {
                     TargetUnit = Parent.Parent,
                     BuffToApply = uniqueBuff

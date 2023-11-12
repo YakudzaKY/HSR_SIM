@@ -258,10 +258,10 @@ namespace HSR_SIM_LIB
                 else if (replay)
                     OutText = "reproduced: " + OutText;
                 LogText(OutText);
-                if (ent is ModEventTemplate)
-                    if (((ModEventTemplate)ent).BuffToApply != null)
+                if (ent is BuffEventTemplate)
+                    if (((BuffEventTemplate)ent).BuffToApply != null)
                     {
-                        OutText = " * " + ((ModEventTemplate)ent).BuffToApply.GetDescription();
+                        OutText = " * " + ((BuffEventTemplate)ent).BuffToApply.GetDescription();
                         LogText(OutText);
                     }
 

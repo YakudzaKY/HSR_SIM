@@ -125,7 +125,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             {
                 mod.ProceedNaturalExpire(this);
             }
-            RemoveMod dispell = new RemoveMod(Parent, AbilityValue, SourceUnit)
+            RemoveBuff dispell = new RemoveBuff(Parent, AbilityValue, SourceUnit)
             { AbilityValue = AbilityValue, BuffToApply = mod, TargetUnit = TargetUnit };
             ChildEvents.Add(dispell);
 
