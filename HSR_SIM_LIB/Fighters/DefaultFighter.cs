@@ -28,7 +28,7 @@ namespace HSR_SIM_LIB.Fighters
         public abstract PathType? Path { get; }
         public abstract Unit.ElementEnm Element { get; }
         public List<Unit.ElementEnm> Weaknesses { get; set; } = new List<Unit.ElementEnm>();
-        public List<DebuffResist> DebuffResists { get; set; }
+        public List<DebuffResist> DebuffResists { get; set; }= new List<DebuffResist>();
         public List<Resist> Resists { get; set; } = new List<Resist>();
         public Unit Parent { get; set; }
         public MechDictionary Mechanics;
@@ -375,7 +375,7 @@ namespace HSR_SIM_LIB.Fighters
                 ,
                 Attack = true
             };
-            defOpener.Events.Add(new ToughnessShred(null, this, this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Val = 30, AbilityValue = defOpener });
+            defOpener.Events.Add(new ToughnessShred(null, this, this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue, Val = 30, AbilityValue = defOpener });
 
             Abilities.Add(defOpener);
 

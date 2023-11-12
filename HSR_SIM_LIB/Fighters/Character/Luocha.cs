@@ -13,12 +13,7 @@ namespace HSR_SIM_LIB.Fighters.Character
 {
     public class Luocha : DefaultFighter
     {
-        private readonly Dictionary<int, double> PoAFAtkMods = new()
-        {
-            { 1, 0.40 }, { 2, 0.425 }, { 3, 0.45 }, { 4, 0.475 }, { 5, 0.50 }
-            ,{ 6, 0.52 }, {7, 0.54 }, { 8, 0.56 }, { 9, 0.58}, { 10, 0.60 }
-            ,{ 11, 0.62 }, { 12, 0.64 }
-        };
+
         private readonly Dictionary<int, double> DeathWishMods = new()
         {
             { 1, 1.20 }, { 2, 1.28 }, { 3, 1.36}, { 4, 1.44 }, { 5, 1.52 }
@@ -26,14 +21,33 @@ namespace HSR_SIM_LIB.Fighters.Character
             ,{ 11, 2.08 }, { 12, 2.16 }
         };
 
-
-        private List<Unit> trackedUnits = new List<Unit>();
-
+        private readonly Dictionary<int, double> PoAFAtkMods = new()
+        {
+            { 1, 0.40 }, { 2, 0.425 }, { 3, 0.45 }, { 4, 0.475 }, { 5, 0.50 }
+            ,{ 6, 0.52 }, {7, 0.54 }, { 8, 0.56 }, { 9, 0.58}, { 10, 0.60 }
+            ,{ 11, 0.62 }, { 12, 0.64 }
+        };
         private readonly Dictionary<int, double> PoAFFix = new()
         {
             { 1, 200 }, { 2, 320 }, { 3, 410 }, { 4, 500 }, { 5, 560 }, { 6, 620 }, { 7, 665 }, { 8, 710 },
             { 9, 755 }, { 10, 800 }  ,{ 11, 845 }, { 12, 890 }
         };
+
+        private readonly Dictionary<int, double> CoLFAtkMods = new()
+        {
+            { 1, 0.12 }, { 2, 0.128 }, { 3, 0.135 }, { 4, 0.143 }, { 5, 0.15 }
+            ,{ 6, 0.156 }, {7, 0.162 }, { 8, 0.168 }, { 9, 0.174}, { 10, 0.18 }
+            ,{ 11, 0.186 }, { 12, 0.192}
+        };
+        private readonly Dictionary<int, double> CoLFFix = new()
+        {
+            { 1, 60 }, { 2, 96 }, { 3, 123 }, { 4, 150 }, { 5, 168 }, { 6, 186 }, { 7, 200 }, { 8, 213 },
+            { 9, 227 }, { 10, 240 }  ,{ 11, 254 }, { 12, 267 }
+        };
+
+        private List<Unit> trackedUnits = new List<Unit>();
+
+
         public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Abundance;
         public sealed override Unit.ElementEnm Element { get; } = Unit.ElementEnm.Imaginary;
         private readonly Buff uniqueBuff = null;
@@ -50,7 +64,18 @@ namespace HSR_SIM_LIB.Fighters.Character
             return unit.GetRes(Resource.ResourceType.HP).ResVal / unit.GetMaxHp(null) <= 0.5;
         }
 
-        //Handler for healing
+        public double? CalcCoLHealing(Event ent)
+        {
+            int skillLvl = Parent.Skills.First(x => x.Name == "Cycle of Life")!.Level;
+            return FighterUtils.CalculateHealByBasicVal((Parent.GetAttack(null) * CoLFAtkMods[skillLvl]) + CoLFFix[skillLvl], ent);
+        }
+        public double? CalcCoLHealingParty(Event ent)
+        {
+            return FighterUtils.CalculateHealByBasicVal((Parent.GetAttack(null) *0.07) + 93, ent);
+        }
+
+
+
         public override void DefaultFighter_HandleEvent(Event ent)
         {
             //if unit consume hp or got attack then apply buff
@@ -62,6 +87,26 @@ namespace HSR_SIM_LIB.Fighters.Character
             else if (ent is ResourceDrain or DamageEventTemplate or Healing or ResourceGain)
             {
                 CheckAndAddTarget(ent.TargetUnit);
+            }
+            else if (ent is ExecuteAbilityFinish &&Parent.Friends.Any(x=>x==ent.SourceUnit)&&ent.AbilityValue.Attack&&ent.SourceUnit.IsAlive&&ColBuffAvailable())
+            {
+                ent.ChildEvents.Add(new Healing(ent.Parent, this, ent.SourceUnit)//will put source unit coz Output healing calc will be calculated by target unit
+                {
+                    AbilityValue = ent.AbilityValue, TargetUnit = ent.SourceUnit, CalculateValue = CalcCoLHealing
+                });
+
+                if (Atraces.HasFlag(ATracesEnm.A4))
+                {
+                    //for all friends except attacker unit
+                    foreach (Unit unit in ent.SourceUnit.Friends.Where(x => x.IsAlive &&x!=ent.SourceUnit))
+                    {
+                  
+                        ent.ChildEvents.Add(new Healing(ent.Parent, this, unit)//will put source unit coz Output healing calc will be calculated by target unit
+                        { 
+                            AbilityValue = ent.AbilityValue, TargetUnit = unit, CalculateValue = CalcCoLHealingParty
+                        });
+                    }
+                }
             }
 
 
@@ -91,10 +136,11 @@ namespace HSR_SIM_LIB.Fighters.Character
 
         }
 
+
         public override void DefaultFighter_HandleStep(Step step)
         {
             //check if friendly unit do action
-            if (step.StepType is Step.StepTypeEnm.ExecuteAbility or Step.StepTypeEnm.UnitFollowUpAction
+            if (step.StepType is Step.StepTypeEnm.ExecuteAbilityFromQueue or Step.StepTypeEnm.UnitFollowUpAction
                 or Step.StepTypeEnm.UnitTurnContinued or Step.StepTypeEnm.UnitTurnStarted)
             {
                 CheckAndAddTarget(step.Actor);
@@ -340,20 +386,26 @@ namespace HSR_SIM_LIB.Fighters.Character
                 ,
                 Element = Element
             };
-            ability.Events.Add(new MechanicValChg(null, this, Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, TargetUnit = Parent, Val = cycleOfLifeMaxCnt, AbilityValue = cycleOfLife });//AbilityValue for Cycle of life
+            ability.Events.Add(new MechanicValChg(null, this, Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue, TargetUnit = Parent, Val = cycleOfLifeMaxCnt, AbilityValue = cycleOfLife });//AbilityValue for Cycle of life
             Abilities.Add(ability);
 
             //CoL buffs
             ConditionMods.Add(new ConditionMod(Parent)
             {
 
-                Mod = new Buff(Parent) { Effects = new List<Effect>() { new EffAtkPrc() { Value = 0.08 } }, CustomIconName = uniqueBuff.CustomIconName }
+                Mod = new Buff(Parent) { Effects = new List<Effect>() { new EffAtkPrc() { Value = 0.2 } }, CustomIconName = uniqueBuff.CustomIconName }
                 ,
                 Target = Parent.ParentTeam
                 ,
                 Condition = new ConditionMod.ConditionRec() { ConditionAvailable = ColBuffAvailable }
 
             });
+
+
+
+            //A6
+            if (Atraces.HasFlag(ATracesEnm.A6))
+                DebuffResists.Add(new DebuffResist() { Debuff = typeof(EffCrowControl), ResistVal = 0.7 });
 
         }
     }

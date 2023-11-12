@@ -16,7 +16,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
         public override string GetDescription()
         {
             return $"Healing {TargetUnit.Name} " +
-                   $" overall={Val:f} to_hp={RealVal:f}";
+                   $" overall={Val:f} to_hp={RealVal:f} Source: {Source.GetType().Name}";
         }
 
         public override void ProcEvent(bool revert)

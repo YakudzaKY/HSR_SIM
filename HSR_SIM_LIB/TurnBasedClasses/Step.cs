@@ -84,7 +84,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
                 res = "Wave completed";
             else if (StepType == StepTypeEnm.Idle)
                 res = "Idle step(scenario completed?)";
-            else if (StepType == StepTypeEnm.ExecuteAbility)
+            else if (StepType == StepTypeEnm.ExecuteAbilityFromQueue)
                 res = "Executed " + Actor.Name + " " + ActorAbility.Name;
             else if (StepType == StepTypeEnm.UnitTurnSelected)
                 res = $"{Actor.Name:s} turn next";
@@ -121,7 +121,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             ,
             StartWave //on wave starts
             ,
-            ExecuteAbility,
+            ExecuteAbilityFromQueue,
             UnitTurnSelected,
             UnitTurnStarted,
             UnitTurnEnded,
@@ -195,6 +195,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
             //set ability on CD
             ability.CooldownTimer = ability.Cooldown;
 
+            //set ability to start execute
+            Events.Add( new ExecuteAbilityStart(this,ability,ability.Parent.Parent){AbilityValue = ability,TargetUnit = target});
             //res gaining
             if (ability.SpGain > 0)
             {
@@ -249,6 +251,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses
 
                 });
             }
+            //set ability to finish  execute
+            Events.Add( new ExecuteAbilityFinish(this,ability,ability.Parent.Parent){AbilityValue = ability,TargetUnit = target});
         }
 
         public Unit Target { get; set; }
@@ -274,7 +278,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses
         //Cast all techniques before fights starts
         public void ExecuteAbilityFromQueue()
         {
-            StepType = StepTypeEnm.ExecuteAbility;
+            StepType = StepTypeEnm.ExecuteAbilityFromQueue;
             Ability fromQ = Parent.BeforeStartQueue.First();
             ExecuteAbility(fromQ);
         }

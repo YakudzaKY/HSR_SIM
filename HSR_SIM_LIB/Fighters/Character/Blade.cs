@@ -467,9 +467,9 @@ namespace HSR_SIM_LIB.Fighters.Character
                     AdjacentTargets = AdjacentTargetsEnm.All
                 };
             //dmg events
-            karmaWind.Events.Add(new ToughnessShred(null, this, this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, Val = 60, AbilityValue = karmaWind });
-            karmaWind.Events.Add(new ResourceDrain(null, this, this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, ResType = Resource.ResourceType.HP, TargetType = TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateKarmaSelfDmg, AbilityValue = karmaWind, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
-            karmaWind.Events.Add(new DirectDamage(null, this, this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, CalculateValue = CalculateKarmaDmg, AbilityValue = karmaWind });
+            karmaWind.Events.Add(new ToughnessShred(null, this, this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue, Val = 60, AbilityValue = karmaWind });
+            karmaWind.Events.Add(new ResourceDrain(null, this, this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue, ResType = Resource.ResourceType.HP, TargetType = TargetTypeEnm.Self, CanSetToZero = false, CalculateValue = CalculateKarmaSelfDmg, AbilityValue = karmaWind, CurentTargetType = AbilityCurrentTargetEnm.AbilityMain });
+            karmaWind.Events.Add(new DirectDamage(null, this, this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue, CalculateValue = CalculateKarmaDmg, AbilityValue = karmaWind });
 
             Abilities.Add(karmaWind);
 

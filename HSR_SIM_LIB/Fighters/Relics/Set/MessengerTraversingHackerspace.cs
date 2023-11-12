@@ -27,7 +27,7 @@ namespace HSR_SIM_LIB.Fighters.Relics.Set
                         {
                             ApplyBuff eventBuff = new(null, this,Parent.Parent)
                             {
-                                OnStepType = Step.StepTypeEnm.ExecuteAbility,
+                                OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
                                 AbilityValue = step.ActorAbility,
                                 Parent = step,
                                 TargetUnit = unit,

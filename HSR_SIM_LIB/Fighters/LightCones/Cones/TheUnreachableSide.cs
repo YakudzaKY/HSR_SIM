@@ -35,25 +35,17 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
                 };
                 ent.ChildEvents.Add(newEvent);
             }
-            base.DefaultLightCone_HandleEvent(ent);
-        }
-
-        //remove buff when attack completed
-        public override void DefaultLightCone_HandleStep(Step step)
-        {
-            if (step.StepType is Step.StepTypeEnm.ExecuteAbility or  Step.StepTypeEnm.UnitFollowUpAction
-                              or Step.StepTypeEnm.UnitTurnContinued or   Step.StepTypeEnm.UnitTurnStarted
-                && step.Actor == Parent.Parent && (step.ActorAbility?.Attack??false) && uniqueBuff != null )
+            //remove buff when attack completed
+            if (ent.SourceUnit == Parent.Parent&&ent is ExecuteAbilityFinish&& ent.AbilityValue.Attack)
             {
-                RemoveBuff newEvent = new(step, this, Parent.Parent)
+                RemoveBuff newEvent = new(ent.Parent, this, Parent.Parent)
                 {
                     TargetUnit = Parent.Parent,
                     BuffToApply = uniqueBuff
                 };
-          
-                step.Events.Add(newEvent);
+                ent.ChildEvents.Add(newEvent);
             }
-            base.DefaultLightCone_HandleStep(step);
+            base.DefaultLightCone_HandleEvent(ent);
         }
 
         public TheUnreachableSide(IFighter parent, int rank) : base(parent, rank)

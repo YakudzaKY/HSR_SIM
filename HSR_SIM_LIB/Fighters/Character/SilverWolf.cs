@@ -92,9 +92,9 @@ namespace HSR_SIM_LIB.Fighters.Character
                 , IgnoreWeakness=true
             };
             //dmg events
-            ability.Events.Add(new DirectDamage(null, this, this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility,  CalculateValue = CalculateFqpDmg,  AbilityValue = ability });
+            ability.Events.Add(new DirectDamage(null, this, this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,  CalculateValue = CalculateFqpDmg,  AbilityValue = ability });
             //shield break in this case going after skill dmg
-            ability.Events.Add(new ResourceDrain(null, this, this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbility, ResType = Resource.ResourceType.Toughness, Val = 60, AbilityValue = ability });
+            ability.Events.Add(new ResourceDrain(null, this, this.Parent) { OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue, ResType = Resource.ResourceType.Toughness, Val = 60, AbilityValue = ability });
       
             Abilities.Add(ability);
 

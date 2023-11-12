@@ -29,7 +29,7 @@ namespace HSR_SIM_LIB.Fighters.Character
 
             //buff apply
             ApplyBuff eventBuff = new(null, this,this.Parent)
-                { OnStepType = Step.StepTypeEnm.ExecuteAbility,  AbilityValue = ability,
+                { OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,  AbilityValue = ability,
                     BuffToApply = (new Buff(Parent){Type=Buff.ModType.Buff,Effects = new List<Effect>(){new EffAtkPrc() { Value = 0.15}} ,BaseDuration= 2,Dispellable = true})
                 };
             ability.Events.Add(eventBuff);
