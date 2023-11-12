@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -9,6 +10,32 @@ namespace HSR_SIM_LIB.Fighters.Special
 {
     public class ForgottenHall : DefaultNPCFighter
     {
+        public override void DefaultFighter_HandleEvent(Event ent)
+        {
+            // wipe party if 1000+cycles
+            if ( ent.TargetUnit==Parent&& ent is IncreaseLevel && Parent.Level>=1000)
+            {
+                foreach (Unit unit in Parent.ParentTeam.ParentSim.PartyTeam.Units)
+                {
+
+                    ResourceDrain newEvent = new(ent.Parent, this,Parent)
+                    {
+                      
+                        TargetUnit = unit,
+                        CanSetToZero = true,
+                        ResType = Resource.ResourceType.HP,
+                        Val = unit.GetRes(Resource.ResourceType.HP).ResVal,
+                        AbilityValue = ent.AbilityValue
+
+                    };
+
+                    ent.ChildEvents.Add(newEvent);
+                }
+            }
+
+            base.DefaultFighter_HandleEvent(ent);
+        }
+
         public ForgottenHall(Unit parent) : base(parent)
         {
 

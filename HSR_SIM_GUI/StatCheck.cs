@@ -671,8 +671,8 @@ namespace HSR_SIM_GUI
             Chart newChart = new Chart();
             newChart.Size = new Size(380, 380);
             newChart.Palette = ChartColorPalette.Chocolate;
-            newChart.Titles.Add(new Title(task.Profile));
-            newChart.Titles.Add(new Title($"wr:{task.Data.WinRate:f}%     cycles:{task.Data.Cycles:f}     totalAV:{task.Data.TotalAV:f}"));
+            newChart.Titles.Add(new Title($"{task.Profile} wr:{task.Data.WinRate:f}%  , only win stats: "));
+            newChart.Titles.Add(new Title($"cycles:{task.Data.Cycles:f}     totalAV:{task.Data.TotalAV:f}"));
             //CharArea
             ChartArea dpsArea = new ChartArea("primaryArea");
 
