@@ -130,6 +130,7 @@ namespace HSR_SIM_LIB
             }
             else
             {
+                res.Cycles = sim.SpecialTeam.Units.FirstOrDefault(x => x.Name == "Forgotten Hall").Level;
                 res.Success = false;
             }
 

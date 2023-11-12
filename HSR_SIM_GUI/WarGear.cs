@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.DataFormats;
-using static HSR_SIM_GUI.Utils;
+using static HSR_SIM_GUI.GuiUtils;
 using System.Text.Json.Serialization;
 using System.Security.Policy;
 using System.Xml;
@@ -155,7 +155,7 @@ namespace HSR_SIM_GUI
         {
 
             InitializeComponent();
-            Utils.ApplyDarkLightTheme(this);
+            GuiUtils.ApplyDarkLightTheme(this);
 
         }
 

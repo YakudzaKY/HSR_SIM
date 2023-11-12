@@ -15,7 +15,7 @@ namespace HSR_SIM_GUI
         public DebugWindow()
         {
             InitializeComponent();
-            Utils.ApplyDarkLightTheme(this);
+            GuiUtils.ApplyDarkLightTheme(this);
         }
 
         private void dbgText_TextChanged(object sender, EventArgs e)

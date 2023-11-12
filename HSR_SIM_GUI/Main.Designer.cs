@@ -1,4 +1,4 @@
-﻿using static HSR_SIM_GUI.Utils;
+﻿using static HSR_SIM_GUI.GuiUtils;
 namespace HSR_SIM_GUI
 {
     partial class Main

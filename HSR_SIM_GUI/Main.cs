@@ -16,7 +16,7 @@ using Ini;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolBar;
 using static HSR_SIM_LIB.Worker;
-using static HSR_SIM_GUI.Utils;
+using static HSR_SIM_GUI.GuiUtils;
 using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_GUI
@@ -38,7 +38,7 @@ namespace HSR_SIM_GUI
         {
             if (string.Equals(kv.Key, Constant.MsgLog))
             {
-                Utils.AddLine(LogWindow, kv.Value, 400);
+                GuiUtils.AddLine(LogWindow, kv.Value, 400);
                 if (!busy)
                     LogWindow.ScrollToCaret();
             }
@@ -76,7 +76,7 @@ namespace HSR_SIM_GUI
             wrk = new Worker();
             wrk.CbLog += callBackStr;
             wrk.CbRend += callBackRender;
-            Utils.ApplyDarkLightTheme(this);
+            GuiUtils.ApplyDarkLightTheme(this);
         }
 
 

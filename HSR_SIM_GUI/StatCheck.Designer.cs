@@ -239,6 +239,7 @@ namespace HSR_SIM_GUI
             btnMainStats.TabIndex = 33;
             btnMainStats.Text = "mainstats";
             btnMainStats.UseVisualStyleBackColor = true;
+            btnMainStats.Click += btnMainStats_Click;
             // 
             // btnLoadSubstats
             // 
@@ -248,6 +249,7 @@ namespace HSR_SIM_GUI
             btnLoadSubstats.TabIndex = 32;
             btnLoadSubstats.Text = "substats";
             btnLoadSubstats.UseVisualStyleBackColor = true;
+            btnLoadSubstats.Click += btnLoadSubstats_Click;
             // 
             // dgStatUpgrades
             // 
