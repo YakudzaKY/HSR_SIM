@@ -238,20 +238,32 @@ namespace HSR_SIM_LIB.Fighters.Character
             Abilities.Add(PrayerOfAbyssFlower);
 
         
-            Ability SystemWarning;
-            //System Warning
-            SystemWarning = new Ability(this) {   AbilityType = Ability.AbilityTypeEnm.Basic
-                , Name = "FIX THOIS FUCKING ATTACK"
+            //basic attack
+            Ability ThornsoftheAbyss;
+            ThornsoftheAbyss = new Ability(this) {   AbilityType = Ability.AbilityTypeEnm.Basic
+                , Name = "Thorns of the Abyss"
                 , Element = Element
                 , AdjacentTargets = Ability.AdjacentTargetsEnm.None
                 , Attack=true
                 , EnergyGain = 20
                 , SpGain = 1
             };
-            //dmg events
-            SystemWarning.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateBasicDmg,  AbilityValue = SystemWarning });
-            SystemWarning.Events.Add(new ToughnessShred(null, this, this.Parent) { Val=30,  AbilityValue = SystemWarning });
-            Abilities.Add(SystemWarning);
+            //dmg events 0.3 x2 then 0.4
+            for (int i = 0; i < 2; i++)
+            {
+                ThornsoftheAbyss.Events.Add(new DirectDamage(null, this, this.Parent)
+                    { CalculateValue = CalculateBasicDmg, AbilityValue = ThornsoftheAbyss , CalculateProportion = 0.3});
+                ThornsoftheAbyss.Events.Add(new ToughnessShred(null, this, this.Parent)
+                    { Val = 30 * 0.3, AbilityValue = ThornsoftheAbyss });
+            }
+            ThornsoftheAbyss.Events.Add(new DirectDamage(null, this, this.Parent)
+                { CalculateValue = CalculateBasicDmg, AbilityValue = ThornsoftheAbyss , CalculateProportion = 0.4});
+            ThornsoftheAbyss.Events.Add(new ToughnessShred(null, this, this.Parent)
+                { Val = 30 * 0.4, AbilityValue = ThornsoftheAbyss });
+            Abilities.Add(ThornsoftheAbyss);
+
+
+
             //Mercy of a Fool
             var ability = new Ability(this)
             {

@@ -1,22 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
-using System.Xml;
 using HSR_SIM_GUI.ChartTools;
 using HSR_SIM_LIB;
-using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using HSR_SIM_LIB.Utils;
-using Tesseract;
 using static HSR_SIM_GUI.GuiUtils;
 using static HSR_SIM_LIB.Worker;
 using static HSR_SIM_GUI.DamageTools.OcrUtils;
@@ -34,9 +27,6 @@ namespace HSR_SIM_GUI
     public partial class StatCheck : Form
     {
 
-
-
-
         private Thread mainThread;
 
 
@@ -44,8 +34,6 @@ namespace HSR_SIM_GUI
         public StatCheck()
         {
             InitializeComponent();
-
-
         }
 
         private void RefreshCbs()
@@ -67,7 +55,9 @@ namespace HSR_SIM_GUI
         }
 
 
-
+        /// <summary>
+        /// force new OCR rectangles
+        /// </summary>
         private bool forceNewRect;
 
         private void LoadStatTable(Dictionary<string, string> table)
@@ -82,11 +72,11 @@ namespace HSR_SIM_GUI
                 chkStats.Items.Add(item.Key.ToString());
                 cbStatToReplace.Items.Add(item.Key);
             }
+
         }
         private void StatCheck_Load(object sender, EventArgs e)
         {
-            LoadStatTable(subStatsUpgrades);
-
+      
 
             RefreshCbs();
             cbScenario.Text = IniF.IniReadValue("form", "Scenario");
@@ -102,8 +92,6 @@ namespace HSR_SIM_GUI
             NmbThreadsCount.Value = Environment.ProcessorCount - 2;
             mainThread = null;
             reloadProfileCharacters();
-
-
 
             //replace calc items
             var mainQuery = (from p in subStatsUpgrades.Keys select p)
@@ -159,12 +147,7 @@ namespace HSR_SIM_GUI
                     gbGearReplace.Controls.Find($"gb{str}", false).First().Controls.Add(tbBox);
 
                 }
-
-
-
             }
-
-
             GuiUtils.ApplyDarkLightTheme(this);
         }
 
@@ -325,15 +308,7 @@ namespace HSR_SIM_GUI
                 newChart.Name = "Chart";
                 pnlCharts.Controls.Add(newChart);
             }
-
-
-
-
             BtnGo.Enabled = true;
-
-
-
-
         }
 
         //load distinct characters from profiles
@@ -359,12 +334,10 @@ namespace HSR_SIM_GUI
 
         private void chkProfiles_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            //delayed item check(coz in E new and old values, but in list are old values)
+            //delayed item check(coz in "ItemCheckEventArgs e" new and old values, but in list are old values)
             this.BeginInvoke((MethodInvoker)(
                 () => reloadProfileCharacters()));
         }
-
-
 
         private void setCalcVisible()
         {

@@ -191,7 +191,7 @@ namespace HSR_SIM_LIB.Fighters.Character
         //50-110
         public double? CalculateBasicDmg(Event ent)
         {
-            return FighterUtils.CalculateDmgByBasicVal((Parent.GetAttack(null) * (0.4 + (Parent.Skills.FirstOrDefault(x => x.Name == "Shard Sword").Level * 0.1))) * 0.5, ent);
+            return FighterUtils.CalculateDmgByBasicVal(Parent.GetAttack(null) * (0.4 + (Parent.Skills.FirstOrDefault(x => x.Name == "Shard Sword").Level * 0.1)) , ent);
         }
 
         public double getDsMaxLostHp(Event ent)
@@ -371,7 +371,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             for (int i = 0; i < 2; i++)
             {
                 shardSword.Events.Add(new DirectDamage(null, this, this.Parent)
-                { CalculateValue = CalculateBasicDmg, AbilityValue = shardSword });
+                { CalculateValue = CalculateBasicDmg, AbilityValue = shardSword ,CalculateProportion = 0.5});
                 shardSword.Events.Add(new ToughnessShred(null, this, this.Parent)
                 { Val = 30 * 0.5, AbilityValue = shardSword });
             }
