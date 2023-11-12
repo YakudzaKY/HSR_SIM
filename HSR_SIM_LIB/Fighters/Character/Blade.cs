@@ -157,7 +157,7 @@ namespace HSR_SIM_LIB.Fighters.Character
 
         private double getSgBasicDmg(Event ent)
         {
-            int skillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Shuhu's Gift").Level;
+            int skillLvl = Parent.Skills.First(x => x.Name == "Shuhu's Gift").Level;
             double attackPart = Parent.GetAttack(ent) * sgAtkMods[skillLvl];
             double maxHpPart = (Parent.GetMaxHp(ent) * sgHpMods[skillLvl]) + (Parent.Rank >= 6 ? 0.5 * Parent.GetMaxHp(ent) : 0);
             return attackPart + maxHpPart;
@@ -202,7 +202,7 @@ namespace HSR_SIM_LIB.Fighters.Character
         //damage for ULTI main target
         public double? CalculateDsDmg(Event ent)
         {
-            int skillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Death Sentence").Level;
+            int skillLvl = Parent.Skills.First(x => x.Name == "Death Sentence").Level;
             double attackPart = Parent.GetAttack(null) * dsMainAtkMods[skillLvl];
             double maxHpPart = Parent.GetMaxHp(ent) * dsMainHpMods[skillLvl];
             double hpLossPart = Math.Min(Mechanics.Values[deathSentence], getDsMaxLostHp(ent)) * dsMainHpMods[skillLvl];
@@ -215,7 +215,7 @@ namespace HSR_SIM_LIB.Fighters.Character
         //damage for ULTI adjacent target
         public double? CalculateDstDmgAdj(Event ent)
         {
-            int skillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Death Sentence").Level;
+            int skillLvl = Parent.Skills.First(x => x.Name == "Death Sentence").Level;
             double attackPart = Parent.GetAttack(null) * dsAdjAtkMods[skillLvl];
             double maxHpPart = Parent.GetMaxHp(ent) * dsAdjHpMods[skillLvl];
             double hpLossPart = Math.Min(Mechanics.Values[deathSentence], getDsMaxLostHp(ent)) * dsAdjHpLossMods[skillLvl];
@@ -226,7 +226,7 @@ namespace HSR_SIM_LIB.Fighters.Character
         //damage for main target
         public double? CalculateForestDmg(Event ent)
         {
-            int skillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Forest of Swords").Level;
+            int skillLvl = Parent.Skills.First(x => x.Name == "Forest of Swords").Level;
             double attackPart = Parent.GetAttack(ent) * (0.16 +
                                                          (skillLvl * 0.04));
             double maxHpPart = Parent.GetMaxHp(ent) * (0.4 + (skillLvl * 0.1));
@@ -236,7 +236,7 @@ namespace HSR_SIM_LIB.Fighters.Character
         //damage for adjacent target
         public double? CalculateForestDmgAdj(Event ent)
         {
-            int skillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Forest of Swords").Level;
+            int skillLvl = Parent.Skills.First(x => x.Name == "Forest of Swords").Level;
             double attackPart = Parent.GetAttack(ent) * forestAdjAtkMods[skillLvl];
             double maxHpPart = Parent.GetMaxHp(ent) * (0.16 + (skillLvl * 0.04));
             return FighterUtils.CalculateDmgByBasicVal(attackPart + maxHpPart, ent);

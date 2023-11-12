@@ -7,6 +7,7 @@ using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using ImageMagick;
+using static HSR_SIM_LIB.Skills.Ability;
 
 namespace HSR_SIM_LIB.Fighters.Character
 {
@@ -18,6 +19,13 @@ namespace HSR_SIM_LIB.Fighters.Character
             ,{ 6, 0.52 }, {7, 0.54 }, { 8, 0.56 }, { 9, 0.58}, { 10, 0.60 }
             ,{ 11, 0.62 }, { 12, 0.64 }
         };
+        private readonly Dictionary<int, double> DeathWishMods = new()
+        {
+            { 1, 1.20 }, { 2, 1.28 }, { 3, 1.36}, { 4, 1.44 }, { 5, 1.52 }
+            ,{ 6, 1.60 }, {7, 1.70 }, { 8, 1.80 }, { 9, 1.90}, { 10, 2 }
+            ,{ 11, 2.08 }, { 12, 2.16 }
+        };
+
 
         private List<Unit> trackedUnits = new List<Unit>();
 
@@ -29,11 +37,12 @@ namespace HSR_SIM_LIB.Fighters.Character
         public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Abundance;
         public sealed override Unit.ElementEnm Element { get; } = Unit.ElementEnm.Imaginary;
         private readonly Buff uniqueBuff = null;
-        private Ability cycleOfLife;
+        private readonly Ability cycleOfLife;
         private readonly double cycleOfLifeMaxCnt = 2;
-        private Ability PrayerOfAbyssFlowerAuto;
-        private Ability PrayerOfAbyssFlower;
-        private readonly Buff triggerCDBuff = null;
+        private readonly Ability prayerOfAbyssFlowerAuto;
+        private readonly Ability prayerOfAbyssFlower;
+        private readonly Ability ultimateAbility;
+        private readonly Buff triggerCdBuff = null;
 
         //If unit hp<=50% for Luocha follow up heals
         private bool UnitAtLowHpForAuto(Unit unit)
@@ -46,7 +55,7 @@ namespace HSR_SIM_LIB.Fighters.Character
         {
             //if unit consume hp or got attack then apply buff
 
-            if (ent is FinishCombat )
+            if (ent is FinishCombat)
             {
                 trackedUnits = new List<Unit>();
             }
@@ -71,7 +80,7 @@ namespace HSR_SIM_LIB.Fighters.Character
                     trackedUnits.Add(entTargetUnit);
                     Parent.ParentTeam.ParentSim.Parent.LogDebug($"{Parent.Name} add {entTargetUnit.Name} to track list");
                 }
-                else if (trackedUnits.Any(x => x == entTargetUnit) && (!UnitAtLowHpForAuto(entTargetUnit)||!entTargetUnit.IsAlive))
+                else if (trackedUnits.Any(x => x == entTargetUnit) && (!UnitAtLowHpForAuto(entTargetUnit) || !entTargetUnit.IsAlive))
                 {
                     //remove high hp unit from track
                     trackedUnits.Remove(entTargetUnit);
@@ -79,7 +88,7 @@ namespace HSR_SIM_LIB.Fighters.Character
                 }
             }
 
-           
+
         }
 
         public override void DefaultFighter_HandleStep(Step step)
@@ -90,7 +99,7 @@ namespace HSR_SIM_LIB.Fighters.Character
             {
                 CheckAndAddTarget(step.Actor);
                 //also check self  stacks
-                if (!ColBuffAvailable() &step.Actor ==Parent && (step.ActorAbility == PrayerOfAbyssFlowerAuto || step.ActorAbility == PrayerOfAbyssFlower))
+                if (!ColBuffAvailable() & step.Actor == Parent && (step.ActorAbility == ultimateAbility || step.ActorAbility == prayerOfAbyssFlowerAuto || step.ActorAbility == prayerOfAbyssFlower))
                 {
                     step.Events.Add(new MechanicValChg(step, this, Parent) { TargetUnit = Parent, Val = 1, AbilityValue = cycleOfLife });
                 }
@@ -113,7 +122,7 @@ namespace HSR_SIM_LIB.Fighters.Character
 
         public bool PoAFAvailable()
         {
-            return  Parent.Buffs.All(x => x.Reference != triggerCDBuff) && (trackedUnits?.Any(x => x.IsAlive)??false);
+            return Parent.Buffs.All(x => x.Reference != triggerCdBuff) && (trackedUnits?.Any(x => x.IsAlive) ?? false);
         }
 
         public bool ColBuffAvailable()
@@ -123,17 +132,23 @@ namespace HSR_SIM_LIB.Fighters.Character
 
         public double? CalculateBasicDmg(Event ent)
         {
-            return FighterUtils.CalculateDmgByBasicVal(Parent.GetAttack(null) *(0.4 + (Parent.Skills.FirstOrDefault(x=>x.Name=="Thorns of the Abyss").Level*0.1)), ent);
+            return FighterUtils.CalculateDmgByBasicVal(Parent.GetAttack(null) * (0.4 + (Parent.Skills.First(x => x.Name == "Thorns of the Abyss").Level * 0.1)), ent);
         }
 
 
         //50-110
         public double? CalculatePrayerOfAbyssFlower(Event ent)
         {
-            int skillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Prayer of Abyss Flower")!.Level;
+            int skillLvl = Parent.Skills.First(x => x.Name == "Prayer of Abyss Flower")!.Level;
             return FighterUtils.CalculateHealByBasicVal((Parent.GetAttack(null) * PoAFAtkMods[skillLvl]) + PoAFFix[skillLvl], ent);
         }
 
+
+        public double? CalculateUltimateDmg(Event ent)
+        {
+            int skillLvl = Parent.Skills.First(x => x.Name == "Death Wish")!.Level;
+            return FighterUtils.CalculateDmgByBasicVal(Parent.GetAttack(null) * DeathWishMods[skillLvl], ent);
+        }
         //get targets for auto heal. One target for Luocha
         public IEnumerable<Unit> CalcFollowPoAFTarget()
         {
@@ -153,7 +168,7 @@ namespace HSR_SIM_LIB.Fighters.Character
                 CustomIconName = "Icon_Abyss_Flower"
             };
 
-            triggerCDBuff = new Buff(Parent)
+            triggerCdBuff = new Buff(Parent)
             {
                 Type = Buff.ModType.Buff,
                 BaseDuration = 2,
@@ -189,8 +204,35 @@ namespace HSR_SIM_LIB.Fighters.Character
             Mechanics.AddVal(cycleOfLife);
             Abilities.Add(cycleOfLife);
 
+            //Prayer of Abyss Flower
+            prayerOfAbyssFlower = new Ability(this)
+            {
+                AbilityType = Ability.AbilityTypeEnm.Ability
+                ,
+                Name = "Prayer of Abyss Flower"
+                ,
+                Element = Element
+                ,
+                TargetType = Ability.TargetTypeEnm.Friend
+                ,
+                CostType = Resource.ResourceType.SP
+                ,
+                Cost = 1
+                ,
+                EnergyGain = 30
+            };
+            if (Atraces.HasFlag(ATracesEnm.A2))
+                prayerOfAbyssFlower.Events.Add(new DispelShit(null, this, this.Parent)
+                { AbilityValue = prayerOfAbyssFlower });
+
+            prayerOfAbyssFlower.Events.Add(new Healing(null, this, this.Parent) { CalculateValue = CalculatePrayerOfAbyssFlower, AbilityValue = prayerOfAbyssFlower });
+
+
+            Abilities.Add(prayerOfAbyssFlower);
+
+
             //Prayer of Abyss Flower(auto)
-            PrayerOfAbyssFlowerAuto = new Ability(this)
+            prayerOfAbyssFlowerAuto = new Ability(this)
             {
                 AbilityType = Ability.AbilityTypeEnm.FollowUpAction
                 ,
@@ -206,62 +248,83 @@ namespace HSR_SIM_LIB.Fighters.Character
                 ,
                 EnergyGain = 30
             };
-            PrayerOfAbyssFlowerAuto.Events.Add(new Healing(null, this, this.Parent) { CalculateTargets = CalcFollowPoAFTarget, CalculateValue = CalculatePrayerOfAbyssFlower, AbilityValue = PrayerOfAbyssFlowerAuto });
-            PrayerOfAbyssFlowerAuto.Events.Add(new ApplyBuff(null, this, Parent)
+            if (Atraces.HasFlag(ATracesEnm.A2))
+                prayerOfAbyssFlowerAuto.Events.Add(new DispelShit(null, this, this.Parent) { CalculateTargets = CalcFollowPoAFTarget, AbilityValue = prayerOfAbyssFlowerAuto });
+            prayerOfAbyssFlowerAuto.Events.Add(new Healing(null, this, this.Parent) { CalculateTargets = CalcFollowPoAFTarget, CalculateValue = CalculatePrayerOfAbyssFlower, AbilityValue = prayerOfAbyssFlowerAuto });
+            prayerOfAbyssFlowerAuto.Events.Add(new ApplyBuff(null, this, Parent)
             {
-                AbilityValue = PrayerOfAbyssFlowerAuto,
+                AbilityValue = prayerOfAbyssFlowerAuto,
                 TargetUnit = Parent,
-                BuffToApply = triggerCDBuff
+                BuffToApply = triggerCdBuff
             });
-            //TODO DISPELL BULLSHIT
-            Abilities.Add(PrayerOfAbyssFlowerAuto);
+            Abilities.Add(prayerOfAbyssFlowerAuto);
 
 
-            //Prayer of Abyss Flower
-            PrayerOfAbyssFlower = new Ability(this)
+
+
+
+            //basic attack
+            Ability ThornsoftheAbyss;
+            ThornsoftheAbyss = new Ability(this)
             {
-                AbilityType = Ability.AbilityTypeEnm.Ability
+                AbilityType = Ability.AbilityTypeEnm.Basic
                 ,
-                Name = "Prayer of Abyss Flower"
+                Name = "Thorns of the Abyss"
                 ,
                 Element = Element
                 ,
-                TargetType = Ability.TargetTypeEnm.Friend
-                ,CostType = Resource.ResourceType.SP
-                ,Cost = 1
+                AdjacentTargets = Ability.AdjacentTargetsEnm.None
                 ,
-                EnergyGain = 30
+                Attack = true
+                ,
+                EnergyGain = 20
+                ,
+                SpGain = 1
             };
 
-            //todo fullfill events
-            PrayerOfAbyssFlower.Events.Add(new Healing(null, this, this.Parent) { CalculateValue = CalculatePrayerOfAbyssFlower, AbilityValue = PrayerOfAbyssFlowerAuto });
-            Abilities.Add(PrayerOfAbyssFlower);
-
-        
-            //basic attack
-            Ability ThornsoftheAbyss;
-            ThornsoftheAbyss = new Ability(this) {   AbilityType = Ability.AbilityTypeEnm.Basic
-                , Name = "Thorns of the Abyss"
-                , Element = Element
-                , AdjacentTargets = Ability.AdjacentTargetsEnm.None
-                , Attack=true
-                , EnergyGain = 20
-                , SpGain = 1
-            };
-            //dmg events 0.3 x2 then 0.4
             for (int i = 0; i < 2; i++)
             {
                 ThornsoftheAbyss.Events.Add(new DirectDamage(null, this, this.Parent)
-                    { CalculateValue = CalculateBasicDmg, AbilityValue = ThornsoftheAbyss , CalculateProportion = 0.3});
+                { CalculateValue = CalculateBasicDmg, AbilityValue = ThornsoftheAbyss, CalculateProportion = 0.3 });
                 ThornsoftheAbyss.Events.Add(new ToughnessShred(null, this, this.Parent)
-                    { Val = 30 * 0.3, AbilityValue = ThornsoftheAbyss });
+                { Val = 30 * 0.3, AbilityValue = ThornsoftheAbyss });
             }
             ThornsoftheAbyss.Events.Add(new DirectDamage(null, this, this.Parent)
-                { CalculateValue = CalculateBasicDmg, AbilityValue = ThornsoftheAbyss , CalculateProportion = 0.4});
+            { CalculateValue = CalculateBasicDmg, AbilityValue = ThornsoftheAbyss, CalculateProportion = 0.4 });
             ThornsoftheAbyss.Events.Add(new ToughnessShred(null, this, this.Parent)
-                { Val = 30 * 0.4, AbilityValue = ThornsoftheAbyss });
+            { Val = 30 * 0.4, AbilityValue = ThornsoftheAbyss });
             Abilities.Add(ThornsoftheAbyss);
 
+
+            // ULTIMATE
+            ultimateAbility = new Ability(this)
+            {
+                AbilityType = Ability.AbilityTypeEnm.Ultimate
+                ,
+                Name = "Death Wish"
+                ,
+                AdjacentTargets = Ability.AdjacentTargetsEnm.All
+                ,
+                Attack = true
+                ,
+                EnergyGain = 5
+                ,
+                Available = UltimateAvailable
+                ,
+                Priority = PriorityEnm.Ultimate
+                ,
+                EndTheTurn = false
+                ,
+                CostType = Resource.ResourceType.Energy
+                ,
+                Cost = Parent.Stats.BaseMaxEnergy
+
+            };
+            //dmg events
+            ultimateAbility.Events.Add(new DispelGood(null, this, this.Parent) { AbilityValue = ultimateAbility, CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
+            ultimateAbility.Events.Add(new DirectDamage(null, this, this.Parent) { CalculateValue = CalculateUltimateDmg, AbilityValue = ultimateAbility, CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
+            ultimateAbility.Events.Add(new ToughnessShred(null, this, this.Parent) { Val = 60, AbilityValue = ultimateAbility, CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
+            Abilities.Add(ultimateAbility);
 
 
             //Mercy of a Fool
