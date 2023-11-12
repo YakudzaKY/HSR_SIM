@@ -1,48 +1,33 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using HSR_SIM_LIB.Skills;
 
-namespace HSR_SIM_LIB.Fighters
+namespace HSR_SIM_LIB.Fighters;
+
+/// <summary>
+///     dictionary with mechancis
+/// </summary>
+public class MechDictionary
 {
-    /// <summary>
-    /// dictionary with mechancis
-    /// </summary>
-    public class MechDictionary 
+    public Dictionary<Ability, double> Values { get; } = new();
+
+
+    //reset values in mich dictionary
+    public void Reset()
     {
- 
-
-        //reset values in mich dictionary
-        public void Reset()
-        {
-            foreach (var item in Values)
-            {
-               
-                
-                Values[item.Key] = 0;
-              
-            }
-        }
+        foreach (var item in Values) Values[item.Key] = 0;
+    }
 
 
+    public void AddVal(Ability ability)
+    {
+        Values.Add(ability, 0);
+    }
 
 
-        public Dictionary<Ability, double> Values { get; }= new Dictionary<Ability, double>();
-
-    
-        
-        public void AddVal(Ability ability)
-        {
-             Values.Add(ability,0);
-        }
-
-
-        public IEnumerator GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
+    public IEnumerator GetEnumerator()
+    {
+        throw new NotImplementedException();
     }
 }

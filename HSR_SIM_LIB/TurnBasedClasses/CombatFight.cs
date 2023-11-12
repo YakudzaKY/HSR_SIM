@@ -1,50 +1,39 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.UnitStuff;
 using static HSR_SIM_LIB.TurnBasedClasses.Step;
 
-namespace HSR_SIM_LIB.TurnBasedClasses
+namespace HSR_SIM_LIB.TurnBasedClasses;
+
+internal class CombatFight
 {
-    internal class CombatFight
+    public CombatFight(Fight refFight, SimCls parent)
     {
-        public SimCls Parent { get; set; }
-        private Fight referenceFight;
-        private short currentWaveCnt = 0;
-        private Wave currentWave;
-        public short CurrentWaveCnt { get => currentWaveCnt; set => currentWaveCnt = value; }
-        public Fight ReferenceFight { get => referenceFight; set => referenceFight = value; }
-        internal Wave CurrentWave { get => currentWave; set => currentWave = value; }
+        ReferenceFight = refFight;
+        Parent = parent;
+    }
 
-        public TurnR Turn { get; set; } = null;
+    public SimCls Parent { get; set; }
+    public short CurrentWaveCnt { get; set; } = 0;
+    public Fight ReferenceFight { get; set; }
 
-        public record TurnR
+    internal Wave CurrentWave { get; set; }
+
+    public TurnR Turn { get; set; } = null;
+
+
+    public IEnumerable<Unit> AllAliveUnits
+    {
+        get
         {
-            public Unit Actor { get; set; } = null;
-            public StepTypeEnm? TurnStage { get; set; }= null;
-
+            return Parent?.PartyTeam.Units.Where(x => x.IsAlive)
+                .Concat(Parent.HostileTeam.Units.Where(x => x.IsAlive)).Concat(Parent.SpecialTeam.Units);
         }
+    }
 
-
-
-        public IEnumerable<Unit> AllAliveUnits
-        {
-            get
-            {
-                return Parent?.PartyTeam.Units.Where(x => x.IsAlive)
-                    .Concat(Parent.HostileTeam.Units.Where(x => x.IsAlive)).Concat(Parent.SpecialTeam.Units);
-
-            }
-
-        }
-
-        public CombatFight(Fight refFight, SimCls parent)
-        {
-
-            ReferenceFight = refFight;
-            Parent = parent;
-        }
-
-
+    public record TurnR
+    {
+        public Unit Actor { get; set; } = null;
+        public StepTypeEnm? TurnStage { get; set; } = null;
     }
 }

@@ -1,12 +1,9 @@
 ﻿using System.Collections.Generic;
 
-namespace HSR_SIM_LIB.TurnBasedClasses
-{
-    public class Fight
-    {
-        List<Wave> waves;
+namespace HSR_SIM_LIB.TurnBasedClasses;
 
-        public string Name { get; internal set; }
-        internal List<Wave> Waves { get => waves; set => waves = value; }
-    }
+public class Fight
+{
+    public string Name { get; internal set; }
+    internal List<Wave> Waves { get; set; }
 }

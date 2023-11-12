@@ -1,41 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 
-namespace HSR_SIM_LIB.Fighters.Relics.Set
+namespace HSR_SIM_LIB.Fighters.Relics.Set;
+
+public class SpaceSealingStation : DefaultRelicSet
 {
-    public class SpaceSealingStation:DefaultRelicSet
+    public SpaceSealingStation(IFighter parent, int num) : base(parent, num)
     {
-        public ConditionMod GetMod()
-        {
-            return new ConditionMod(Parent.Parent)
-            {
-                Mod = new Buff(Parent.Parent)
-                {
-                    Effects = new List<Effect>() { new EffAtkPrc() { Value = 0.12 } },
-                    CustomIconName = "gear\\" + GetType().ToString().Split('.').Last()
-                },
-                Target = Parent.Parent,
-                Condition = new ConditionMod.ConditionRec()
-                {
-                    CondtionParam = ConditionMod.ConditionCheckParam.SPD,
-                    CondtionExpression = ConditionMod.ConditionCheckExpression.EqualOrMore,
-                    Value = 120
-                }
-            };
-        }
+        if (num >= 2) ConditionMods.Add(GetMod());
+    }
 
-        public SpaceSealingStation(IFighter parent, int num) : base(parent, num)
+    public ConditionMod GetMod()
+    {
+        return new ConditionMod(Parent.Parent)
         {
-            if (num >= 2)
+            Mod = new Buff(Parent.Parent)
             {
-                ConditionMods.Add(GetMod());
+                Effects = new List<Effect> { new EffAtkPrc { Value = 0.12 } },
+                CustomIconName = "gear\\" + GetType().ToString().Split('.').Last()
+            },
+            Target = Parent.Parent,
+            Condition = new ConditionMod.ConditionRec
+            {
+                CondtionParam = ConditionMod.ConditionCheckParam.SPD,
+                CondtionExpression = ConditionMod.ConditionCheckExpression.EqualOrMore,
+                Value = 120
             }
-
-        }
+        };
     }
 }

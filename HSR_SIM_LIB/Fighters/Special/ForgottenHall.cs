@@ -1,76 +1,63 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using static HSR_SIM_LIB.Skills.Ability;
 
-namespace HSR_SIM_LIB.Fighters.Special
+namespace HSR_SIM_LIB.Fighters.Special;
+
+public class ForgottenHall : DefaultNPCFighter
 {
-    public class ForgottenHall : DefaultNPCFighter
+    public ForgottenHall(Unit parent) : base(parent)
     {
-        public override void DefaultFighter_HandleEvent(Event ent)
+        Ability IncreaseCycle;
+        //Karma Wind
+        IncreaseCycle = new Ability(this)
         {
-            // wipe party if 1000+cycles
-            if ( ent.TargetUnit==Parent&& ent is IncreaseLevel && Parent.Level>=1000)
+            AbilityType = AbilityTypeEnm.Ability,
+            Name = "Cycle Set",
+            Attack = false,
+            TargetType = TargetTypeEnm.Self,
+            AdjacentTargets = AdjacentTargetsEnm.None,
+            EndTheTurn = true
+        };
+        //dmg events
+        IncreaseCycle.Events.Add(new IncreaseLevel(null, this, Parent)
+            { Val = 1, TargetType = TargetTypeEnm.Self, AbilityValue = IncreaseCycle });
+
+        IncreaseCycle.Events.Add(new ApplyBuff(null, this, Parent)
+        {
+            AbilityValue = IncreaseCycle,
+            BuffToApply = new Buff(Parent)
             {
-                foreach (Unit unit in Parent.ParentTeam.ParentSim.PartyTeam.Units)
+                Type = Buff.ModType.Buff,
+                Effects = new List<Effect> { new EffReduceBAV { Value = 50 } },
+                BaseDuration = 1,
+                Dispellable = false
+            }
+        });
+        Abilities.Add(IncreaseCycle);
+    }
+
+    public override void DefaultFighter_HandleEvent(Event ent)
+    {
+        // wipe party if 1000+cycles
+        if (ent.TargetUnit == Parent && ent is IncreaseLevel && Parent.Level >= 1000)
+            foreach (var unit in Parent.ParentTeam.ParentSim.PartyTeam.Units)
+            {
+                ResourceDrain newEvent = new(ent.Parent, this, Parent)
                 {
+                    TargetUnit = unit,
+                    CanSetToZero = true,
+                    ResType = Resource.ResourceType.HP,
+                    Val = unit.GetRes(Resource.ResourceType.HP).ResVal,
+                    AbilityValue = ent.AbilityValue
+                };
 
-                    ResourceDrain newEvent = new(ent.Parent, this,Parent)
-                    {
-                      
-                        TargetUnit = unit,
-                        CanSetToZero = true,
-                        ResType = Resource.ResourceType.HP,
-                        Val = unit.GetRes(Resource.ResourceType.HP).ResVal,
-                        AbilityValue = ent.AbilityValue
-
-                    };
-
-                    ent.ChildEvents.Add(newEvent);
-                }
+                ent.ChildEvents.Add(newEvent);
             }
 
-            base.DefaultFighter_HandleEvent(ent);
-        }
-
-        public ForgottenHall(Unit parent) : base(parent)
-        {
-
-            Ability IncreaseCycle;
-            //Karma Wind
-            IncreaseCycle = new Ability(this)
-            {
-                AbilityType = Ability.AbilityTypeEnm.Ability
-                ,
-                Name = "Cycle Set"
-                ,
-                Attack = false
-                ,
-                TargetType = Ability.TargetTypeEnm.Self
-                ,
-                AdjacentTargets = AdjacentTargetsEnm.None
-                ,
-                EndTheTurn = true
-
-            };
-            //dmg events
-            IncreaseCycle.Events.Add(new IncreaseLevel(null, this, this.Parent) { Val = 1, TargetType = TargetTypeEnm.Self, AbilityValue = IncreaseCycle });
-
-            IncreaseCycle.Events.Add(new ApplyBuff(null, this, this.Parent)
-            {
-                AbilityValue = IncreaseCycle,
-                BuffToApply = (new Buff(Parent)
-                {
-                    Type = Buff.ModType.Buff,
-                    Effects = new List<Effect>() { new EffReduceBAV() { Value = 50 } },
-                    BaseDuration = 1,
-                    Dispellable = false
-                })
-            });
-            Abilities.Add(IncreaseCycle);
-        }
+        base.DefaultFighter_HandleEvent(ent);
     }
 }

@@ -1,22 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.UnitStuff;
 
-namespace HSR_SIM_LIB.Skills.ReadyBuffs
+namespace HSR_SIM_LIB.Skills.ReadyBuffs;
+
+public class BuffBleedWB : Buff
 {
-    public class BuffBleedWB : Buff
+    public BuffBleedWB(Unit caster, Buff reference = null) : base(caster, reference)
     {
-        public BuffBleedWB(Unit caster, Buff reference = null) : base(caster, reference)
-        {
-            DoNotClone = true;
-            Type = ModType.Dot;
-            BaseDuration = 2;
-            Effects = new List<Effect>() { new EffBleed() { CalculateValue = FighterUtils.CalculateShieldBrokeDmg } };
-        }
+        DoNotClone = true;
+        Type = ModType.Dot;
+        BaseDuration = 2;
+        Effects = new List<Effect> { new EffBleed { CalculateValue = FighterUtils.CalculateShieldBrokeDmg } };
     }
 }
