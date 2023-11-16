@@ -8,7 +8,7 @@ public class EffFreeze : Effect
     {
         if (mod == mod.Caster.Fighter.ShieldBreakMod)
         {
-            var dotProcEvent = new ToughnessBreakDoTDamage(ent.Parent, mod.Caster, mod.Caster)
+            var dotProcEvent = new ToughnessBreakDoTDamage(ent.ParentStep, mod.Caster, mod.Caster)
             {
                 CalculateValue = CalculateValue,
                 TargetUnit = ent.TargetUnit,
@@ -19,7 +19,7 @@ public class EffFreeze : Effect
         }
         else
         {
-            var dotProcEvent = new DoTDamage(ent.Parent, mod.Caster, mod.Caster)
+            var dotProcEvent = new DoTDamage(ent.ParentStep, mod.Caster, mod.Caster)
             {
                 CalculateValue = CalculateValue,
                 TargetUnit = ent.TargetUnit,

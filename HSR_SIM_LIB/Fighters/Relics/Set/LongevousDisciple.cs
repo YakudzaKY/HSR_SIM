@@ -20,6 +20,7 @@ internal class LongevousDisciple : DefaultRelicSet
         };
     }
 
+    private Step lastDamageStep = null;
     public override void DefaultRelicSet_HandleEvent(Event ent)
     {
         //if friend unit consume our hp or got attack then apply buff
@@ -28,9 +29,12 @@ internal class LongevousDisciple : DefaultRelicSet
                  && ent.AbilityValue?.Parent.Parent.ParentTeam == Parent.Parent.ParentTeam
                  && ent.TargetUnit == Parent.Parent
                  && ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal != 0)
-                || (ent.TargetUnit == Parent.Parent && ent is DirectDamage))
+                || (ent.TargetUnit == Parent.Parent && ent is DirectDamage && ent.ParentStep!=lastDamageStep))
             {
-                ApplyBuff newEvent = new(ent.Parent, this, Parent.Parent)
+                //only one proc per action 
+                if (ent is DirectDamage)
+                    lastDamageStep = ent.ParentStep;
+                ApplyBuff newEvent = new(ent.ParentStep, this, Parent.Parent)
                 {
                     TargetUnit = Parent.Parent,
                     BuffToApply = uniqueBuff

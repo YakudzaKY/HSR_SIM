@@ -18,7 +18,7 @@ public class ToughnessShred : Event
                  TargetUnit.Fighter.Weaknesses.Any(x => x == AbilityValue.Element)) || AbilityValue.IgnoreWeakness)
                 ChildEvents.Add(new ResourceDrain(null, null, AbilityValue.Parent.Parent)
                 {
-                    Parent = Parent,
+                    ParentStep = ParentStep,
                     TargetUnit = TargetUnit,
                     ResType = Resource.ResourceType.Toughness,
                     Val = Val,

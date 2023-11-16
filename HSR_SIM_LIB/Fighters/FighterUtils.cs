@@ -76,8 +76,8 @@ public static class FighterUtils
         var defender = ent.TargetUnit;
         var attackElem = ent.AbilityValue?.Element ?? attacker.Fighter.Element;
 
-        ent.Parent.Parent.Parent?.LogDebug("=======================");
-        ent.Parent.Parent.Parent?.LogDebug(
+        ent.ParentStep.Parent.Parent?.LogDebug("=======================");
+        ent.ParentStep.Parent.Parent?.LogDebug(
             $"{attacker.Name:s} ({attacker.ParentTeam.Units.IndexOf(attacker) + 1:d}) Break shield of {defender.Name} ({defender.ParentTeam.Units.IndexOf(defender) + 1:d})");
         double baseDmg;
         var maxToughnessMult = 0.5 + (double)defender.Stats.MaxToughness / 120;
@@ -139,13 +139,13 @@ public static class FighterUtils
         var vulnMult = 1 + defender.GetElemVulnerability(attackElem, ent) + defender.GetAllDamageVulnerability(ent);
         var brokenMultiplier = defender.GetBrokenMultiplier();
         var totalDmg = baseDmg * breakEffect * defMultiplier * resPen * vulnMult * brokenMultiplier;
-        ent.Parent.Parent.Parent?.LogDebug($"baseDmg({baseDmg:f}) ; breakEffect({breakEffect:f})");
-        ent.Parent.Parent.Parent?.LogDebug($"Def {def:f} -> ignored to {defWithIgnore:f} ");
-        ent.Parent.Parent.Parent?.LogDebug(
+        ent.ParentStep.Parent.Parent?.LogDebug($"baseDmg({baseDmg:f}) ; breakEffect({breakEffect:f})");
+        ent.ParentStep.Parent.Parent?.LogDebug($"Def {def:f} -> ignored to {defWithIgnore:f} ");
+        ent.ParentStep.Parent.Parent?.LogDebug(
             $"defMultiplier({defMultiplier:f}) = 1-(defender.Stats.Def({defWithIgnore:f})/(defender.Stats.Def({defWithIgnore:f})+200+(10*attacker.Level({attacker.Level:d}))))");
-        ent.Parent.Parent.Parent?.LogDebug(
+        ent.ParentStep.Parent.Parent?.LogDebug(
             $"resPen= {resPen:f} ; vulnMult= {vulnMult:f} ; brokenMultiplier= {brokenMultiplier:f}");
-        ent.Parent.Parent.Parent?.LogDebug($"TOTAL DAMAGE= {totalDmg:f}");
+        ent.ParentStep.Parent.Parent?.LogDebug($"TOTAL DAMAGE= {totalDmg:f}");
         return totalDmg;
     }
 
@@ -202,18 +202,18 @@ public static class FighterUtils
 
         var totalDmg = baseDmg * critMultiplier * damageBoost * defMultiplier * resPen * vulnMult *
                        dmgReduction * brokenMultiplier;
-        ent.Parent.Parent.Parent?.LogDebug("=======================");
-        ent.Parent.Parent.Parent?.LogDebug($"baseDmg={baseDmg:f} crit chance={attacker.GetCritRate(ent):f} ");
-        ent.Parent.Parent.Parent?.LogDebug(
+        ent.ParentStep.Parent.Parent?.LogDebug("=======================");
+        ent.ParentStep.Parent.Parent?.LogDebug($"baseDmg={baseDmg:f} crit chance={attacker.GetCritRate(ent):f} ");
+        ent.ParentStep.Parent.Parent?.LogDebug(
             $"{attacker.Name:s} ({attacker.ParentTeam.Units.IndexOf(attacker) + 1:d}) Damaging {defender.Name} ({defender.ParentTeam.Units.IndexOf(defender) + 1:d})");
-        ent.Parent.Parent.Parent?.LogDebug(
+        ent.ParentStep.Parent.Parent?.LogDebug(
             $"damageBoost({damageBoost:f}) = 1+ GetElemBoostValue({attacker.GetElemBoostValue(attackElem, ent):f})  +AllDmgBoost({attacker.AllDmgBoost(ent):f}) + dotMultiplier({dotMultiplier:f})");
-        ent.Parent.Parent.Parent?.LogDebug($"Def {def:f} -> ignored to {defWithIgnore:f} ");
-        ent.Parent.Parent.Parent?.LogDebug(
+        ent.ParentStep.Parent.Parent?.LogDebug($"Def {def:f} -> ignored to {defWithIgnore:f} ");
+        ent.ParentStep.Parent.Parent?.LogDebug(
             $"defMultiplier({defMultiplier:f}) = 1-(defender.Stats.Def({defWithIgnore:f})/(defender.Stats.Def({defWithIgnore:f})+200+(10*attacker.Level({attacker.Level:d}))))");
-        ent.Parent.Parent.Parent?.LogDebug(
+        ent.ParentStep.Parent.Parent?.LogDebug(
             $"resPen= {resPen:f} ; vulnMult= {vulnMult:f} ; critMultiplier={critMultiplier:f} ; dmgReduction= {dmgReduction:f} ; brokenMultiplier= {brokenMultiplier:f} ; abilityTypeMultiplier {attacker.GetAbilityTypeMultiplier(ent):f}");
-        ent.Parent.Parent.Parent?.LogDebug($"TOTAL DAMAGE= {totalDmg:f}");
+        ent.ParentStep.Parent.Parent?.LogDebug($"TOTAL DAMAGE= {totalDmg:f}");
         return totalDmg;
     }
 
@@ -234,8 +234,8 @@ public static class FighterUtils
         var realChance = baseChance * (1 + effectHitRate) * (1 - effectRes) * (1 - debuffRes) * (1 - ccRes);
 
 
-        ent.Parent.Parent.Parent?.LogDebug("=======================");
-        ent.Parent.Parent.Parent?.LogDebug(
+        ent.ParentStep.Parent.Parent?.LogDebug("=======================");
+        ent.ParentStep.Parent.Parent?.LogDebug(
             $"Debuff realChance {realChance:f} =baseChance {baseChance:f} * (1+ effectHitRate {effectHitRate:f})* (1- effectRes {effectRes:f})  * (1- debuffRes {debuffRes:f})" +
             (isCC ? $"* (1- ccRes {ccRes:f})" : ""));
 
@@ -257,8 +257,8 @@ public static class FighterUtils
         var prcShieldBonus = attacker.PrcShieldBonus(ent);
         var shieldVal = (baseVal + additiveShieldBonus) * (1 + prcShieldBonus);
 
-        ent.Parent.Parent.Parent?.LogDebug("=======================");
-        ent.Parent.Parent.Parent?.LogDebug(
+        ent.ParentStep.Parent.Parent?.LogDebug("=======================");
+        ent.ParentStep.Parent.Parent?.LogDebug(
             $"Shield val is {shieldVal:f} = (baseVal {baseVal:f} + additiveShieldBonus {additiveShieldBonus:f}) * (1+ prcShieldBonus{prcShieldBonus:f})");
         return shieldVal;
     }
@@ -276,8 +276,8 @@ public static class FighterUtils
         var outMod = healer.GetOutgoingHealMultiplier(ent);
         var inMod = receiver.GetIncomingHealMultiplier(ent);
         var res = baseHeal * outMod * inMod;
-        ent.Parent.Parent.Parent?.LogDebug("=======================");
-        ent.Parent.Parent.Parent?.LogDebug(
+        ent.ParentStep.Parent.Parent?.LogDebug("=======================");
+        ent.ParentStep.Parent.Parent?.LogDebug(
             $"Heal val is {res:f} = baseHeal{baseHeal:f} * outMod{outMod:f} *  inMod{inMod:f}");
         return res;
     }

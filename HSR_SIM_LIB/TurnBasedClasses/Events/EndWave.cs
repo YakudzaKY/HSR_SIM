@@ -25,16 +25,16 @@ public class EndWave : Event
         if (!revert)
         {
             if (!TriggersHandled)
-                UnloadedUnits = Parent.Parent.HostileTeam.Units;
+                UnloadedUnits = ParentStep.Parent.HostileTeam.Units;
 
-            Parent.Parent.HostileTeam.UnBindUnits();
-            Parent.Parent.CurrentFight.CurrentWave = null;
+            ParentStep.Parent.HostileTeam.UnBindUnits();
+            ParentStep.Parent.CurrentFight.CurrentWave = null;
         }
         else
         {
-            Parent.Parent.CurrentFight.CurrentWave =
-                Parent.Parent.CurrentFight.ReferenceFight.Waves[Parent.Parent.CurrentFight.CurrentWaveCnt - 1];
-            Parent.Parent.HostileTeam.BindUnits(UnloadedUnits);
+            ParentStep.Parent.CurrentFight.CurrentWave =
+                ParentStep.Parent.CurrentFight.ReferenceFight.Waves[ParentStep.Parent.CurrentFight.CurrentWaveCnt - 1];
+            ParentStep.Parent.HostileTeam.BindUnits(UnloadedUnits);
         }
 
         base.ProcEvent(revert);

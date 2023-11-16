@@ -25,7 +25,7 @@ public class SilverWolf : DefaultFighter
         {
             AbilityType = Ability.AbilityTypeEnm.Technique, Name = "Force Quit Program", Cost = 1,
             CostType = Resource.ResourceType.TP, Element = Element, AdjacentTargets = Ability.AdjacentTargetsEnm.All,
-            Attack = true, IgnoreWeakness = true
+            IgnoreWeakness = true
         };
         //dmg events
         ability.Events.Add(new DirectDamage(null, this, Parent)
@@ -48,7 +48,7 @@ public class SilverWolf : DefaultFighter
         SystemWarning = new Ability(this)
         {
             AbilityType = Ability.AbilityTypeEnm.Basic, Name = "System Warning", Element = Element,
-            AdjacentTargets = Ability.AdjacentTargetsEnm.None, Attack = true, EnergyGain = 20, SpGain = 1
+            AdjacentTargets = Ability.AdjacentTargetsEnm.None, EnergyGain = 20, SpGain = 1
         };
         //dmg events
         SystemWarning.Events.Add(new DirectDamage(null, this, Parent)
@@ -78,7 +78,7 @@ public class SilverWolf : DefaultFighter
             //if enemy enter combat need debuff
             if (Parent.Enemies.Any(x => x == ent.TargetUnit))
             {
-                ApplyBuff newEvent = new(ent.Parent, this, Parent)
+                ApplyBuff newEvent = new(ent.ParentStep, this, Parent)
                 {
                     TargetUnit = ent.TargetUnit,
                     BuffToApply = new Buff(Parent)

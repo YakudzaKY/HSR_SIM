@@ -29,7 +29,7 @@ public abstract class DefaultFighter : IFighter
     private ILightCone lightCone;
     public MechDictionary Mechanics;
 
-    public List<IRelicSet> relics;
+    private List<IRelicSet> relics;
 
 
     //Blade constructor
@@ -50,8 +50,7 @@ public abstract class DefaultFighter : IFighter
             AbilityType = Ability.AbilityTypeEnm.Technique,
             Name = "Default opener",
             Element = Element,
-            AdjacentTargets = Ability.AdjacentTargetsEnm.All,
-            Attack = true
+            AdjacentTargets = Ability.AdjacentTargetsEnm.All
         };
         defOpener.Events.Add(new ToughnessShred(null, this, Parent)
             { OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue, Val = 30, AbilityValue = defOpener });
@@ -307,7 +306,7 @@ public abstract class DefaultFighter : IFighter
             return Parent.Friends.Where(x => x.IsAlive).OrderBy(x => x.Fighter.Role).First();
         throw new NotImplementedException();
 
-        return null;
+       // return null;
     }
 
     public object Clone()
@@ -326,7 +325,7 @@ public abstract class DefaultFighter : IFighter
     public IEnumerable<Unit> GetWeaknessTargets()
     {
         return Parent.Enemies.Where(x => x.IsAlive
-                                         && x.Fighter.Weaknesses.Any(x => x == Parent.Fighter.Element));
+                                         && x.Fighter.Weaknesses.Any(y => y == Parent.Fighter.Element));
     }
 
     //alive friends

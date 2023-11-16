@@ -20,9 +20,9 @@ public abstract class Event : CloneClass
     private double? val; //Theoretical value
 
 
-    public Event(Step parent, ICloneable source, Unit sourceUnit)
+    public Event(Step parentStep, ICloneable source, Unit sourceUnit)
     {
-        Parent = parent;
+        ParentStep = parentStep;
         Source = source;
         SourceUnit = sourceUnit;
     }
@@ -58,7 +58,7 @@ public abstract class Event : CloneClass
     //after calc Val will be multiplied by this number
     public double CalculateProportion { get; set; } = 1;
 
-    public Step Parent { get; set; }
+    public Step ParentStep { get; set; }
     public bool TriggersHandled { get; set; }
 
     public bool IsDamageEvent => this is ToughnessBreak or DoTDamage or DirectDamage or ToughnessBreakDoTDamage;
@@ -74,15 +74,15 @@ public abstract class Event : CloneClass
     /// <param name="revert"></param>
     public virtual void ProcEvent(bool revert)
     {
-        Parent.ProceedEvents.Add(this);
+        ParentStep.ProceedEvents.Add(this);
 
         //call handlers
         if (!TriggersHandled)
         {
             TriggersHandled = true;
             //proc events only in battle
-            if (Parent.Parent.CurrentFight != null)
-                Parent.Parent.EventHandlerProc?.Invoke(this);
+            if (ParentStep.Parent.CurrentFight != null)
+                ParentStep.Parent.EventHandlerProc?.Invoke(this);
         }
 
         //Child events
@@ -100,7 +100,7 @@ public abstract class Event : CloneClass
     public void DispelMod(Buff mod, bool naturalFinish)
     {
         if (naturalFinish) mod.ProceedNaturalExpire(this);
-        var dispell = new RemoveBuff(Parent, AbilityValue, SourceUnit)
+        var dispell = new RemoveBuff(ParentStep, AbilityValue, SourceUnit)
             { AbilityValue = AbilityValue, BuffToApply = mod, TargetUnit = TargetUnit };
         ChildEvents.Add(dispell);
     }
@@ -119,7 +119,7 @@ public abstract class Event : CloneClass
     public void TryDebuff(Buff mod, double baseChance)
     {
         //add Dots and debuffs
-        ApplyBuff dotEvent = new(Parent, Source, SourceUnit)
+        ApplyBuff dotEvent = new(ParentStep, Source, SourceUnit)
         {
             AbilityValue = AbilityValue,
             TargetUnit = TargetUnit,
@@ -137,7 +137,7 @@ public abstract class Event : CloneClass
         else
         {
             //debuff apply failed
-            DebuffResisted failEvent = new(Parent, Source, SourceUnit)
+            DebuffResisted failEvent = new(ParentStep, Source, SourceUnit)
             {
                 AbilityValue = AbilityValue,
                 TargetUnit = TargetUnit,

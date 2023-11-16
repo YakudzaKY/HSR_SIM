@@ -73,7 +73,7 @@ public class Blade : DefaultFighter
     };
 
     private readonly Ability shuhuGift; //passive ability
-
+    private Step lastDamageStep = null;
 
     private readonly double shuHuMaxCnt; // passive max counter
 
@@ -107,7 +107,6 @@ public class Blade : DefaultFighter
             TargetType = TargetTypeEnm.Enemy,
             AdjacentTargets = AdjacentTargetsEnm.All,
             EnergyGain = 10,
-            Attack = true,
             Available = SGAvailable,
             Priority = PriorityEnm.Medium
         };
@@ -145,7 +144,6 @@ public class Blade : DefaultFighter
             Name = "Shard Sword",
             Element = Element,
             AdjacentTargets = AdjacentTargetsEnm.None,
-            Attack = true,
             EnergyGain = 20,
             SpGain = 1,
             Available = HellscapeNotActive
@@ -168,7 +166,6 @@ public class Blade : DefaultFighter
             Name = "Forest of Swords",
             Element = Element,
             AdjacentTargets = AdjacentTargetsEnm.Blast,
-            Attack = true,
             EnergyGain = 30,
             Available = HellscapeActive
         };
@@ -212,7 +209,6 @@ public class Blade : DefaultFighter
             AbilityType = AbilityTypeEnm.Ultimate,
             Name = "Death Sentence",
             AdjacentTargets = AdjacentTargetsEnm.Blast,
-            Attack = true,
             EnergyGain = 5,
             Available = UltimateAvailable,
             Priority = PriorityEnm.Ultimate,
@@ -260,7 +256,6 @@ public class Blade : DefaultFighter
                 Cost = 1,
                 CostType = Resource.ResourceType.TP,
                 Element = Element,
-                Attack = true,
                 TargetType = TargetTypeEnm.Enemy,
                 AdjacentTargets = AdjacentTargetsEnm.All
             };
@@ -290,7 +285,6 @@ public class Blade : DefaultFighter
             Name = "Hellscape",
             Cost = 1,
             CostType = Resource.ResourceType.SP,
-            Attack = false,
             TargetType = TargetTypeEnm.Self,
             AdjacentTargets = AdjacentTargetsEnm.None,
             EndTheTurn = false,
@@ -368,24 +362,27 @@ public class Blade : DefaultFighter
             && (
                 (ent is ResourceDrain && ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal > 0)
                 || (ent is DamageEventTemplate && ent.RealVal > 0)
-            )
+            )&& (ent is DoTDamage||ent.ParentStep!=lastDamageStep)
            )
         {
+            //once per attack
+            if (ent is not DoTDamage)
+                lastDamageStep = ent.ParentStep;
             if (Mechanics.Values[shuhuGift] < shuHuMaxCnt)
-                ent.ChildEvents.Add(new MechanicValChg(ent.Parent, this, Parent)
+                ent.ChildEvents.Add(new MechanicValChg(ent.ParentStep, this, Parent)
                     { TargetUnit = Parent, Val = 1, AbilityValue = shuhuGift });
 
             var bladeHalfHp = Parent.GetMaxHp(ent) * 0.5;
             //if hp<=50% but was 50%+ then apply hp buff
             if (Parent.Rank >= 4 && Parent.GetRes(Resource.ResourceType.HP).ResVal <= bladeHalfHp &&
                 Parent.GetRes(Resource.ResourceType.HP).ResVal + ent.RealVal > bladeHalfHp)
-                ent.ChildEvents.Add(new ApplyBuff(ent.Parent, this, Parent)
+                ent.ChildEvents.Add(new ApplyBuff(ent.ParentStep, this, Parent)
                     { TargetUnit = Parent, AbilityValue = shuhuGift, BuffToApply = e4Buff });
         }
 
         if (ent.Reference == forestLastHitEvent && Atraces.HasFlag(ATracesEnm.A4) &&
             ent.TargetUnit.GetRes(Resource.ResourceType.Toughness).ResVal == 0)
-            ent.ChildEvents.Add(new Healing(ent.Parent, this, Parent)
+            ent.ChildEvents.Add(new Healing(ent.ParentStep, this, Parent)
                 { TargetUnit = Parent, CalculateValue = CalculateForestHeal, AbilityValue = forestOfSwords });
         //buffering Lost hp pull
         if (ent.TargetUnit == Parent
@@ -394,7 +391,7 @@ public class Blade : DefaultFighter
                 || ent.IsDamageEvent
             ))
         {
-            var dsValCharge = new MechanicValChg(ent.Parent, this, Parent)
+            var dsValCharge = new MechanicValChg(ent.ParentStep, this, Parent)
                 { TargetUnit = Parent, Val = ent.RealVal, AbilityValue = deathSentence };
             ent.ChildEvents.Add(dsValCharge);
         }

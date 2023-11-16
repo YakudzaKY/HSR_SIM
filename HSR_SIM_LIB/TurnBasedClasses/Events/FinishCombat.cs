@@ -28,19 +28,19 @@ internal class FinishCombat : Event
         {
             if (!TriggersHandled)
             {
-                oldCombatFight = Parent.Parent.CurrentFight;
+                oldCombatFight = ParentStep.Parent.CurrentFight;
                 oldMechDictionary = new Dictionary<Unit, MechDictionary>();
                 //set sp to 0
-                ChildEvents.Add(new PartyResourceDrain(Parent, this, null)
+                ChildEvents.Add(new PartyResourceDrain(ParentStep, this, null)
                 {
-                    Val = Parent.Parent.PartyTeam.GetRes(Resource.ResourceType.SP).ResVal,
-                    TargetTeam = Parent.Parent.PartyTeam, ResType = Resource.ResourceType.SP
+                    Val = ParentStep.Parent.PartyTeam.GetRes(Resource.ResourceType.SP).ResVal,
+                    TargetTeam = ParentStep.Parent.PartyTeam, ResType = Resource.ResourceType.SP
                 });
             }
 
 
             //save each buff
-            foreach (var unit in Parent.Parent.PartyTeam.Units)
+            foreach (var unit in ParentStep.Parent.PartyTeam.Units)
             {
                 if (!TriggersHandled)
                 {
@@ -68,11 +68,11 @@ internal class FinishCombat : Event
                     effect.OnRemove(this, buff);
             }
 
-            Parent.Parent.CurrentFight = null;
+            ParentStep.Parent.CurrentFight = null;
         }
         else
         {
-            Parent.Parent.CurrentFight = oldCombatFight;
+            ParentStep.Parent.CurrentFight = oldCombatFight;
             //restore each buff
             foreach (var unitWBuffs in removedBuffs)
             {

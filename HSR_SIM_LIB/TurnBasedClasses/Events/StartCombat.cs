@@ -22,21 +22,21 @@ internal class StartCombat : Event
 
         if (!revert)
         {
-            Parent.Parent.DoEnterCombat = false;
-            Parent.Parent.CurrentFight =
-                new CombatFight(Parent.Parent.CurrentScenario.Fights[Parent.Parent.CurrentFightStep], Parent.Parent);
-            Parent.Parent.CurrentFightStep += 1;
+            ParentStep.Parent.DoEnterCombat = false;
+            ParentStep.Parent.CurrentFight =
+                new CombatFight(ParentStep.Parent.CurrentScenario.Fights[ParentStep.Parent.CurrentFightStep], ParentStep.Parent);
+            ParentStep.Parent.CurrentFightStep += 1;
             if (!TriggersHandled)
-                ChildEvents.Add(new PartyResourceGain(Parent, this, null)
+                ChildEvents.Add(new PartyResourceGain(ParentStep, this, null)
                 {
-                    Val = Constant.StartSp, TargetTeam = Parent.Parent.PartyTeam, ResType = Resource.ResourceType.SP
+                    Val = Constant.StartSp, TargetTeam = ParentStep.Parent.PartyTeam, ResType = Resource.ResourceType.SP
                 });
         }
         else
         {
-            Parent.Parent.DoEnterCombat = true;
-            Parent.Parent.CurrentFight = null;
-            Parent.Parent.CurrentFightStep -= 1;
+            ParentStep.Parent.DoEnterCombat = true;
+            ParentStep.Parent.CurrentFight = null;
+            ParentStep.Parent.CurrentFightStep -= 1;
         }
 
         base.ProcEvent(revert);

@@ -122,7 +122,7 @@ public class SimCls : ICloneable
     {
         if (ent is StartWave)
             foreach (var unit in AllUnits)
-                ent.ChildEvents.Add(new UnitEnteringBattle(ent.Parent, this, unit) { TargetUnit = unit });
+                ent.ChildEvents.Add(new UnitEnteringBattle(ent.ParentStep, this, unit) { TargetUnit = unit });
 
         if (ent is DamageEventTemplate)
         {
@@ -135,7 +135,7 @@ public class SimCls : ICloneable
             //HP reduced to 0
             if (ent.RealVal != 0 && ent.TargetUnit.GetRes(ResourceType.HP).ResVal == 0)
             {
-                Defeat defeatEvent = new(ent.Parent, ent.Source, ent.SourceUnit)
+                Defeat defeatEvent = new(ent.ParentStep, ent.Source, ent.SourceUnit)
                 {
                     AbilityValue = ent.AbilityValue,
                     TargetUnit = ent.TargetUnit
@@ -152,7 +152,7 @@ public class SimCls : ICloneable
             if (((ResourceDrain)ent).ResType == ResourceType.HP && ent.RealVal != 0 &&
                 ent.TargetUnit.GetRes(((ResourceDrain)ent).ResType).ResVal == 0)
             {
-                Defeat defeatEvent = new(ent.Parent, ent.Source, ent.SourceUnit)
+                Defeat defeatEvent = new(ent.ParentStep, ent.Source, ent.SourceUnit)
                 {
                     AbilityValue = ent.AbilityValue,
                     TargetUnit = ent.TargetUnit
@@ -168,7 +168,7 @@ public class SimCls : ICloneable
             {
                 //temporary give back the THG for calculation break damage. will be reduce at the end
                 ent.TargetUnit.GetRes(((ResourceDrain)ent).ResType).ResVal += (double)ent.RealVal;
-                ToughnessBreak shieldBrkEvent = new(ent.Parent, ent.Source, ent.SourceUnit)
+                ToughnessBreak shieldBrkEvent = new(ent.ParentStep, ent.Source, ent.SourceUnit)
                 {
                     AbilityValue = ent.AbilityValue,
                     TargetUnit = ent.TargetUnit
@@ -176,7 +176,7 @@ public class SimCls : ICloneable
                 shieldBrkEvent.Val = FighterUtils.CalculateShieldBrokeDmg(shieldBrkEvent);
                 ent.ChildEvents.Add(shieldBrkEvent);
 
-                ModActionValue delayAV = new(ent.Parent, ent.Source, ent.SourceUnit)
+                ModActionValue delayAV = new(ent.ParentStep, ent.Source, ent.SourceUnit)
                 {
                     AbilityValue = ent.AbilityValue, TargetUnit = ent.TargetUnit,
                     Val = -ent.TargetUnit.GetBaseActionValue(ent) * 0.25

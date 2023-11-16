@@ -6,7 +6,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 // command to start battle(when combat technique used)
 public class EnterCombat : Event
 {
-    public EnterCombat(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
+    public EnterCombat(Step parentStep, ICloneable source, Unit sourceUnit) : base(parentStep, source, sourceUnit)
     {
     }
 
@@ -18,7 +18,7 @@ public class EnterCombat : Event
     public override void ProcEvent(bool revert)
     {
         //entering combat
-        Parent.Parent.DoEnterCombat = !revert;
+        ParentStep.Parent.DoEnterCombat = !revert;
         base.ProcEvent(revert);
     }
 }

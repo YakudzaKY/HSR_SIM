@@ -23,7 +23,7 @@ public class Defeat : Event
     {
         //attacker got 10 energy
         if (!TriggersHandled)
-            ChildEvents.Add(new EnergyGain(Parent, null, AbilityValue.Parent.Parent)
+            ChildEvents.Add(new EnergyGain(ParentStep, null, AbilityValue.Parent.Parent)
                 { Val = 10, TargetUnit = AbilityValue.Parent.Parent, AbilityValue = AbilityValue });
         //got defeated
 

@@ -19,9 +19,9 @@ public class CombatStartSkillQueue : Event
     {
         //party buffs or opening
         if (!revert)
-            Parent.Parent.BeforeStartQueue.Add(AbilityValue);
+            ParentStep.Parent.BeforeStartQueue.Add(AbilityValue);
         else
-            Parent.Parent.BeforeStartQueue.Remove(AbilityValue);
+            ParentStep.Parent.BeforeStartQueue.Remove(AbilityValue);
         base.ProcEvent(revert);
     }
 }

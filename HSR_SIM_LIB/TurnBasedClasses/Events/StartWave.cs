@@ -24,19 +24,19 @@ public class StartWave : Event
 
         if (!revert)
         {
-            Parent.Parent.CurrentFight.CurrentWaveCnt += 1;
-            Parent.Parent.CurrentFight.CurrentWave =
-                Parent.Parent.CurrentFight.ReferenceFight.Waves[Parent.Parent.CurrentFight.CurrentWaveCnt - 1];
-            StartingUnits ??= SimCls.GetCombatUnits(Parent.Parent.CurrentFight.CurrentWave.Units);
-            Parent.Parent.HostileTeam.BindUnits(StartingUnits);
+            ParentStep.Parent.CurrentFight.CurrentWaveCnt += 1;
+            ParentStep.Parent.CurrentFight.CurrentWave =
+                ParentStep.Parent.CurrentFight.ReferenceFight.Waves[ParentStep.Parent.CurrentFight.CurrentWaveCnt - 1];
+            StartingUnits ??= SimCls.GetCombatUnits(ParentStep.Parent.CurrentFight.CurrentWave.Units);
+            ParentStep.Parent.HostileTeam.BindUnits(StartingUnits);
             //set start action value
-            foreach (var unit in Parent.Parent.AllUnits) unit.Stats.ResetAV();
+            foreach (var unit in ParentStep.Parent.AllUnits) unit.Stats.ResetAV();
         }
         else
         {
-            Parent.Parent.HostileTeam.UnBindUnits();
-            Parent.Parent.CurrentFight.CurrentWaveCnt -= 1;
-            Parent.Parent.CurrentFight.CurrentWave = null;
+            ParentStep.Parent.HostileTeam.UnBindUnits();
+            ParentStep.Parent.CurrentFight.CurrentWaveCnt -= 1;
+            ParentStep.Parent.CurrentFight.CurrentWave = null;
         }
 
         base.ProcEvent(revert);

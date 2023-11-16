@@ -299,7 +299,7 @@ public class Unit : CloneClass
     ///     search avalable for unit condition mods(planars self or ally)
     /// </summary>
     /// <returns></returns>
-    public List<PassiveMod> GetConditionMods(Unit targetForCondition, Type? effTypeToSearch)
+    public List<PassiveMod> GetConditionMods(Unit targetForCondition, Type effTypeToSearch)
     {
         List<PassiveMod> res = new();
         if (ParentTeam == null)

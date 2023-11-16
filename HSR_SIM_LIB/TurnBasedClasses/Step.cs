@@ -157,7 +157,7 @@ public class Step
     public void ExecuteAbility(Ability ability, Unit target = null)
     {
         Actor = ability.Parent
-            .Parent; //WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
+            .Parent; //WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.ParentStep but can change in future)
         Target = target;
         if (target != null && !target.IsAlive)
             throw new Exception($"{target.Name} is dead. cant use {ability.Name} ");
@@ -168,6 +168,7 @@ public class Step
         //set ability to start execute
         Events.Add(new ExecuteAbilityStart(this, ability, ability.Parent.Parent)
             { AbilityValue = ability, TargetUnit = target });
+
         //res gaining
         if (ability.SpGain > 0)
             Events.Add(new PartyResourceGain(this, ability.Parent, ability.Parent.Parent)
@@ -198,6 +199,7 @@ public class Step
                 { Val = ability.EnergyGain, TargetUnit = ability.Parent.Parent, AbilityValue = ability });
 
 
+
         //clone events by targets
         foreach (var ent in ability.Events.Where(x => x.OnStepType == StepType || x.OnStepType == null))
             if (ent.CalculateTargets != null || ent.TargetUnit == null) //need set targets
@@ -217,7 +219,7 @@ public class Step
         if (ability.AbilityType == AbilityTypeEnm.Technique)
             Events.Add(new CombatStartSkillDeQueue(this, null, ability.Parent.Parent)
             {
-                Parent = this,
+                ParentStep = this,
                 AbilityValue = ability
             });
         //set ability to finish  execute
@@ -235,7 +237,7 @@ public class Step
     {
         var unitEnt = (Event)ent.Clone();
         unitEnt.Reference = ent;
-        unitEnt.Parent = this;
+        unitEnt.ParentStep = this;
         unitEnt.TargetUnit = target ?? ent.TargetUnit;
         Events.Add(unitEnt);
     }
@@ -259,13 +261,13 @@ public class Step
         {
             Events.Add(new CombatStartSkillQueue(this, null, ability.Parent.Parent)
             {
-                Parent = this,
+                ParentStep = this,
                 AbilityValue = ability
             });
             if (ability.Attack)
                 Events.Add(new EnterCombat(this, null, ability.Parent.Parent)
                 {
-                    Parent = this,
+                    ParentStep = this,
                     AbilityValue = ability
                 });
         }
@@ -273,7 +275,7 @@ public class Step
         foreach (var ent in ability.Events.Where(x => x.OnStepType == StepType))
         {
             var unitEnt = (Event)ent.Clone();
-            unitEnt.Parent = this;
+            unitEnt.ParentStep = this;
             Events.Add(unitEnt);
         }
 
@@ -285,7 +287,7 @@ public class Step
                 { ResType = (ResourceType)ability.CostType, Val = ability.Cost });
 
         Actor = ability.Parent
-            .Parent; //WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.Parent but can change in future)
+            .Parent; //WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.ParentStep but can change in future)
         ActorAbility = ability; //WAT ABILITY is casting
     }
 

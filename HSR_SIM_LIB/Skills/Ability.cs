@@ -85,7 +85,10 @@ public class Ability : CloneClass
     public TargetTypeEnm TargetType { get; set; } = TargetTypeEnm.Enemy;
     public AdjacentTargetsEnm AdjacentTargets { get; set; } = AdjacentTargetsEnm.None;
 
-    public bool Attack { get; set; }
+    public bool Attack
+    {
+        get { return Events.Any(x => x is DirectDamage or ToughnessShred); }
+    }
     public double EnergyGain { get; set; }
     public bool IgnoreWeakness { get; set; }
 

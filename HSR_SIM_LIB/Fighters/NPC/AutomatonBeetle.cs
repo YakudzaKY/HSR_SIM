@@ -34,7 +34,6 @@ public class AutomatonBeetle : DefaultNPCFighter
             Name = "Unstable Forcefield",
             Element = Element,
             AdjacentTargets = Ability.AdjacentTargetsEnm.None,
-            Attack = true,
             SpGain = 1
         };
         //dmg events
@@ -57,12 +56,12 @@ public class AutomatonBeetle : DefaultNPCFighter
         if (ent is DirectDamage && ent.TargetUnit == Parent &&
             ent.TargetUnit.Buffs.Any(x => x.Effects.Any(y => y is EffBarrier)))
         {
-            RemoveBuff newEvent = new(ent.Parent, this, Parent)
+            RemoveBuff newEvent = new(ent.ParentStep, this, Parent)
             {
                 TargetUnit = Parent,
                 BuffToApply = barierBuff
             };
-            ent.Parent.Events.Add(newEvent);
+            ent.ParentStep.Events.Add(newEvent);
         }
     }
 }

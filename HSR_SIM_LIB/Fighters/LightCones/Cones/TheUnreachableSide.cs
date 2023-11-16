@@ -36,7 +36,7 @@ internal class TheUnreachableSide : DefaultLightCone
               ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal != 0)
              || (ent.TargetUnit == Parent.Parent && ent is DirectDamage)) && uniqueBuff != null)
         {
-            ApplyBuff newEvent = new(ent.Parent, this, Parent.Parent)
+            ApplyBuff newEvent = new(ent.ParentStep, this, Parent.Parent)
             {
                 TargetUnit = Parent.Parent,
                 BuffToApply = uniqueBuff
@@ -47,7 +47,7 @@ internal class TheUnreachableSide : DefaultLightCone
         //remove buff when attack completed
         if (ent.SourceUnit == Parent.Parent && ent is ExecuteAbilityFinish && ent.AbilityValue.Attack)
         {
-            RemoveBuff newEvent = new(ent.Parent, this, Parent.Parent)
+            RemoveBuff newEvent = new(ent.ParentStep, this, Parent.Parent)
             {
                 TargetUnit = Parent.Parent,
                 BuffToApply = uniqueBuff

@@ -17,7 +17,6 @@ public class ForgottenHall : DefaultNPCFighter
         {
             AbilityType = AbilityTypeEnm.Ability,
             Name = "Cycle Set",
-            Attack = false,
             TargetType = TargetTypeEnm.Self,
             AdjacentTargets = AdjacentTargetsEnm.None,
             EndTheTurn = true
@@ -46,7 +45,7 @@ public class ForgottenHall : DefaultNPCFighter
         if (ent.TargetUnit == Parent && ent is IncreaseLevel && Parent.Level >= 1000)
             foreach (var unit in Parent.ParentTeam.ParentSim.PartyTeam.Units)
             {
-                ResourceDrain newEvent = new(ent.Parent, this, Parent)
+                ResourceDrain newEvent = new(ent.ParentStep, this, Parent)
                 {
                     TargetUnit = unit,
                     CanSetToZero = true,

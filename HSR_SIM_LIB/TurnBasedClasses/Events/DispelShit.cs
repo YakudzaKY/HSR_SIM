@@ -24,7 +24,7 @@ internal class DispelShit : Event
                 TargetUnit.Buffs.FirstOrDefault(x =>
                     x.Type is Buff.ModType.Debuff or Buff.ModType.Dot && x.Dispellable);
             if (buffToDispell != null)
-                ChildEvents.Add(new RemoveBuff(Parent, Source, SourceUnit)
+                ChildEvents.Add(new RemoveBuff(ParentStep, Source, SourceUnit)
                     { TargetUnit = TargetUnit, AbilityValue = AbilityValue, BuffToApply = buffToDispell });
         }
 

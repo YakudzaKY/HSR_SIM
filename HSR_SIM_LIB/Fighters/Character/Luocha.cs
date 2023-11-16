@@ -154,7 +154,6 @@ public class Luocha : DefaultFighter
             Name = "Thorns of the Abyss",
             Element = Element,
             AdjacentTargets = AdjacentTargetsEnm.None,
-            Attack = true,
             EnergyGain = 20,
             SpGain = 1
         };
@@ -180,7 +179,6 @@ public class Luocha : DefaultFighter
             AbilityType = AbilityTypeEnm.Ultimate,
             Name = "Death Wish",
             AdjacentTargets = AdjacentTargetsEnm.All,
-            Attack = true,
             EnergyGain = 5,
             Available = UltimateAvailable,
             Priority = PriorityEnm.Ultimate,
@@ -273,7 +271,7 @@ public class Luocha : DefaultFighter
                  ent.AbilityValue.Attack && ent.SourceUnit.IsAlive && ColBuffAvailable())
         {
             ent.ChildEvents.Add(
-                new Healing(ent.Parent, this,
+                new Healing(ent.ParentStep, this,
                         ent.SourceUnit) //will put source unit coz Output healing calc will be calculated by target unit
                     {
                         AbilityValue = ent.AbilityValue, TargetUnit = ent.SourceUnit, CalculateValue = CalcCoLHealing
@@ -283,7 +281,7 @@ public class Luocha : DefaultFighter
                 //for all friends except attacker unit
                 foreach (var unit in ent.SourceUnit.Friends.Where(x => x.IsAlive && x != ent.SourceUnit))
                     ent.ChildEvents.Add(
-                        new Healing(ent.Parent, this,
+                        new Healing(ent.ParentStep, this,
                                 unit) //will put source unit coz Output healing calc will be calculated by target unit
                             {
                                 AbilityValue = ent.AbilityValue, TargetUnit = unit, CalculateValue = CalcCoLHealingParty

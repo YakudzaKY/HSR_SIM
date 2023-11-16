@@ -149,7 +149,7 @@ internal class OcrUtils
                     var xDoc = new XmlDocument();
                     xDoc.Load($"{AppDomain.CurrentDomain.BaseDirectory}\\tessdata\\{loc}.xml");
                     var xRoot = xDoc.DocumentElement;
-                    var toList = 0;
+     
 
                     if (xRoot != null)
                         for (var i = 0; i < strings.Count; i++)

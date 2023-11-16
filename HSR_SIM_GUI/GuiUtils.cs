@@ -123,7 +123,7 @@ internal static class GuiUtils
     public static int WaitForActiveWindow(nint windowHandle, int seconds)
     {
         DateTime startTime;
-        var activeTitle = "";
+  
 
         startTime = DateTime.Now;
         var activefForegroundWindow = GetForegroundWindow();

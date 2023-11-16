@@ -26,10 +26,10 @@ public class ModActionValue : Event
         }
         else
         {
-            foreach (var unit in Parent.Parent.CurrentFight.AllAliveUnits)
+            foreach (var unit in ParentStep.Parent.CurrentFight.AllAliveUnits)
                 unit.Stats.PerformedActionValue += (double)(revert ? -Val : Val);
             if (!TriggersHandled)
-                Parent.Parent.TotalAv += (double)Val;
+                ParentStep.Parent.TotalAv += (double)Val;
         }
 
         base.ProcEvent(revert);
