@@ -33,11 +33,11 @@ public abstract class DamageEventTemplate : Event
                 double maxShieldval = 0;
                 double srchVal;
                 foreach (var mod in TargetUnit.Buffs.Where(x => x.Effects.Any(y => y is EffShield)))
-                foreach (var eff in mod.Effects.Where(x => x is EffShield))
-                {
-                    srchVal = eff.Value ?? 0;
-                    if (srchVal > maxShieldval) maxShieldval = srchVal;
-                }
+                    foreach (var eff in mod.Effects.Where(x => x is EffShield))
+                    {
+                        srchVal = eff.Value ?? 0;
+                        if (srchVal > maxShieldval) maxShieldval = srchVal;
+                    }
 
                 //cant hit more than val
                 RealBarrierVal = Math.Min(maxShieldval,
@@ -52,8 +52,8 @@ public abstract class DamageEventTemplate : Event
 
         //reduce all shields
         foreach (var mod in TargetUnit.Buffs.Where(x => x.Effects.Any(y => y is EffShield)))
-        foreach (var eff in mod.Effects.Where(x => x is EffShield))
-            eff.Value -= revert ? -RealBarrierVal : RealBarrierVal;
+            foreach (var eff in mod.Effects.Where(x => x is EffShield))
+                eff.Value -= revert ? -RealBarrierVal : RealBarrierVal;
         var res = TargetUnit.GetRes(Resource.ResourceType.HP);
         res.ResVal += (double)-(revert ? -RealVal : RealVal);
     }

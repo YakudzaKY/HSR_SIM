@@ -388,7 +388,7 @@ public class Luocha : DefaultFighter
 
     public bool ColAvailable()
     {
-        return Mechanics.Values[cycleOfLife] == cycleOfLifeMaxCnt;
+        return Mechanics.Values[cycleOfLife] >= cycleOfLifeMaxCnt;
     }
 
     public bool PoAFAvailable()

@@ -8,6 +8,12 @@ public class Effect:CloneClass
     public Event.CalculateValuePrc CalculateValue { get; init; }
 
     public double? Value { get; set; }
+
+    /// <summary>
+    /// DynamicValue - value of effect can be changed
+    /// </summary>
+    public virtual bool DynamicValue => CalculateValue != null;
+
     public bool StackAffectValue { get; set; } = true; // do we multiply final value by stack count ?
 
     /// <summary>

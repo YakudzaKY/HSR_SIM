@@ -395,13 +395,13 @@ public class Unit : CloneClass
                 //copy buff
                 srchMod = (Buff)mod.Clone();
                 //if we have calced values then clone all effects(in the same order)
-                if (mod.Effects.Any(x => x.CalculateValue != null))
+                if (mod.Effects.Any(x => x.DynamicValue ))
                 {
                     srchMod.Effects = new List<Effect>();
                     //clone calced effects
                     foreach (Effect eff in mod.Effects)
                     {
-                        if (eff.CalculateValue != null)
+                        if (eff.DynamicValue)
                             srchMod.Effects.Add((Effect)eff.Clone());
                         else
                         {
