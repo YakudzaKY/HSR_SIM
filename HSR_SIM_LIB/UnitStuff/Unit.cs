@@ -275,22 +275,22 @@ public class Unit : CloneClass
 
 
         foreach (var mod in conditionsToCheck)
-        foreach (var effect in mod.Effects.Where(y => y.GetType() == modType
-                                                      && (y is not EffElementalTemplate eft || eft.Element == elem)
-                                                      && (y is not EffAbilityTypeBoost efAbility ||
-                                                          (ent?.AbilityValue != null && efAbility.AbilityType ==
-                                                              ent.AbilityValue.AbilityType))
-                 )
-                )
-        {
-            double finalValue;
-            if (effect.CalculateValue != null)
-                finalValue = (double)effect.CalculateValue(ent);
-            else
-                finalValue = (double)effect.Value;
+            foreach (var effect in mod.Effects.Where(y => y.GetType() == modType
+                                                          && (y is not EffElementalTemplate eft || eft.Element == elem)
+                                                          && (y is not EffAbilityTypeBoost efAbility ||
+                                                              (ent?.AbilityValue != null && efAbility.AbilityType ==
+                                                                  ent.AbilityValue.AbilityType))
+                     )
+                    )
+            {
+                double finalValue;
+                if (effect.CalculateValue != null)
+                    finalValue = (double)effect.CalculateValue(ent);
+                else
+                    finalValue = (double)effect.Value;
 
-            res += finalValue * (effect.StackAffectValue ? mod.Stack : 1);
-        }
+                res += finalValue * (effect.StackAffectValue ? mod.Stack : 1);
+            }
 
         return res;
     }
@@ -312,9 +312,9 @@ public class Unit : CloneClass
                 res.AddRange(from cmod in unit.fighter.ConditionMods
                         .Where(x => x.Mod.Effects.Any(x => effTypeToSearch == null || x.GetType() == effTypeToSearch))
                         .Concat(unit.fighter.PassiveMods)
-                    where (cmod.Target == this || cmod.Target == ParentTeam) &&
-                          (cmod is not ConditionMod mod || mod.Truly(targetForCondition))
-                    select cmod);
+                             where (cmod.Target == this || cmod.Target == ParentTeam) &&
+                                   (cmod is not ConditionMod mod || mod.Truly(targetForCondition))
+                             select cmod);
             if (unit.Fighter is DefaultFighter unitFighter)
             {
                 //LC
@@ -324,18 +324,18 @@ public class Unit : CloneClass
                             .Where(x => x.Mod.Effects.Any(
                                 x => effTypeToSearch == null || x.GetType() == effTypeToSearch))
                             .Concat(unitFighter.LightCone.PassiveMods)
-                        where (cmod.Target == this || cmod.Target == ParentTeam) &&
-                              (cmod is not ConditionMod mod || mod.Truly(targetForCondition))
-                        select cmod);
+                                 where (cmod.Target == this || cmod.Target == ParentTeam) &&
+                                       (cmod is not ConditionMod mod || mod.Truly(targetForCondition))
+                                 select cmod);
                 //GEAR
                 foreach (var relic in unitFighter.Relics)
                     res.AddRange(from cmod in relic.ConditionMods
                             .Where(x => x.Mod.Effects.Any(
                                 x => effTypeToSearch == null || x.GetType() == effTypeToSearch))
                             .Concat(relic.PassiveMods)
-                        where (cmod.Target == this || cmod.Target == ParentTeam) &&
-                              (cmod is not ConditionMod mod || mod.Truly(targetForCondition))
-                        select cmod);
+                                 where (cmod.Target == this || cmod.Target == ParentTeam) &&
+                                       (cmod is not ConditionMod mod || mod.Truly(targetForCondition))
+                                 select cmod);
             }
         }
 
@@ -380,12 +380,39 @@ public class Unit : CloneClass
         {
             //add stack
             srchMod.Stack = Math.Min(srchMod.MaxStack, srchMod.Stack + mod.Stack);
+            //refresh effect values for bigger numbers
+            foreach (Effect eff in mod.Effects)
+            {
+                Effect findExistingEff = srchMod.Effects.FirstOrDefault(x => eff.GetType() == x.GetType());
+                findExistingEff.Value = Math.Max(findExistingEff.Value ?? 0, eff.Value ?? 0);
+            }
         }
         else
         {
             //or add new
             if (!mod.DoNotClone)
+            {
+                //copy buff
                 srchMod = (Buff)mod.Clone();
+                //if we have calced values then clone all effects(in the same order)
+                if (mod.Effects.Any(x => x.CalculateValue != null))
+                {
+                    srchMod.Effects = new List<Effect>();
+                    //clone calced effects
+                    foreach (Effect eff in mod.Effects)
+                    {
+                        if (eff.CalculateValue != null)
+                            srchMod.Effects.Add((Effect)eff.Clone());
+                        else
+                        {
+                            srchMod.Effects.Add(eff);
+                        }
+                    }
+                }
+
+
+            }
+
             else
                 srchMod = mod;
             srchMod.Stack = Math.Min(srchMod.MaxStack, srchMod.Stack);
@@ -457,14 +484,14 @@ public class Unit : CloneClass
         //MODS
         if (Buffs != null)
             foreach (var mod in Buffs)
-            foreach (var effect in mod.Effects.Where(x => x is EffDamageReduction))
-                for (var i = 0; i < mod.Stack; i++)
-                    res *= 1 - effect.Value ?? 0;
+                foreach (var effect in mod.Effects.Where(x => x is EffDamageReduction))
+                    for (var i = 0; i < mod.Stack; i++)
+                        res *= 1 - effect.Value ?? 0;
         //Condition
         foreach (var pmod in GetConditionMods(targetForCondition, typeof(EffDamageReduction)))
-        foreach (var effect in pmod.Mod.Effects.Where(x => x is EffDamageReduction))
-            for (var i = 0; i < pmod.Mod.Stack; i++)
-                res *= 1 - effect.Value ?? 0;
+            foreach (var effect in pmod.Mod.Effects.Where(x => x is EffDamageReduction))
+                for (var i = 0; i < pmod.Mod.Stack; i++)
+                    res *= 1 - effect.Value ?? 0;
         return res;
     }
 

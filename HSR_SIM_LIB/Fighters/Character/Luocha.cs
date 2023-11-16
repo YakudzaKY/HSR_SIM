@@ -47,6 +47,7 @@ public class Luocha : DefaultFighter
     private readonly Ability prayerOfAbyssFlower;
     private readonly Ability prayerOfAbyssFlowerAuto;
     private readonly Buff triggerCdBuff;
+    private readonly Buff e2ShieldBuff;
     private readonly Ability ultimateAbility;
     private readonly Buff uniqueBuff;
 
@@ -86,7 +87,7 @@ public class Luocha : DefaultFighter
             TargetType = TargetTypeEnm.Self
         };
         cycleOfLife.Events.Add(new MechanicValChg(null, this, Parent)
-            { TargetUnit = Parent, AbilityValue = cycleOfLife, Val = -cycleOfLifeMaxCnt });
+        { TargetUnit = Parent, AbilityValue = cycleOfLife, Val = -cycleOfLifeMaxCnt });
         cycleOfLife.Events.Add(new ApplyBuff(null, this, Parent)
         {
             AbilityValue = cycleOfLife,
@@ -109,10 +110,10 @@ public class Luocha : DefaultFighter
         };
         if (Atraces.HasFlag(ATracesEnm.A2))
             prayerOfAbyssFlower.Events.Add(new DispelShit(null, this, Parent)
-                { AbilityValue = prayerOfAbyssFlower });
+            { AbilityValue = prayerOfAbyssFlower });
 
         prayerOfAbyssFlower.Events.Add(new Healing(null, this, Parent)
-            { CalculateValue = CalculatePrayerOfAbyssFlower, AbilityValue = prayerOfAbyssFlower });
+        { CalculateValue = CalculatePrayerOfAbyssFlower, AbilityValue = prayerOfAbyssFlower });
 
 
         Abilities.Add(prayerOfAbyssFlower);
@@ -131,10 +132,11 @@ public class Luocha : DefaultFighter
         };
         if (Atraces.HasFlag(ATracesEnm.A2))
             prayerOfAbyssFlowerAuto.Events.Add(new DispelShit(null, this, Parent)
-                { CalculateTargets = CalcFollowPoAFTarget, AbilityValue = prayerOfAbyssFlowerAuto });
+            { CalculateTargets = CalcFollowPoAFTarget, AbilityValue = prayerOfAbyssFlowerAuto });
         prayerOfAbyssFlowerAuto.Events.Add(new Healing(null, this, Parent)
         {
-            CalculateTargets = CalcFollowPoAFTarget, CalculateValue = CalculatePrayerOfAbyssFlower,
+            CalculateTargets = CalcFollowPoAFTarget,
+            CalculateValue = CalculatePrayerOfAbyssFlower,
             AbilityValue = prayerOfAbyssFlowerAuto
         });
         prayerOfAbyssFlowerAuto.Events.Add(new ApplyBuff(null, this, Parent)
@@ -145,6 +147,8 @@ public class Luocha : DefaultFighter
         });
         Abilities.Add(prayerOfAbyssFlowerAuto);
 
+        e2ShieldBuff = new Buff(Parent, null)
+            { Effects = new List<Effect>() { new EffShield() { CalculateValue = CalculateE2Shield } } };
 
         //basic attack
         Ability ThornsoftheAbyss;
@@ -161,15 +165,15 @@ public class Luocha : DefaultFighter
         for (var i = 0; i < 2; i++)
         {
             ThornsoftheAbyss.Events.Add(new DirectDamage(null, this, Parent)
-                { CalculateValue = CalculateBasicDmg, AbilityValue = ThornsoftheAbyss, CalculateProportion = 0.3 });
+            { CalculateValue = CalculateBasicDmg, AbilityValue = ThornsoftheAbyss, CalculateProportion = 0.3 });
             ThornsoftheAbyss.Events.Add(new ToughnessShred(null, this, Parent)
-                { Val = 30 * 0.3, AbilityValue = ThornsoftheAbyss });
+            { Val = 30 * 0.3, AbilityValue = ThornsoftheAbyss });
         }
 
         ThornsoftheAbyss.Events.Add(new DirectDamage(null, this, Parent)
-            { CalculateValue = CalculateBasicDmg, AbilityValue = ThornsoftheAbyss, CalculateProportion = 0.4 });
+        { CalculateValue = CalculateBasicDmg, AbilityValue = ThornsoftheAbyss, CalculateProportion = 0.4 });
         ThornsoftheAbyss.Events.Add(new ToughnessShred(null, this, Parent)
-            { Val = 30 * 0.4, AbilityValue = ThornsoftheAbyss });
+        { Val = 30 * 0.4, AbilityValue = ThornsoftheAbyss });
         Abilities.Add(ThornsoftheAbyss);
 
 
@@ -188,14 +192,15 @@ public class Luocha : DefaultFighter
         };
         //dmg events
         ultimateAbility.Events.Add(new DispelGood(null, this, Parent)
-            { AbilityValue = ultimateAbility, CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
+        { AbilityValue = ultimateAbility, CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
         ultimateAbility.Events.Add(new DirectDamage(null, this, Parent)
         {
-            CalculateValue = CalculateUltimateDmg, AbilityValue = ultimateAbility,
+            CalculateValue = CalculateUltimateDmg,
+            AbilityValue = ultimateAbility,
             CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent
         });
         ultimateAbility.Events.Add(new ToughnessShred(null, this, Parent)
-            { Val = 60, AbilityValue = ultimateAbility, CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
+        { Val = 60, AbilityValue = ultimateAbility, CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
         Abilities.Add(ultimateAbility);
 
 
@@ -210,7 +215,9 @@ public class Luocha : DefaultFighter
         };
         ability.Events.Add(new MechanicValChg(null, this, Parent)
         {
-            OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue, TargetUnit = Parent, Val = cycleOfLifeMaxCnt,
+            OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
+            TargetUnit = Parent,
+            Val = cycleOfLifeMaxCnt,
             AbilityValue = cycleOfLife
         }); //AbilityValue for Cycle of life
         Abilities.Add(ability);
@@ -220,7 +227,8 @@ public class Luocha : DefaultFighter
         {
             Mod = new Buff(Parent)
             {
-                Effects = new List<Effect> { new EffAtkPrc { Value = 0.2 } }, CustomIconName = uniqueBuff.CustomIconName
+                Effects = new List<Effect> { new EffAtkPrc { Value = 0.2 } },
+                CustomIconName = uniqueBuff.CustomIconName
             },
             Target = Parent.ParentTeam,
             Condition = new ConditionMod.ConditionRec { ConditionAvailable = ColBuffAvailable }
@@ -230,8 +238,33 @@ public class Luocha : DefaultFighter
         //A6
         if (Atraces.HasFlag(ATracesEnm.A6))
             DebuffResists.Add(new DebuffResist { Debuff = typeof(EffCrowControl), ResistVal = 0.7 });
+        //E2
+        if (Parent.Rank >= 2)
+            PassiveMods.Add(new PassiveMod(Parent)
+            {
+                Mod = new Buff(Parent)
+                { Effects = new List<Effect> { new EffOutgoingHealingPrc() { CalculateValue = CalculateE2 } } },
+                Target = Parent,
+                IsTargetCheck = true
+            });
     }
 
+    public double? CalculateE2Shield(Event ent)
+    {
+       
+        return FighterUtils.CalculateShield(Parent.GetAttack(ent) * 0.18 + 240 ,ent,Parent);
+    }
+
+    public double? CalculateE2(Event ent)
+    {
+        double res = 0;
+
+        if ((ent.AbilityValue == prayerOfAbyssFlowerAuto || ent.AbilityValue == prayerOfAbyssFlower)&&ent.TargetUnit.GetHpPrc(ent)<0.5)
+        {
+            res = 0.3;
+        }
+        return res;
+    }
 
     public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Abundance;
     public sealed override Unit.ElementEnm Element { get; } = Unit.ElementEnm.Imaginary;
@@ -245,13 +278,13 @@ public class Luocha : DefaultFighter
     public double? CalcCoLHealing(Event ent)
     {
         var skillLvl = Parent.Skills.First(x => x.Name == "Cycle of Life")!.Level;
-        return FighterUtils.CalculateHealByBasicVal(Parent.GetAttack(null) * CoLFAtkMods[skillLvl] + CoLFFix[skillLvl],
+        return FighterUtils.CalculateHealByBasicVal(Parent.GetAttack(ent) * CoLFAtkMods[skillLvl] + CoLFFix[skillLvl],
             ent);
     }
 
     public double? CalcCoLHealingParty(Event ent)
     {
-        return FighterUtils.CalculateHealByBasicVal(Parent.GetAttack(null) * 0.07 + 93, ent);
+        return FighterUtils.CalculateHealByBasicVal(Parent.GetAttack(ent) * 0.07 + 93, ent);
     }
 
 
@@ -273,9 +306,11 @@ public class Luocha : DefaultFighter
             ent.ChildEvents.Add(
                 new Healing(ent.ParentStep, this,
                         ent.SourceUnit) //will put source unit coz Output healing calc will be calculated by target unit
-                    {
-                        AbilityValue = ent.AbilityValue, TargetUnit = ent.SourceUnit, CalculateValue = CalcCoLHealing
-                    });
+                {
+                    AbilityValue = ent.AbilityValue,
+                    TargetUnit = ent.SourceUnit,
+                    CalculateValue = CalcCoLHealing
+                });
 
             if (Atraces.HasFlag(ATracesEnm.A4))
                 //for all friends except attacker unit
@@ -283,9 +318,19 @@ public class Luocha : DefaultFighter
                     ent.ChildEvents.Add(
                         new Healing(ent.ParentStep, this,
                                 unit) //will put source unit coz Output healing calc will be calculated by target unit
-                            {
-                                AbilityValue = ent.AbilityValue, TargetUnit = unit, CalculateValue = CalcCoLHealingParty
-                            });
+                        {
+                            AbilityValue = ent.AbilityValue,
+                            TargetUnit = unit,
+                            CalculateValue = CalcCoLHealingParty
+                        });
+        }
+
+        if (Parent.Rank >= 2&&ent is ExecuteAbilityStart && ent.SourceUnit == Parent &&(ent.AbilityValue ==prayerOfAbyssFlowerAuto||ent.AbilityValue ==prayerOfAbyssFlower))
+        {
+            //E2 shield part
+            if (Parent.Rank >= 2&& ent.TargetUnit.GetHpPrc(ent)>=0.5)
+               ent.ChildEvents.Add(new ApplyBuff(ent.ParentStep,this,ent.SourceUnit) 
+                   {TargetUnit = ent.TargetUnit,AbilityValue = ent.AbilityValue,BuffToApply = e2ShieldBuff});
         }
 
 
@@ -328,7 +373,7 @@ public class Luocha : DefaultFighter
                                                                  step.ActorAbility == prayerOfAbyssFlowerAuto ||
                                                                  step.ActorAbility == prayerOfAbyssFlower))
                 step.Events.Add(new MechanicValChg(step, this, Parent)
-                    { TargetUnit = Parent, Val = 1, AbilityValue = cycleOfLife });
+                { TargetUnit = Parent, Val = 1, AbilityValue = cycleOfLife });
         }
 
 

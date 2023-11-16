@@ -46,8 +46,4 @@ internal class LongevousDisciple : DefaultRelicSet
         base.DefaultRelicSet_HandleEvent(ent);
     }
 
-    public override void DefaultRelicSet_HandleStep(Step step)
-    {
-        base.DefaultRelicSet_HandleStep(step);
-    }
 }

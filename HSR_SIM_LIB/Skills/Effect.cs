@@ -1,8 +1,9 @@
-﻿using HSR_SIM_LIB.TurnBasedClasses.Events;
+﻿using System;
+using HSR_SIM_LIB.TurnBasedClasses.Events;
 
 namespace HSR_SIM_LIB.Skills;
 
-public class Effect
+public class Effect:CloneClass
 {
     public Event.CalculateValuePrc CalculateValue { get; init; }
 
@@ -51,4 +52,6 @@ public class Effect
     public virtual void BeforeRemove(Event ent, Buff buff)
     {
     }
+
+  
 }

@@ -36,7 +36,7 @@ public class Buff : CloneClass
     public ModType Type { get; init; }
 
     public string CustomIconName { get; set; }
-    public List<Effect> Effects { get; init; } = new();
+    public List<Effect> Effects { get; set; } = new();
     public Ability AbilityValue { get; set; }
 
     public bool IsOld { get; set; } = false;
@@ -144,4 +144,6 @@ public class Buff : CloneClass
         return
             $">> {Type.ToString():s} for {modsStr:s} duration={BaseDuration.ToString():D} dispellable={Dispellable.ToString():s}";
     }
+
+ 
 }

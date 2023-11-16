@@ -110,7 +110,7 @@ public class SilverWolf : DefaultFighter
             ent);
     }
 
-    //get 0.2 AllDmg per debuff  on enemy Team
+    //get 0.2 AllDmg per debuff  on target
     public static double? CalculateE6(Event ent)
     {
         double maxDebufs = 5;
