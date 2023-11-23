@@ -18,7 +18,6 @@ internal class TheUnreachableSide : DefaultLightCone
         if (Path == Parent.Path)
             uniqueBuff = new Buff(Parent.Parent)
             {
-                Dispellable = false,
                 Type = Buff.BuffType.Buff,
                 BaseDuration = null,
                 MaxStack = 1,

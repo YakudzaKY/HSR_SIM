@@ -62,14 +62,16 @@ public class Luocha : DefaultFighter
             Type = Buff.BuffType.Buff,
             BaseDuration = 2,
             MaxStack = 1,
+            Dispellable = false,
             CustomIconName = "Icon_Abyss_Flower"
         };
 
         triggerCdBuff = new Buff(Parent)
         {
-            Type = Buff.BuffType.Buff,
+            Type = Buff.BuffType.Debuff,
             BaseDuration = 2,
             MaxStack = 1,
+            Dispellable = false,
             CustomIconName = "Abyss_Flower_CD"
         };
 

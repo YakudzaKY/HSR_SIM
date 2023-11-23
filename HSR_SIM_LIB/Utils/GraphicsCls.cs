@@ -452,6 +452,13 @@ public static class GraphicsCls
                         , buff.Stack + "/" + buff.MaxStack
                         , new SolidBrush(Color.Coral)
                         , new Font("Tahoma", (int)Math.Round(BarFontSize * 0.8), FontStyle.Bold), true);
+                if (!buff.Dispellable)
+                    DrawText(buffPoint.X+ (int)(ElemSizeMini.Height * 0.5)
+                        , buffPoint.Y + (int)(ElemSizeMini.Height * 0.5)
+                        , gfx
+                        , "\u26ca"
+                        , new SolidBrush(Color.LightGray)
+                        , new Font("Tahoma", (int)Math.Round(BarFontSize * 0.8), FontStyle.Bold), true);
                 j++;
             }
 
