@@ -150,7 +150,7 @@ public class Luocha : DefaultFighter
         Abilities.Add(prayerOfAbyssFlowerAuto);
 
         e2ShieldBuff = new Buff(Parent, null)
-            { Effects = new List<Effect>() { new EffShield() { CalculateValue = CalculateE2Shield } } };
+        { Effects = new List<Effect>() { new EffShield() { CalculateValue = CalculateE2Shield } } };
 
         //basic attack
         Ability ThornsoftheAbyss;
@@ -193,6 +193,10 @@ public class Luocha : DefaultFighter
             Cost = Parent.Stats.BaseMaxEnergy
         };
         //dmg events
+        //E6
+        if (Parent.Rank >= 6)
+            ultimateAbility.Events.Add(new ApplyBuff(null, this, Parent)
+            { BuffToApply = new Buff(Parent) { CustomIconName = "Ability_Death_Wish", BaseDuration = 2, Type = Buff.BuffType.Debuff, Effects = new List<Effect>() { new EffAllDamageResist() { Value = 0.2 } } }, AbilityValue = ultimateAbility, CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
         ultimateAbility.Events.Add(new DispelGood(null, this, Parent)
         { AbilityValue = ultimateAbility, CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
         ultimateAbility.Events.Add(new DirectDamage(null, this, Parent)
@@ -252,31 +256,31 @@ public class Luocha : DefaultFighter
 
         //E4
         if (Parent.Rank >= 4)
-        //CoL buffs
-        ConditionBuffs.Add(new ConditionBuff(Parent)
-        {
-            Mod = new Buff(Parent)
+            //CoL buffs
+            ConditionBuffs.Add(new ConditionBuff(Parent)
             {
-                Type = Buff.BuffType.Debuff,
-                Effects = new List<Effect> { new EffAllDamageBoost() { Value = -0.12 } },
-                CustomIconName = uniqueBuff.CustomIconName
-            },
-            Target = TargetTypeEnm.Enemy,
-            Condition = new ConditionBuff.ConditionRec { ConditionAvailable = ColBuffAvailable }
-        });
+                Mod = new Buff(Parent)
+                {
+                    Type = Buff.BuffType.Debuff,
+                    Effects = new List<Effect> { new EffAllDamageBoost() { Value = -0.12 } },
+                    CustomIconName = uniqueBuff.CustomIconName
+                },
+                Target = TargetTypeEnm.Enemy,
+                Condition = new ConditionBuff.ConditionRec { ConditionAvailable = ColBuffAvailable }
+            });
     }
 
     public double? CalculateE2Shield(Event ent)
     {
-       
-        return FighterUtils.CalculateShield(Parent.GetAttack(ent) * 0.18 + 240 ,ent,Parent);
+
+        return FighterUtils.CalculateShield(Parent.GetAttack(ent) * 0.18 + 240, ent, Parent);
     }
 
     public double? CalculateE2(Event ent)
     {
         double res = 0;
 
-        if ((ent.AbilityValue == prayerOfAbyssFlowerAuto || ent.AbilityValue == prayerOfAbyssFlower)&&ent.TargetUnit.GetHpPrc(ent)<0.5)
+        if ((ent.AbilityValue == prayerOfAbyssFlowerAuto || ent.AbilityValue == prayerOfAbyssFlower) && ent.TargetUnit.GetHpPrc(ent) < 0.5)
         {
             res = 0.3;
         }
@@ -342,12 +346,12 @@ public class Luocha : DefaultFighter
                         });
         }
 
-        if (Parent.Rank >= 2&&ent is ExecuteAbilityStart && ent.SourceUnit == Parent &&(ent.AbilityValue ==prayerOfAbyssFlowerAuto||ent.AbilityValue ==prayerOfAbyssFlower))
+        if (Parent.Rank >= 2 && ent is ExecuteAbilityStart && ent.SourceUnit == Parent && (ent.AbilityValue == prayerOfAbyssFlowerAuto || ent.AbilityValue == prayerOfAbyssFlower))
         {
             //E2 shield part
-            if (Parent.Rank >= 2&& ent.TargetUnit.GetHpPrc(ent)>=0.5)
-               ent.ChildEvents.Add(new ApplyBuff(ent.ParentStep,this,ent.SourceUnit) 
-                   {TargetUnit = ent.TargetUnit,AbilityValue = ent.AbilityValue,BuffToApply = e2ShieldBuff});
+            if (Parent.Rank >= 2 && ent.TargetUnit.GetHpPrc(ent) >= 0.5)
+                ent.ChildEvents.Add(new ApplyBuff(ent.ParentStep, this, ent.SourceUnit)
+                { TargetUnit = ent.TargetUnit, AbilityValue = ent.AbilityValue, BuffToApply = e2ShieldBuff });
         }
 
 
