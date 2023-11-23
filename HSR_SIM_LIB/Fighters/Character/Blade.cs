@@ -84,7 +84,7 @@ public class Blade : DefaultFighter
 
         hellscapeBuff = new Buff(Parent)
         {
-            Type = Buff.ModType.Buff,
+            Type = Buff.BuffType.Buff,
             BaseDuration = 3,
             MaxStack = 1,
             CustomIconName = "Hellscape",
@@ -313,7 +313,7 @@ public class Blade : DefaultFighter
         //Ascended Traces
         //=====================
         if (Atraces.HasFlag(ATracesEnm.A2))
-            ConditionMods.Add(new ConditionMod(Parent)
+            ConditionBuffs.Add(new ConditionBuff(Parent)
             {
                 Mod = new Buff(Parent)
                 {
@@ -321,14 +321,14 @@ public class Blade : DefaultFighter
                     CustomIconName = "Traces\\A2"
                 },
                 Target = Parent,
-                Condition = new ConditionMod.ConditionRec
+                Condition = new ConditionBuff.ConditionRec
                 {
-                    CondtionParam = ConditionMod.ConditionCheckParam.HPPrc,
-                    CondtionExpression = ConditionMod.ConditionCheckExpression.EqualOrLess, Value = 0.5
+                    CondtionParam = ConditionBuff.ConditionCheckParam.HPPrc,
+                    CondtionExpression = ConditionBuff.ConditionCheckExpression.EqualOrLess, Value = 0.5
                 }
             });
         if (Atraces.HasFlag(ATracesEnm.A6))
-            PassiveMods.Add(new PassiveMod(Parent)
+            PassiveBuffs.Add(new PassiveBuff(Parent)
             {
                 Mod = new Buff(Parent)
                 {

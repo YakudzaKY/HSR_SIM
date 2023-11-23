@@ -10,7 +10,7 @@ public class BuffWindShearWB : Buff
     public BuffWindShearWB(Unit caster, Buff reference = null) : base(caster, reference)
     {
         DoNotClone = true;
-        Type = ModType.Dot;
+        Type = BuffType.Dot;
         BaseDuration = 2;
         MaxStack = 5;
         Effects = new List<Effect> { new EffWindShear { CalculateValue = FighterUtils.CalculateShieldBrokeDmg } };

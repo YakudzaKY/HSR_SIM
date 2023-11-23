@@ -12,9 +12,9 @@ public class SpaceSealingStation : DefaultRelicSet
         if (num >= 2) ConditionMods.Add(GetMod());
     }
 
-    public ConditionMod GetMod()
+    public ConditionBuff GetMod()
     {
-        return new ConditionMod(Parent.Parent)
+        return new ConditionBuff(Parent.Parent)
         {
             Mod = new Buff(Parent.Parent)
             {
@@ -22,10 +22,10 @@ public class SpaceSealingStation : DefaultRelicSet
                 CustomIconName = "gear\\" + GetType().ToString().Split('.').Last()
             },
             Target = Parent.Parent,
-            Condition = new ConditionMod.ConditionRec
+            Condition = new ConditionBuff.ConditionRec
             {
-                CondtionParam = ConditionMod.ConditionCheckParam.SPD,
-                CondtionExpression = ConditionMod.ConditionCheckExpression.EqualOrMore,
+                CondtionParam = ConditionBuff.ConditionCheckParam.SPD,
+                CondtionExpression = ConditionBuff.ConditionCheckExpression.EqualOrMore,
                 Value = 120
             }
         };

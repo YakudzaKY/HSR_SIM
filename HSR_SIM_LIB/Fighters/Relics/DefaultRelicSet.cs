@@ -16,8 +16,8 @@ public class DefaultRelicSet : IRelicSet
     }
 
     public IFighter Parent { get; set; }
-    public List<PassiveMod> PassiveMods { get; set; } = new(); // 100% uptime
-    public List<ConditionMod> ConditionMods { get; set; } = new(); //when conditions are ok on character
+    public List<PassiveBuff> PassiveMods { get; set; } = new(); // 100% uptime
+    public List<ConditionBuff> ConditionMods { get; set; } = new(); //when conditions are ok on character
     public int Num { get; set; }
     public IRelicSet.EventHandler EventHandlerProc { get; set; }
     public IRelicSet.StepHandler StepHandlerProc { get; set; }

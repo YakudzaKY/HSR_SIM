@@ -12,9 +12,9 @@ internal class InertSalsotto : DefaultRelicSet
         if (num >= 2) ConditionMods.Add(GetMod());
     }
 
-    public ConditionMod GetMod()
+    public ConditionBuff GetMod()
     {
-        return new ConditionMod(Parent.Parent)
+        return new ConditionBuff(Parent.Parent)
         {
             Mod = new Buff(Parent.Parent)
             {
@@ -26,10 +26,10 @@ internal class InertSalsotto : DefaultRelicSet
                 CustomIconName = "gear\\" + GetType().ToString().Split('.').Last()
             },
             Target = Parent.Parent,
-            Condition = new ConditionMod.ConditionRec
+            Condition = new ConditionBuff.ConditionRec
             {
-                CondtionParam = ConditionMod.ConditionCheckParam.CritRate,
-                CondtionExpression = ConditionMod.ConditionCheckExpression.EqualOrMore,
+                CondtionParam = ConditionBuff.ConditionCheckParam.CritRate,
+                CondtionExpression = ConditionBuff.ConditionCheckExpression.EqualOrMore,
                 Value = 0.50
             }
         };

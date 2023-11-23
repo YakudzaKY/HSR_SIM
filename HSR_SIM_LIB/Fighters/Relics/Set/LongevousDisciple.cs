@@ -15,7 +15,7 @@ internal class LongevousDisciple : DefaultRelicSet
     {
         uniqueBuff = new Buff(Parent.Parent)
         {
-            Type = Buff.ModType.Buff, BaseDuration = 2, MaxStack = 2,
+            Type = Buff.BuffType.Buff, BaseDuration = 2, MaxStack = 2,
             Effects = new List<Effect> { new EffCritPrc { Value = 0.08 } }
         };
     }

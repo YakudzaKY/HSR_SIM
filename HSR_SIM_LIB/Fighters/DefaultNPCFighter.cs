@@ -23,7 +23,7 @@ public class DefaultNPCFighter : IFighter
         StepHandlerProc += DefaultFighter_HandleStep;
     }
 
-    public List<ConditionMod> ConditionMods { get; set; } = new();
+    public List<ConditionBuff> ConditionBuffs { get; set; } = new();
 
     public Unit GetBestTarget(Ability ability)
     {
@@ -58,7 +58,7 @@ public class DefaultNPCFighter : IFighter
         throw new Exception($"no enemy will be chosen by AGGRO counter={counter}");
     }
 
-    public List<PassiveMod> PassiveMods { get; set; } = new();
+    public List<PassiveBuff> PassiveBuffs { get; set; } = new();
     public Buff ShieldBreakMod { get; set; } = new(null);
     public PathType? Path { get; set; } = null;
     public Unit.ElementEnm Element { get; set; }

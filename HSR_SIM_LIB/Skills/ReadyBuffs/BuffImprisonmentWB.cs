@@ -11,7 +11,7 @@ public class BuffImprisonmentWB : Buff
     {
         DoNotClone = true;
         Dispellable = true;
-        Type = ModType.Debuff;
+        Type = BuffType.Debuff;
         BaseDuration = 1;
         Effects = new List<Effect>
         {

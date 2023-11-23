@@ -57,13 +57,6 @@ public class Ability : CloneClass
     }
 
 
-    public enum WeaknessBreakOrderEnm
-    {
-        ToughnessFirst,
-        DirectDamageFirst
-    }
-
-
     public Ability(IFighter parent)
     {
         Parent = parent;

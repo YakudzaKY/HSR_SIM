@@ -59,7 +59,7 @@ public class Luocha : DefaultFighter
 
         uniqueBuff = new Buff(Parent)
         {
-            Type = Buff.ModType.Buff,
+            Type = Buff.BuffType.Buff,
             BaseDuration = 2,
             MaxStack = 1,
             CustomIconName = "Icon_Abyss_Flower"
@@ -67,7 +67,7 @@ public class Luocha : DefaultFighter
 
         triggerCdBuff = new Buff(Parent)
         {
-            Type = Buff.ModType.Buff,
+            Type = Buff.BuffType.Buff,
             BaseDuration = 2,
             MaxStack = 1,
             CustomIconName = "Abyss_Flower_CD"
@@ -223,7 +223,7 @@ public class Luocha : DefaultFighter
         Abilities.Add(ability);
 
         //CoL buffs
-        ConditionMods.Add(new ConditionMod(Parent)
+        ConditionBuffs.Add(new ConditionBuff(Parent)
         {
             Mod = new Buff(Parent)
             {
@@ -231,7 +231,7 @@ public class Luocha : DefaultFighter
                 CustomIconName = uniqueBuff.CustomIconName
             },
             Target = Parent.ParentTeam,
-            Condition = new ConditionMod.ConditionRec { ConditionAvailable = ColBuffAvailable }
+            Condition = new ConditionBuff.ConditionRec { ConditionAvailable = ColBuffAvailable }
         });
 
 
@@ -240,13 +240,28 @@ public class Luocha : DefaultFighter
             DebuffResists.Add(new DebuffResist { Debuff = typeof(EffCrowControl), ResistVal = 0.7 });
         //E2
         if (Parent.Rank >= 2)
-            PassiveMods.Add(new PassiveMod(Parent)
+            PassiveBuffs.Add(new PassiveBuff(Parent)
             {
                 Mod = new Buff(Parent)
                 { Effects = new List<Effect> { new EffOutgoingHealingPrc() { CalculateValue = CalculateE2 } } },
                 Target = Parent,
                 IsTargetCheck = true
             });
+
+        //E4
+        if (Parent.Rank >= 4)
+        //CoL buffs
+        ConditionBuffs.Add(new ConditionBuff(Parent)
+        {
+            Mod = new Buff(Parent)
+            {
+                Type = Buff.BuffType.Debuff,
+                Effects = new List<Effect> { new EffAllDamageBoost() { Value = -0.12 } },
+                CustomIconName = uniqueBuff.CustomIconName
+            },
+            Target = TargetTypeEnm.Enemy,
+            Condition = new ConditionBuff.ConditionRec { ConditionAvailable = ColBuffAvailable }
+        });
     }
 
     public double? CalculateE2Shield(Event ent)

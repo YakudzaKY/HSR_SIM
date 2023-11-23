@@ -16,7 +16,7 @@ public class Buff : CloneClass
     public delegate void StepHandler(Step step);
 
 
-    public enum ModType
+    public enum BuffType
     {
         Buff,
         Debuff,
@@ -33,7 +33,7 @@ public class Buff : CloneClass
         Caster = caster;
     }
 
-    public ModType Type { get; init; }
+    public BuffType Type { get; init; }
 
     public string CustomIconName { get; set; }
     public List<Effect> Effects { get; set; } = new();
@@ -91,7 +91,7 @@ public class Buff : CloneClass
     public void Proceed(Step step)
     {
         //do some shit
-        if (Type == ModType.Dot)
+        if (Type == BuffType.Dot)
             foreach (var effect in Effects)
                 if (Reference == Caster.Fighter.ShieldBreakMod)
                 {

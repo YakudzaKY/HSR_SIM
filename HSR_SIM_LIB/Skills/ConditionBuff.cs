@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Skills;
 
-public class ConditionMod : PassiveMod
+public class ConditionBuff : PassiveBuff
 {
     public enum ConditionCheckExpression
     {
@@ -22,7 +23,7 @@ public class ConditionMod : PassiveMod
     }
 
 
-    public ConditionMod(Unit parentUnit) : base(parentUnit)
+    public ConditionBuff(Unit parentUnit) : base(parentUnit)
     {
     }
 
@@ -38,8 +39,18 @@ public class ConditionMod : PassiveMod
         throw new NotImplementedException();
     }
 
-    public bool Truly(Unit chkUnit = null)
+    /// <summary>
+    /// Expression are true?
+    /// </summary>
+    /// <param name="chkUnit"></param>
+    /// <param name="excludeCondBuff">prevent from recursion</param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public bool Truly(Unit chkUnit = null,List<ConditionBuff> excludeCondBuff=null)
     {
+        if (excludeCondBuff == null)
+            excludeCondBuff = new List<ConditionBuff>();
+        excludeCondBuff.Add(this);
         if (Condition.ConditionAvailable != null) return Condition.ConditionAvailable();
 
         switch (chkUnit)
@@ -53,10 +64,10 @@ public class ConditionMod : PassiveMod
 
         var res = Condition.CondtionParam switch
         {
-            ConditionCheckParam.SPD => CheckExpression(chkUnit.GetSpeed(null)),
-            ConditionCheckParam.CritRate => CheckExpression(chkUnit.GetCritRate(null)),
-            ConditionCheckParam.HPPrc => chkUnit.GetMaxHp(null) != 0 &&
-                                         CheckExpression(chkUnit.GetHpPrc(null)),
+            ConditionCheckParam.SPD => CheckExpression(chkUnit.GetSpeed(null,excludeCondBuff)),
+            ConditionCheckParam.CritRate => CheckExpression(chkUnit.GetCritRate(null,excludeCondBuff)),
+            ConditionCheckParam.HPPrc => chkUnit.GetMaxHp(null,excludeCondBuff) != 0 &&
+                                         CheckExpression(chkUnit.GetHpPrc(null,excludeCondBuff)),
             ConditionCheckParam.Weakness => chkUnit.Fighter.Weaknesses.Any(x => x == Condition.ElemValue),
             _ => throw new NotImplementedException()
         };

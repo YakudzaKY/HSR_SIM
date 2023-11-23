@@ -13,7 +13,7 @@ public class BuffEntanglementWB : Buff
     {
         DoNotClone = true;
         Dispellable = true;
-        Type = ModType.Debuff;
+        Type = BuffType.Debuff;
         BaseDuration = 1;
         MaxStack = 5;
         Effects = new List<Effect>

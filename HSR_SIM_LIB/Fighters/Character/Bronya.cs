@@ -28,7 +28,7 @@ public class Bronya : DefaultFighter
             OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue, AbilityValue = ability,
             BuffToApply = new Buff(Parent)
             {
-                Type = Buff.ModType.Buff, Effects = new List<Effect> { new EffAtkPrc { Value = 0.15 } },
+                Type = Buff.BuffType.Buff, Effects = new List<Effect> { new EffAtkPrc { Value = 0.15 } },
                 BaseDuration = 2, Dispellable = true
             }
         };
@@ -54,7 +54,7 @@ public class Bronya : DefaultFighter
         //=====================
 
         if (Atraces.HasFlag(ATracesEnm.A6))
-            PassiveMods.Add(new PassiveMod(Parent)
+            PassiveBuffs.Add(new PassiveBuff(Parent)
             {
                 Mod = new Buff(Parent)
                     { Effects = new List<Effect> { new EffAllDamageBoost { Value = 0.10 } } },

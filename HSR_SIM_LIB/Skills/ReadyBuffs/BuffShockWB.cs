@@ -10,7 +10,7 @@ public class BuffShockWB : Buff
     public BuffShockWB(Unit caster, Buff reference = null) : base(caster, reference)
     {
         DoNotClone = true;
-        Type = ModType.Dot;
+        Type = BuffType.Dot;
         BaseDuration = 2;
         Effects = new List<Effect> { new EffShock { CalculateValue = FighterUtils.CalculateShieldBrokeDmg } };
     }

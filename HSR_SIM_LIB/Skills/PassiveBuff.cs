@@ -2,15 +2,15 @@
 
 namespace HSR_SIM_LIB.Skills;
 
-public class PassiveMod
+public class PassiveBuff
 {
-    public PassiveMod(Unit parentUnit)
+    public PassiveBuff(Unit parentUnit)
     {
         Parent = parentUnit;
     }
 
     public Buff Mod { get; set; }
-    public CloneClass Target { get; set; } //in most cases target==parent, but when target is full team then not
+    public object Target { get; set; } //in most cases target==parent, but when target is full team then not
     public Unit Parent { get; init; }
     public bool IsTargetCheck { get; set; }
 }

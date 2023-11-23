@@ -17,9 +17,9 @@ public interface IFighter : ICloneable
 
     public delegate void StepHandler(Step step);
 
-    public List<ConditionMod> ConditionMods { get; set; }
+    public List<ConditionBuff> ConditionBuffs { get; set; }
 
-    public List<PassiveMod> PassiveMods { get; set; }
+    public List<PassiveBuff> PassiveBuffs { get; set; }
 
     //need of unique effect on shield break
     public Buff ShieldBreakMod { get; set; }

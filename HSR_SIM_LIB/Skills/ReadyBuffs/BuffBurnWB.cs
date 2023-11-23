@@ -10,7 +10,7 @@ public class BuffBurnWB : Buff
     public BuffBurnWB(Unit caster, Buff reference = null) : base(caster, reference)
     {
         DoNotClone = true;
-        Type = ModType.Dot;
+        Type = BuffType.Dot;
         BaseDuration = 2;
         Effects = new List<Effect> { new EffBurn { CalculateValue = FighterUtils.CalculateShieldBrokeDmg } };
     }

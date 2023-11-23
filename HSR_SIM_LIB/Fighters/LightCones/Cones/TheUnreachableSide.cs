@@ -19,7 +19,7 @@ internal class TheUnreachableSide : DefaultLightCone
             uniqueBuff = new Buff(Parent.Parent)
             {
                 Dispellable = false,
-                Type = Buff.ModType.Buff,
+                Type = Buff.BuffType.Buff,
                 BaseDuration = null,
                 MaxStack = 1,
                 Effects = new List<Effect> { new EffAllDamageBoost { Value = modifiers[rank] } }

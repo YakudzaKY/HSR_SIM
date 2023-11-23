@@ -261,7 +261,7 @@ public static class GraphicsCls
                 {
                     gfx.DrawImage(new Bitmap(Utl.LoadBitmap(weak.ToString()), ElemSizeMini),
                         new Point(portraitPoint.X + j * ElemSizeMini.Width,
-                            portraitPoint.Y + (int)(PortraitSize.Height * 0.8)));
+                            portraitPoint.Y + (int)(PortraitSize.Height * 0.2)));
                     j++;
                 }
 
@@ -423,8 +423,8 @@ public static class GraphicsCls
                         ElemSizeMini), buffPoint);
                 gfx.DrawRectangle(
                     new Pen(
-                        buff.Type == Buff.ModType.Buff ? Color.Aquamarine :
-                        buff.Type == Buff.ModType.Debuff ? Color.Brown : Color.Violet, 1), buffPoint.X, buffPoint.Y,
+                        buff.Type == Buff.BuffType.Buff ? Color.Aquamarine :
+                        buff.Type == Buff.BuffType.Debuff ? Color.Brown : Color.Violet, 1), buffPoint.X, buffPoint.Y,
                     ElemSizeMini.Width, ElemSizeMini.Height);
 
                 //duration
@@ -457,14 +457,14 @@ public static class GraphicsCls
 
             //ConditionsBuffs
             j = 0;
-            foreach (var buff in unit.GetConditionMods(null, null).Where(x => x is ConditionMod))
+            foreach (var buff in unit.GetConditionBuffs(null, null).Where(x => x is ConditionBuff))
             {
                 var buffPoint = new Point(portraitPoint.X + j * ElemSizeMini.Width,
                     portraitPoint.Y + PortraitSize.Height - ElemSizeMini.Width);
                 gfx.DrawImage(
                     new Bitmap(Utl.LoadBitmap(buff.Mod.CustomIconName ?? buff.Mod.Effects.First().GetType().Name),
                         ElemSizeMini), buffPoint);
-                gfx.DrawRectangle(new Pen(Color.Blue, 1), buffPoint.X, buffPoint.Y, ElemSizeMini.Width,
+                gfx.DrawRectangle(new Pen((buff.Mod.Type== Buff.BuffType.Buff )?Color.Blue:Color.DarkRed, 1), buffPoint.X, buffPoint.Y, ElemSizeMini.Width,
                     ElemSizeMini.Height);
 
 

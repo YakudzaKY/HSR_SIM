@@ -21,7 +21,7 @@ internal class DispelGood : Event
         if (!TriggersHandled)
         {
             var buffToDispell =
-                TargetUnit.Buffs.FirstOrDefault(x => x.Type is Buff.ModType.Buff && x.Dispellable);
+                TargetUnit.Buffs.FirstOrDefault(x => x.Type is Buff.BuffType.Buff && x.Dispellable);
             if (buffToDispell != null)
                 ChildEvents.Add(new RemoveBuff(ParentStep, Source, SourceUnit)
                     { TargetUnit = TargetUnit, AbilityValue = AbilityValue, BuffToApply = buffToDispell });

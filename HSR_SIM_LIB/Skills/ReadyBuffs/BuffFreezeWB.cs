@@ -11,7 +11,7 @@ public class BuffFreezeWB : Buff
     public BuffFreezeWB(Unit caster, Buff reference = null) : base(caster, reference)
     {
         DoNotClone = true;
-        Type = ModType.Debuff;
+        Type = BuffType.Debuff;
         BaseDuration = 1;
         Effects = new List<Effect> { new EffFreeze { CalculateValue = FighterUtils.CalculateShieldBrokeDmg } };
         EventHandlerProc += FreezeEventHandler;

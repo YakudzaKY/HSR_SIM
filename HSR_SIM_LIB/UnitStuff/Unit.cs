@@ -101,8 +101,8 @@ public class Unit : CloneClass
     {
         get
         {
-            return ParentTeam.ParentSim.Teams
-                .First(x => x != ParentTeam && x.TeamType != Team.TeamTypeEnm.Special);
+            return ParentTeam?.ParentSim.Teams
+                .FirstOrDefault(x => x != ParentTeam && x.TeamType != Team.TeamTypeEnm.Special);
         }
     }
 
@@ -264,13 +264,13 @@ public class Unit : CloneClass
     ///     Get total stat by Buffs by type
     /// </summary>
     /// <returns></returns>
-    public double GetModsByType(Type modType, ElementEnm? elem = null, Event ent = null)
+    public double GetModsByType(Type modType, ElementEnm? elem = null, Event ent = null, List<ConditionBuff> excludeCondBuff = null)
     {
         double res = 0;
         List<Buff> conditionsToCheck = new();
         //get all mods to check
         conditionsToCheck.AddRange(Buffs);
-        foreach (var pmode in GetConditionMods(this, modType))
+        foreach (var pmode in GetConditionBuffs(this, modType, excludeCondBuff))
             conditionsToCheck.Add(pmode.Mod);
 
 
@@ -295,47 +295,42 @@ public class Unit : CloneClass
         return res;
     }
 
+    public IEnumerable<PassiveBuff> GetConditionBuffToUnit(List<PassiveBuff> passiveBuffs, List<ConditionBuff> conditionBuffs, Unit targetForBuff, Type effTypeToSearch, List<ConditionBuff> excludeCondBuff = null)
+    {
+        IEnumerable<PassiveBuff> res =
+        (from cmod in passiveBuffs
+                .Where(x => x.Mod.Effects.Any(x => effTypeToSearch == null || x.GetType() == effTypeToSearch))
+                .Concat(conditionBuffs.Where(y=>excludeCondBuff==null||!excludeCondBuff.Contains(y)))
+         where ((cmod.Target is Unit && cmod.Target == this)
+                || (cmod.Target is Team && cmod.Target == ParentTeam)
+                || (cmod.Target is TargetTypeEnm && cmod.Parent.GetTargetsForUnit((TargetTypeEnm)cmod.Target).Contains(this))) 
+               &&(cmod is not ConditionBuff mod || mod.Truly(targetForBuff,excludeCondBuff))
+         select cmod);
+        return res;
+    }
     /// <summary>
     ///     search avalable for unit condition mods(planars self or ally)
     /// </summary>
     /// <returns></returns>
-    public List<PassiveMod> GetConditionMods(Unit targetForCondition, Type effTypeToSearch)
+    public List<PassiveBuff> GetConditionBuffs(Unit targetForBuff, Type effTypeToSearch, List<ConditionBuff> excludeCondBuff = null)
     {
-        List<PassiveMod> res = new();
+        List<PassiveBuff> res = new();
         if (ParentTeam == null)
             return res;
 
 
-        foreach (var unit in ParentTeam.Units.Where(x => x.IsAlive))
+        foreach (var unit in ParentTeam.ParentSim.AllUnits.Where(x => x.IsAlive))
         {
-            if (unit.fighter.ConditionMods.Concat(unit.fighter.PassiveMods).Any())
-                res.AddRange(from cmod in unit.fighter.ConditionMods
-                        .Where(x => x.Mod.Effects.Any(x => effTypeToSearch == null || x.GetType() == effTypeToSearch))
-                        .Concat(unit.fighter.PassiveMods)
-                             where (cmod.Target == this || cmod.Target == ParentTeam) &&
-                                   (cmod is not ConditionMod mod || mod.Truly(targetForCondition))
-                             select cmod);
+            if (unit.fighter.ConditionBuffs.Concat(unit.fighter.PassiveBuffs).Any())
+                res.AddRange(GetConditionBuffToUnit(unit.fighter.PassiveBuffs, unit.fighter.ConditionBuffs, targetForBuff, effTypeToSearch, excludeCondBuff));
             if (unit.Fighter is DefaultFighter unitFighter)
             {
                 //LC
-
                 if (unitFighter.LightCone != null)
-                    res.AddRange(from cmod in unitFighter.LightCone.ConditionMods
-                            .Where(x => x.Mod.Effects.Any(
-                                x => effTypeToSearch == null || x.GetType() == effTypeToSearch))
-                            .Concat(unitFighter.LightCone.PassiveMods)
-                                 where (cmod.Target == this || cmod.Target == ParentTeam) &&
-                                       (cmod is not ConditionMod mod || mod.Truly(targetForCondition))
-                                 select cmod);
+                    res.AddRange(GetConditionBuffToUnit(unitFighter.LightCone.PassiveMods, unitFighter.LightCone.ConditionMods, targetForBuff, effTypeToSearch, excludeCondBuff));
                 //GEAR
                 foreach (var relic in unitFighter.Relics)
-                    res.AddRange(from cmod in relic.ConditionMods
-                            .Where(x => x.Mod.Effects.Any(
-                                x => effTypeToSearch == null || x.GetType() == effTypeToSearch))
-                            .Concat(relic.PassiveMods)
-                                 where (cmod.Target == this || cmod.Target == ParentTeam) &&
-                                       (cmod is not ConditionMod mod || mod.Truly(targetForCondition))
-                                 select cmod);
+                    res.AddRange(GetConditionBuffToUnit(relic.PassiveMods, relic.ConditionMods, targetForBuff, effTypeToSearch, excludeCondBuff));
             }
         }
 
@@ -395,7 +390,7 @@ public class Unit : CloneClass
                 //copy buff
                 srchMod = (Buff)mod.Clone();
                 //if we have calced values then clone all effects(in the same order)
-                if (mod.Effects.Any(x => x.DynamicValue ))
+                if (mod.Effects.Any(x => x.DynamicValue))
                 {
                     srchMod.Effects = new List<Effect>();
                     //clone calced effects
@@ -447,7 +442,7 @@ public class Unit : CloneClass
         if (targetType == TargetTypeEnm.Friend)
             return Friends.Where(x => x.IsAlive);
         if (targetType == TargetTypeEnm.Enemy)
-            return Enemies.Where(x => x.IsAlive);
+            return Enemies?.Where(x => x.IsAlive) ?? new List<Unit>();
 
         throw new NotImplementedException();
     }
@@ -488,7 +483,7 @@ public class Unit : CloneClass
                     for (var i = 0; i < mod.Stack; i++)
                         res *= 1 - effect.Value ?? 0;
         //Condition
-        foreach (var pmod in GetConditionMods(targetForCondition, typeof(EffDamageReduction)))
+        foreach (var pmod in GetConditionBuffs(targetForCondition, typeof(EffDamageReduction)))
             foreach (var effect in pmod.Mod.Effects.Where(x => x is EffDamageReduction))
                 for (var i = 0; i < pmod.Mod.Stack; i++)
                     res *= 1 - effect.Value ?? 0;
@@ -527,20 +522,20 @@ public class Unit : CloneClass
         return 1 + GetModsByType(typeof(EffIncomeHealingPrc), ent: ent);
     }
 
-    public double GetCritRate(Event ent)
+    public double GetCritRate(Event ent, List<ConditionBuff> excludeCondBuff = null)
     {
-        return Stats.CritChance + GetModsByType(typeof(EffCritPrc), ent: ent);
+        return Stats.CritChance + GetModsByType(typeof(EffCritPrc), ent: ent,excludeCondBuff:excludeCondBuff);
     }
 
-    public double GetCritDamage(Event ent)
+    public double GetCritDamage(Event ent, List<ConditionBuff> excludeCondBuff = null)
     {
-        return Stats.CritDmg + GetModsByType(typeof(EffCritDmg), ent: ent);
+        return Stats.CritDmg + GetModsByType(typeof(EffCritDmg), ent: ent,excludeCondBuff:excludeCondBuff);
     }
 
-    public double GetMaxHp(Event ent)
+    public double GetMaxHp(Event ent, List<ConditionBuff> excludeCondBuff=null)
     {
-        return Stats.BaseMaxHp * (1 + GetModsByType(typeof(EffMaxHpPrc)) + Stats.MaxHpPrc) +
-               GetModsByType(typeof(EffMaxHp)) + Stats.MaxHpFix;
+        return Stats.BaseMaxHp * (1 + GetModsByType(typeof(EffMaxHpPrc), ent: ent,excludeCondBuff:excludeCondBuff) + Stats.MaxHpPrc) +
+               GetModsByType(typeof(EffMaxHp), ent: ent,excludeCondBuff:excludeCondBuff) + Stats.MaxHpFix;
     }
 
     public double GetActionValue(Event ent)
@@ -555,16 +550,16 @@ public class Unit : CloneClass
         return GetInitialBaseActionValue(ent) - GetModsByType(typeof(EffReduceBAV), ent: ent);
     }
 
-    public double GetHpPrc(Event ent)
+    public double GetHpPrc(Event ent, List<ConditionBuff> excludeCondBuff=null)
     {
-        return GetRes(ResourceType.HP).ResVal / GetMaxHp(ent);
+        return GetRes(ResourceType.HP).ResVal / GetMaxHp(ent,excludeCondBuff);
     }
 
-    public double GetSpeed(Event ent)
+    public double GetSpeed(Event ent, List<ConditionBuff> excludeCondBuff = null)
     {
-        return Stats.BaseSpeed * (1 + GetModsByType(typeof(EffSpeedPrc), ent: ent) -
-                   GetModsByType(typeof(EffReduceSpdPrc), ent: ent) + Stats.SpeedPrc) +
-               GetModsByType(typeof(EffSpeed), ent: ent) +
+        return Stats.BaseSpeed * (1 + GetModsByType(typeof(EffSpeedPrc), ent: ent,excludeCondBuff:excludeCondBuff) -
+                   GetModsByType(typeof(EffReduceSpdPrc), ent: ent,excludeCondBuff:excludeCondBuff) + Stats.SpeedPrc) +
+               GetModsByType(typeof(EffSpeed), ent: ent,excludeCondBuff:excludeCondBuff) +
                Stats.SpeedFix;
     }
 

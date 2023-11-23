@@ -95,8 +95,8 @@ public abstract class DefaultFighter : IFighter
     }
 
     public Buff ShieldBreakMod { get; set; } = new(null);
-    public List<ConditionMod> ConditionMods { get; set; } = new();
-    public List<PassiveMod> PassiveMods { get; set; } = new();
+    public List<ConditionBuff> ConditionBuffs { get; set; } = new();
+    public List<PassiveBuff> PassiveBuffs { get; set; } = new();
     public abstract PathType? Path { get; }
     public abstract Unit.ElementEnm Element { get; }
     public List<Unit.ElementEnm> Weaknesses { get; set; } = new();

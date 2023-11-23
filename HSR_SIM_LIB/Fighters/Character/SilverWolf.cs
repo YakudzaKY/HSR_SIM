@@ -59,7 +59,7 @@ public class SilverWolf : DefaultFighter
 
 
         if (Parent.Rank >= 6)
-            PassiveMods.Add(new PassiveMod(Parent)
+            PassiveBuffs.Add(new PassiveBuff(Parent)
             {
                 Mod = new Buff(Parent)
                     { Effects = new List<Effect> { new EffAllDamageBoost { CalculateValue = CalculateE6 } } },
@@ -83,7 +83,7 @@ public class SilverWolf : DefaultFighter
                     TargetUnit = ent.TargetUnit,
                     BuffToApply = new Buff(Parent)
                     {
-                        Type = Buff.ModType.Debuff,
+                        Type = Buff.BuffType.Debuff,
                         Effects = new List<Effect> { new EffEffectResPrc { Value = -0.20 } }
                     }
                 };
@@ -117,7 +117,7 @@ public class SilverWolf : DefaultFighter
         double debufs = 0;
 
 
-        debufs += ent.TargetUnit.Buffs.Count(x => x.Type == Buff.ModType.Debuff || x.Type == Buff.ModType.Dot);
+        debufs += ent.TargetUnit.Buffs.Count(x => x.Type == Buff.BuffType.Debuff || x.Type == Buff.BuffType.Dot);
         if (debufs > maxDebufs) debufs = maxDebufs;
 
         return debufs * 0.2;

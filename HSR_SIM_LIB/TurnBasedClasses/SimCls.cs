@@ -367,7 +367,7 @@ public class SimCls : ICloneable
                 //set all Buffs are "old"
                 foreach (var mod in CurrentFight.Turn.Actor.Buffs) mod.IsOld = true;
                 //dot proc
-                foreach (var dot in CurrentFight.Turn.Actor.Buffs.Where(x => x.Type == ModType.Dot || x.IsEarlyProc()))
+                foreach (var dot in CurrentFight.Turn.Actor.Buffs.Where(x => x.Type == BuffType.Dot || x.IsEarlyProc()))
                     dot.Proceed(newStep);
             }
         }
@@ -428,7 +428,7 @@ public class SimCls : ICloneable
 
                     //remove buffs
                     foreach (var dot in CurrentFight.Turn.Actor.Buffs.Where(x =>
-                                 x.Type != ModType.Dot && !x.IsEarlyProc())) dot.Proceed(newStep);
+                                 x.Type != BuffType.Dot && !x.IsEarlyProc())) dot.Proceed(newStep);
                     CurrentFight.Turn = null;
                 }
         }

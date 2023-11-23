@@ -30,7 +30,7 @@ public class ForgottenHall : DefaultNPCFighter
             AbilityValue = IncreaseCycle,
             BuffToApply = new Buff(Parent)
             {
-                Type = Buff.ModType.Buff,
+                Type = Buff.BuffType.Buff,
                 Effects = new List<Effect> { new EffReduceBAV { Value = 50 } },
                 BaseDuration = 1,
                 Dispellable = false

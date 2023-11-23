@@ -10,7 +10,7 @@ public class BuffBleedWB : Buff
     public BuffBleedWB(Unit caster, Buff reference = null) : base(caster, reference)
     {
         DoNotClone = true;
-        Type = ModType.Dot;
+        Type = BuffType.Dot;
         BaseDuration = 2;
         Effects = new List<Effect> { new EffBleed { CalculateValue = FighterUtils.CalculateShieldBrokeDmg } };
     }

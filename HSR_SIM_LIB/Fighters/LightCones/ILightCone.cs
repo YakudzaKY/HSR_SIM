@@ -16,8 +16,8 @@ public interface ILightCone : ICloneable
 
     public delegate void StepHandler(Step step);
 
-    public List<ConditionMod> ConditionMods { get; set; }
-    public List<PassiveMod> PassiveMods { get; set; }
+    public List<ConditionBuff> ConditionMods { get; set; }
+    public List<PassiveBuff> PassiveMods { get; set; }
     public int Rank { get; set; }
     public PathType Path { get; }
 

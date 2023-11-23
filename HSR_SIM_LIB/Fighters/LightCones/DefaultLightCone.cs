@@ -19,8 +19,8 @@ internal abstract class DefaultLightCone : ILightCone
 
 
     public IFighter Parent { get; set; }
-    public List<ConditionMod> ConditionMods { get; set; } = new();
-    public List<PassiveMod> PassiveMods { get; set; } = new();
+    public List<ConditionBuff> ConditionMods { get; set; } = new();
+    public List<PassiveBuff> PassiveMods { get; set; } = new();
     public int Rank { get; set; }
     public abstract FighterUtils.PathType Path { get; }
     public ILightCone.EventHandler EventHandlerProc { get; set; }

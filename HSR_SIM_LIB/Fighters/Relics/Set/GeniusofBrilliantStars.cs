@@ -10,7 +10,7 @@ internal class GeniusofBrilliantStars : DefaultRelicSet
     public GeniusofBrilliantStars(IFighter parent, int num) : base(parent, num)
     {
         if (num >= 2)
-            PassiveMods.Add(new PassiveMod(Parent.Parent)
+            PassiveMods.Add(new PassiveBuff(Parent.Parent)
             {
                 Mod = new Buff(Parent.Parent)
                     { Effects = new List<Effect> { new EffDefIgnore { Value = 0.10 } } },
@@ -18,15 +18,15 @@ internal class GeniusofBrilliantStars : DefaultRelicSet
             });
 
         if (num >= 4)
-            ConditionMods.Add(new ConditionMod(parent.Parent)
+            ConditionMods.Add(new ConditionBuff(parent.Parent)
             {
                 Mod = new Buff(Parent.Parent) { Effects = new List<Effect> { new EffDefIgnore { Value = 0.10 } } },
                 IsTargetCheck = true,
                 Target = Parent.Parent,
-                Condition = new ConditionMod.ConditionRec
+                Condition = new ConditionBuff.ConditionRec
                 {
-                    CondtionParam = ConditionMod.ConditionCheckParam.Weakness,
-                    CondtionExpression = ConditionMod.ConditionCheckExpression.EqualOrMore,
+                    CondtionParam = ConditionBuff.ConditionCheckParam.Weakness,
+                    CondtionExpression = ConditionBuff.ConditionCheckExpression.EqualOrMore,
                     ElemValue = Unit.ElementEnm.Quantum
                 }
             });
