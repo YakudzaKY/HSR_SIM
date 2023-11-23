@@ -123,12 +123,10 @@ public abstract class Event : CloneClass
         {
             AbilityValue = AbilityValue,
             TargetUnit = TargetUnit,
-            BaseChance = baseChance,
             BuffToApply = mod
         };
 
-
-        if (FighterUtils.CalculateDebuffResisted(dotEvent))
+        if (FighterUtils.CalculateDebuffResisted(dotEvent,baseChance))
         {
             ChildEvents.Add(dotEvent);
             //subscription to events(need calc stacks at attacks)

@@ -7,12 +7,16 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 //apply buff debuff dot etc
 public class ApplyBuff : BuffEventTemplate
 {
+    /// <summary>
+    /// place buff/debuff on target. If have some chance to place buff then use AttemptEffect instead
+    /// </summary>
+    /// <param name="parent"></param>
+    /// <param name="source"></param>
+    /// <param name="sourceUnit"></param>
     public ApplyBuff(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
     {
     }
 
-    //Base Chance to apply debuff
-    public double BaseChance { get; set; }
 
     public override string GetDescription()
     {

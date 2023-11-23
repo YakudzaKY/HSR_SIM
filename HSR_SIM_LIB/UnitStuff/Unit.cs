@@ -220,6 +220,7 @@ public class Unit : CloneClass
             res += Fighter.Resists.First(x => x.ResistType == elem).ResistVal;
 
         res += GetModsByType(typeof(EffElementalResist), elem, ent);
+        res += GetModsByType(typeof(EffAllDamageResist),  ent:ent);
         return res;
     }
 
