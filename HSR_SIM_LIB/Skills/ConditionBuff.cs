@@ -42,33 +42,28 @@ public class ConditionBuff : PassiveBuff
     /// <summary>
     /// Expression are true?
     /// </summary>
-    /// <param name="chkUnit"></param>
+    /// <param name="chkUnit"> target </param>
     /// <param name="excludeCondBuff">prevent from recursion</param>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
-    public bool Truly(Unit chkUnit = null,List<ConditionBuff> excludeCondBuff=null)
+    public bool Truly(Unit targetUnit = null,List<ConditionBuff> excludeCondBuff=null)
     {
         if (excludeCondBuff == null)
             excludeCondBuff = new List<ConditionBuff>();
         excludeCondBuff.Add(this);
         if (Condition.ConditionAvailable != null) return Condition.ConditionAvailable();
-
-        switch (chkUnit)
-        {
-            case null when IsTargetCheck:
-                return false;
-            case null:
-                chkUnit = Parent;
-                break;
-        }
+        //if target check, then check conditions by target. Else get parent
+        Unit untToCheck = IsTargetCheck ? targetUnit : Parent;
+        if (untToCheck == null)
+            return false;
 
         var res = Condition.CondtionParam switch
         {
-            ConditionCheckParam.SPD => CheckExpression(chkUnit.GetSpeed(null,excludeCondBuff)),
-            ConditionCheckParam.CritRate => CheckExpression(chkUnit.GetCritRate(null,excludeCondBuff)),
-            ConditionCheckParam.HPPrc => chkUnit.GetMaxHp(null,excludeCondBuff) != 0 &&
-                                         CheckExpression(chkUnit.GetHpPrc(null,excludeCondBuff)),
-            ConditionCheckParam.Weakness => chkUnit.Fighter.Weaknesses.Any(x => x == Condition.ElemValue),
+            ConditionCheckParam.SPD => CheckExpression(untToCheck.GetSpeed(null,excludeCondBuff)),
+            ConditionCheckParam.CritRate => CheckExpression(untToCheck.GetCritRate(null,excludeCondBuff)),
+            ConditionCheckParam.HPPrc => untToCheck.GetMaxHp(null,excludeCondBuff) != 0 &&
+                                         CheckExpression(untToCheck.GetHpPrc(null,excludeCondBuff)),
+            ConditionCheckParam.Weakness => untToCheck.Fighter.Weaknesses.Any(x => x == Condition.ElemValue),
             _ => throw new NotImplementedException()
         };
         return res;

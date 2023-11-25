@@ -13,9 +13,9 @@ public abstract class DamageEventTemplate : Event
     }
 
     public double? RealBarrierVal { get; set; }
-
+    //after calc Val will be multiplied by this number
+    public double CalculateProportion { get; set; } = 1;
     public Buff Modification { get; set; }
-    public bool CanSetToZero { get; init; } = true;
 
     public void DamageWorks(bool revert)
     {

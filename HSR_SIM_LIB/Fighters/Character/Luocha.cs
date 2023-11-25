@@ -228,17 +228,19 @@ public class Luocha : DefaultFighter
         }); //AbilityValue for Cycle of life
         Abilities.Add(ability);
 
-        //CoL buffs
-        ConditionBuffs.Add(new ConditionBuff(Parent)
-        {
-            Mod = new Buff(Parent)
+        //E1
+        if (Parent.Rank >= 1)
+            //CoL buffs
+            ConditionBuffs.Add(new ConditionBuff(Parent)
             {
-                Effects = new List<Effect> { new EffAtkPrc { Value = 0.2 } },
-                CustomIconName = uniqueBuff.CustomIconName
-            },
-            Target = Parent.ParentTeam,
-            Condition = new ConditionBuff.ConditionRec { ConditionAvailable = ColBuffAvailable }
-        });
+                Mod = new Buff(Parent)
+                {
+                    Effects = new List<Effect> { new EffAtkPrc { Value = 0.2 } },
+                    CustomIconName = uniqueBuff.CustomIconName
+                },
+                Target = Parent.ParentTeam,
+                Condition = new ConditionBuff.ConditionRec { ConditionAvailable = ColBuffAvailable }
+            });
 
 
         //A6

@@ -46,7 +46,7 @@ public abstract class Event : CloneClass
         {
             //calc value first
             if (CalculateValue != null && val == null)
-                val = CalculateValue(this) * CalculateProportion;
+                val = CalculateValue(this) ;
             return val;
         }
 
@@ -55,8 +55,7 @@ public abstract class Event : CloneClass
 
     public double? RealVal { get; set; }
 
-    //after calc Val will be multiplied by this number
-    public double CalculateProportion { get; set; } = 1;
+
 
     public Step ParentStep { get; set; }
     public bool TriggersHandled { get; set; }

@@ -201,7 +201,7 @@ public static class FighterUtils
         var brokenMultiplier = defender.GetBrokenMultiplier();
 
         var totalDmg = baseDmg * critMultiplier * damageBoost * defMultiplier * resPen * vulnMult *
-                       dmgReduction * brokenMultiplier;
+                       dmgReduction * brokenMultiplier *((DamageEventTemplate)ent).CalculateProportion;
         ent.ParentStep.Parent.Parent?.LogDebug("=======================");
         ent.ParentStep.Parent.Parent?.LogDebug($"baseDmg={baseDmg:f} crit chance={attacker.GetCritRate(ent):f} ");
         ent.ParentStep.Parent.Parent?.LogDebug(
@@ -212,7 +212,7 @@ public static class FighterUtils
         ent.ParentStep.Parent.Parent?.LogDebug(
             $"defMultiplier({defMultiplier:f}) = 1-(defender.Stats.Def({defWithIgnore:f})/(defender.Stats.Def({defWithIgnore:f})+200+(10*attacker.Level({attacker.Level:d}))))");
         ent.ParentStep.Parent.Parent?.LogDebug(
-            $"resPen= {resPen:f} ; vulnMult= {vulnMult:f} ; critMultiplier={critMultiplier:f} ; dmgReduction= {dmgReduction:f} ; brokenMultiplier= {brokenMultiplier:f} ; abilityTypeMultiplier {attacker.GetAbilityTypeMultiplier(ent):f}");
+            $"resPen= {resPen:f} ; vulnMult= {vulnMult:f} ; critMultiplier={critMultiplier:f} ; dmgReduction= {dmgReduction:f} ; brokenMultiplier= {brokenMultiplier:f} ; abilityTypeMultiplier {attacker.GetAbilityTypeMultiplier(ent):f} dmg proportion={((DamageEventTemplate)ent).CalculateProportion:f}");
         ent.ParentStep.Parent.Parent?.LogDebug($"TOTAL DAMAGE= {totalDmg:f}");
         return totalDmg;
     }

@@ -290,6 +290,7 @@ public class Unit : CloneClass
                 else
                     finalValue = (double)effect.Value;
 
+                //ent?.ParentStep.Parent.Parent?.LogDebug($"{mod.AbilityValue?.Name} {mod.Caster.Name} add to val = { finalValue}");
                 res += finalValue * (effect.StackAffectValue ? mod.Stack : 1);
             }
 
