@@ -328,7 +328,7 @@ public class Luocha : DefaultFighter
         {
             ent.ChildEvents.Add(
                 new Healing(ent.ParentStep, this,
-                        ent.SourceUnit) //will put source unit coz Output healing calc will be calculated by target unit
+                        Parent) //will put source unit coz Output healing calc will be calculated by target unit
                 {
                     AbilityValue = ent.AbilityValue,
                     TargetUnit = ent.SourceUnit,
@@ -340,7 +340,7 @@ public class Luocha : DefaultFighter
                 foreach (var unit in ent.SourceUnit.Friends.Where(x => x.IsAlive && x != ent.SourceUnit))
                     ent.ChildEvents.Add(
                         new Healing(ent.ParentStep, this,
-                                unit) //will put source unit coz Output healing calc will be calculated by target unit
+                                Parent) //will put source unit coz Output healing calc will be calculated by target unit
                         {
                             AbilityValue = ent.AbilityValue,
                             TargetUnit = unit,
