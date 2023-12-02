@@ -11,10 +11,7 @@ public abstract class DamageEventTemplate : Event
     public DamageEventTemplate(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
     {
     }
-
     public double? RealBarrierVal { get; set; }
-    //after calc Val will be multiplied by this number
-    public double CalculateProportion { get; set; } = 1;
     public Buff Modification { get; set; }
 
     public void DamageWorks(bool revert)

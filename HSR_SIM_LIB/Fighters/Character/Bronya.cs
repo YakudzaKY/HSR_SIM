@@ -42,12 +42,14 @@ public class Bronya : DefaultFighter
         SystemWarning = new Ability(this)
         {
             AbilityType = Ability.AbilityTypeEnm.Basic, Name = "FIX THIS SHIT!!!", Element = Element,
-            AdjacentTargets = Ability.AdjacentTargetsEnm.None, EnergyGain = 20, SpGain = 1
+            AdjacentTargets = Ability.AdjacentTargetsEnm.None, SpGain = 1
         };
         //dmg events
         SystemWarning.Events.Add(new DirectDamage(null, this, Parent)
             { CalculateValue = CalculateBasicDmg, AbilityValue = SystemWarning });
         SystemWarning.Events.Add(new ToughnessShred(null, this, Parent) { Val = 30, AbilityValue = SystemWarning });
+        SystemWarning.Events.Add(new EnergyGain(null, this, Parent)
+            { Val = 20, TargetUnit = Parent, AbilityValue = SystemWarning });
         Abilities.Add(SystemWarning);
         //=====================
         //Ascended Traces

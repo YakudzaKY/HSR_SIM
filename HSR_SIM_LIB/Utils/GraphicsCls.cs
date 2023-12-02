@@ -403,8 +403,7 @@ public static class GraphicsCls
                     DrawText(portraitPoint.X + DmgIconSize.Width
                         , pointY
                         , gfx
-                        , Math.Floor(ent.Val ?? 0) +
-                          (ent is DirectDamage damage && damage.IsCrit ? " crit" : "")
+                        , $"{(int)Math.Floor(ent.Val?? 0):D}{(ent is DirectDamage damage && damage.IsCrit ? " crit" : "")}"
                         , new SolidBrush(nmbrColor)
                         , new Font("Tahoma", BarFontSize, FontStyle.Bold));
 
