@@ -19,7 +19,6 @@ public abstract class Event : CloneClass
     public List<Event> ChildEvents = new();
     private double? val; //Theoretical value
 
-
     public Event(Step parentStep, ICloneable source, Unit sourceUnit)
     {
         ParentStep = parentStep;
@@ -34,19 +33,31 @@ public abstract class Event : CloneClass
     public ICloneable Source { get; }
     public Ability.TargetTypeEnm? TargetType { get; set; }
 
-    public Ability.AbilityCurrentTargetEnm? CurentTargetType { get; set; }
+    public Ability.AbilityCurrentTargetEnm? CurrentTargetType { get; set; }
     public Unit SourceUnit { get; set; }
     public Unit TargetUnit { get; set; }
     public StepTypeEnm? OnStepType { get; init; }
     public Ability AbilityValue { get; set; }
+    //after calc Val will be multiplied by this number
+    public double? CalculateProportion { get; set; } = null;
 
     public double? Val
     {
         get
         {
             //calc value first
-            if (CalculateValue != null && val == null)
-                val = CalculateValue(this) ;
+            if (!TriggersHandled)
+            {
+                if (CalculateValue != null)
+                    val = CalculateValue(this);
+                if (CalculateProportion != null)
+                {
+                    val *= CalculateProportion;
+                    ParentStep.Parent.Parent?.LogDebug($" new val proportion({CalculateProportion:f})={val:f}");
+                }
+
+                
+            }
             return val;
         }
 

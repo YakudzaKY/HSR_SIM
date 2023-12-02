@@ -107,8 +107,7 @@ public class Luocha : DefaultFighter
             Element = Element,
             TargetType = TargetTypeEnm.Friend,
             CostType = Resource.ResourceType.SP,
-            Cost = 1,
-            EnergyGain = 30
+            Cost = 1
         };
         if (Atraces.HasFlag(ATracesEnm.A2))
             prayerOfAbyssFlower.Events.Add(new DispelShit(null, this, Parent)
@@ -116,8 +115,8 @@ public class Luocha : DefaultFighter
 
         prayerOfAbyssFlower.Events.Add(new Healing(null, this, Parent)
         { CalculateValue = CalculatePrayerOfAbyssFlower, AbilityValue = prayerOfAbyssFlower });
-
-
+        prayerOfAbyssFlower.Events.Add(new EnergyGain(null, this, Parent)
+        { Val = 30, TargetUnit = Parent, AbilityValue = prayerOfAbyssFlower });
         Abilities.Add(prayerOfAbyssFlower);
 
 
@@ -130,7 +129,6 @@ public class Luocha : DefaultFighter
             Available = PoAFAvailable,
             Priority = PriorityEnm.High,
             TargetType = TargetTypeEnm.Friend,
-            EnergyGain = 30
         };
         if (Atraces.HasFlag(ATracesEnm.A2))
             prayerOfAbyssFlowerAuto.Events.Add(new DispelShit(null, this, Parent)
@@ -141,6 +139,8 @@ public class Luocha : DefaultFighter
             CalculateValue = CalculatePrayerOfAbyssFlower,
             AbilityValue = prayerOfAbyssFlowerAuto
         });
+        prayerOfAbyssFlowerAuto.Events.Add(new EnergyGain(null, this, Parent)
+        { Val = 30, TargetUnit = Parent, AbilityValue = prayerOfAbyssFlowerAuto });
         prayerOfAbyssFlowerAuto.Events.Add(new ApplyBuff(null, this, Parent)
         {
             AbilityValue = prayerOfAbyssFlowerAuto,
@@ -160,22 +160,20 @@ public class Luocha : DefaultFighter
             Name = "Thorns of the Abyss",
             Element = Element,
             AdjacentTargets = AdjacentTargetsEnm.None,
-            EnergyGain = 20,
             SpGain = 1
         };
 
-        for (var i = 0; i < 2; i++)
+        foreach (double proportion in new[] { 0.3, 0.3, 0.4 })
         {
             ThornsoftheAbyss.Events.Add(new DirectDamage(null, this, Parent)
-            { CalculateValue = CalculateBasicDmg, AbilityValue = ThornsoftheAbyss, CalculateProportion = 0.3 });
+            { CalculateValue = CalculateBasicDmg, AbilityValue = ThornsoftheAbyss, CalculateProportion = proportion });
             ThornsoftheAbyss.Events.Add(new ToughnessShred(null, this, Parent)
-            { Val = 30 * 0.3, AbilityValue = ThornsoftheAbyss });
+            { Val = 30, AbilityValue = ThornsoftheAbyss, CalculateProportion = proportion });
+            ThornsoftheAbyss.Events.Add(new EnergyGain(null, this, Parent)
+            { Val = 20, TargetUnit = Parent, AbilityValue = ThornsoftheAbyss, CalculateProportion = proportion });
         }
 
-        ThornsoftheAbyss.Events.Add(new DirectDamage(null, this, Parent)
-        { CalculateValue = CalculateBasicDmg, AbilityValue = ThornsoftheAbyss, CalculateProportion = 0.4 });
-        ThornsoftheAbyss.Events.Add(new ToughnessShred(null, this, Parent)
-        { Val = 30 * 0.4, AbilityValue = ThornsoftheAbyss });
+
         Abilities.Add(ThornsoftheAbyss);
 
 
@@ -185,7 +183,6 @@ public class Luocha : DefaultFighter
             AbilityType = AbilityTypeEnm.Ultimate,
             Name = "Death Wish",
             AdjacentTargets = AdjacentTargetsEnm.All,
-            EnergyGain = 5,
             Available = UltimateAvailable,
             Priority = PriorityEnm.Ultimate,
             EndTheTurn = false,
@@ -196,17 +193,19 @@ public class Luocha : DefaultFighter
         //E6
         if (Parent.Rank >= 6)
             ultimateAbility.Events.Add(new ApplyBuff(null, this, Parent)
-            { BuffToApply = new Buff(Parent) { CustomIconName = "Ability_Death_Wish", BaseDuration = 2, Type = Buff.BuffType.Debuff, Effects = new List<Effect>() { new EffAllDamageResist() { Value = 0.2 } } }, AbilityValue = ultimateAbility, CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
+            { BuffToApply = new Buff(Parent) { CustomIconName = "Ability_Death_Wish", BaseDuration = 2, Type = Buff.BuffType.Debuff, Effects = new List<Effect>() { new EffAllDamageResist() { Value = 0.2 } } }, AbilityValue = ultimateAbility, CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
         ultimateAbility.Events.Add(new DispelGood(null, this, Parent)
-        { AbilityValue = ultimateAbility, CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
+        { AbilityValue = ultimateAbility, CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
         ultimateAbility.Events.Add(new DirectDamage(null, this, Parent)
         {
             CalculateValue = CalculateUltimateDmg,
             AbilityValue = ultimateAbility,
-            CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent
+            CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent
         });
         ultimateAbility.Events.Add(new ToughnessShred(null, this, Parent)
-        { Val = 60, AbilityValue = ultimateAbility, CurentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
+        { Val = 60, AbilityValue = ultimateAbility, CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
+        ultimateAbility.Events.Add(new EnergyGain(null, this, Parent)
+        { Val = 5, TargetUnit = Parent, AbilityValue = ultimateAbility });
         Abilities.Add(ultimateAbility);
 
 

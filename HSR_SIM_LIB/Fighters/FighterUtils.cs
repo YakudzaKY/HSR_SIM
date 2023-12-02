@@ -199,9 +199,8 @@ public static class FighterUtils
         var dmgReduction = defender.GetDamageReduction(defender);
 
         var brokenMultiplier = defender.GetBrokenMultiplier();
-
         var totalDmg = baseDmg * critMultiplier * damageBoost * defMultiplier * resPen * vulnMult *
-                       dmgReduction * brokenMultiplier *((DamageEventTemplate)ent).CalculateProportion;
+                       dmgReduction * brokenMultiplier;
         ent.ParentStep.Parent.Parent?.LogDebug("=======================");
         ent.ParentStep.Parent.Parent?.LogDebug($"baseDmg={baseDmg:f} crit chance={attacker.GetCritRate(ent):f} ");
         ent.ParentStep.Parent.Parent?.LogDebug(

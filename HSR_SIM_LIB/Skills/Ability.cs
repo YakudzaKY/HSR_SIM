@@ -15,7 +15,6 @@ namespace HSR_SIM_LIB.Skills;
 public class Ability : CloneClass
 {
     public delegate bool DCanUsePrc();
-
     public enum AbilityCurrentTargetEnm
     {
         AbilityAdjacent,
@@ -82,7 +81,6 @@ public class Ability : CloneClass
     {
         get { return Events.Any(x => x is DirectDamage or ToughnessShred); }
     }
-    public double EnergyGain { get; set; }
     public bool IgnoreWeakness { get; set; }
 
     public int Cooldown { get; set; } = 0;

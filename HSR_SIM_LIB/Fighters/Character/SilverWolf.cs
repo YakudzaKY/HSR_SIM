@@ -23,20 +23,27 @@ public class SilverWolf : DefaultFighter
         //Force Quit Program
         ability = new Ability(this)
         {
-            AbilityType = Ability.AbilityTypeEnm.Technique, Name = "Force Quit Program", Cost = 1,
-            CostType = Resource.ResourceType.TP, Element = Element, AdjacentTargets = Ability.AdjacentTargetsEnm.All,
+            AbilityType = Ability.AbilityTypeEnm.Technique,
+            Name = "Force Quit Program",
+            Cost = 1,
+            CostType = Resource.ResourceType.TP,
+            Element = Element,
+            AdjacentTargets = Ability.AdjacentTargetsEnm.All,
             IgnoreWeakness = true
         };
         //dmg events
         ability.Events.Add(new DirectDamage(null, this, Parent)
         {
-            OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue, CalculateValue = CalculateFqpDmg,
+            OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
+            CalculateValue = CalculateFqpDmg,
             AbilityValue = ability
         });
         //shield break in this case going after skill dmg
         ability.Events.Add(new ResourceDrain(null, this, Parent)
         {
-            OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue, ResType = Resource.ResourceType.Toughness, Val = 60,
+            OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
+            ResType = Resource.ResourceType.Toughness,
+            Val = 60,
             AbilityValue = ability
         });
 
@@ -47,14 +54,18 @@ public class SilverWolf : DefaultFighter
         //System Warning
         SystemWarning = new Ability(this)
         {
-            AbilityType = Ability.AbilityTypeEnm.Basic, Name = "System Warning", Element = Element,
-            AdjacentTargets = Ability.AdjacentTargetsEnm.None, EnergyGain = 20, SpGain = 1
+            AbilityType = Ability.AbilityTypeEnm.Basic,
+            Name = "System Warning",
+            Element = Element,
+            AdjacentTargets = Ability.AdjacentTargetsEnm.None,
+            SpGain = 1
         };
         //dmg events
         SystemWarning.Events.Add(new DirectDamage(null, this, Parent)
-            { CalculateValue = CalculateBasicDmg, AbilityValue = SystemWarning });
+        { CalculateValue = CalculateBasicDmg, AbilityValue = SystemWarning });
         SystemWarning.Events.Add(new ToughnessShred(null, this, Parent) { Val = 30, AbilityValue = SystemWarning });
-
+        SystemWarning.Events.Add(new EnergyGain(null, this, Parent)
+        { Val = 20, TargetUnit = Parent, AbilityValue = SystemWarning });
         Abilities.Add(SystemWarning);
 
 
@@ -62,7 +73,7 @@ public class SilverWolf : DefaultFighter
             PassiveBuffs.Add(new PassiveBuff(Parent)
             {
                 Mod = new Buff(Parent)
-                    { Effects = new List<Effect> { new EffAllDamageBoost { CalculateValue = CalculateE6 } } },
+                { Effects = new List<Effect> { new EffAllDamageBoost { CalculateValue = CalculateE6 } } },
                 Target = Parent,
                 IsTargetCheck = true
             });

@@ -193,13 +193,6 @@ public class Step
             });
         }
 
-        //Energy regen
-        if (ability.EnergyGain > 0)
-            Events.Add(new EnergyGain(this, ability, ability.Parent.Parent)
-                { Val = ability.EnergyGain, TargetUnit = ability.Parent.Parent, AbilityValue = ability });
-
-
-
         //clone events by targets
         foreach (var ent in ability.Events.Where(x => x.OnStepType == StepType || x.OnStepType == null))
             if (ent.CalculateTargets != null || ent.TargetUnit == null) //need set targets
@@ -207,7 +200,7 @@ public class Step
                 var targetsUnits =
                     ent.CalculateTargets != null
                         ? ent.CalculateTargets()
-                        : ability.GetTargets(target, ent.TargetType, ent.CurentTargetType);
+                        : ability.GetTargets(target, ent.TargetType, ent.CurrentTargetType);
                 foreach (var unit in targetsUnits) CloneEvent(ability, ent, unit);
             }
             else
