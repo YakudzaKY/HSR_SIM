@@ -35,7 +35,7 @@ internal class EchoesoftheCoffin : DefaultLightCone
                 ability.Events.Add(eventBuff);
             }
             //add event to energy regen to all attacks
-            foreach (Ability ability in Parent.Abilities.Where(x => x.Attack))
+            foreach (Ability ability in Parent.Abilities.Where(x => x.Attack && x.AbilityType!=Ability.AbilityTypeEnm.Technique))
             {
                 EnergyGain enrgEvent = new(null, this, Parent.Parent)
                 {
