@@ -15,7 +15,7 @@ public class EnergyGain : Event
 
     public override string GetDescription()
     {
-        return $"{TargetUnit.Name} Gain energy:{Val:f} * regenRate = {RealVal:f}";
+        return $"{TargetUnit.Name} Gain energy:{Val:f} * regenRate = {RealVal:f} source: {Source.GetType().Name}";
     }
 
 

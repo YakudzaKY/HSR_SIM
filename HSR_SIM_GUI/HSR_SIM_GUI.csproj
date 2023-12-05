@@ -68,6 +68,7 @@
     <None Remove="Data\Images\EffReduceBAV.webp" />
     <None Remove="Data\Images\EffShield.webp" />
     <None Remove="Data\Images\EffShock.webp" />
+    <None Remove="Data\Images\EffSpeed.webp" />
     <None Remove="Data\Images\EffSpeedPrc.webp" />
     <None Remove="Data\Images\EffWindShear.webp" />
     <None Remove="Data\Images\fire.webp" />
@@ -274,6 +275,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Images\EffShock.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Images\EffSpeed.webp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Images\EffSpeedPrc.webp">

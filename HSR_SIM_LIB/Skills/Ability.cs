@@ -79,7 +79,7 @@ public class Ability : CloneClass
 
     public bool Attack
     {
-        get { return Events.Any(x => x is DirectDamage or ToughnessShred); }
+        get { return Events.Any(x => x is DirectDamage); }
     }
     public bool IgnoreWeakness { get; set; }
 
