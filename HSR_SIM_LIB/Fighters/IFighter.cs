@@ -25,7 +25,7 @@ public interface IFighter : ICloneable
     public Buff ShieldBreakMod { get; set; }
     public Unit.ElementEnm Element { get; }
     public PathType? Path { get; }
-    public List<Unit.ElementEnm> Weaknesses { get; set; }
+    public List<Unit.ElementEnm> NativeWeaknesses { get; set; }
     public List<Resist> Resists { get; set; }
     public List<DebuffResist> DebuffResists { get; set; }
     public EventHandler EventHandlerProc { get; set; }

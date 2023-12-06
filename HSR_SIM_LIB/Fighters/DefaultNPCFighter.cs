@@ -62,7 +62,7 @@ public class DefaultNPCFighter : IFighter
     public Buff ShieldBreakMod { get; set; } = new(null);
     public PathType? Path { get; set; } = null;
     public Unit.ElementEnm Element { get; set; }
-    public List<Unit.ElementEnm> Weaknesses { get; set; } = new();
+    public List<Unit.ElementEnm> NativeWeaknesses { get; set; } = new();
     public List<Resist> Resists { get; set; } = new();
     public List<DebuffResist> DebuffResists { get; set; } = new();
     public Unit Parent { get; set; }

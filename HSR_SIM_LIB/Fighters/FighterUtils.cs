@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
@@ -222,11 +223,11 @@ public static class FighterUtils
         var attacker = ent.SourceUnit;
         var defender = ent.TargetUnit;
 
-        var mod = ent.BuffToApply.Effects.First();
+        var mod = ent.BuffToApply.Effects.FirstOrDefault();
         var isCC = ent.BuffToApply.CrowdControl;
         var effectHitRate = attacker.GetEffectHit(ent);
         var effectRes = defender.GetEffectRes(ent);
-        var debuffRes = defender.GetDebuffResists(mod.GetType(), ent);
+        var debuffRes = defender.GetDebuffResists(mod?.GetType()??typeof(Effect), ent);
         double ccRes = 0;
         if (isCC) ccRes = defender.GetDebuffResists(typeof(EffCrowControl));
         var realChance = baseChance * (1 + effectHitRate) * (1 - effectRes) * (1 - debuffRes) * (1 - ccRes);

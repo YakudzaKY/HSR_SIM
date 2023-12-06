@@ -6,6 +6,7 @@ using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
+using HSR_SIM_LIB.Utils.Utils;
 
 namespace HSR_SIM_LIB.Fighters.Character;
 
@@ -84,7 +85,7 @@ public class SilverWolf : DefaultFighter
         alwChgVal = alwChgValMods[Parent.Skills.First(x => x.Name == "Allow Changes?").Level-1];
 
         allowChangesDebuff = new Buff(Parent, null)
-        {  Type = Buff.BuffType.Debuff, BaseDuration = 2, CustomIconName = "Allow_Changes ", Effects = new List<Effect>() { new EffWeaknessImpair() } ,EffectStackingType = Buff.EffectStackingTypeEnm.FullReplace};
+        {  Type = Buff.BuffType.Debuff, BaseDuration = 2, CustomIconName = "Allow_Changes ", Effects = new List<Effect>() { } ,EffectStackingType = Buff.EffectStackingTypeEnm.FullReplace};
 
         allowChangesDebuffAllDmgRes = new Buff(Parent, null)
             { Type = Buff.BuffType.Debuff, BaseDuration = 2, Effects = new List<Effect>() { new EffAllDamageResist() {Value = alwChgVal}} };
@@ -143,6 +144,8 @@ public class SilverWolf : DefaultFighter
 
         Abilities.Add(SystemWarning);
 
+
+        //todo best target is who can be main dps target and does not have element
         //Allow Changes?
         Ability AllowChanges;
         AllowChanges = new Ability(this)
@@ -212,7 +215,26 @@ public class SilverWolf : DefaultFighter
             //if allow changes landed then choose element
             if (ab.BuffToApply == allowChangesDebuff)
             {
-                
+                //first find elements not in native weakness
+                bool reduceResists = true;
+                var elemListToApply = this.GetAliveFriends().Select(x => x.Fighter.Element).Where(x=>!ent.TargetUnit.Fighter.NativeWeaknesses.Contains(x)).Distinct().ToArray();
+                if (!elemListToApply.Any())
+                {
+                    elemListToApply =
+                        this.GetAliveFriends().Select(x => x.Fighter.Element).Distinct()
+                            .ToArray(); //else pick all elements
+                    reduceResists = false;
+                }
+
+                double elemRnd =new MersenneTwister().NextDouble();//get rand [0-1)
+                Unit.ElementEnm elm = elemListToApply[(int)Math.Floor(elemRnd*elemListToApply.Length)];
+                ent.ChildEvents.Add(new ApplyBuffEffect(ent.ParentStep,this,Parent) {TargetUnit = ent.TargetUnit,BuffToApply =allowChangesDebuff,Eff =  new EffWeaknessImpair() { Element = elm } });
+                if (reduceResists)
+                    ent.ChildEvents.Add(new ApplyBuffEffect(ent.ParentStep,this,Parent) {TargetUnit = ent.TargetUnit,BuffToApply =allowChangesDebuff,Eff =  new EffElementalResist() { Element = elm,Value = -0.2} });
+
+
+
+
             }
         }
         //TODO handle enemy break shield by any of party members(A6?)

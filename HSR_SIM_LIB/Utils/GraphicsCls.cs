@@ -105,7 +105,7 @@ public static class GraphicsCls
                 break;
             }
 
-            foreach (var elm in unit.Fighter.Weaknesses)
+            foreach (var elm in unit.GetWeaknesses(null))
                 if (elemList.IndexOf(elm) < 0)
                     elemList.Add(elm);
         }
@@ -256,14 +256,14 @@ public static class GraphicsCls
                 new Point(portraitPoint.X + PortraitSize.Width - ElemSizeMini.Width, portraitPoint.Y));
             //weaknesses
             short j = 0;
-            if (unit.Fighter.Weaknesses != null)
-                foreach (var weak in unit.Fighter.Weaknesses)
-                {
+       
+            foreach (var weak in unit.GetWeaknesses(null))
+            {
                     gfx.DrawImage(new Bitmap(Utl.LoadBitmap(weak.ToString()), ElemSizeMini),
                         new Point(portraitPoint.X + j * ElemSizeMini.Width,
                             portraitPoint.Y + (int)(PortraitSize.Height * 0.2)));
                     j++;
-                }
+            }
 
             //healthbar
             if (unit.GetMaxHp(null) > 0)

@@ -9,9 +9,9 @@ public class MaraStruckSoldier : DefaultNPCFighter
         //Elemenet
         Element = Unit.ElementEnm.Wind;
 
-        Weaknesses.Add(Unit.ElementEnm.Fire);
-        Weaknesses.Add(Unit.ElementEnm.Ice);
-        Weaknesses.Add(Unit.ElementEnm.Quantum);
+        NativeWeaknesses.Add(Unit.ElementEnm.Fire);
+        NativeWeaknesses.Add(Unit.ElementEnm.Ice);
+        NativeWeaknesses.Add(Unit.ElementEnm.Quantum);
         Resists.Add(new Resist { ResistType = Unit.ElementEnm.Physical, ResistVal = 0.20 });
         Resists.Add(new Resist { ResistType = Unit.ElementEnm.Lightning, ResistVal = 0.20 });
         Resists.Add(new Resist { ResistType = Unit.ElementEnm.Wind, ResistVal = 0.20 });
