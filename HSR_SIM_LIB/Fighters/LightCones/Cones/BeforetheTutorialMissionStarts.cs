@@ -11,8 +11,8 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones;
 internal class BeforetheTutorialMissionStarts : DefaultLightCone
 {
     
-    private readonly Dictionary<int, double> modifiersEnrg = new()
-        { { 1, 4 }, { 2, 5}, { 3, 6 }, { 4, 7 }, { 5, 8 } };
+    private readonly double[]  modifiersEnrg =
+        {  4 ,  5,  6 ,  7 ,  8  };
     public BeforetheTutorialMissionStarts(IFighter parent, int rank) : base(parent, rank)
     {
         if (Path == Parent.Path)
@@ -41,7 +41,7 @@ internal class BeforetheTutorialMissionStarts : DefaultLightCone
                 select p.TargetUnit)
             .Distinct();
         var emmTargets = targetHits as Unit[] ?? targetHits.ToArray();
-        return emmTargets.Length>0? modifiersEnrg[Rank]:0 ;
+        return emmTargets.Length>0? modifiersEnrg[Rank-1]:0 ;
     }
 
 

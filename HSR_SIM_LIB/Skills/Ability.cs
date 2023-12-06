@@ -77,9 +77,12 @@ public class Ability : CloneClass
     public TargetTypeEnm TargetType { get; set; } = TargetTypeEnm.Enemy;
     public AdjacentTargetsEnm AdjacentTargets { get; set; } = AdjacentTargetsEnm.None;
 
+    /// <summary>
+    /// Technique attack shred toughness by default without dmg
+    /// </summary>
     public bool Attack
     {
-        get { return Events.Any(x => x is DirectDamage); }
+        get { return Events.Any(x => x is DirectDamage or ToughnessShred); }
     }
     public bool IgnoreWeakness { get; set; }
 

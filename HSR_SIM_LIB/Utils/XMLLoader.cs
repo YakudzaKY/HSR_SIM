@@ -217,6 +217,16 @@ public static class XMLLoader
         if (unitCode != unit.Name)
             throw new Exception(string.Format("Looking wargear for {0:s} but loaded for {1:s}", unit.Name, unitCode));
         unit.Stats = ExctractStats(xRoot, unit.Level, unit);
+        
+        foreach (XmlElement xmlSkill in xRoot.SelectNodes("Skill"))
+        {
+            Skill skill = new()
+            {
+                Name = xmlSkill.Attributes.GetNamedItem("name").Value.Trim(),
+                Level = int.Parse(xmlSkill.Attributes.GetNamedItem("level").Value)
+            };
+            unit.Skills.Add(skill);
+        }
 
         if (unit.Fighter is DefaultFighter)
         {
@@ -235,15 +245,6 @@ public static class XMLLoader
                 unit.RelicsClasses.Add(newRec);
             }
 
-            foreach (XmlElement xmlSkill in xRoot.SelectNodes("Skill"))
-            {
-                Skill skill = new()
-                {
-                    Name = xmlSkill.Attributes.GetNamedItem("name").Value.Trim(),
-                    Level = int.Parse(xmlSkill.Attributes.GetNamedItem("level").Value)
-                };
-                unit.Skills.Add(skill);
-            }
         }
     }
 

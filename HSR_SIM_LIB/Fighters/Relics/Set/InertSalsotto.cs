@@ -16,7 +16,7 @@ internal class InertSalsotto : DefaultRelicSet
     {
         return new ConditionBuff(Parent.Parent)
         {
-            Mod = new Buff(Parent.Parent)
+            AppliedBuff = new Buff(Parent.Parent)
             {
                 Effects = new List<Effect>
                 {

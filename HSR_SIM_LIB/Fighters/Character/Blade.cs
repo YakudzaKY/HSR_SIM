@@ -17,60 +17,159 @@ public class Blade : DefaultFighter
     private readonly Ability deathSentence; //ultimate
 
     //adjacent
-    private readonly Dictionary<int, double> dsAdjAtkMods = new()
+    private readonly double[]  dsAdjAtkMods = 
     {
-        { 1, 0.096 }, { 2, 0.102 }, { 3, 0.109 }, { 4, 0.115 }, { 5, 0.122 }, { 6, 0.128 }, { 7, 0.136 }, { 8, 0.144 },
-        { 9, 0.152 }, { 10, 0.16 }, { 11, 0.166 }, { 12, 0.173 }
+        0.096,
+        0.1024,
+        0.1088,
+        0.1152,
+        0.1216,
+        0.128,
+        0.136,
+        0.144,
+        0.152,
+        0.16,
+        0.1664,
+        0.1728,
+        0.1792,
+        0.1856,
+        0.192,
     };
 
-    private readonly Dictionary<int, double> dsAdjHpLossMods = new()
+    private readonly double[]  dsAdjHpLossMods =
     {
-        { 1, 0.24 }, { 2, 0.26 }, { 3, 0.27 }, { 4, 0.29 }, { 5, 0.30 }, { 6, 0.32 }, { 7, 0.34 }, { 8, 0.36 },
-        { 9, 0.38 }, { 10, 0.40 }, { 11, 0.42 }, { 12, 0.43 }
+        0.24,
+        0.256,
+        0.272,
+        0.288,
+        0.304,
+        0.32,
+        0.34,
+        0.36,
+        0.38,
+        0.4,
+        0.416,
+        0.432,
+        0.448,
+        0.464,
+        0.48,
     };
 
-    private readonly Dictionary<int, double> dsAdjHpMods = new()
+    private readonly double[]  dsAdjHpMods =
     {
-        { 1, 0.24 }, { 2, 0.256 }, { 3, 0.272 }, { 4, 0.288 }, { 5, 0.304 }, { 6, 0.32 }, { 7, 0.34 }, { 8, 0.36 },
-        { 9, 0.38 }, { 10, 0.40 }, { 11, 0.416 }, { 12, 0.432 }
+        0.24,
+        0.256,
+        0.272,
+        0.288,
+        0.304,
+        0.32,
+        0.34,
+        0.36,
+        0.38,
+        0.4,
+        0.416,
+        0.432,
+        0.448,
+        0.464,
+        0.48,
     };
-
+    
 
     //ultimate
     //main
-    private readonly Dictionary<int, double> dsMainAtkMods = new()
+    private readonly double[]  dsMainAtkMods = 
     {
-        { 1, 0.24 }, { 2, 0.256 }, { 3, 0.272 }, { 4, 0.288 }, { 5, 0.304 }, { 6, 0.32 }, { 7, 0.34 }, { 8, 0.36 },
-        { 9, 0.38 }, { 10, 0.40 }, { 11, 0.416 }, { 12, 0.432 }
+        0.24,
+        0.256,
+        0.272,
+        0.288,
+        0.304,
+        0.32,
+        0.34,
+        0.36,
+        0.38,
+        0.4,
+        0.416,
+        0.432,
+        0.448,
+        0.464,
+        0.48,
     };
 
-    private readonly Dictionary<int, double> dsMainHpMods = new()
+    private readonly double[]  dsMainHpMods =
     {
-        { 1, 0.60 }, { 2, 0.64 }, { 3, 0.68 }, { 4, 0.72 }, { 5, 0.76 }, { 6, 0.80 }, { 7, 0.85 }, { 8, 0.90 },
-        { 9, 0.95 }, { 10, 1.00 }, { 11, 1.04 }, { 12, 1.08 }
+        0.6,
+        0.64,
+        0.68,
+        0.72,
+        0.76,
+        0.8,
+        0.85,
+        0.9,
+        0.95,
+        1.0,
+        1.04,
+        1.08,
+        1.12,
+        1.16,
+        1.2,
     };
 
 
     //
-    private readonly Dictionary<int, double> forestAdjAtkMods = new()
+    private readonly double[]  forestAdjAtkMods = 
     {
-        { 1, 0.08 }, { 2, 0.096 }, { 3, 0.112 }, { 4, 0.128 }, { 5, 0.144 }, { 6, 0.16 }, { 7, 0.176 }
+        0.08,
+        0.096,
+        0.112,
+        0.128,
+        0.144,
+        0.16,
+        0.176,
+        0.192,
+        0.208,
     };
 
     private readonly Event forestMainTrgtHit; //last hit in main target by this ability(for event handlers)
     private readonly Ability forestOfSwords; //enchanced basic
     private readonly Buff hellscapeBuff; //E buff
 
-    private readonly Dictionary<int, double> sgAtkMods = new()
+    private readonly double[]  sgAtkMods = 
     {
-        { 1, 0.22 }, { 2, 0.242 }, { 3, 0.264 }, { 4, 0.286 }, { 5, 0.308 }, { 6, 0.330 }, { 7, 0.358 }, { 8, 0.385 },
-        { 9, 0.431 }, { 10, 0.44 }, { 11, 0.462 }, { 12, 0.484 }
+        0.22,
+        0.242,
+        0.264,
+        0.286,
+        0.308,
+        0.33,
+        0.3575,
+        0.385,
+        0.4125,
+        0.44,
+        0.462,
+        0.484,
+        0.506,
+        0.528,
+        0.55,
     };
 
-    private readonly Dictionary<int, double> sgHpMods = new()
+    private readonly double[]  sgHpMods =
     {
-        { 1, 0.55 }, { 2, 0.605 }, { 3, 0.66 }, { 4, 0.715 }, { 5, 0.77 }, { 6, 0.825 }, { 7, 0.894 }, { 8, 0.963 },
-        { 9, 1.031 }, { 10, 1.10 }, { 11, 1.155 }, { 12, 1.21 }
+        0.55,
+        0.605,
+        0.66,
+        0.715,
+        0.77,
+        0.825,
+        0.89375,
+        0.9625,
+        1.03125,
+        1.1,
+        1.155,
+        1.21,
+        1.265,
+        1.32,
+        1.375,
     };
 
     private readonly Ability shuhuGift; //passive ability
@@ -78,10 +177,40 @@ public class Blade : DefaultFighter
 
     private readonly double shuHuMaxCnt; // passive max counter
 
+    private double dsAdjAtk;
+    private double dsAdjHpLoss;
+    private double dsAdjHp;
+    private double dsMainAtk;
+    private double dsMainHp;
+    private double forestAdjAtk;
+    private double sgAtk;
+    private double sgHp;
+
+    private int dsSkillLvl;
+    private int fsSkillLvl;
+    private int sgSkillLvl;
+
+    private int ssSkillLvl;
     //Blade constructor
     public Blade(Unit parent) : base(parent)
     {
         Parent.Stats.BaseMaxEnergy = 130;
+
+        dsSkillLvl = Parent.Skills.First(x => x.Name == "Death Sentence").Level;
+        fsSkillLvl=Parent.Skills.First(x => x.Name == "Forest of Swords").Level;
+        sgSkillLvl=Parent.Skills.First(x => x.Name == "Shuhu's Gift").Level;
+        ssSkillLvl=Parent.Skills.First(x => x.Name == "Shard Sword").Level;
+
+        dsAdjAtk = dsAdjAtkMods[dsSkillLvl-1];
+        dsAdjHpLoss = dsAdjHpLossMods[dsSkillLvl-1];
+        dsAdjHp = dsAdjHpMods[dsSkillLvl-1];
+        dsMainAtk = dsMainAtkMods[dsSkillLvl-1];
+        dsMainHp=dsMainHpMods[dsSkillLvl-1];
+       
+        forestAdjAtk = forestAdjAtkMods[fsSkillLvl-1];
+
+        sgAtk = sgAtkMods[sgSkillLvl-1];
+        sgHp= sgHpMods[sgSkillLvl-1];
 
         hellscapeBuff = new Buff(Parent)
         {
@@ -320,7 +449,7 @@ public class Blade : DefaultFighter
         if (Atraces.HasFlag(ATracesEnm.A2))
             ConditionBuffs.Add(new ConditionBuff(Parent)
             {
-                Mod = new Buff(Parent)
+                AppliedBuff = new Buff(Parent)
                 {
                     Effects = new List<Effect> { new EffIncomeHealingPrc { Value = 0.20 } },
                     CustomIconName = "Traces\\A2"
@@ -335,7 +464,7 @@ public class Blade : DefaultFighter
         if (Atraces.HasFlag(ATracesEnm.A6))
             PassiveBuffs.Add(new PassiveBuff(Parent)
             {
-                Mod = new Buff(Parent)
+                AppliedBuff = new Buff(Parent)
                 {
                     Effects = new List<Effect>
                     {
@@ -423,9 +552,8 @@ public class Blade : DefaultFighter
 
     private double getSgBasicDmg(Event ent)
     {
-        var skillLvl = Parent.Skills.First(x => x.Name == "Shuhu's Gift").Level;
-        var attackPart = Parent.GetAttack(ent) * sgAtkMods[skillLvl];
-        var maxHpPart = Parent.GetMaxHp(ent) * sgHpMods[skillLvl] + (Parent.Rank >= 6 ? 0.5 * Parent.GetMaxHp(ent) : 0);
+        var attackPart = Parent.GetAttack(ent) * sgAtk;
+        var maxHpPart = Parent.GetMaxHp(ent) * sgHp+ (Parent.Rank >= 6 ? 0.5 * Parent.GetMaxHp(ent) : 0);
         return attackPart + maxHpPart;
     }
 
@@ -456,7 +584,7 @@ public class Blade : DefaultFighter
     public double? CalculateBasicDmg(Event ent)
     {
         return FighterUtils.CalculateDmgByBasicVal(
-            Parent.GetAttack(null) * (0.4 + Parent.Skills.FirstOrDefault(x => x.Name == "Shard Sword").Level * 0.1),
+            Parent.GetAttack(null) * (0.4 + ssSkillLvl * 0.1),
             ent);
     }
 
@@ -468,10 +596,10 @@ public class Blade : DefaultFighter
     //damage for ULTI main target
     public double? CalculateDsDmg(Event ent)
     {
-        var skillLvl = Parent.Skills.First(x => x.Name == "Death Sentence").Level;
-        var attackPart = Parent.GetAttack(null) * dsMainAtkMods[skillLvl];
-        var maxHpPart = Parent.GetMaxHp(ent) * dsMainHpMods[skillLvl];
-        var hpLossPart = Math.Min(Mechanics.Values[deathSentence], getDsMaxLostHp(ent)) * dsMainHpMods[skillLvl];
+
+        var attackPart = Parent.GetAttack(ent) * dsMainAtk;
+        var maxHpPart = Parent.GetMaxHp(ent) * dsMainHp;
+        var hpLossPart = Math.Min(Mechanics.Values[deathSentence], getDsMaxLostHp(ent)) * dsMainHp;
         //E1 ultimate buff
         if (Parent.Rank >= 1)
             hpLossPart += Math.Min(Mechanics.Values[deathSentence], getDsMaxLostHp(ent)) * 1.5;
@@ -481,10 +609,9 @@ public class Blade : DefaultFighter
     //damage for ULTI adjacent target
     public double? CalculateDstDmgAdj(Event ent)
     {
-        var skillLvl = Parent.Skills.First(x => x.Name == "Death Sentence").Level;
-        var attackPart = Parent.GetAttack(null) * dsAdjAtkMods[skillLvl];
-        var maxHpPart = Parent.GetMaxHp(ent) * dsAdjHpMods[skillLvl];
-        var hpLossPart = Math.Min(Mechanics.Values[deathSentence], getDsMaxLostHp(ent)) * dsAdjHpLossMods[skillLvl];
+        var attackPart = Parent.GetAttack(ent) * dsAdjAtk;
+        var maxHpPart = Parent.GetMaxHp(ent) * dsAdjHp;
+        var hpLossPart = Math.Min(Mechanics.Values[deathSentence], getDsMaxLostHp(ent)) * dsAdjHpLoss;
         return FighterUtils.CalculateDmgByBasicVal(attackPart + maxHpPart + hpLossPart, ent);
     }
 
@@ -492,19 +619,18 @@ public class Blade : DefaultFighter
     //damage for main target
     public double? CalculateForestDmg(Event ent)
     {
-        var skillLvl = Parent.Skills.First(x => x.Name == "Forest of Swords").Level;
+
         var attackPart = Parent.GetAttack(ent) * (0.16 +
-                                                  skillLvl * 0.04);
-        var maxHpPart = Parent.GetMaxHp(ent) * (0.4 + skillLvl * 0.1);
+                                                  fsSkillLvl * 0.04);
+        var maxHpPart = Parent.GetMaxHp(ent) * (0.4 + fsSkillLvl * 0.1);
         return FighterUtils.CalculateDmgByBasicVal(attackPart + maxHpPart, ent);
     }
 
     //damage for adjacent target
     public double? CalculateForestDmgAdj(Event ent)
     {
-        var skillLvl = Parent.Skills.First(x => x.Name == "Forest of Swords").Level;
-        var attackPart = Parent.GetAttack(ent) * forestAdjAtkMods[skillLvl];
-        var maxHpPart = Parent.GetMaxHp(ent) * (0.16 + skillLvl * 0.04);
+        var attackPart = Parent.GetAttack(ent) * forestAdjAtk;
+        var maxHpPart = Parent.GetMaxHp(ent) * (0.16 + fsSkillLvl * 0.04);
         return FighterUtils.CalculateDmgByBasicVal(attackPart + maxHpPart, ent);
     }
 

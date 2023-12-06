@@ -11,11 +11,11 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones;
 
 internal class EchoesoftheCoffin : DefaultLightCone
 {
-    private readonly Dictionary<int, double> modifiersEnrg = new()
-        { { 1, 3 }, { 2, 3.5}, { 3, 4 }, { 4, 4.5 }, { 5, 5 } };
+    private readonly double[] modifiersEnrg = 
+        { 3 ,  3.5,  4 , 4.5 ,  5  };
 
-    private readonly Dictionary<int, double> modifiersSpd = new()
-        { { 1, 12 }, { 2, 14}, { 3, 16 }, { 4, 18 }, { 5, 20 } };
+    private readonly double[] modifiersSpd = 
+        {  12 ,  14,  16 , 18 ,  20  };
     public EchoesoftheCoffin(IFighter parent, int rank) : base(parent, rank)
     {
         if (Path == Parent.Path)
@@ -28,7 +28,7 @@ internal class EchoesoftheCoffin : DefaultLightCone
                     AbilityValue = ability,
                     BuffToApply = new Buff(Parent.Parent)
                     {
-                        Type = Buff.BuffType.Buff, Effects = new List<Effect> { new EffSpeed() { Value = modifiersSpd[Rank] } },
+                        Type = Buff.BuffType.Buff, Effects = new List<Effect> { new EffSpeed() { Value = modifiersSpd[Rank-1] } },
                         BaseDuration = 1
                     }
                 };
@@ -56,7 +56,7 @@ internal class EchoesoftheCoffin : DefaultLightCone
                 select p.TargetUnit)
             .Distinct();
         var emmTargets = targetHits as Unit[] ?? targetHits.ToArray();
-        return modifiersEnrg[Rank] * Math.Min(emmTargets.Count(), 3);
+        return modifiersEnrg[Rank-1] * Math.Min(emmTargets.Count(), 3);
     }
 
 

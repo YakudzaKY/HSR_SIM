@@ -5,7 +5,7 @@ using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 
-// unit defeated( usefull for geppard etc)
+// unit got defeated
 public class Defeat : Event
 {
     public Defeat(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
@@ -23,7 +23,7 @@ public class Defeat : Event
     {
         //attacker got 10 energy
         if (!TriggersHandled)
-            ChildEvents.Add(new EnergyGain(ParentStep, null, AbilityValue.Parent.Parent)
+            ChildEvents.Add(new EnergyGain(ParentStep, TargetUnit, AbilityValue.Parent.Parent)
                 { Val = 10, TargetUnit = AbilityValue.Parent.Parent, AbilityValue = AbilityValue });
         //got defeated
 

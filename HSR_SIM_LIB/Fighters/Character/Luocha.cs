@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
@@ -11,37 +12,38 @@ namespace HSR_SIM_LIB.Fighters.Character;
 
 public class Luocha : DefaultFighter
 {
-    private readonly Dictionary<int, double> CoLFAtkMods = new()
+    private readonly double[]  coLfAtkMods = 
     {
-        { 1, 0.12 }, { 2, 0.128 }, { 3, 0.135 }, { 4, 0.143 }, { 5, 0.15 }, { 6, 0.156 }, { 7, 0.162 }, { 8, 0.168 },
-        { 9, 0.174 }, { 10, 0.18 }, { 11, 0.186 }, { 12, 0.192 }
+         0.12 ,  0.1275, 0.135,  0.1425 ,  0.15 ,  0.156,  0.162 ,  0.168 ,
+         0.174 ,  0.18 ,  0.186 , 0.192 
     };
 
-    private readonly Dictionary<int, double> CoLFFix = new()
+    private readonly double[]    coLfFixMods =
     {
-        { 1, 60 }, { 2, 96 }, { 3, 123 }, { 4, 150 }, { 5, 168 }, { 6, 186 }, { 7, 200 }, { 8, 213 },
-        { 9, 227 }, { 10, 240 }, { 11, 254 }, { 12, 267 }
+        60 ,  96 ,  123 ,  150,  168 , 186 ,  199.5, 213 ,
+       226.5 , 240 ,  253.5 ,  267 
     };
 
     private readonly Ability cycleOfLife;
     private readonly double cycleOfLifeMaxCnt = 2;
 
-    private readonly Dictionary<int, double> DeathWishMods = new()
+    private readonly double[]  deathWishMods =
     {
-        { 1, 1.20 }, { 2, 1.28 }, { 3, 1.36 }, { 4, 1.44 }, { 5, 1.52 }, { 6, 1.60 }, { 7, 1.70 }, { 8, 1.80 },
-        { 9, 1.90 }, { 10, 2 }, { 11, 2.08 }, { 12, 2.16 }
+         1.20 ,  1.28 ,  1.36 ,  1.44 ,  1.52 ,  1.60 ,  1.70,  1.80 ,
+         1.90 ,  2 , 2.08 ,  2.16
     };
 
-    private readonly Dictionary<int, double> PoAFAtkMods = new()
+    private readonly double[]  poAfAtkMods = 
     {
-        { 1, 0.40 }, { 2, 0.425 }, { 3, 0.45 }, { 4, 0.475 }, { 5, 0.50 }, { 6, 0.52 }, { 7, 0.54 }, { 8, 0.56 },
-        { 9, 0.58 }, { 10, 0.60 }, { 11, 0.62 }, { 12, 0.64 }
+         0.40 ,  0.425 ,  0.45 ,  0.475 ,  0.50 ,  0.52,  0.54 ,  0.56 ,
+         0.58 ,  0.60 ,  0.62 , 0.64
+
     };
 
-    private readonly Dictionary<int, double> PoAFFix = new()
+    private readonly double[]  poAfFixMods =
     {
-        { 1, 200 }, { 2, 320 }, { 3, 410 }, { 4, 500 }, { 5, 560 }, { 6, 620 }, { 7, 665 }, { 8, 710 },
-        { 9, 755 }, { 10, 800 }, { 11, 845 }, { 12, 890 }
+         200 ,  320 ,  410 ,  500 ,  560 ,  620 ,  665 ,  710 ,
+         755 , 800 ,  845 ,  890 
     };
 
     private readonly Ability prayerOfAbyssFlower;
@@ -53,9 +55,30 @@ public class Luocha : DefaultFighter
 
     private List<Unit> trackedUnits = new();
 
+    private double coLfAtk;
+    private double coLfFix;
+    private double deathWish;
+    private double poAfAtk;
+    private double poAfFix;
+    private int coLLvl;
+    private int dWLvl;
+    private int totALvl;
+    private int poALvl;
+
     public Luocha(Unit parent) : base(parent)
     {
         Parent.Stats.BaseMaxEnergy = 100;
+
+        coLLvl = Parent.Skills.First(x => x.Name == "Cycle of Life")!.Level;
+        dWLvl= Parent.Skills.First(x => x.Name == "Death Wish")!.Level;
+        totALvl=Parent.Skills.First(x => x.Name == "Thorns of the Abyss")!.Level;
+        poALvl = Parent.Skills.First(x => x.Name == "Prayer of Abyss Flower")!.Level;
+
+        coLfAtk = coLfAtkMods[coLLvl-1];
+        coLfFix = coLfFixMods[coLLvl-1];
+        deathWish = deathWishMods[dWLvl-1];
+        poAfAtk= poAfAtkMods[poALvl-1];
+        poAfFix= poAfFixMods[poALvl-1];
 
         uniqueBuff = new Buff(Parent)
         {
@@ -232,7 +255,7 @@ public class Luocha : DefaultFighter
             //CoL buffs
             ConditionBuffs.Add(new ConditionBuff(Parent)
             {
-                Mod = new Buff(Parent)
+                AppliedBuff = new Buff(Parent)
                 {
                     Effects = new List<Effect> { new EffAtkPrc { Value = 0.2 } },
                     CustomIconName = uniqueBuff.CustomIconName
@@ -249,7 +272,7 @@ public class Luocha : DefaultFighter
         if (Parent.Rank >= 2)
             PassiveBuffs.Add(new PassiveBuff(Parent)
             {
-                Mod = new Buff(Parent)
+                AppliedBuff = new Buff(Parent)
                 { Effects = new List<Effect> { new EffOutgoingHealingPrc() { CalculateValue = CalculateE2 } } },
                 Target = Parent,
                 IsTargetCheck = true
@@ -260,7 +283,7 @@ public class Luocha : DefaultFighter
             //CoL buffs
             ConditionBuffs.Add(new ConditionBuff(Parent)
             {
-                Mod = new Buff(Parent)
+                AppliedBuff = new Buff(Parent)
                 {
                     Type = Buff.BuffType.Debuff,
                     Effects = new List<Effect> { new EffAllDamageBoost() { Value = -0.12 } },
@@ -299,8 +322,7 @@ public class Luocha : DefaultFighter
 
     public double? CalcCoLHealing(Event ent)
     {
-        var skillLvl = Parent.Skills.First(x => x.Name == "Cycle of Life")!.Level;
-        return FighterUtils.CalculateHealByBasicVal(Parent.GetAttack(ent) * CoLFAtkMods[skillLvl] + CoLFFix[skillLvl],
+        return FighterUtils.CalculateHealByBasicVal(Parent.GetAttack(ent) * coLfAtk + coLfFix,
             ent);
     }
 
@@ -426,7 +448,7 @@ public class Luocha : DefaultFighter
     public double? CalculateBasicDmg(Event ent)
     {
         return FighterUtils.CalculateDmgByBasicVal(
-            Parent.GetAttack(null) * (0.4 + Parent.Skills.First(x => x.Name == "Thorns of the Abyss").Level * 0.1),
+            Parent.GetAttack(null) * (0.4 + totALvl * 0.1),
             ent);
     }
 
@@ -434,16 +456,14 @@ public class Luocha : DefaultFighter
     //50-110
     public double? CalculatePrayerOfAbyssFlower(Event ent)
     {
-        var skillLvl = Parent.Skills.First(x => x.Name == "Prayer of Abyss Flower")!.Level;
-        return FighterUtils.CalculateHealByBasicVal(Parent.GetAttack(null) * PoAFAtkMods[skillLvl] + PoAFFix[skillLvl],
+        return FighterUtils.CalculateHealByBasicVal(Parent.GetAttack(null) * poAfAtk + poAfFix,
             ent);
     }
 
 
     public double? CalculateUltimateDmg(Event ent)
     {
-        var skillLvl = Parent.Skills.First(x => x.Name == "Death Wish")!.Level;
-        return FighterUtils.CalculateDmgByBasicVal(Parent.GetAttack(null) * DeathWishMods[skillLvl], ent);
+        return FighterUtils.CalculateDmgByBasicVal(Parent.GetAttack(null) * deathWish, ent);
     }
 
     //get targets for auto heal. One target for Luocha

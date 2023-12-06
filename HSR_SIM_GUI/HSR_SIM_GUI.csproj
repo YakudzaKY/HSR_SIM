@@ -17,6 +17,7 @@
   <ItemGroup>
     <None Remove="Data\api.txt" />
     <None Remove="Data\Images\Abyss_Flower_CD.webp" />
+    <None Remove="Data\Images\Allow_Changes .webp" />
     <None Remove="Data\Images\Blood.png" />
     <None Remove="Data\Images\BreakShield.png" />
     <None Remove="Data\Images\BreakShieldDot.png" />
@@ -55,6 +56,7 @@
     <None Remove="Data\Images\DoT.png" />
     <None Remove="Data\Images\EffAbilityTypeBoost.webp" />
     <None Remove="Data\Images\EffAllDamageBoost.webp" />
+    <None Remove="Data\Images\EffAllDamageResist.png" />
     <None Remove="Data\Images\EffAtkPrc.webp" />
     <None Remove="Data\Images\EffBarrier.webp" />
     <None Remove="Data\Images\EffBleed.webp" />
@@ -122,6 +124,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Data\Images\Abyss_Flower_CD.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Images\Allow_Changes .webp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Images\Blood.png">
@@ -236,6 +241,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Images\EffAllDamageBoost.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Images\EffAllDamageResist.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Images\EffAtkPrc.webp">

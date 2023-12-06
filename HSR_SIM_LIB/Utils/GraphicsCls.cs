@@ -468,9 +468,9 @@ public static class GraphicsCls
                 var buffPoint = new Point(portraitPoint.X + j * ElemSizeMini.Width,
                     portraitPoint.Y + PortraitSize.Height - ElemSizeMini.Width);
                 gfx.DrawImage(
-                    new Bitmap(Utl.LoadBitmap(buff.Mod.CustomIconName ?? buff.Mod.Effects.First().GetType().Name),
+                    new Bitmap(Utl.LoadBitmap(buff.AppliedBuff.CustomIconName ?? buff.AppliedBuff.Effects.First().GetType().Name),
                         ElemSizeMini), buffPoint);
-                gfx.DrawRectangle(new Pen((buff.Mod.Type== Buff.BuffType.Buff )?Color.Blue:Color.DarkRed, 1), buffPoint.X, buffPoint.Y, ElemSizeMini.Width,
+                gfx.DrawRectangle(new Pen((buff.AppliedBuff.Type== Buff.BuffType.Buff )?Color.Blue:Color.DarkRed, 1), buffPoint.X, buffPoint.Y, ElemSizeMini.Width,
                     ElemSizeMini.Height);
 
 
