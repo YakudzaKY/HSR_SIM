@@ -7,6 +7,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 //apply buff debuff dot etc
 public class ApplyBuff : BuffEventTemplate
 {
+    private int stacksApplied = 0;
     /// <summary>
     /// place buff/debuff on target. If have some chance to place buff then use AttemptEffect instead
     /// </summary>
@@ -34,9 +35,25 @@ public class ApplyBuff : BuffEventTemplate
             modEffect.Value = modEffect.CalculateValue(this);
 
         if (!revert)
-            TargetUnit.ApplyBuff(this, BuffToApply);
+        {
+            stacksApplied = TargetUnit.ApplyBuff(this, BuffToApply);
+
+        }
         else
-            TargetUnit.RemoveBuff(this, BuffToApply);
+        {
+            if (TargetUnit.GetStacks(BuffToApply) - stacksApplied > 0)
+                TargetUnit.AddStack(BuffToApply, -stacksApplied);
+            else
+            {
+                TargetUnit.RemoveBuff(this, BuffToApply);
+            }
+
+
+
+        }
+
+
+
 
         base.ProcEvent(revert);
     }

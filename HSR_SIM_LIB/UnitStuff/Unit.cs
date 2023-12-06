@@ -360,11 +360,14 @@ public class Unit : CloneClass
     ///     Search buff by ref. and add stack or reset duration.
     ///     If buff have no ref then search by itself
     ///     also search by SourceObject+effects
+    ///
+    /// return stacks applied
     /// </summary>
     /// <param name="buff"></param>
     /// <param name="abilityValue"></param>
-    public void ApplyBuff(Event ent, Buff buff)
+    public int  ApplyBuff(Event ent, Buff buff)
     {
+        int res = 0;
         var srchBuff = Buffs.FirstOrDefault(x =>
             ((x.Reference == (buff.Reference ?? buff) || (buff.SourceObject != null && buff.SourceObject == x.SourceObject))
              && (buff.UniqueUnit == null || x.UniqueUnit == buff.UniqueUnit))
@@ -376,7 +379,9 @@ public class Unit : CloneClass
         if (srchBuff != null)
         {
             //add stack
+            int oldStacks = srchBuff.Stack;
             srchBuff.Stack = Math.Min(srchBuff.MaxStack, srchBuff.Stack + buff.Stack);
+            res = srchBuff.Stack - oldStacks;
             if (srchBuff.EffectStackingType == Buff.EffectStackingTypeEnm.FullReplace)
             {
                 srchBuff.Effects.Clear();
@@ -390,7 +395,7 @@ public class Unit : CloneClass
                     if (srchBuff.EffectStackingType == Buff.EffectStackingTypeEnm.PickMax)
                         findExistingEff.Value = Math.Max(findExistingEff.Value ?? 0, eff.Value ?? 0);
                     else if  (srchBuff.EffectStackingType == Buff.EffectStackingTypeEnm.Plus)
-                        findExistingEff.Value+=+ eff.Value ?? 0;
+                        findExistingEff.Value+= eff.Value ?? 0;
                     else
                     {
                         throw new NotImplementedException();
@@ -419,13 +424,14 @@ public class Unit : CloneClass
                         }
                     }
                 }
-
+                
 
             }
 
             else
                 srchBuff = buff;
             srchBuff.Stack = Math.Min(srchBuff.MaxStack, srchBuff.Stack);
+            res = srchBuff.Stack;
             srchBuff.Reference = buff.Reference ?? buff;
             srchBuff.Owner = this;
             Buffs.Add(srchBuff);
@@ -435,6 +441,7 @@ public class Unit : CloneClass
         //reset duration
         srchBuff.IsOld = false; //renew the flag
         srchBuff.DurationLeft = srchBuff.BaseDuration;
+        return res;
     }
 
     /// <summary>
@@ -450,6 +457,27 @@ public class Unit : CloneClass
             Buffs.Remove(foundBuff);
             foreach (var effect in foundBuff.Effects) effect.OnRemove(ent, foundBuff);
         }
+    }
+
+
+    public void AddStack( Buff mod, int stackCount=1)
+    {
+        if (Buffs.Any(x => x.Reference == (mod.Reference ?? mod)))
+        {
+            var foundBuff = Buffs.First(x => x.Reference == (mod.Reference ?? mod));
+            foundBuff.Stack += stackCount;
+        }
+    }
+
+    public int GetStacks( Buff mod)
+    {
+        if (Buffs.Any(x => x.Reference == (mod.Reference ?? mod)))
+        {
+            var foundBuff = Buffs.First(x => x.Reference == (mod.Reference ?? mod));
+            return foundBuff.Stack;
+        }
+
+        return 0;
     }
 
     public IEnumerable<Unit> GetTargetsForUnit(TargetTypeEnm? targetType)

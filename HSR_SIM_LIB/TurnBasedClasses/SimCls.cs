@@ -203,12 +203,12 @@ public class SimCls : ICloneable
                                 { Stack = ent.TargetUnit.Fighter is DefaultNPCBossFIghter ? 3 : 1 }, 1.5);
                         break;
                     case ElementEnm.Quantum:
-                        ent.TryDebuff(new BuffEntanglementWB(ent.SourceUnit, ent.SourceUnit.Fighter.ShieldBreakMod),
+                        ent.TryDebuff(new BuffEntanglementWB(ent.SourceUnit, ent.SourceUnit.Fighter.ShieldBreakMod,ent),
                             1.5);
 
                         break;
                     case ElementEnm.Imaginary:
-                        ent.TryDebuff(new BuffImprisonmentWB(ent.SourceUnit, ent.SourceUnit.Fighter.ShieldBreakMod),
+                        ent.TryDebuff(new BuffImprisonmentWB(ent.SourceUnit, ent.SourceUnit.Fighter.ShieldBreakMod,ent),
                             1.5);
                         break;
                     default:
