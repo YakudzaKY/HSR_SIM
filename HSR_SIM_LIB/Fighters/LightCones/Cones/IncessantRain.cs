@@ -60,8 +60,8 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
                 var targetHits = (from p in ent.ParentStep.Events 
                         where p  is DirectDamage
                         select p.TargetUnit)
-                    .Distinct()/*.Where(x =>
-                        x.IsAlive && x.Buffs.All(y => y.Reference != aetherCodeDebuff))*/;
+                    .Distinct().Where(x =>
+                        x.IsAlive && x.Buffs.All(y => y.Reference != aetherCodeDebuff));
                 if (targetHits.Any())
                 {
                     ent.ChildEvents.Add(new AttemptEffect(ent.ParentStep, this, Parent.Parent)
