@@ -140,8 +140,6 @@ public class SimCls : ICloneable
                     AbilityValue = ent.AbilityValue,
                     TargetUnit = ent.TargetUnit
                 };
-                //remove all buffs and debuffs
-                defeatEvent.RemovedMods.AddRange(ent.TargetUnit.Buffs);
                 ent.ChildEvents.Add(defeatEvent);
             }
         }
@@ -157,9 +155,7 @@ public class SimCls : ICloneable
                     AbilityValue = ent.AbilityValue,
                     TargetUnit = ent.TargetUnit
                 };
-                //remove all buffs and debuffs
-                defeatEvent.RemovedMods.AddRange(ent.TargetUnit.Buffs);
-                ent.ChildEvents.Add(defeatEvent);
+                ent.ParentStep.Events.Add(defeatEvent);
             }
 
             //THG reduced tp 0

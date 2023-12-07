@@ -135,6 +135,7 @@ public class DefaultNPCFighter : IFighter
 
     public virtual void DefaultFighter_HandleEvent(Event ent)
     {
+
     }
 
     public virtual void DefaultFighter_HandleStep(Step step)

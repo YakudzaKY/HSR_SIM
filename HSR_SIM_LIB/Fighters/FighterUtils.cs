@@ -217,6 +217,7 @@ public static class FighterUtils
         return totalDmg;
     }
 
+
     //debuff is resisted?
     public static bool CalculateDebuffResisted(ApplyBuff ent,double baseChance)
     {

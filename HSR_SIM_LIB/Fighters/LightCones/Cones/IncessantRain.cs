@@ -25,12 +25,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
             {
                 aetherCodeDebuff = new Buff(Parent.Parent, null)
                     { Type = Buff.BuffType.Debuff,AbilityValue = null,BaseDuration = 1,Effects = new List<Effect>(){new EffAllDamageVulnerability(){Value =lcMods[Rank-1] }}};
-                //add event to energy regen to all attacks
-                foreach (Ability ability in Parent.Abilities.Where(x => x.AbilityType!=Ability.AbilityTypeEnm.Technique))
-                {
-                    ability.Events.Add(new AttemptEffect(null, this, Parent.Parent) { CalculateTargets = calcAetherTargets, BaseChance = 1, BuffToApply = aetherCodeDebuff });
-           
-                }
+
 
                 Parent.PassiveBuffs.Add(new PassiveBuff(Parent.Parent)
                 {
@@ -54,19 +49,32 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
             
         }
 
-        //alive friends
-        private IEnumerable<Unit> calcAetherTargets()
-        {
-            List<Unit>  res = new List<Unit>();
-            Unit rUnit = (Unit)Utl.GetRandomObject(Parent.Parent.Enemies.Where(x =>
-                x.IsAlive && x.Buffs.All(y => y.Reference != aetherCodeDebuff)));
-            if (rUnit != null)
-            {
-                res.Add(rUnit);
-            }
-            return res;
-        }
 
         public override FighterUtils.PathType Path { get; } = FighterUtils.PathType.Nihility;
+
+        public override void DefaultLightCone_HandleEvent(Event ent)
+        {
+            
+            if (ent is ExecuteAbilityFinish && ent.SourceUnit == Parent.Parent&&ent.AbilityValue.Attack&&ent.AbilityValue.AbilityType!=Ability.AbilityTypeEnm.Technique)
+            {
+                var targetHits = (from p in ent.ParentStep.Events 
+                        where p  is DirectDamage
+                        select p.TargetUnit)
+                    .Distinct().Where(x =>
+                        x.IsAlive && x.Buffs.All(y => y.Reference != aetherCodeDebuff));
+                if (targetHits.Any())
+                {
+                    ent.ChildEvents.Add(new AttemptEffect(ent.ParentStep, this, Parent.Parent)
+                    {
+                        TargetUnit = (Unit)Utl.GetRandomObject(targetHits), BaseChance = 1,
+                        BuffToApply = aetherCodeDebuff
+                    });
+                }
+
+
+            }
+            base.DefaultLightCone_HandleEvent(ent);
+        }
+
     }
 }

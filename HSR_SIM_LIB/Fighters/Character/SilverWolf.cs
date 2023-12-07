@@ -260,6 +260,7 @@ public class SilverWolf : DefaultFighter
         UserBanned.Events.Add(new ToughnessShred(null, this, Parent) { Val = 90, AbilityValue = UserBanned });
         UserBanned.Events.Add(new EnergyGain(null, this, Parent)
             { Val = 5, TargetUnit = Parent, AbilityValue = UserBanned });
+
         Abilities.Add(UserBanned);
 
         //TALENT debuffs stacking
@@ -290,6 +291,14 @@ public class SilverWolf : DefaultFighter
     {
 
         var attackPart = Parent.GetAttack(ent) * ultDmg;
+
+        return FighterUtils.CalculateDmgByBasicVal(attackPart, ent);
+    }
+
+    private double? CalculateE4Dmg(Event ent)
+    {
+
+        var attackPart = Parent.GetAttack(ent) * 0.2;
 
         return FighterUtils.CalculateDmgByBasicVal(attackPart, ent);
     }
@@ -338,6 +347,20 @@ public class SilverWolf : DefaultFighter
 
             }
         }
+        //E4
+        if (ent is ExecuteAbilityFinish && ent.SourceUnit == Parent&&ent.AbilityValue.Attack&&ent.AbilityValue.AbilityType==AbilityTypeEnm.Ultimate&& Parent.Rank >= 4)
+        {
+            double debuffs = 0;
+            debuffs = ent.TargetUnit.Buffs.Count(x => x.Type == Buff.BuffType.Debuff || x.Type == Buff.BuffType.Dot);
+            debuffs = Math.Min(debuffs, 5);
+            for (int i = 0; i < debuffs; i++)
+            {
+                ent.ChildEvents.Add(new DirectDamage(ent.ParentStep, this, Parent)
+                    { TargetUnit = ent.TargetUnit,CalculateValue = CalculateE4Dmg, AbilityValue = ent.AbilityValue });
+            }
+
+          
+        }
         //TODO handle enemy break shield by any of party members(A6?)
 
         base.DefaultFighter_HandleEvent(ent);
@@ -364,7 +387,7 @@ public class SilverWolf : DefaultFighter
         double debuffs = 0;
 
 
-        debuffs += ent.TargetUnit.Buffs.Count(x => x.Type == Buff.BuffType.Debuff || x.Type == Buff.BuffType.Dot);
+        debuffs = ent.TargetUnit.Buffs.Count(x => x.Type == Buff.BuffType.Debuff || x.Type == Buff.BuffType.Dot);
         if (debuffs > maxDebuffs) debuffs = maxDebuffs;
 
         return debuffs * 0.2;

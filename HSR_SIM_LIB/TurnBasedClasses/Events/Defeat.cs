@@ -12,7 +12,7 @@ public class Defeat : Event
     {
     }
 
-    public List<Buff> RemovedMods { get; set; } = new();
+
 
     public override string GetDescription()
     {
@@ -29,12 +29,6 @@ public class Defeat : Event
 
         TargetUnit.IsAlive = revert;
 
-        if (!revert)
-            foreach (var mod in RemovedMods)
-                TargetUnit.RemoveBuff(this, mod);
-        else
-            foreach (var mod in RemovedMods)
-                TargetUnit.ApplyBuff(this, mod);
 
         base.ProcEvent(revert);
     }
