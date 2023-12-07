@@ -8,12 +8,14 @@ using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using HSR_SIM_LIB.Utils;
 using HSR_SIM_LIB.Utils.Utils;
+using static HSR_SIM_LIB.Skills.Ability;
 
 namespace HSR_SIM_LIB.Fighters.Character;
 
 public class SilverWolf : DefaultFighter
 {
     private Buff allowChangesDebuff;
+    private Buff ultDefDebuff;
     private Buff allowChangesDebuffAllDmgRes;
 
 
@@ -73,9 +75,68 @@ public class SilverWolf : DefaultFighter
         0.1125,
     };
 
+    private readonly double[]  ultDmgMods = 
+    {
+        2.28,
+        2.432,
+        2.584,
+        2.736,
+        2.888,
+        3.04,
+        3.23,
+        3.42,
+        3.61,
+        3.8,
+        3.952,
+        4.104,
+        4.256,
+        4.408,
+        4.56,
+    };
+
+    private readonly double[] ultDefMods =
+    {
+        0.36,
+        0.369,
+        0.378,
+        0.387,
+        0.396,
+        0.405,
+        0.41625,
+        0.4275,
+        0.43875,
+        0.45,
+        0.459,
+        0.468,
+        0.477,
+        0.486,
+        0.495,
+    };
+
+    private readonly double[] ultChanceMods =
+    {
+        0.85,
+        0.865,
+        0.88,
+        0.895,
+        0.91,
+        0.925,
+        0.94375,
+        0.9625,
+        0.98125,
+        1.0,
+        1.015,
+        1.03,
+        1.045,
+        1.06,
+        1.075,
+    };
     private readonly double alwChgChnc;
     private readonly double alwChgAtk;
     private readonly double alwChgVal;
+    private readonly double ultDmg;
+    private readonly double ultDef;
+    private readonly double ultChance;
     private readonly int swSkillLvl;
     public SilverWolf(Unit parent) : base(parent)
     {
@@ -84,12 +145,19 @@ public class SilverWolf : DefaultFighter
         alwChgAtk = alwChgAtkMods[Parent.Skills.First(x => x.Name == "Allow Changes?").Level-1];
         swSkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "System Warning").Level;
         alwChgVal = alwChgValMods[Parent.Skills.First(x => x.Name == "Allow Changes?").Level-1];
+        
+        ultDmg = ultDmgMods[Parent.Skills.First(x => x.Name == "User Banned").Level-1];
+        ultDef = ultDefMods[Parent.Skills.First(x => x.Name == "User Banned").Level-1];
+        ultChance = ultChanceMods[Parent.Skills.First(x => x.Name == "User Banned").Level-1];
 
         allowChangesDebuff = new Buff(Parent, null)
-        {  Type = Buff.BuffType.Debuff, BaseDuration = 2, CustomIconName = "Allow_Changes ", Effects = new List<Effect>() { } ,EffectStackingType = Buff.EffectStackingTypeEnm.FullReplace};
+        {  Type = Buff.BuffType.Debuff, BaseDuration = 2, CustomIconName = "Allow_Changes", Effects = new List<Effect>() { } ,EffectStackingType = Buff.EffectStackingTypeEnm.FullReplace};
 
         allowChangesDebuffAllDmgRes = new Buff(Parent, null)
             { Type = Buff.BuffType.Debuff, BaseDuration = 2, Effects = new List<Effect>() { new EffAllDamageResist() {Value = alwChgVal}} };
+
+        ultDefDebuff    = new Buff(Parent, null)
+            {  Type = Buff.BuffType.Debuff, BaseDuration = 3, Effects = new List<Effect>() { new EffDefPrc() {Value = -ultDef} }};
         //=====================
         //Abilities
         //=====================
@@ -137,11 +205,15 @@ public class SilverWolf : DefaultFighter
             SpGain = 1
         };
         //dmg events
-        SystemWarning.Events.Add(new DirectDamage(null, this, Parent)
-        { CalculateValue = CalculateBasicDmg, AbilityValue = SystemWarning });
-        SystemWarning.Events.Add(new ToughnessShred(null, this, Parent) { Val = 30, AbilityValue = SystemWarning });
-        SystemWarning.Events.Add(new EnergyGain(null, this, Parent)
-        { Val = 20, TargetUnit = Parent, AbilityValue = SystemWarning });
+        //dmg events
+        foreach (double proportion in new[] {  0.25,0.25, 0.5 })
+        {
+            SystemWarning.Events.Add(new DirectDamage(null, this, Parent)
+                { CalculateValue = CalculateBasicDmg, AbilityValue = SystemWarning , CalculateProportion = proportion });
+            SystemWarning.Events.Add(new ToughnessShred(null, this, Parent) { Val = 30, AbilityValue = SystemWarning, CalculateProportion = proportion  });
+            SystemWarning.Events.Add(new EnergyGain(null, this, Parent)
+                { Val = 20, TargetUnit = Parent, AbilityValue = SystemWarning, CalculateProportion = proportion  });
+        }
 
         Abilities.Add(SystemWarning);
 
@@ -168,7 +240,29 @@ public class SilverWolf : DefaultFighter
         { Val = 30, TargetUnit = Parent, AbilityValue = AllowChanges });
         Abilities.Add(AllowChanges);
 
+        //User Banned
+        Ability UserBanned;
+        UserBanned = new Ability(this)
+        {
+            AbilityType = Ability.AbilityTypeEnm.Ultimate,
+            Name = "User Banned",
+            AdjacentTargets = Ability.AdjacentTargetsEnm.None,
+            CostType = Resource.ResourceType.Energy,
+            Cost = Parent.Stats.BaseMaxEnergy,
+            Priority = PriorityEnm.Ultimate,
+            EndTheTurn = false,
+            Available = UltimateAvailable,
+        };
+        UserBanned.Events.Add(new AttemptEffect(null, this, Parent) { BaseChance = ultChance, BuffToApply = ultDefDebuff });
+        //dmg events
+        UserBanned.Events.Add(new DirectDamage(null, this, Parent)
+            { CalculateValue = CalculateUltimateDmg, AbilityValue = UserBanned });
+        UserBanned.Events.Add(new ToughnessShred(null, this, Parent) { Val = 90, AbilityValue = UserBanned });
+        UserBanned.Events.Add(new EnergyGain(null, this, Parent)
+            { Val = 5, TargetUnit = Parent, AbilityValue = UserBanned });
+        Abilities.Add(UserBanned);
 
+        //TALENT debuffs stacking
 
 
         if (Parent.Rank >= 6)
@@ -183,7 +277,8 @@ public class SilverWolf : DefaultFighter
 
     public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Nihility;
     public sealed override Unit.ElementEnm Element { get; } = Unit.ElementEnm.Quantum;
-    public double? CalculateAbilityDmg(Event ent)
+
+    private double? CalculateAbilityDmg(Event ent)
     {
 
         var attackPart = Parent.GetAttack(ent) * alwChgAtk;
@@ -191,6 +286,13 @@ public class SilverWolf : DefaultFighter
         return FighterUtils.CalculateDmgByBasicVal(attackPart, ent);
     }
 
+    private double? CalculateUltimateDmg(Event ent)
+    {
+
+        var attackPart = Parent.GetAttack(ent) * ultDmg;
+
+        return FighterUtils.CalculateDmgByBasicVal(attackPart, ent);
+    }
     public override void DefaultFighter_HandleEvent(Event ent)
     {
         //if unit consume hp or got attack then apply buff

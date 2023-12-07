@@ -18,6 +18,7 @@
     <None Remove="Data\api.txt" />
     <None Remove="Data\Images\Abyss_Flower_CD.webp" />
     <None Remove="Data\Images\Allow_Changes .webp" />
+    <None Remove="Data\Images\Allow_Changes.webp" />
     <None Remove="Data\Images\Blood.png" />
     <None Remove="Data\Images\BreakShield.png" />
     <None Remove="Data\Images\BreakShieldDot.png" />
@@ -63,6 +64,7 @@
     <None Remove="Data\Images\EffBleed.webp" />
     <None Remove="Data\Images\EffBurn.webp" />
     <None Remove="Data\Images\EffCritPrc.webp" />
+    <None Remove="Data\Images\EffDefPrc.webp" />
     <None Remove="Data\Images\EffEffectResPrc.webp" />
     <None Remove="Data\Images\EffEntanglement.webp" />
     <None Remove="Data\Images\EffFreeze.webp" />
@@ -127,7 +129,7 @@
     <Content Include="Data\Images\Abyss_Flower_CD.webp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Data\Images\Allow_Changes .webp">
+    <Content Include="Data\Images\Allow_Changes.webp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Images\Blood.png">
@@ -263,6 +265,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Images\EffCritPrc.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Images\EffDefPrc.webp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Images\EffEffectResPrc.webp">

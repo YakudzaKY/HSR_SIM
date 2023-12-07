@@ -220,9 +220,9 @@ public static class FighterUtils
     //debuff is resisted?
     public static bool CalculateDebuffResisted(ApplyBuff ent,double baseChance)
     {
+
         var attacker = ent.SourceUnit;
         var defender = ent.TargetUnit;
-
         var mod = ent.BuffToApply.Effects.FirstOrDefault();
         var isCC = ent.BuffToApply.CrowdControl;
         var effectHitRate = attacker.GetEffectHit(ent);

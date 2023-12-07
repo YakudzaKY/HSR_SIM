@@ -46,7 +46,8 @@ public static class Utl
                 arr[i] = element;
                 i = i + 1;
             }
-            res = arr[(int)Math.Floor(rNextDouble * arr.Length)];
+            if (arr.Length > 0)
+                res = arr[(int)Math.Floor(rNextDouble * arr.Length)];
         }
         else
         {

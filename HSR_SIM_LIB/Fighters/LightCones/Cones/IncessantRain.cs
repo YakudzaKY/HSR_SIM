@@ -58,8 +58,12 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
         private IEnumerable<Unit> calcAetherTargets()
         {
             List<Unit>  res = new List<Unit>();
-            res.Add((Unit)Utl.GetRandomObject(Parent.Parent.Enemies.Where(x =>
-                x.IsAlive && x.Buffs.All(y => y.Reference != aetherCodeDebuff))));
+            Unit rUnit = (Unit)Utl.GetRandomObject(Parent.Parent.Enemies.Where(x =>
+                x.IsAlive && x.Buffs.All(y => y.Reference != aetherCodeDebuff)));
+            if (rUnit != null)
+            {
+                res.Add(rUnit);
+            }
             return res;
         }
 
