@@ -57,6 +57,7 @@
     <None Remove="Data\Images\EffAbilityTypeBoost.webp" />
     <None Remove="Data\Images\EffAllDamageBoost.webp" />
     <None Remove="Data\Images\EffAllDamageResist.png" />
+    <None Remove="Data\Images\EffAllDamageVulnerability.png" />
     <None Remove="Data\Images\EffAtkPrc.webp" />
     <None Remove="Data\Images\EffBarrier.webp" />
     <None Remove="Data\Images\EffBleed.webp" />
@@ -244,6 +245,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Images\EffAllDamageResist.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Images\EffAllDamageVulnerability.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Images\EffAtkPrc.webp">

@@ -6,6 +6,7 @@ using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
+using HSR_SIM_LIB.Utils;
 using HSR_SIM_LIB.Utils.Utils;
 
 namespace HSR_SIM_LIB.Fighters.Character;
@@ -217,17 +218,15 @@ public class SilverWolf : DefaultFighter
             {
                 //first find elements not in native weakness
                 bool reduceResists = true;
-                var elemListToApply = this.GetAliveFriends().Select(x => x.Fighter.Element).Where(x=>!ent.TargetUnit.Fighter.NativeWeaknesses.Contains(x)).Distinct().ToArray();
+                var elemListToApply = this.GetAliveFriends().Select(x => x.Fighter.Element).Where(x=>!ent.TargetUnit.Fighter.NativeWeaknesses.Contains(x)).Distinct();
                 if (!elemListToApply.Any())
                 {
                     elemListToApply =
-                        this.GetAliveFriends().Select(x => x.Fighter.Element).Distinct()
-                            .ToArray(); //else pick all elements
+                        this.GetAliveFriends().Select(x => x.Fighter.Element).Distinct(); //else pick all elements
                     reduceResists = false;
                 }
 
-                double elemRnd =new MersenneTwister().NextDouble();//get rand [0-1)
-                Unit.ElementEnm elm = elemListToApply[(int)Math.Floor(elemRnd*elemListToApply.Length)];
+                Unit.ElementEnm elm = (Unit.ElementEnm)Utl.GetRandomObject(elemListToApply);
                 ent.ChildEvents.Add(new ApplyBuffEffect(ent.ParentStep,this,Parent) {TargetUnit = ent.TargetUnit,BuffToApply =allowChangesDebuff,Eff =  new EffWeaknessImpair() { Element = elm } });
                 if (reduceResists)
                     ent.ChildEvents.Add(new ApplyBuffEffect(ent.ParentStep,this,Parent) {TargetUnit = ent.TargetUnit,BuffToApply =allowChangesDebuff,Eff =  new EffElementalResist() { Element = elm,Value = -0.2} });
@@ -243,13 +242,13 @@ public class SilverWolf : DefaultFighter
     }
 
 
-    public double? CalculateFqpDmg(Event ent)
+    private double? CalculateFqpDmg(Event ent)
     {
         return FighterUtils.CalculateDmgByBasicVal(Parent.GetAttack(ent) * 0.8, ent);
     }
 
     //50-110
-    public double? CalculateBasicDmg(Event ent)
+    private double? CalculateBasicDmg(Event ent)
     {
         return FighterUtils.CalculateDmgByBasicVal(
             Parent.GetAttack(ent) * (0.4 + swSkillLvl * 0.1),
@@ -257,7 +256,7 @@ public class SilverWolf : DefaultFighter
     }
 
     //get 0.2 AllDmg per debuff  on target
-    public static double? CalculateE6(Event ent)
+    private static double? CalculateE6(Event ent)
     {
         double maxDebuffs = 5;
         double debuffs = 0;

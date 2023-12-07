@@ -1,8 +1,13 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
+using HSR_SIM_LIB.UnitStuff;
+using HSR_SIM_LIB.Utils.Utils;
 using ImageMagick;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace HSR_SIM_LIB.Utils;
 
@@ -14,6 +19,41 @@ public static class Utl
     private static readonly Dictionary<string, Bitmap> ImageCache = new();
     public static string DataFolder { get; set; } = AppDomain.CurrentDomain.BaseDirectory + "DATA\\";
 
+    public static bool IsList(object o)
+    {
+        if (o == null) return false;
+        return o is IList &&
+               o.GetType().IsGenericType &&
+               o.GetType().GetGenericTypeDefinition().IsAssignableFrom(typeof(List<>));
+    }
+
+    /// <summary>
+    /// Get one item from list by random
+    /// </summary>
+    /// <param name="items"></param>
+    /// <returns></returns>
+    public static object GetRandomObject(object items)
+    {
+        double rNextDouble = new MersenneTwister().NextDouble();//get rand [0-1)
+        object res = null;
+        if (items is IEnumerable ie)
+        {
+            object[] arr = new object[] { };
+            int i = 0;
+            foreach (object element in ie)
+            {
+                Array.Resize<object>(ref arr, i + 1);
+                arr[i] = element;
+                i = i + 1;
+            }
+            res = arr[(int)Math.Floor(rNextDouble * arr.Length)];
+        }
+        else
+        {
+            throw new NotImplementedException();
+        }
+        return res;
+    }
 
     /// <summary>
     ///     Create bitmap with convertation
