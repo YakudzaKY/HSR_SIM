@@ -17,6 +17,7 @@ public class SilverWolf : DefaultFighter
     private Buff allowChangesDebuff;
     private Buff ultDefDebuff;
     private Buff allowChangesDebuffAllDmgRes;
+    private Event UltimateHitLastEvent;
 
 
     private readonly double[]  alwChgAtkMods= {
@@ -258,8 +259,9 @@ public class SilverWolf : DefaultFighter
         UserBanned.Events.Add(new DirectDamage(null, this, Parent)
             { CalculateValue = CalculateUltimateDmg, AbilityValue = UserBanned });
         UserBanned.Events.Add(new ToughnessShred(null, this, Parent) { Val = 90, AbilityValue = UserBanned });
-        UserBanned.Events.Add(new EnergyGain(null, this, Parent)
-            { Val = 5, TargetUnit = Parent, AbilityValue = UserBanned });
+        UltimateHitLastEvent = new EnergyGain(null, this, Parent)
+            { Val = 5, TargetUnit = Parent, AbilityValue = UserBanned };
+        UserBanned.Events.Add(UltimateHitLastEvent);
 
         Abilities.Add(UserBanned);
 
@@ -353,15 +355,16 @@ public class SilverWolf : DefaultFighter
             }
         }
         //E4
-        if (ent is ExecuteAbilityFinish && ent.SourceUnit == Parent&&ent.AbilityValue.Attack&&ent.AbilityValue.AbilityType==AbilityTypeEnm.Ultimate&& Parent.Rank >= 4)
+        if ( Parent.Rank >= 4&&ent.Reference==UltimateHitLastEvent)
         {
             double debuffs = 0;
-            debuffs = ent.TargetUnit.Buffs.Count(x => x.Type == Buff.BuffType.Debuff || x.Type == Buff.BuffType.Dot);
+            Unit tarUnit = ent.ParentStep.Target;
+            debuffs = tarUnit.Buffs.Count(x => x.Type == Buff.BuffType.Debuff || x.Type == Buff.BuffType.Dot);
             debuffs = Math.Min(debuffs, 5);
             for (int i = 0; i < debuffs; i++)
             {
                 ent.ChildEvents.Add(new DirectDamage(ent.ParentStep, this, Parent)
-                    { TargetUnit = ent.TargetUnit,CalculateValue = CalculateE4Dmg, AbilityValue = ent.AbilityValue });
+                    { TargetUnit = tarUnit,CalculateValue = CalculateE4Dmg, AbilityValue = ent.AbilityValue });
             }
 
           
