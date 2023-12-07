@@ -263,7 +263,11 @@ public class SilverWolf : DefaultFighter
 
         Abilities.Add(UserBanned);
 
-        //TALENT debuffs stacking
+        /* Talent + A4 debuff stacking
+         * pick random bug not exists in target. else pick bugs with smallest duration(if 2 bugs with 2 turns and 1 bug with 3 turns then pick random from 2 bugs)         * 
+         * Procs from all attack include technique
+         *
+         */
 
 
         if (Parent.Rank >= 6)
@@ -314,6 +318,7 @@ public class SilverWolf : DefaultFighter
                     TargetUnit = ent.TargetUnit,
                     BuffToApply = new Buff(Parent)
                     {
+                        Dispellable = false,
                         Type = Buff.BuffType.Debuff,
                         Effects = new List<Effect> { new EffEffectResPrc { Value = -0.20 } }
                     }
