@@ -13,9 +13,9 @@ public class Vagrant : DefaultNPCFighter
         //Elemenet
         Element = Unit.ElementEnm.Physical;
 
-        Weaknesses.Add(Unit.ElementEnm.Fire);
-        Weaknesses.Add(Unit.ElementEnm.Ice);
-        Weaknesses.Add(Unit.ElementEnm.Imaginary);
+        NativeWeaknesses.Add(Unit.ElementEnm.Fire);
+        NativeWeaknesses.Add(Unit.ElementEnm.Ice);
+        NativeWeaknesses.Add(Unit.ElementEnm.Imaginary);
         //resist
         Resists.Add(new Resist { ResistType = Unit.ElementEnm.Physical, ResistVal = 0.20 });
         Resists.Add(new Resist { ResistType = Unit.ElementEnm.Lightning, ResistVal = 0.20 });

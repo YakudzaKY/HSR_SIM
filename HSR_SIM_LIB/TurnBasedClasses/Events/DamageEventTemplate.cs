@@ -26,6 +26,7 @@ public abstract class DamageEventTemplate : Event
             }
             else
             {
+                double skillVal = (double)Val;
                 //find the all shields and max value
                 double maxShieldval = 0;
                 double srchVal;
@@ -38,12 +39,12 @@ public abstract class DamageEventTemplate : Event
 
                 //cant hit more than val
                 RealBarrierVal = Math.Min(maxShieldval,
-                    (double)Val);
+                    skillVal);
                 //get current hp
                 var resVal = TargetUnit.GetRes(Resource.ResourceType.HP).ResVal;
                 //same shit here
                 RealVal = Math.Min(resVal,
-                    (double)Val - (double)RealBarrierVal);
+                    skillVal- (double)RealBarrierVal);
             }
         }
 

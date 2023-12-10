@@ -105,7 +105,7 @@ public static class GraphicsCls
                 break;
             }
 
-            foreach (var elm in unit.Fighter.Weaknesses)
+            foreach (var elm in unit.GetWeaknesses(null))
                 if (elemList.IndexOf(elm) < 0)
                     elemList.Add(elm);
         }
@@ -256,14 +256,14 @@ public static class GraphicsCls
                 new Point(portraitPoint.X + PortraitSize.Width - ElemSizeMini.Width, portraitPoint.Y));
             //weaknesses
             short j = 0;
-            if (unit.Fighter.Weaknesses != null)
-                foreach (var weak in unit.Fighter.Weaknesses)
-                {
+       
+            foreach (var weak in unit.GetWeaknesses(null))
+            {
                     gfx.DrawImage(new Bitmap(Utl.LoadBitmap(weak.ToString()), ElemSizeMini),
                         new Point(portraitPoint.X + j * ElemSizeMini.Width,
                             portraitPoint.Y + (int)(PortraitSize.Height * 0.2)));
                     j++;
-                }
+            }
 
             //healthbar
             if (unit.GetMaxHp(null) > 0)
@@ -468,9 +468,9 @@ public static class GraphicsCls
                 var buffPoint = new Point(portraitPoint.X + j * ElemSizeMini.Width,
                     portraitPoint.Y + PortraitSize.Height - ElemSizeMini.Width);
                 gfx.DrawImage(
-                    new Bitmap(Utl.LoadBitmap(buff.Mod.CustomIconName ?? buff.Mod.Effects.First().GetType().Name),
+                    new Bitmap(Utl.LoadBitmap(buff.AppliedBuff.CustomIconName ?? buff.AppliedBuff.Effects.First().GetType().Name),
                         ElemSizeMini), buffPoint);
-                gfx.DrawRectangle(new Pen((buff.Mod.Type== Buff.BuffType.Buff )?Color.Blue:Color.DarkRed, 1), buffPoint.X, buffPoint.Y, ElemSizeMini.Width,
+                gfx.DrawRectangle(new Pen((buff.AppliedBuff.Type== Buff.BuffType.Buff )?Color.Blue:Color.DarkRed, 1), buffPoint.X, buffPoint.Y, ElemSizeMini.Width,
                     ElemSizeMini.Height);
 
 

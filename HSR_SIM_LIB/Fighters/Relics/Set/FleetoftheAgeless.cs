@@ -12,7 +12,7 @@ internal class FleetoftheAgeless : DefaultRelicSet
         if (num >= 2)
             ConditionMods.Add(new ConditionBuff(parent.Parent)
             {
-                Mod = new Buff(Parent.Parent)
+                AppliedBuff = new Buff(Parent.Parent)
                 {
                     Effects = new List<Effect> { new EffAtkPrc { Value = 0.08 } },
                     CustomIconName = "gear\\" + GetType().ToString().Split('.').Last()

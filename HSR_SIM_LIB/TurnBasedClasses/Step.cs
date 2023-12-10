@@ -42,6 +42,13 @@ public class Step
         Parent = parent;
     }
 
+
+    public IEnumerable<Unit> TargetsHit =>
+        (from p in Events
+            where p is DirectDamage
+            select p.TargetUnit)
+        .Distinct();
+
     public SimCls Parent { get; }
 
     public StepTypeEnm StepType { get; set; }

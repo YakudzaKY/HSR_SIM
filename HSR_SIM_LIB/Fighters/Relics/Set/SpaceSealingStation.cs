@@ -16,7 +16,7 @@ public class SpaceSealingStation : DefaultRelicSet
     {
         return new ConditionBuff(Parent.Parent)
         {
-            Mod = new Buff(Parent.Parent)
+            AppliedBuff = new Buff(Parent.Parent)
             {
                 Effects = new List<Effect> { new EffAtkPrc { Value = 0.12 } },
                 CustomIconName = "gear\\" + GetType().ToString().Split('.').Last()

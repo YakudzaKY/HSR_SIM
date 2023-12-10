@@ -15,7 +15,7 @@ public class ToughnessShred : Event
     {
         if (!TriggersHandled)
             if ((TargetUnit.Buffs.All(x => x.Effects.All(y => y is not EffBarrier)) &&
-                 TargetUnit.Fighter.Weaknesses.Any(x => x == AbilityValue.Element)) || AbilityValue.IgnoreWeakness)
+                 TargetUnit.GetWeaknesses(this).Any(x => x == AbilityValue.Element)) || AbilityValue.IgnoreWeakness)
                 ChildEvents.Add(new ResourceDrain(null, null, AbilityValue.Parent.Parent)
                 {
                     ParentStep = ParentStep,

@@ -12,9 +12,9 @@ internal class AutomatonGrizzlyComplete : DefaultNPCBossFIghter
         //Elemenet
         Element = Unit.ElementEnm.Physical;
 
-        Weaknesses.Add(Unit.ElementEnm.Fire);
-        Weaknesses.Add(Unit.ElementEnm.Lightning);
-        Weaknesses.Add(Unit.ElementEnm.Ice);
+        NativeWeaknesses.Add(Unit.ElementEnm.Fire);
+        NativeWeaknesses.Add(Unit.ElementEnm.Lightning);
+        NativeWeaknesses.Add(Unit.ElementEnm.Ice);
         Resists.Add(new Resist { ResistType = Unit.ElementEnm.Physical, ResistVal = 0.20 });
         Resists.Add(new Resist { ResistType = Unit.ElementEnm.Wind, ResistVal = 0.20 });
         Resists.Add(new Resist { ResistType = Unit.ElementEnm.Quantum, ResistVal = 0.20 });

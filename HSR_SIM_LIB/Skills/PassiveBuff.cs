@@ -9,7 +9,7 @@ public class PassiveBuff
         Parent = parentUnit;
     }
 
-    public Buff Mod { get; set; }
+    public Buff AppliedBuff { get; set; }
     public object Target { get; set; } //in most cases target==parent, but when target is full team then not
     public Unit Parent { get; init; }
     public bool IsTargetCheck { get; set; }

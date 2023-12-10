@@ -9,13 +9,13 @@ using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Skills;
 
-public class Buff : CloneClass
+public class Buff(Unit caster, Buff reference = null) : CloneClass
 {
     public delegate void EventHandler(Event ent);
 
     public delegate void StepHandler(Step step);
 
-
+    public EffectStackingTypeEnm EffectStackingType { get; set; } = EffectStackingTypeEnm.PickMax;
     public enum BuffType
     {
         Buff,
@@ -23,15 +23,15 @@ public class Buff : CloneClass
         Dot
     }
 
+    public enum EffectStackingTypeEnm
+    {
+        PickMax,
+        Plus,
+        FullReplace
+    }
     //dot will be auto on start
     public static List<Type> EarlyProcMods = new() { typeof(EffEntanglement) };
 
-
-    public Buff(Unit caster, Buff reference = null)
-    {
-        Reference = reference;
-        Caster = caster;
-    }
 
     public BuffType Type { get; init; }
 
@@ -66,12 +66,12 @@ public class Buff : CloneClass
     public int MaxStack { get; set; } = 1;
     public int? BaseDuration { get; set; }
     public int? DurationLeft { get; set; }
-    public Unit Caster { get; set; }
+    public Unit Caster { get; set; } = caster;
     public object SourceObject { get; set; }
 
     public string UniqueStr { get; set; }
 
-    public Buff Reference { get; set; }
+    public Buff Reference { get; set; } = reference;
 
     public bool Dispellable { get; init; } = true;
     public Unit UniqueUnit { get; set; }

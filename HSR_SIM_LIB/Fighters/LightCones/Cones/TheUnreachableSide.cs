@@ -8,8 +8,8 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones;
 
 internal class TheUnreachableSide : DefaultLightCone
 {
-    private readonly Dictionary<int, double> modifiers = new()
-        { { 1, 0.24 }, { 2, 0.28 }, { 3, 0.32 }, { 4, 0.36 }, { 5, 0.40 } };
+    private readonly double[]modifiers =
+        {  0.24,  0.28 , 0.32 , 0.36,  0.40 };
 
     private readonly Buff uniqueBuff;
 
@@ -21,7 +21,7 @@ internal class TheUnreachableSide : DefaultLightCone
                 Type = Buff.BuffType.Buff,
                 BaseDuration = null,
                 MaxStack = 1,
-                Effects = new List<Effect> { new EffAllDamageBoost { Value = modifiers[rank] } }
+                Effects = new List<Effect> { new EffAllDamageBoost { Value = modifiers[rank-1] } }
             };
     }
 

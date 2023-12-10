@@ -9,7 +9,7 @@ namespace HSR_SIM_LIB.Skills.ReadyBuffs;
 
 public class BuffEntanglementWB : Buff
 {
-    public BuffEntanglementWB(Unit caster, Buff reference = null) : base(caster, reference)
+    public BuffEntanglementWB(Unit caster, Buff reference = null, Event ent=null) : base(caster, reference)
     {
         DoNotClone = true;
         Dispellable = true;
@@ -21,16 +21,46 @@ public class BuffEntanglementWB : Buff
             new EffEntanglement { CalculateValue = FighterUtils.CalculateShieldBrokeDmg },
             new EffDelay
             {
-                Value = 0.20 * (1 + caster.GetBreakDmg(null)),
+                Value = 0.20 * (1 + caster.GetBreakDmg(ent)),
                 StackAffectValue = false
             }
         };
         EventHandlerProc += EntanglementEventHandler;
     }
 
-    public void EntanglementEventHandler(Event ent)
+    private bool UnitGotHitByAbility(List<Event> events)
     {
-        if (ent is DirectDamage && ent.TargetUnit == Owner)
-            Stack = Math.Min(Stack + 1, MaxStack);
+        foreach (Event ent in events)
+        {
+            if (ent is DirectDamage && ent.TargetUnit == Owner)
+            {
+                return true;
+            }
+   
+        }
+        return false;
+    }
+
+    private bool UnitGotDebuffByAbility(List<Event> events)
+    {
+        foreach (Event ent in events)
+        {
+            if (ent is ApplyBuff aBuff && ent.TargetUnit == Owner && aBuff.BuffToApply == this)
+            {
+                return true;
+            }
+
+
+        }
+        return false;
+    }
+
+    private void EntanglementEventHandler(Event ent)
+    {
+        //ability cast is finish. 
+        if (ent is ExecuteAbilityFinish && ent.AbilityValue.Attack)
+            //if got hit by ability and no debuff applied in this action
+            if (UnitGotHitByAbility(ent.ParentStep.ProceedEvents) && !UnitGotDebuffByAbility(ent.ParentStep.ProceedEvents))
+              ent.ChildEvents.Add(new ApplyBuffStack(ent.ParentStep,this,Caster){Stacks=1,BuffToApply = this,TargetUnit = Owner});  
     }
 }

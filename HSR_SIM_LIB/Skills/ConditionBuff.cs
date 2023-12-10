@@ -63,7 +63,7 @@ public class ConditionBuff : PassiveBuff
             ConditionCheckParam.CritRate => CheckExpression(untToCheck.GetCritRate(null,excludeCondBuff)),
             ConditionCheckParam.HPPrc => untToCheck.GetMaxHp(null,excludeCondBuff) != 0 &&
                                          CheckExpression(untToCheck.GetHpPrc(null,excludeCondBuff)),
-            ConditionCheckParam.Weakness => untToCheck.Fighter.Weaknesses.Any(x => x == Condition.ElemValue),
+            ConditionCheckParam.Weakness => untToCheck.GetWeaknesses(null,excludeCondBuff).Any(x => x == Condition.ElemValue),
             _ => throw new NotImplementedException()
         };
         return res;

@@ -189,22 +189,22 @@ public class Unit : CloneClass
 
     public double AllDmgBoost(Event ent = null)
     {
-        return GetModsByType(typeof(EffAllDamageBoost), ent: ent);
+        return GetBuffSumByType(typeof(EffAllDamageBoost), ent: ent);
     }
 
     public double AdditiveShieldBonus(Event ent = null)
     {
-        return GetModsByType(typeof(EffAdditiveShieldBonus), ent: ent);
+        return GetBuffSumByType(typeof(EffAdditiveShieldBonus), ent: ent);
     }
 
     public double PrcShieldBonus(Event ent = null)
     {
-        return GetModsByType(typeof(EffPrcShieldBonus), ent: ent);
+        return GetBuffSumByType(typeof(EffPrcShieldBonus), ent: ent);
     }
 
     public double ResistsPenetration(ElementEnm elem, Event ent = null)
     {
-        return GetModsByType(typeof(EffElementalPenetration), elem, ent);
+        return GetBuffSumByType(typeof(EffElementalPenetration), elem, ent);
     }
 
     /// <summary>
@@ -219,8 +219,8 @@ public class Unit : CloneClass
         if (Fighter.Resists.Any(x => x.ResistType == elem))
             res += Fighter.Resists.First(x => x.ResistType == elem).ResistVal;
 
-        res += GetModsByType(typeof(EffElementalResist), elem, ent);
-        res += GetModsByType(typeof(EffAllDamageResist),  ent:ent);
+        res += GetBuffSumByType(typeof(EffElementalResist), elem, ent);
+        res += GetBuffSumByType(typeof(EffAllDamageResist), ent: ent);
         return res;
     }
 
@@ -230,18 +230,18 @@ public class Unit : CloneClass
         if (Fighter.DebuffResists.Any(x => x.Debuff == debuff))
             res += Fighter.DebuffResists.First(x => x.Debuff == debuff).ResistVal;
 
-        res += GetModsByType(typeof(EffDebufResist), ent: ent);
+        res += GetBuffSumByType(typeof(EffDebufResist), ent: ent);
         return res;
     }
 
     public double DotBoost(Event ent = null)
     {
-        return GetModsByType(typeof(EffDoTBoost), ent: ent);
+        return GetBuffSumByType(typeof(EffDoTBoost), ent: ent);
     }
 
     public double DefIgnore(Event ent = null)
     {
-        return GetModsByType(typeof(EffDefIgnore), ent: ent);
+        return GetBuffSumByType(typeof(EffDefIgnore), ent: ent);
     }
 
     /// <summary>
@@ -258,31 +258,55 @@ public class Unit : CloneClass
 
     public double GetElemBoostValue(ElementEnm elem, Event ent = null)
     {
-        return GetElemBoost(elem).Value + GetModsByType(typeof(EffElementalBoost), elem, ent);
+        return GetElemBoost(elem).Value + GetBuffSumByType(typeof(EffElementalBoost), elem, ent);
+    }
+
+
+    /// <summary>
+    ///     Get total stat by Buffs by type
+    /// </summary>
+    /// <returns></returns>
+    public List<KeyValuePair<Buff,List<Effect>>> GetBuffEffectsByType(Type srchBuffType, ElementEnm? elem = null, Event ent = null, List<ConditionBuff> excludeCondBuff = null, Buff.BuffType? buffType = null)
+    {
+        List<KeyValuePair<Buff,List<Effect>>> res= new();
+
+        List<Buff> buffList = new();
+        //get all mods to check
+        buffList.AddRange(Buffs.Where(x => buffType is null || x.Type == buffType));
+        foreach (var pmode in GetConditionBuffs(this, srchBuffType, excludeCondBuff).Where(x => buffType is null || x.AppliedBuff.Type == buffType))
+            buffList.Add(pmode.AppliedBuff);
+
+        foreach (var mod in buffList)
+        {
+            List<Effect> effectList = new();
+            effectList.AddRange(mod.Effects.Where(y => y.GetType() == srchBuffType
+                                                       && (y is not EffElementalTemplate eft || eft.Element == elem)
+                                                       && (y is not EffAbilityTypeBoost efAbility ||
+                                                           (ent?.AbilityValue != null && efAbility.AbilityType ==
+                                                               ent.AbilityValue.AbilityType))));
+            if (effectList.Count > 0)
+            {
+                res.Add(new KeyValuePair<Buff, List<Effect>>(mod,effectList));
+            }
+        }
+
+      
+
+        return res;
     }
 
     /// <summary>
     ///     Get total stat by Buffs by type
     /// </summary>
     /// <returns></returns>
-    public double GetModsByType(Type modType, ElementEnm? elem = null, Event ent = null, List<ConditionBuff> excludeCondBuff = null)
+    public double GetBuffSumByType(Type srchBuffType, ElementEnm? elem = null, Event ent = null, List<ConditionBuff> excludeCondBuff = null, Buff.BuffType? buffType = null)
     {
         double res = 0;
-        List<Buff> conditionsToCheck = new();
-        //get all mods to check
-        conditionsToCheck.AddRange(Buffs);
-        foreach (var pmode in GetConditionBuffs(this, modType, excludeCondBuff))
-            conditionsToCheck.Add(pmode.Mod);
+        List<KeyValuePair<Buff,List<Effect>>> effList = GetBuffEffectsByType(srchBuffType, elem, ent, excludeCondBuff, buffType);
 
-
-        foreach (var mod in conditionsToCheck)
-            foreach (var effect in mod.Effects.Where(y => y.GetType() == modType
-                                                          && (y is not EffElementalTemplate eft || eft.Element == elem)
-                                                          && (y is not EffAbilityTypeBoost efAbility ||
-                                                              (ent?.AbilityValue != null && efAbility.AbilityType ==
-                                                                  ent.AbilityValue.AbilityType))
-                     )
-                    )
+        foreach (var kp in effList)
+        {
+            foreach (var effect in kp.Value)
             {
                 double finalValue;
                 if (effect.CalculateValue != null)
@@ -290,23 +314,26 @@ public class Unit : CloneClass
                 else
                     finalValue = (double)effect.Value;
 
-                //ent?.ParentStep.Parent.Parent?.LogDebug($"{mod.AbilityValue?.Name} {mod.Caster.Name} add to val = { finalValue}");
-                res += finalValue * (effect.StackAffectValue ? mod.Stack : 1);
+                res += finalValue * (effect.StackAffectValue ? kp.Key.Stack : 1);
             }
+        }
+        
 
         return res;
     }
+
+
 
     public IEnumerable<PassiveBuff> GetConditionBuffToUnit(List<PassiveBuff> passiveBuffs, List<ConditionBuff> conditionBuffs, Unit targetForBuff, Type effTypeToSearch, List<ConditionBuff> excludeCondBuff = null)
     {
         IEnumerable<PassiveBuff> res =
         (from cmod in passiveBuffs
-                .Where(x => x.Mod.Effects.Any(x => effTypeToSearch == null || x.GetType() == effTypeToSearch))
-                .Concat(conditionBuffs.Where(y=>excludeCondBuff==null||!excludeCondBuff.Contains(y)))
+                .Where(x => x.AppliedBuff.Effects.Any(x => effTypeToSearch == null || x.GetType() == effTypeToSearch))
+                .Concat(conditionBuffs.Where(y => excludeCondBuff == null || !excludeCondBuff.Contains(y)))
          where ((cmod.Target is Unit && cmod.Target == this)
                 || (cmod.Target is Team && cmod.Target == ParentTeam)
-                || (cmod.Target is TargetTypeEnm && cmod.Parent.GetTargetsForUnit((TargetTypeEnm)cmod.Target).Contains(this))) 
-               &&(cmod is not ConditionBuff mod || mod.Truly(targetForBuff,excludeCondBuff))
+                || (cmod.Target is TargetTypeEnm && cmod.Parent.GetTargetsForUnit((TargetTypeEnm)cmod.Target).Contains(this)))
+               && (cmod is not ConditionBuff mod || mod.Truly(targetForBuff, excludeCondBuff))
          select cmod);
         return res;
     }
@@ -357,52 +384,70 @@ public class Unit : CloneClass
     }
 
     /// <summary>
-    ///     Search mod by ref. and add stack or reset duration.
-    ///     If mod have no ref then search by itself
+    ///     Search buff by ref. and add stack or reset duration.
+    ///     If buff have no ref then search by itself
     ///     also search by SourceObject+effects
+    ///
+    /// return stacks applied
     /// </summary>
-    /// <param name="mod"></param>
+    /// <param name="buff"></param>
     /// <param name="abilityValue"></param>
-    public void ApplyBuff(Event ent, Buff mod)
+    public int ApplyBuff(Event ent, Buff buff)
     {
-        var srchMod = Buffs.FirstOrDefault(x =>
-            ((x.Reference == (mod.Reference ?? mod) || (mod.SourceObject != null && mod.SourceObject == x.SourceObject))
-             && (mod.UniqueUnit == null || x.UniqueUnit == mod.UniqueUnit))
-            || (!string.IsNullOrEmpty(mod.UniqueStr) && string.Equals(x.UniqueStr, mod.UniqueStr)));
+        int res = 0;
+        var srchBuff = Buffs.FirstOrDefault(x =>
+            ((x.Reference == (buff.Reference ?? buff) || (buff.SourceObject != null && buff.SourceObject == x.SourceObject))
+             && (buff.UniqueUnit == null || x.UniqueUnit == buff.UniqueUnit))
+            || (!string.IsNullOrEmpty(buff.UniqueStr) && string.Equals(x.UniqueStr, buff.UniqueStr)));
 
 
-        foreach (var effect in mod.Effects) effect.BeforeApply(ent, mod);
+        foreach (var effect in buff.Effects) effect.BeforeApply(ent, buff);
         //find existing by ref, or by UNIQUE tag
-        if (srchMod != null)
+        if (srchBuff != null)
         {
             //add stack
-            srchMod.Stack = Math.Min(srchMod.MaxStack, srchMod.Stack + mod.Stack);
-            //refresh effect values for bigger numbers
-            foreach (Effect eff in mod.Effects)
+            int oldStacks = srchBuff.Stack;
+            srchBuff.Stack = Math.Min(srchBuff.MaxStack, srchBuff.Stack + buff.Stack);
+            res = srchBuff.Stack - oldStacks;
+            if (srchBuff.EffectStackingType == Buff.EffectStackingTypeEnm.FullReplace)
             {
-                Effect findExistingEff = srchMod.Effects.FirstOrDefault(x => eff.GetType() == x.GetType());
-                findExistingEff.Value = Math.Max(findExistingEff.Value ?? 0, eff.Value ?? 0);
+                srchBuff.Effects.Clear();
+                srchBuff.Effects.AddRange(buff.Effects);
             }
+            else
+                //refresh effect values for bigger numbers
+                foreach (Effect eff in buff.Effects)
+                {
+                    Effect findExistingEff = srchBuff.Effects.FirstOrDefault(x => eff.GetType() == x.GetType());
+                    if (srchBuff.EffectStackingType == Buff.EffectStackingTypeEnm.PickMax)
+                        findExistingEff.Value = Math.Max(findExistingEff.Value ?? 0, eff.Value ?? 0);
+                    else if (srchBuff.EffectStackingType == Buff.EffectStackingTypeEnm.Plus)
+                        findExistingEff.Value += eff.Value ?? 0;
+                    else
+                    {
+                        throw new NotImplementedException();
+                    }
+                }
         }
         else
         {
             //or add new
-            if (!mod.DoNotClone)
+            if (!buff.DoNotClone)
             {
                 //copy buff
-                srchMod = (Buff)mod.Clone();
+                srchBuff = (Buff)buff.Clone();
                 //if we have calced values then clone all effects(in the same order)
-                if (mod.Effects.Any(x => x.DynamicValue))
+                if (buff.Effects.Any(x => x.DynamicValue))
                 {
-                    srchMod.Effects = new List<Effect>();
+                    srchBuff.Effects = new List<Effect>();
                     //clone calced effects
-                    foreach (Effect eff in mod.Effects)
+                    foreach (Effect eff in buff.Effects)
                     {
                         if (eff.DynamicValue)
-                            srchMod.Effects.Add((Effect)eff.Clone());
+                            srchBuff.Effects.Add((Effect)eff.Clone());
                         else
                         {
-                            srchMod.Effects.Add(eff);
+                            srchBuff.Effects.Add(eff);
                         }
                     }
                 }
@@ -411,21 +456,23 @@ public class Unit : CloneClass
             }
 
             else
-                srchMod = mod;
-            srchMod.Stack = Math.Min(srchMod.MaxStack, srchMod.Stack);
-            srchMod.Reference = mod.Reference ?? mod;
-            srchMod.Owner = this;
-            Buffs.Add(srchMod);
+                srchBuff = buff;
+            srchBuff.Stack = Math.Min(srchBuff.MaxStack, srchBuff.Stack);
+            res = srchBuff.Stack;
+            srchBuff.Reference = buff.Reference ?? buff;
+            srchBuff.Owner = this;
+            Buffs.Add(srchBuff);
         }
 
-        foreach (var effect in srchMod.Effects) effect.OnApply(ent, srchMod);
+        foreach (var effect in srchBuff.Effects) effect.OnApply(ent, srchBuff);
         //reset duration
-        srchMod.IsOld = false; //renew the flag
-        srchMod.DurationLeft = srchMod.BaseDuration;
+        srchBuff.IsOld = false; //renew the flag
+        srchBuff.DurationLeft = srchBuff.BaseDuration;
+        return res;
     }
 
     /// <summary>
-    ///     remove mod by ref
+    ///     remove buff by ref
     /// </summary>
     /// <param name="mod"></param>
     public void RemoveBuff(Event ent, Buff mod)
@@ -437,6 +484,27 @@ public class Unit : CloneClass
             Buffs.Remove(foundBuff);
             foreach (var effect in foundBuff.Effects) effect.OnRemove(ent, foundBuff);
         }
+    }
+
+
+    public void AddStack(Buff mod, int stackCount = 1)
+    {
+        if (Buffs.Any(x => x.Reference == (mod.Reference ?? mod)))
+        {
+            var foundBuff = Buffs.First(x => x.Reference == (mod.Reference ?? mod));
+            foundBuff.Stack += stackCount;
+        }
+    }
+
+    public int GetStacks(Buff mod)
+    {
+        if (Buffs.Any(x => x.Reference == (mod.Reference ?? mod)))
+        {
+            var foundBuff = Buffs.First(x => x.Reference == (mod.Reference ?? mod));
+            return foundBuff.Stack;
+        }
+
+        return 0;
     }
 
     public IEnumerable<Unit> GetTargetsForUnit(TargetTypeEnm? targetType)
@@ -457,17 +525,17 @@ public class Unit : CloneClass
     /// <returns></returns>
     public double GetElemVulnerability(ElementEnm attackElem, Event ent = null)
     {
-        return GetModsByType(typeof(EffElementalVulnerability), attackElem, ent);
+        return GetBuffSumByType(typeof(EffElementalVulnerability), attackElem, ent);
     }
 
     public double GetAllDamageVulnerability(Event ent = null)
     {
-        return GetModsByType(typeof(EffAllDamageVulnerability), ent: ent);
+        return GetBuffSumByType(typeof(EffAllDamageVulnerability), ent: ent);
     }
 
     public double GetDotVulnerability(Event ent = null)
     {
-        return GetModsByType(typeof(EffDoTVulnerability), ent: ent);
+        return GetBuffSumByType(typeof(EffDoTVulnerability), ent: ent);
     }
 
     /// <summary>
@@ -486,8 +554,8 @@ public class Unit : CloneClass
                         res *= 1 - effect.Value ?? 0;
         //Condition
         foreach (var pmod in GetConditionBuffs(targetForCondition, typeof(EffDamageReduction)))
-            foreach (var effect in pmod.Mod.Effects.Where(x => x is EffDamageReduction))
-                for (var i = 0; i < pmod.Mod.Stack; i++)
+            foreach (var effect in pmod.AppliedBuff.Effects.Where(x => x is EffDamageReduction))
+                for (var i = 0; i < pmod.AppliedBuff.Stack; i++)
                     res *= 1 - effect.Value ?? 0;
         return res;
     }
@@ -511,57 +579,56 @@ public class Unit : CloneClass
     /// <returns></returns>
     public double GetAbilityTypeMultiplier(Event ent = null)
     {
-        return GetModsByType(typeof(EffAbilityTypeBoost), ent: ent);
+        return GetBuffSumByType(typeof(EffAbilityTypeBoost), ent: ent);
     }
 
     public double GetOutgoingHealMultiplier(Event ent)
     {
-        return 1 + Stats.HealRate + GetModsByType(typeof(EffOutgoingHealingPrc), ent: ent);
+        return 1 + Stats.HealRate + GetBuffSumByType(typeof(EffOutgoingHealingPrc), ent: ent);
     }
 
     public double GetIncomingHealMultiplier(Event ent)
     {
-        return 1 + GetModsByType(typeof(EffIncomeHealingPrc), ent: ent);
+        return 1 + GetBuffSumByType(typeof(EffIncomeHealingPrc), ent: ent);
     }
 
     public double GetCritRate(Event ent, List<ConditionBuff> excludeCondBuff = null)
     {
-        return Stats.CritChance + GetModsByType(typeof(EffCritPrc), ent: ent,excludeCondBuff:excludeCondBuff);
+        return Stats.CritChance + GetBuffSumByType(typeof(EffCritPrc), ent: ent, excludeCondBuff: excludeCondBuff);
     }
 
     public double GetCritDamage(Event ent, List<ConditionBuff> excludeCondBuff = null)
     {
-        return Stats.CritDmg + GetModsByType(typeof(EffCritDmg), ent: ent,excludeCondBuff:excludeCondBuff);
+        return Stats.CritDmg + GetBuffSumByType(typeof(EffCritDmg), ent: ent, excludeCondBuff: excludeCondBuff);
     }
 
-    public double GetMaxHp(Event ent, List<ConditionBuff> excludeCondBuff=null)
+    public double GetMaxHp(Event ent, List<ConditionBuff> excludeCondBuff = null)
     {
-        return Stats.BaseMaxHp * (1 + GetModsByType(typeof(EffMaxHpPrc), ent: ent,excludeCondBuff:excludeCondBuff) + Stats.MaxHpPrc) +
-               GetModsByType(typeof(EffMaxHp), ent: ent,excludeCondBuff:excludeCondBuff) + Stats.MaxHpFix;
+        return Stats.BaseMaxHp * (1 + GetBuffSumByType(typeof(EffMaxHpPrc), ent: ent, excludeCondBuff: excludeCondBuff) + Stats.MaxHpPrc) +
+               GetBuffSumByType(typeof(EffMaxHp), ent: ent, excludeCondBuff: excludeCondBuff) + Stats.MaxHpFix;
     }
 
     public double GetActionValue(Event ent)
     {
         return GetBaseActionValue(ent) *
-               (1 - GetModsByType(typeof(EffAdvance), ent: ent) + GetModsByType(typeof(EffDelay), ent: ent)) -
+               (1 - GetBuffSumByType(typeof(EffAdvance), ent: ent) + GetBuffSumByType(typeof(EffDelay), ent: ent)) -
                Stats.PerformedActionValue;
     }
 
     public double GetBaseActionValue(Event ent)
     {
-        return GetInitialBaseActionValue(ent) - GetModsByType(typeof(EffReduceBAV), ent: ent);
+        return GetInitialBaseActionValue(ent) - GetBuffSumByType(typeof(EffReduceBAV), ent: ent);
     }
 
-    public double GetHpPrc(Event ent, List<ConditionBuff> excludeCondBuff=null)
+    public double GetHpPrc(Event ent, List<ConditionBuff> excludeCondBuff = null)
     {
-        return GetRes(ResourceType.HP).ResVal / GetMaxHp(ent,excludeCondBuff);
+        return GetRes(ResourceType.HP).ResVal / GetMaxHp(ent, excludeCondBuff);
     }
 
     public double GetSpeed(Event ent, List<ConditionBuff> excludeCondBuff = null)
     {
-        return Stats.BaseSpeed * (1 + GetModsByType(typeof(EffSpeedPrc), ent: ent,excludeCondBuff:excludeCondBuff) -
-                   GetModsByType(typeof(EffReduceSpdPrc), ent: ent,excludeCondBuff:excludeCondBuff) + Stats.SpeedPrc) +
-               GetModsByType(typeof(EffSpeed), ent: ent,excludeCondBuff:excludeCondBuff) +
+        return Stats.BaseSpeed * (1 + GetBuffSumByType(typeof(EffSpeedPrc), ent: ent, excludeCondBuff: excludeCondBuff) + Stats.SpeedPrc) +
+               GetBuffSumByType(typeof(EffSpeed), ent: ent, excludeCondBuff: excludeCondBuff) +
                Stats.SpeedFix;
     }
 
@@ -573,44 +640,58 @@ public class Unit : CloneClass
 
     public double GetEffectRes(Event ent)
     {
-        return GetModsByType(typeof(EffEffectResPrc), ent: ent) + Stats.EffectResPrc + Stats.BaseEffectRes +
-               GetModsByType(typeof(EffEffectRes), ent: ent);
+        return GetBuffSumByType(typeof(EffEffectResPrc), ent: ent) + Stats.EffectResPrc + Stats.BaseEffectRes +
+               GetBuffSumByType(typeof(EffEffectRes), ent: ent);
     }
 
     public double GetEffectHit(Event ent)
     {
-        return GetModsByType(typeof(EffEffectHitPrc), ent: ent) + Stats.EffectHitPrc + Stats.BaseEffectHit +
-               GetModsByType(typeof(EffEffectHit), ent: ent);
+        return GetBuffSumByType(typeof(EffEffectHitPrc), ent: ent) + Stats.EffectHitPrc + Stats.BaseEffectHit +
+               GetBuffSumByType(typeof(EffEffectHit), ent: ent);
     }
 
     public double EnergyRegenPrc(Event ent)
     {
-        return 1 + GetModsByType(typeof(EffEnergyRatePrc), ent: ent) + Stats.BaseEnergyResPrc + Stats.BaseEnergyRes;
+        return 1 + GetBuffSumByType(typeof(EffEnergyRatePrc), ent: ent) + Stats.BaseEnergyResPrc + Stats.BaseEnergyRes;
     }
 
     public double GetDef(Event ent)
     {
-        return Stats.BaseDef * (1 + GetModsByType(typeof(EffDefPrc), ent: ent) + Stats.DefPrc) +
-               GetModsByType(typeof(EffDef), ent: ent);
+        return Stats.BaseDef * (1 + GetBuffSumByType(typeof(EffDefPrc), ent: ent) + Stats.DefPrc) +
+               GetBuffSumByType(typeof(EffDef), ent: ent);
     }
 
     public double GetAggro(Event ent)
     {
         if (IsAlive)
-            return Stats.BaseAggro * (1 + GetModsByType(typeof(EffBaseAgrroPrc), ent: ent)) *
-                   (1 + GetModsByType(typeof(EffAgrroPrc), ent: ent));
+            return Stats.BaseAggro * (1 + GetBuffSumByType(typeof(EffBaseAgrroPrc), ent: ent)) *
+                   (1 + GetBuffSumByType(typeof(EffAgrroPrc), ent: ent));
         return 0;
     }
 
     public double GetAttack(Event ent)
     {
-        return Stats.BaseAttack * (1 + GetModsByType(typeof(EffAtkPrc), ent: ent) + Stats.AttackPrc) +
-               GetModsByType(typeof(EffAtk), ent: ent) + Stats.AttackFix;
+        return Stats.BaseAttack * (1 + GetBuffSumByType(typeof(EffAtkPrc), ent: ent) + Stats.AttackPrc) +
+               GetBuffSumByType(typeof(EffAtk), ent: ent) + Stats.AttackFix;
     }
 
     public double GetBreakDmg(Event ent)
     {
-        return GetModsByType(typeof(EffBreakDmgPrc), ent: ent) + Stats.BreakDmgPrc;
+        return GetBuffSumByType(typeof(EffBreakDmgPrc), ent: ent) + Stats.BreakDmgPrc;
+    }
+
+    public List<Unit.ElementEnm> GetWeaknesses(Event ent, List<ConditionBuff> excludeCondBuff = null)
+    {
+        List<Unit.ElementEnm> res=new();
+        //add native weakness to result
+        res.AddRange(Fighter.NativeWeaknesses);
+        //grab weakness from debuffs
+        var elems = GetBuffEffectsByType(typeof(EffWeaknessImpair), ent: ent,excludeCondBuff:excludeCondBuff).Select(x=>x.Value);
+        foreach (var Lst in elems)
+        {
+           res.AddRange(Lst.Select(x=>((EffWeaknessImpair)x).Element)); 
+        }
+        return res ;
     }
 
     public record DamageBoostRec
