@@ -40,8 +40,9 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
         //get 0.2 AllDmg per debuff  on target
         private double? calcCrit(Event ent)
         {
+           
             double debuffs = 0;
-            debuffs += ent.TargetUnit.Buffs.Count(x => x.Type == Buff.BuffType.Debuff || x.Type == Buff.BuffType.Dot);
+            debuffs += ent?.TargetUnit?.Buffs.Count(x => x.Type == Buff.BuffType.Debuff || x.Type == Buff.BuffType.Dot)??0;
             if (debuffs >= 3)
                 return lcMods[Rank - 1];
             else
