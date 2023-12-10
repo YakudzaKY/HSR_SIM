@@ -51,12 +51,7 @@ internal class EchoesoftheCoffin : DefaultLightCone
 
     private double? CalcEnergyRgn(Event ent)
     {
-        var targetHits = (from p in ent.ParentStep.Events 
-                where p  is DirectDamage
-                select p.TargetUnit)
-            .Distinct();
-        var emmTargets = targetHits as Unit[] ?? targetHits.ToArray();
-        return modifiersEnrg[Rank-1] * Math.Min(emmTargets.Count(), 3);
+        return modifiersEnrg[Rank-1] * Math.Min(ent.ParentStep.TargetsHit.Count(), 3);
     }
 
 

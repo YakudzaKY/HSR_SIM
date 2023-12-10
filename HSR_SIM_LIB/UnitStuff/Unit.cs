@@ -627,8 +627,7 @@ public class Unit : CloneClass
 
     public double GetSpeed(Event ent, List<ConditionBuff> excludeCondBuff = null)
     {
-        return Stats.BaseSpeed * (1 + GetBuffSumByType(typeof(EffSpeedPrc), ent: ent, excludeCondBuff: excludeCondBuff) -
-                   GetBuffSumByType(typeof(EffReduceSpdPrc), ent: ent, excludeCondBuff: excludeCondBuff) + Stats.SpeedPrc) +
+        return Stats.BaseSpeed * (1 + GetBuffSumByType(typeof(EffSpeedPrc), ent: ent, excludeCondBuff: excludeCondBuff) + Stats.SpeedPrc) +
                GetBuffSumByType(typeof(EffSpeed), ent: ent, excludeCondBuff: excludeCondBuff) +
                Stats.SpeedFix;
     }
