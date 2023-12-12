@@ -473,11 +473,8 @@ public class SilverWolf : DefaultFighter
             if (Parent.Rank >= 4)
                 for (int i = 0; i < debuffs; i++)
                 {
-
                     ent.ChildEvents.Add(new DirectDamage(ent.ParentStep, this, Parent)
                     { TargetUnit = tarUnit, CalculateValue = CalculateE4Dmg });
-
-
                 }
             ent.ChildEvents.Add(new EnergyGain(ent.ParentStep, this, Parent)
             { TargetUnit = Parent, Val = 7 * debuffs });
@@ -497,9 +494,6 @@ public class SilverWolf : DefaultFighter
         {
             ImplantBug(ent.TargetUnit,ent,0.65);//fixed chance
         }
-
-        //TODO handle enemy break shield by any of party members(A6?)
-
         base.DefaultFighter_HandleEvent(ent);
     }
 

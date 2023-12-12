@@ -26,7 +26,7 @@ public abstract class Event : CloneClass
         SourceUnit = sourceUnit;
     }
 
-    public CalculateValuePrc CalculateValue { get; init; }
+    public CalculateValuePrc CalculateValue { get; set; }
     public CalculateTargetPrc CalculateTargets { get; init; }
 
 
@@ -46,18 +46,22 @@ public abstract class Event : CloneClass
         get
         {
             //calc value first
-            if (!TriggersHandled)
-            {
-                if (CalculateValue != null)
-                    val = CalculateValue(this);
-                if (CalculateProportion != null)
-                {
-                    val *= CalculateProportion;
-                    ParentStep.Parent.Parent?.LogDebug($" new val proportion({CalculateProportion:f})={val:f}");
-                }
 
-                
+            if (CalculateValue != null)
+            {
+                val = CalculateValue(this);
+                CalculateValue = null;
             }
+
+            if (CalculateProportion != null)
+            {
+                val *= CalculateProportion;
+                CalculateProportion = null;
+                ParentStep.Parent.Parent?.LogDebug($" new val proportion({CalculateProportion:f})={val:f}");
+            }
+
+
+
             return val;
         }
 
@@ -111,7 +115,7 @@ public abstract class Event : CloneClass
     {
         if (naturalFinish) mod.ProceedNaturalExpire(this);
         var dispell = new RemoveBuff(ParentStep, ParentStep.ActorAbility, SourceUnit)
-            {  BuffToApply = mod, TargetUnit = TargetUnit };
+        { BuffToApply = mod, TargetUnit = TargetUnit };
         ChildEvents.Add(dispell);
     }
 
@@ -135,7 +139,7 @@ public abstract class Event : CloneClass
             BuffToApply = mod
         };
 
-        if (FighterUtils.CalculateDebuffApplied(dotEvent,baseChance))
+        if (FighterUtils.CalculateDebuffApplied(dotEvent, baseChance))
         {
             ChildEvents.Add(dotEvent);
         }
