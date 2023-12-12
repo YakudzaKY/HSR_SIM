@@ -23,8 +23,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
         
         public override void ProcEvent(bool revert)
         {
-            //Apply mod
-            BuffToApply.AbilityValue ??= AbilityValue;
+
             if (!TargetUnit.IsAlive) return;
             if (!TriggersHandled)
                 RealStacks = Math.Min(BuffToApply.MaxStack - TargetUnit.GetStacks(BuffToApply), Stacks);

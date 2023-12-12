@@ -23,7 +23,6 @@ internal class MessengerTraversingHackerspace : DefaultRelicSet
                         ApplyBuff eventBuff = new(null, this, Parent.Parent)
                         {
                             OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
-                            AbilityValue = step.ActorAbility,
                             ParentStep = step,
                             TargetUnit = unit,
                             BuffToApply = new Buff(Parent.Parent)

@@ -75,7 +75,7 @@ public static class FighterUtils
 
         var attacker = ent.SourceUnit;
         var defender = ent.TargetUnit;
-        var attackElem = ent.AbilityValue?.Element ?? attacker.Fighter.Element;
+        var attackElem = ent.ParentStep.ActorAbility?.Element ?? attacker.Fighter.Element;
 
         ent.ParentStep.Parent.Parent?.LogDebug("=======================");
         ent.ParentStep.Parent.Parent?.LogDebug(
@@ -162,7 +162,7 @@ public static class FighterUtils
         var attacker = ent.SourceUnit;
         var defender = ent.TargetUnit;
 
-        var attackElem = ent.AbilityValue.Element;
+        var attackElem = ent.ParentStep.ActorAbility.Element;
 
         //crit multiplier
         double critMultiplier = 1;
@@ -219,7 +219,7 @@ public static class FighterUtils
 
 
     //debuff is resisted?
-    public static bool CalculateDebuffResisted(ApplyBuff ent,double baseChance)
+    public static bool CalculateDebuffApplied(ApplyBuff ent,double baseChance)
     {
 
         var attacker = ent.SourceUnit;

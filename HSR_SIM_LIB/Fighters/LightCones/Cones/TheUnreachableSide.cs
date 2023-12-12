@@ -31,7 +31,7 @@ internal class TheUnreachableSide : DefaultLightCone
     public override void DefaultLightCone_HandleEvent(Event ent)
     {
         //if unit consume hp or got attack then apply buff
-        if (((ent.AbilityValue?.Parent == Parent && ent.TargetUnit == Parent.Parent && ent is ResourceDrain &&
+        if (((ent.ParentStep.ActorAbility?.Parent == Parent && ent.TargetUnit == Parent.Parent && ent is ResourceDrain &&
               ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal != 0)
              || (ent.TargetUnit == Parent.Parent && ent is DirectDamage)) && uniqueBuff != null)
         {
@@ -44,7 +44,7 @@ internal class TheUnreachableSide : DefaultLightCone
         }
 
         //remove buff when attack completed
-        if (ent.SourceUnit == Parent.Parent && ent is ExecuteAbilityFinish && ent.AbilityValue.Attack)
+        if (ent.SourceUnit == Parent.Parent && ent is ExecuteAbilityFinish && ent.ParentStep.ActorAbility.Attack)
         {
             RemoveBuff newEvent = new(ent.ParentStep, this, Parent.Parent)
             {

@@ -24,7 +24,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
             if (Path == Parent.Path)
             {
                 aetherCodeDebuff = new Buff(Parent.Parent, null)
-                    { Type = Buff.BuffType.Debuff,AbilityValue = null,BaseDuration = 1,Effects = new List<Effect>(){new EffAllDamageVulnerability(){Value =lcMods[Rank-1] }}};
+                    { Type = Buff.BuffType.Debuff,BaseDuration = 1,Effects = new List<Effect>(){new EffAllDamageVulnerability(){Value =lcMods[Rank-1] }}};
 
 
                 Parent.PassiveBuffs.Add(new PassiveBuff(Parent.Parent)
@@ -56,7 +56,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
         public override void DefaultLightCone_HandleEvent(Event ent)
         {
             
-            if (ent is ExecuteAbilityFinish && ent.SourceUnit == Parent.Parent&&ent.AbilityValue.Attack&&ent.AbilityValue.AbilityType!=Ability.AbilityTypeEnm.Technique)
+            if (ent is ExecuteAbilityFinish && ent.SourceUnit == Parent.Parent&&ent.ParentStep.ActorAbility.Attack&&ent.ParentStep.ActorAbility.AbilityType!=Ability.AbilityTypeEnm.Technique)
             {
                 var targetHits = ent.ParentStep.TargetsHit.Where(x=>x.Buffs.All(y => y.Reference != aetherCodeDebuff));
                 if (targetHits.Any())

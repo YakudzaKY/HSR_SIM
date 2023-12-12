@@ -282,8 +282,8 @@ public class Unit : CloneClass
             effectList.AddRange(mod.Effects.Where(y => y.GetType() == srchBuffType
                                                        && (y is not EffElementalTemplate eft || eft.Element == elem)
                                                        && (y is not EffAbilityTypeBoost efAbility ||
-                                                           (ent?.AbilityValue != null && efAbility.AbilityType ==
-                                                               ent.AbilityValue.AbilityType))));
+                                                           (ent?.ParentStep.ActorAbility != null && efAbility.AbilityType ==
+                                                               ent.ParentStep.ActorAbility.AbilityType))));
             if (effectList.Count > 0)
             {
                 res.Add(new KeyValuePair<Buff, List<Effect>>(mod,effectList));

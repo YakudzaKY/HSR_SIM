@@ -37,7 +37,7 @@ public abstract class Event : CloneClass
     public Unit SourceUnit { get; set; }
     public Unit TargetUnit { get; set; }
     public StepTypeEnm? OnStepType { get; init; }
-    public Ability AbilityValue { get; set; }
+
     //after calc Val will be multiplied by this number
     public double? CalculateProportion { get; set; } = null;
 
@@ -110,8 +110,8 @@ public abstract class Event : CloneClass
     public void DispelMod(Buff mod, bool naturalFinish)
     {
         if (naturalFinish) mod.ProceedNaturalExpire(this);
-        var dispell = new RemoveBuff(ParentStep, AbilityValue, SourceUnit)
-            { AbilityValue = AbilityValue, BuffToApply = mod, TargetUnit = TargetUnit };
+        var dispell = new RemoveBuff(ParentStep, ParentStep.ActorAbility, SourceUnit)
+            {  BuffToApply = mod, TargetUnit = TargetUnit };
         ChildEvents.Add(dispell);
     }
 
@@ -131,23 +131,19 @@ public abstract class Event : CloneClass
         //add Dots and debuffs
         ApplyBuff dotEvent = new(ParentStep, Source, SourceUnit)
         {
-            AbilityValue = AbilityValue,
             TargetUnit = TargetUnit,
             BuffToApply = mod
         };
 
-        if (FighterUtils.CalculateDebuffResisted(dotEvent,baseChance))
+        if (FighterUtils.CalculateDebuffApplied(dotEvent,baseChance))
         {
             ChildEvents.Add(dotEvent);
-            //subscription to events(need calc stacks at attacks)
-            dotEvent.BuffToApply.AbilityValue = AbilityValue;
         }
         else
         {
             //debuff apply failed
             DebuffResisted failEvent = new(ParentStep, Source, SourceUnit)
             {
-                AbilityValue = AbilityValue,
                 TargetUnit = TargetUnit,
                 BuffToApply = dotEvent.BuffToApply
             };

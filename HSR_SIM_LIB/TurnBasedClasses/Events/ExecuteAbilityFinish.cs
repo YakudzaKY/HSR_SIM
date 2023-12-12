@@ -11,6 +11,6 @@ internal class ExecuteAbilityFinish : Event
 
     public override string GetDescription()
     {
-        return $"{SourceUnit.Name} finish execute {AbilityValue.Name}";
+        return $"{SourceUnit.Name} finish execute {ParentStep.ActorAbility.Name}";
     }
 }

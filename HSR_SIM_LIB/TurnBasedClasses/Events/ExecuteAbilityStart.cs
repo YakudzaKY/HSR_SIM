@@ -11,6 +11,6 @@ internal class ExecuteAbilityStart : Event
 
     public override string GetDescription()
     {
-        return $"{SourceUnit.Name} start execute {AbilityValue.Name}";
+        return $"{SourceUnit.Name} start execute {ParentStep.ActorAbility.Name}";
     }
 }

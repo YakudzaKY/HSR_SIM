@@ -53,7 +53,7 @@ public abstract class DefaultFighter : IFighter
             AdjacentTargets = Ability.AdjacentTargetsEnm.All
         };
         defOpener.Events.Add(new ToughnessShred(null, this, Parent)
-            { OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue, Val = 30, AbilityValue = defOpener });
+            { OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue, Val = 30});
 
         Abilities.Add(defOpener);
     }

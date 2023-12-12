@@ -280,16 +280,14 @@ public class SilverWolf : DefaultFighter
         ability.Events.Add(new DirectDamage(null, this, Parent)
         {
             OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
-            CalculateValue = CalculateFqpDmg,
-            AbilityValue = ability
+            CalculateValue = CalculateFqpDmg
         });
         //shield break in this case going after skill dmg
         ability.Events.Add(new ResourceDrain(null, this, Parent)
         {
             OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
             ResType = Resource.ResourceType.Toughness,
-            Val = 60,
-            AbilityValue = ability
+            Val = 60
         });
 
         Abilities.Add(ability);
@@ -310,10 +308,10 @@ public class SilverWolf : DefaultFighter
         foreach (double proportion in new[] { 0.25, 0.25, 0.5 })
         {
             SystemWarning.Events.Add(new DirectDamage(null, this, Parent)
-            { CalculateValue = CalculateBasicDmg, AbilityValue = SystemWarning, CalculateProportion = proportion });
-            SystemWarning.Events.Add(new ToughnessShred(null, this, Parent) { Val = 30, AbilityValue = SystemWarning, CalculateProportion = proportion });
+            { CalculateValue = CalculateBasicDmg, CalculateProportion = proportion });
+            SystemWarning.Events.Add(new ToughnessShred(null, this, Parent) { Val = 30, CalculateProportion = proportion });
             SystemWarning.Events.Add(new EnergyGain(null, this, Parent)
-            { Val = 20, TargetUnit = Parent, AbilityValue = SystemWarning, CalculateProportion = proportion });
+            { Val = 20, TargetUnit = Parent, CalculateProportion = proportion });
         }
 
         Abilities.Add(SystemWarning);
@@ -335,10 +333,10 @@ public class SilverWolf : DefaultFighter
         AllowChanges.Events.Add(new AttemptEffect(null, this, Parent) { BaseChance = 1, BuffToApply = allowChangesDebuffAllDmgRes });
         //dmg events
         AllowChanges.Events.Add(new DirectDamage(null, this, Parent)
-        { CalculateValue = CalculateAbilityDmg, AbilityValue = AllowChanges });
-        AllowChanges.Events.Add(new ToughnessShred(null, this, Parent) { Val = 60, AbilityValue = AllowChanges });
+        { CalculateValue = CalculateAbilityDmg });
+        AllowChanges.Events.Add(new ToughnessShred(null, this, Parent) { Val = 60});
         AllowChanges.Events.Add(new EnergyGain(null, this, Parent)
-        { Val = 30, TargetUnit = Parent, AbilityValue = AllowChanges });
+        { Val = 30, TargetUnit = Parent });
         Abilities.Add(AllowChanges);
 
         //User Banned
@@ -357,10 +355,10 @@ public class SilverWolf : DefaultFighter
         UserBanned.Events.Add(new AttemptEffect(null, this, Parent) { BaseChance = ultChance, BuffToApply = ultDefDebuff });
         //dmg events
         UserBanned.Events.Add(new DirectDamage(null, this, Parent)
-        { CalculateValue = CalculateUltimateDmg, AbilityValue = UserBanned });
-        UserBanned.Events.Add(new ToughnessShred(null, this, Parent) { Val = 90, AbilityValue = UserBanned });
+        { CalculateValue = CalculateUltimateDmg });
+        UserBanned.Events.Add(new ToughnessShred(null, this, Parent) { Val = 90 });
         UltimateHitLastEvent = new EnergyGain(null, this, Parent)
-        { Val = 5, TargetUnit = Parent, AbilityValue = UserBanned };
+        { Val = 5, TargetUnit = Parent };
         UserBanned.Events.Add(UltimateHitLastEvent);
 
         Abilities.Add(UserBanned);
@@ -477,17 +475,17 @@ public class SilverWolf : DefaultFighter
                 {
 
                     ent.ChildEvents.Add(new DirectDamage(ent.ParentStep, this, Parent)
-                    { TargetUnit = tarUnit, CalculateValue = CalculateE4Dmg, AbilityValue = ent.AbilityValue });
+                    { TargetUnit = tarUnit, CalculateValue = CalculateE4Dmg });
 
 
                 }
             ent.ChildEvents.Add(new EnergyGain(ent.ParentStep, this, Parent)
-            { TargetUnit = Parent, Val = 7 * debuffs, AbilityValue = ent.AbilityValue });
+            { TargetUnit = Parent, Val = 7 * debuffs });
 
 
         }
 
-        else if (ent is ExecuteAbilityFinish && ent.SourceUnit == Parent && ent.AbilityValue.Attack)
+        else if (ent is ExecuteAbilityFinish && ent.SourceUnit == Parent && ent.ParentStep.ActorAbility.Attack)
         {
             foreach (Unit target in ent.ParentStep.TargetsHit)
             {
