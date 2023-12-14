@@ -36,7 +36,7 @@ public interface IFighter : ICloneable
     public List<Ability> Abilities { get; set; }
     public Unit Parent { get; set; }
     public double Cost { get; } //unit cost in the squad
-    public UnitRole? Role { get; }
+    public UnitRole? Role { get; set; }
     public Unit GetBestTarget(Ability ability);
     public string GetSpecialText(); //text for different triggers counters etc
     public void Reset();

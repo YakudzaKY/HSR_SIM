@@ -266,9 +266,9 @@ public class Unit : CloneClass
     ///     Get total stat by Buffs by type
     /// </summary>
     /// <returns></returns>
-    public List<KeyValuePair<Buff,List<Effect>>> GetBuffEffectsByType(Type srchBuffType, ElementEnm? elem = null, Event ent = null, List<ConditionBuff> excludeCondBuff = null, Buff.BuffType? buffType = null)
+    public List<KeyValuePair<Buff, List<Effect>>> GetBuffEffectsByType(Type srchBuffType, ElementEnm? elem = null, Event ent = null, List<ConditionBuff> excludeCondBuff = null, Buff.BuffType? buffType = null)
     {
-        List<KeyValuePair<Buff,List<Effect>>> res= new();
+        List<KeyValuePair<Buff, List<Effect>>> res = new();
 
         List<Buff> buffList = new();
         //get all mods to check
@@ -286,11 +286,11 @@ public class Unit : CloneClass
                                                                ent.ParentStep.ActorAbility.AbilityType))));
             if (effectList.Count > 0)
             {
-                res.Add(new KeyValuePair<Buff, List<Effect>>(mod,effectList));
+                res.Add(new KeyValuePair<Buff, List<Effect>>(mod, effectList));
             }
         }
 
-      
+
 
         return res;
     }
@@ -302,7 +302,7 @@ public class Unit : CloneClass
     public double GetBuffSumByType(Type srchBuffType, ElementEnm? elem = null, Event ent = null, List<ConditionBuff> excludeCondBuff = null, Buff.BuffType? buffType = null)
     {
         double res = 0;
-        List<KeyValuePair<Buff,List<Effect>>> effList = GetBuffEffectsByType(srchBuffType, elem, ent, excludeCondBuff, buffType);
+        List<KeyValuePair<Buff, List<Effect>>> effList = GetBuffEffectsByType(srchBuffType, elem, ent, excludeCondBuff, buffType);
 
         foreach (var kp in effList)
         {
@@ -317,7 +317,7 @@ public class Unit : CloneClass
                 res += finalValue * (effect.StackAffectValue ? kp.Key.Stack : 1);
             }
         }
-        
+
 
         return res;
     }
@@ -328,8 +328,9 @@ public class Unit : CloneClass
     {
         IEnumerable<PassiveBuff> res =
         (from cmod in passiveBuffs
-                .Where(x => x.AppliedBuff.Effects.Any(x => effTypeToSearch == null || x.GetType() == effTypeToSearch))
-                .Concat(conditionBuffs.Where(y => excludeCondBuff == null || !excludeCondBuff.Contains(y)))
+                .Where(x => x.AppliedBuff.Effects.Any(y => effTypeToSearch == null || y.GetType() == effTypeToSearch))
+                .Concat(conditionBuffs.Where(z => z.AppliedBuff.Effects.Any(y => effTypeToSearch == null || y.GetType() == effTypeToSearch)
+                                                  && (excludeCondBuff == null || !excludeCondBuff.Contains(z))))
          where ((cmod.Target is Unit && cmod.Target == this)
                 || (cmod.Target is Team && cmod.Target == ParentTeam)
                 || (cmod.Target is TargetTypeEnm && cmod.Parent.GetTargetsForUnit((TargetTypeEnm)cmod.Target).Contains(this)))
@@ -682,16 +683,16 @@ public class Unit : CloneClass
 
     public List<Unit.ElementEnm> GetWeaknesses(Event ent, List<ConditionBuff> excludeCondBuff = null)
     {
-        List<Unit.ElementEnm> res=new();
+        List<Unit.ElementEnm> res = new();
         //add native weakness to result
         res.AddRange(Fighter.NativeWeaknesses);
         //grab weakness from debuffs
-        var elems = GetBuffEffectsByType(typeof(EffWeaknessImpair), ent: ent,excludeCondBuff:excludeCondBuff).Select(x=>x.Value);
+        var elems = GetBuffEffectsByType(typeof(EffWeaknessImpair), ent: ent, excludeCondBuff: excludeCondBuff).Select(x => x.Value);
         foreach (var Lst in elems)
         {
-           res.AddRange(Lst.Select(x=>((EffWeaknessImpair)x).Element)); 
+            res.AddRange(Lst.Select(x => ((EffWeaknessImpair)x).Element));
         }
-        return res ;
+        return res;
     }
 
     public record DamageBoostRec

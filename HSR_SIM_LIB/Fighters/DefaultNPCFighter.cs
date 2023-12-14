@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
@@ -7,6 +8,7 @@ using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using HSR_SIM_LIB.Utils.Utils;
 using static HSR_SIM_LIB.Fighters.FighterUtils;
+using static HSR_SIM_LIB.TurnBasedClasses.CombatFight;
 
 namespace HSR_SIM_LIB.Fighters;
 
@@ -72,28 +74,36 @@ public class DefaultNPCFighter : IFighter
         return null;
     }
 
-    public virtual double Cost => Parent.GetAttack(null) /
+    public virtual double Cost =>  ((Parent.Stats.BaseAttack * (1 + Parent.Stats.AttackPrc) + Parent.Stats.AttackFix) * Parent.Stats.BaseCritChance * Parent.Stats.BaseCritDmg)/
                                   (Parent.Fighter.Abilities.Count(x => x.TargetType == Ability.TargetTypeEnm.Friend) +
                                    1);
 
-
+    private UnitRole? role;
     public UnitRole? Role
     {
         get
         {
-            if (!Parent.IsAlive) return null;
-            //special units have no role
-            if (Parent.ParentTeam == Parent.ParentTeam.ParentSim.SpecialTeam)
-                return null;
-            var unitsToSearch = Parent.ParentTeam.Units.Where(x => x.IsAlive).OrderByDescending(x => x.Fighter.Cost)
-                .ThenByDescending(x => x.GetAttack(null) * x.Stats.BaseCritChance * x.Stats.BaseCritDmg).ToList();
-            if (Parent == unitsToSearch.First())
-                return UnitRole.MainDPS;
+            if (role == null&&Parent.IsAlive && Parent.ParentTeam != Parent.ParentTeam.ParentSim.SpecialTeam)
+            {
+                
+                    var unitsToSearch = Parent.ParentTeam.Units.Where(x => x.IsAlive)
+                        .OrderByDescending(x => x.Fighter.Cost)
+                        
+                        .ToList();
+                    if (Parent == unitsToSearch.First())
+                        role = UnitRole.MainDPS;
 
-            if (Parent == unitsToSearch.ElementAt(1))
-                return UnitRole.SecondDPS;
-            return UnitRole.Support;
+                    else if (Parent == unitsToSearch.ElementAt(1))
+                        role = UnitRole.SecondDPS;
+                    else
+                        role = UnitRole.Support;
+                
+                
+            }
+            return role;
         }
+        set => role = value;
+
     }
 
     public void Reset()

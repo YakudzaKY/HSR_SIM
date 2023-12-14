@@ -28,6 +28,7 @@ public class Defeat : Event
         //got defeated
 
         TargetUnit.IsAlive = revert;
+        TargetUnit.ParentTeam.ResetRoles();
 
 
         base.ProcEvent(revert);
