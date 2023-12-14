@@ -10,6 +10,7 @@ using HSR_SIM_LIB.Utils;
 using static HSR_SIM_LIB.Utils.Constant;
 using static HSR_SIM_LIB.UnitStuff.Resource;
 using static HSR_SIM_LIB.Skills.Ability;
+using static HSR_SIM_LIB.Skills.ConditionBuff;
 
 namespace HSR_SIM_LIB.UnitStuff;
 
@@ -182,8 +183,8 @@ public class Unit : CloneClass
     /// </summary>
     public Resource GetRes(ResourceType rt)
     {
-        if (!Resources.Any(x => x.ResType == rt))
-            Resources.Add(new Resource { ResType = rt, ResVal = 0 });
+        if (Resources.All(x => x.ResType != rt))
+            Resources.Add(new Resource(this) { ResType = rt, ResVal = 0 });
         return Resources.First(resource => resource.ResType == rt);
     }
 
@@ -273,7 +274,7 @@ public class Unit : CloneClass
         List<Buff> buffList = new();
         //get all mods to check
         buffList.AddRange(Buffs.Where(x => buffType is null || x.Type == buffType));
-        foreach (var pmode in GetConditionBuffs(this, srchBuffType, excludeCondBuff).Where(x => buffType is null || x.AppliedBuff.Type == buffType))
+        foreach (var pmode in GetConditionBuffs(this, srchBuffType, excludeCondBuff,ent:ent).Where(x => buffType is null || x.AppliedBuff.Type == buffType))
             buffList.Add(pmode.AppliedBuff);
 
         foreach (var mod in buffList)
@@ -324,7 +325,7 @@ public class Unit : CloneClass
 
 
 
-    public IEnumerable<PassiveBuff> GetConditionBuffToUnit(List<PassiveBuff> passiveBuffs, List<ConditionBuff> conditionBuffs, Unit targetForBuff, Type effTypeToSearch, List<ConditionBuff> excludeCondBuff = null)
+    public IEnumerable<PassiveBuff> GetConditionBuffToUnit(List<PassiveBuff> passiveBuffs, List<ConditionBuff> conditionBuffs, Unit targetForBuff, Type effTypeToSearch, List<ConditionBuff> excludeCondBuff = null, Event ent=null)
     {
         IEnumerable<PassiveBuff> res =
         (from cmod in passiveBuffs
@@ -334,7 +335,7 @@ public class Unit : CloneClass
          where ((cmod.Target is Unit && cmod.Target == this)
                 || (cmod.Target is Team && cmod.Target == ParentTeam)
                 || (cmod.Target is TargetTypeEnm && cmod.Parent.GetTargetsForUnit((TargetTypeEnm)cmod.Target).Contains(this)))
-               && (cmod is not ConditionBuff mod || mod.Truly(targetForBuff, excludeCondBuff))
+               && (cmod is not ConditionBuff mod || mod.Truly(targetForBuff, excludeCondBuff,ent:ent))
          select cmod);
         return res;
     }
@@ -342,7 +343,7 @@ public class Unit : CloneClass
     ///     search avalable for unit condition mods(planars self or ally)
     /// </summary>
     /// <returns></returns>
-    public List<PassiveBuff> GetConditionBuffs(Unit targetForBuff, Type effTypeToSearch, List<ConditionBuff> excludeCondBuff = null)
+    public List<PassiveBuff> GetConditionBuffs(Unit targetForBuff, Type effTypeToSearch, List<ConditionBuff> excludeCondBuff = null,Event ent =null)
     {
         List<PassiveBuff> res = new();
         if (ParentTeam == null)
@@ -352,15 +353,15 @@ public class Unit : CloneClass
         foreach (var unit in ParentTeam.ParentSim.AllUnits.Where(x => x.IsAlive))
         {
             if (unit.fighter.ConditionBuffs.Concat(unit.fighter.PassiveBuffs).Any())
-                res.AddRange(GetConditionBuffToUnit(unit.fighter.PassiveBuffs, unit.fighter.ConditionBuffs, targetForBuff, effTypeToSearch, excludeCondBuff));
+                res.AddRange(GetConditionBuffToUnit(unit.fighter.PassiveBuffs, unit.fighter.ConditionBuffs, targetForBuff, effTypeToSearch, excludeCondBuff,ent:ent));
             if (unit.Fighter is DefaultFighter unitFighter)
             {
                 //LC
                 if (unitFighter.LightCone != null)
-                    res.AddRange(GetConditionBuffToUnit(unitFighter.LightCone.PassiveMods, unitFighter.LightCone.ConditionMods, targetForBuff, effTypeToSearch, excludeCondBuff));
+                    res.AddRange(GetConditionBuffToUnit(unitFighter.LightCone.PassiveMods, unitFighter.LightCone.ConditionMods, targetForBuff, effTypeToSearch, excludeCondBuff,ent:ent));
                 //GEAR
                 foreach (var relic in unitFighter.Relics)
-                    res.AddRange(GetConditionBuffToUnit(relic.PassiveMods, relic.ConditionMods, targetForBuff, effTypeToSearch, excludeCondBuff));
+                    res.AddRange(GetConditionBuffToUnit(relic.PassiveMods, relic.ConditionMods, targetForBuff, effTypeToSearch, excludeCondBuff,ent:ent));
             }
         }
 
@@ -464,7 +465,7 @@ public class Unit : CloneClass
             srchBuff.Owner = this;
             Buffs.Add(srchBuff);
         }
-
+        this.ResetCondition(ConditionBuff.ConditionCheckParam.Buff);
         foreach (var effect in srchBuff.Effects) effect.OnApply(ent, srchBuff);
         //reset duration
         srchBuff.IsOld = false; //renew the flag
@@ -478,6 +479,7 @@ public class Unit : CloneClass
     /// <param name="mod"></param>
     public void RemoveBuff(Event ent, Buff mod)
     {
+
         if (Buffs.Any(x => x.Reference == (mod.Reference ?? mod)))
         {
             var foundBuff = Buffs.First(x => x.Reference == (mod.Reference ?? mod));
@@ -485,6 +487,7 @@ public class Unit : CloneClass
             Buffs.Remove(foundBuff);
             foreach (var effect in foundBuff.Effects) effect.OnRemove(ent, foundBuff);
         }
+        this.ResetCondition(ConditionBuff.ConditionCheckParam.Buff);
     }
 
 
@@ -543,7 +546,7 @@ public class Unit : CloneClass
     ///     https://honkai-star-rail.fandom.com/wiki/DMG_Reduction
     /// </summary>
     /// <returns></returns>
-    public double GetDamageReduction(Unit targetForCondition = null)
+    public double GetDamageReduction(Unit targetForCondition = null,Event ent = null)
     {
         double res = 1;
 
@@ -554,7 +557,7 @@ public class Unit : CloneClass
                     for (var i = 0; i < mod.Stack; i++)
                         res *= 1 - effect.Value ?? 0;
         //Condition
-        foreach (var pmod in GetConditionBuffs(targetForCondition, typeof(EffDamageReduction)))
+        foreach (var pmod in GetConditionBuffs(targetForCondition, typeof(EffDamageReduction),ent:ent))
             foreach (var effect in pmod.AppliedBuff.Effects.Where(x => x is EffDamageReduction))
                 for (var i = 0; i < pmod.AppliedBuff.Stack; i++)
                     res *= 1 - effect.Value ?? 0;
@@ -633,6 +636,13 @@ public class Unit : CloneClass
                Stats.SpeedFix;
     }
 
+    public void ResetCondition(ConditionCheckParam chkPrm)
+    {
+        foreach (ConditionBuff cb in this.Fighter.ConditionBuffs.Where(x=>x.Condition.CondtionParam==chkPrm))
+        {
+            cb.NeedRecalc = true;
+        }
+    }
     private double GetInitialBaseActionValue(Event ent)
     {
         return Stats.LoadedBaseActionValue ?? 10000 / GetSpeed(ent);

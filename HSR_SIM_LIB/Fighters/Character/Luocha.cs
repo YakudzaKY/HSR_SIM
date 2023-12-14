@@ -256,7 +256,7 @@ public class Luocha : DefaultFighter
                     CustomIconName = uniqueBuff.CustomIconName
                 },
                 Target = Parent.ParentTeam,
-                Condition = new ConditionBuff.ConditionRec { ConditionAvailable = ColBuffAvailable }
+                Condition = new ConditionBuff.ConditionRec { BuffValue= uniqueBuff,CondtionExpression =ConditionBuff.ConditionCheckExpression.Exists,CondtionParam = ConditionBuff.ConditionCheckParam.Buff }
             });
 
 
@@ -285,7 +285,7 @@ public class Luocha : DefaultFighter
                     CustomIconName = uniqueBuff.CustomIconName
                 },
                 Target = TargetTypeEnm.Enemy,
-                Condition = new ConditionBuff.ConditionRec { ConditionAvailable = ColBuffAvailable }
+                Condition = new ConditionBuff.ConditionRec {BuffValue= uniqueBuff, CondtionExpression =ConditionBuff.ConditionCheckExpression.Exists,CondtionParam = ConditionBuff.ConditionCheckParam.Buff}
             });
     }
 

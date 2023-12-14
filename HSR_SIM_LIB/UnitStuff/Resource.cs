@@ -1,9 +1,11 @@
-﻿namespace HSR_SIM_LIB.UnitStuff;
+﻿using HSR_SIM_LIB.Skills;
+
+namespace HSR_SIM_LIB.UnitStuff;
 
 /// <summary>
 ///     Class for resources. It can be party (like SP) or character HP
 /// </summary>
-public class Resource : CloneClass
+public class Resource(CloneClass parent) : CloneClass
 {
     public enum ResourceType
     {
@@ -15,6 +17,19 @@ public class Resource : CloneClass
     }
 
     public ResourceType? ResType { get; set; }
+    CloneClass Parent { get; set; } = parent;
+    private double resVal;
+    public double ResVal
+    {
+        get => resVal;
 
-    public double ResVal { get; set; }
+        set
+        {
+            resVal = value;
+            if (ResType == ResourceType.HP)
+            {
+                ((Unit)Parent).ResetCondition(ConditionBuff.ConditionCheckParam.HPPrc);
+            }
+        }
+    }
 }

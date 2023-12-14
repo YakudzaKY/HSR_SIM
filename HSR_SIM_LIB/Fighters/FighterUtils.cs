@@ -197,7 +197,7 @@ public static class FighterUtils
         var vulnMult = 1 + defender.GetElemVulnerability(attackElem, ent) + defender.GetAllDamageVulnerability(ent) +
                        dotVulnerability;
 
-        var dmgReduction = defender.GetDamageReduction(defender);
+        var dmgReduction = defender.GetDamageReduction(defender,ent);
 
         var brokenMultiplier = defender.GetBrokenMultiplier();
         var totalDmg = baseDmg * critMultiplier * damageBoost * defMultiplier * resPen * vulnMult *

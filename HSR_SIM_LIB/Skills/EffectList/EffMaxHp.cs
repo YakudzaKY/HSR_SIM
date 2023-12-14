@@ -27,4 +27,16 @@ public class EffMaxHp : Effect
         buffOwner.GetRes(Resource.ResourceType.HP).ResVal -= GetCorrectedHP(ent, buff);
         base.BeforeRemove(ent, buff);
     }
+
+    public override void OnApply(Event ent, Buff buff)
+    {
+        buff.Owner.ResetCondition(ConditionBuff.ConditionCheckParam.HPPrc);
+        base.OnApply(ent, buff);
+    }
+
+    public override void OnRemove(Event ent, Buff buff)
+    {
+        buff.Owner.ResetCondition(ConditionBuff.ConditionCheckParam.HPPrc);
+        base.OnRemove(ent, buff);
+    }
 }

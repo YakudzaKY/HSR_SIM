@@ -26,7 +26,7 @@ internal class GeniusofBrilliantStars : DefaultRelicSet
                 Condition = new ConditionBuff.ConditionRec
                 {
                     CondtionParam = ConditionBuff.ConditionCheckParam.Weakness,
-                    CondtionExpression = ConditionBuff.ConditionCheckExpression.EqualOrMore,
+                    CondtionExpression = ConditionBuff.ConditionCheckExpression.Exists,
                     ElemValue = Unit.ElementEnm.Quantum
                 }
             });

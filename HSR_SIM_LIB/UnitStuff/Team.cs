@@ -59,11 +59,11 @@ public class Team : CloneClass
             if (resources == null)
             {
                 resources = new List<Resource>();
-                foreach (var name in Enum.GetNames<ResourceType>())
+                foreach (var resourceType in new ResourceType [] { ResourceType.SP ,ResourceType.TP})
                 {
-                    Resource res = new()
+                    Resource res = new(this)
                     {
-                        ResType = (ResourceType)Enum.Parse(typeof(ResourceType), name, true),
+                        ResType = resourceType,
                         ResVal = 0
                     };
                     resources.Add(res);
