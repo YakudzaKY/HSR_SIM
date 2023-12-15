@@ -10,11 +10,14 @@
 	<replacer from="Крит. урон" to="crit_dmg" />
 	<replacer from="восстановления" to="sp_rate" />
 	<replacer from="Бонус исцеления" to="heal_rate" />
-	<replacer from="" to="wind_dmg" />
-	<replacer from="" to="physical_dmg" />
+	<replacer from="Бонус ветр. урона" to="wind_dmg" />
+	<replacer from="Бонус физ. урона" to="physical_dmg" />
 	<replacer from="Бонус огн. урона" to="fire_dmg" />
-	<replacer from="" to="ice_dmg" />
-	<replacer from="" to="lightning_dmg" />
-	<replacer from="" to="quantum_dmg" />
-	<replacer from="" to="imaginary_dmg" />
+	<replacer from="Бонус лед. урона" to="ice_dmg" />
+	<replacer from="Бонус элек. урона" to="lightning_dmg" />
+	<replacer from="Бонус квант. урона" to="quantum_dmg" />
+	<replacer from="Бонус мним. урона" to="imaginary_dmg" />
+	<valFix from="_" to="." />
+	<valFix from="[." to="4" />
+	<valFix from="‚" to="," />
 </replacers>

@@ -93,7 +93,7 @@ public class ConditionBuff(Unit parentUnit) : PassiveBuff(parentUnit)
                     if (truly)
                         foreach (Effect eff in AppliedBuff.Effects)
                         {
-                            eff.BeforeApply(ent, AppliedBuff,target);//todo proxy target
+                            eff.BeforeApply(ent, AppliedBuff,target);
                             eff.OnApply(ent, AppliedBuff,target);
                         }
                     else

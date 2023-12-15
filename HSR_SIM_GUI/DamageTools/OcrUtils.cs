@@ -149,36 +149,52 @@ internal class OcrUtils
                     var xDoc = new XmlDocument();
                     xDoc.Load($"{AppDomain.CurrentDomain.BaseDirectory}\\tessdata\\{loc}.xml");
                     var xRoot = xDoc.DocumentElement;
-     
+
+                    Dictionary<string, string> replacers = new Dictionary<string, string>();
+                    Dictionary<string, string> valFixers = new Dictionary<string, string>();
+                    //parse replacers
+                    foreach (XmlElement xnode in xRoot.SelectNodes("replacer"))
+                    {
+                        replacers.Add(xnode.Attributes.GetNamedItem("from").Value.Trim(), xnode.Attributes.GetNamedItem("to")?.Value.Trim());
+                    }
+                    foreach (XmlElement xnode in xRoot.SelectNodes("valFix"))
+                    {
+                        valFixers.Add(xnode.Attributes.GetNamedItem("from").Value.Trim(), xnode.Attributes.GetNamedItem("to")?.Value.Trim());
+                    }
 
                     if (xRoot != null)
                         for (var i = 0; i < strings.Count; i++)
                             //parse all items
-                            foreach (XmlElement xnode in xRoot)
-                                if (xnode.Name == "replacer")
-                                {
-                                    var wordFrom = xnode.Attributes.GetNamedItem("from").Value.Trim();
-                                    var wordTo = xnode.Attributes.GetNamedItem("to")?.Value.Trim();
+                            foreach (KeyValuePair<string, string> replacer in replacers)
+                            {
+                                var wordFrom = replacer.Key;
+                                var wordTo = replacer.Value;
 
-                                    var wordNdx = strings[i].IndexOf(wordFrom);
-                                    if (wordNdx >= 0)
+                                var wordNdx = strings[i].IndexOf(wordFrom);
+                                if (wordNdx >= 0)
+                                {
+                                    var rx = new Regex("[0-9]");
+                                    var val = "";
+                                    var ndx = rx.Matches(stringsNumbers[i])
+                                        .FirstOrDefault(x => x.Index > wordNdx)?.Index ?? 0;
+                                    if (ndx > 0)
+                                        val = stringsNumbers[i].Substring(ndx).Replace(" ", string.Empty);
+                                    else
+                                        val = strings[i]
+                                            .Substring(rx.Matches(strings[i]).First(x => x.Index > wordNdx).Index)
+                                            .Replace(" ", string.Empty);
+                                    foreach (KeyValuePair<string, string> vlFix in valFixers)
                                     {
-                                        var rx = new Regex("[0-9]");
-                                        var val = "";
-                                        var ndx = rx.Matches(stringsNumbers[i])
-                                            .FirstOrDefault(x => x.Index > wordNdx)?.Index ?? 0;
-                                        if (ndx > 0)
-                                            val = stringsNumbers[i].Substring(ndx).Replace(" ", string.Empty);
-                                        else
-                                            val = strings[i]
-                                                .Substring(rx.Matches(strings[i]).First(x => x.Index > wordNdx).Index)
-                                                .Replace(" ", string.Empty);
-                                        var key = wordTo + (val.EndsWith("%") ? "_prc" : "_fix");
-                                        res.Add(res.Count,
-                                            new RStatWordRec { Key = key, Value = val, StatMode = itemRectMode });
-                                        break;
+                                        val = val.Replace(vlFix.Key, vlFix.Value);
                                     }
+                                    var key = wordTo + (val.EndsWith("%") ? "_prc" : "_fix");
+
+
+                                    res.Add(res.Count,
+                                        new RStatWordRec { Key = key, Value = val, StatMode = itemRectMode });
+                                    break;
                                 }
+                            }
 
                     page.Dispose();
                     pageNumbers.Dispose();
@@ -191,6 +207,8 @@ internal class OcrUtils
         engineNumbers.Dispose();
         return res;
     }
+
+
 
     public record RStatWordRec
     {

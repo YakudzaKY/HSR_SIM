@@ -106,7 +106,7 @@ namespace HSR_SIM_GUI
             NmbIterations.Name = "NmbIterations";
             NmbIterations.Size = new System.Drawing.Size(116, 23);
             NmbIterations.TabIndex = 13;
-            NmbIterations.Value = new decimal(new int[] { 100, 0, 0, 0 });
+            NmbIterations.Value = new decimal(new int[] { 1000, 0, 0, 0 });
             // 
             // label3
             // 

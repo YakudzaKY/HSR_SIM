@@ -135,20 +135,20 @@ public partial class StatCheck : Form
         return 0;
     }
 
-    private double SearchStatDeltaByNameInMainStats(string item)
+    private static double SearchStatDeltaByNameInMainStats(string item)
     {
         return ExctractDoubleVal(mainStatsUpgrades.First(x => x.Key.Equals(item)).Value);
     }
 
-    private double SearchStatBaseByNameInMainStats(string item)
+    private static double SearchStatBaseByNameInMainStats(string item)
     {
         return ExctractDoubleVal(mainStatsBase.First(x => x.Key.Equals(item)).Value);
     }
 
-    private double ExctractDoubleVal(string inputStr)
+    private static double ExctractDoubleVal(string inputStr)
     {
-        inputStr = inputStr.Replace(".", ",");
-        return inputStr.EndsWith("%")
+        inputStr = inputStr.Replace('.', ',');
+        return inputStr.EndsWith('%')
             ? double.Parse(inputStr.Substring(0, inputStr.Length - 1)) / 100
             : double.Parse(inputStr);
     }
@@ -257,7 +257,7 @@ public partial class StatCheck : Form
         while (mainThread.IsAlive)
         {
             Thread.Sleep(100);
-            PB1.Value = myTaskList.Tasks.Sum(x => x.Results.Count() + x.Subtasks.Sum(y => y.Results.Count()));
+            PB1.Value = myTaskList.Tasks.Sum(x => x.Results.Count + x.Subtasks.Sum(y => y.Results.Count));
             Refresh();
         }
 
@@ -300,7 +300,7 @@ public partial class StatCheck : Form
     {
         //delayed item check(coz in "ItemCheckEventArgs e" new and old values, but in list are old values)
         BeginInvoke((MethodInvoker)(
-            () => reloadProfileCharacters()));
+            reloadProfileCharacters));
     }
 
     private void setCalcVisible()
