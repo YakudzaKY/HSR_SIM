@@ -1,5 +1,6 @@
 ﻿using System;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
+using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Skills;
 
@@ -28,7 +29,8 @@ public class Effect:CloneClass
     /// </summary>
     /// <param name="ent"></param>
     /// <param name="buff"></param>
-    public virtual void OnApply(Event ent, Buff buff)
+    /// <param name="target">override buff owner</param>
+    public virtual void OnApply(Event ent, Buff buff,Unit target=null)
     {
     }
 
@@ -37,7 +39,8 @@ public class Effect:CloneClass
     /// </summary>
     /// <param name="ent"></param>
     /// <param name="buff"></param>
-    public virtual void BeforeApply(Event ent, Buff buff)
+    /// <param name="target">override buff owner</param>
+    public virtual void BeforeApply(Event ent, Buff buff,Unit target=null)
     {
     }
 
@@ -46,7 +49,8 @@ public class Effect:CloneClass
     /// </summary>
     /// <param name="ent"></param>
     /// <param name="buff"></param>
-    public virtual void OnRemove(Event ent, Buff buff)
+    /// <param name="target">override buff owner</param>
+    public virtual void OnRemove(Event ent, Buff buff,Unit target=null)
     {
     }
 
@@ -55,7 +59,8 @@ public class Effect:CloneClass
     /// </summary>
     /// <param name="ent"></param>
     /// <param name="buff"></param>
-    public virtual void BeforeRemove(Event ent, Buff buff)
+    /// <param name="target">override buff owner</param>
+    public virtual void BeforeRemove(Event ent, Buff buff,Unit target=null)
     {
     }
 

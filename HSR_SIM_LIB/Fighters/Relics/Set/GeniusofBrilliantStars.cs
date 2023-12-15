@@ -18,7 +18,7 @@ internal class GeniusofBrilliantStars : DefaultRelicSet
             });
 
         if (num >= 4)
-            ConditionMods.Add(new ConditionBuff(parent.Parent)
+            Parent.ConditionBuffs.Add(new ConditionBuff(parent.Parent)
             {
                 AppliedBuff = new Buff(Parent.Parent) { Effects = new List<Effect> { new EffDefIgnore { Value = 0.10 } } },
                 IsTargetCheck = true,

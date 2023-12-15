@@ -12,31 +12,31 @@ public class EffMaxHpPrc : Effect
         return increasedHP * buffOwner.GetHpPrc(ent);
     }
 
-    public override void BeforeApply(Event ent, Buff buff)
+    public override void BeforeApply(Event ent, Buff buff, Unit target = null)
     {
-        var buffOwner = buff.Owner ?? ent.TargetUnit;
+        var buffOwner = (target??buff.Owner) ?? ent.TargetUnit;
         buffOwner.GetRes(Resource.ResourceType.HP).ResVal += GetCorrectedHP(ent, buff);
 
-        base.BeforeApply(ent, buff);
+        base.BeforeApply(ent, buff, target);
     }
 
 
-    public override void BeforeRemove(Event ent, Buff buff)
+    public override void BeforeRemove(Event ent, Buff buff, Unit target = null)
     {
-        var buffOwner = buff.Owner ?? ent.TargetUnit;
+        var buffOwner = (target??buff.Owner) ?? ent.TargetUnit;
         buffOwner.GetRes(Resource.ResourceType.HP).ResVal -= GetCorrectedHP(ent, buff);
-        base.BeforeRemove(ent, buff);
+        base.BeforeRemove(ent, buff, target);
     }
 
-    public override void OnApply(Event ent, Buff buff)
+    public override void OnApply(Event ent, Buff buff, Unit target = null)
     {
-        buff.Owner.ResetCondition(ConditionBuff.ConditionCheckParam.HPPrc);
-        base.OnApply(ent, buff);
+        (target ?? buff.Owner).ResetCondition(ConditionBuff.ConditionCheckParam.HPPrc);
+        base.OnApply(ent, buff,target);
     }
 
-    public override void OnRemove(Event ent, Buff buff)
+    public override void OnRemove(Event ent, Buff buff, Unit target = null)
     {
-        buff.Owner.ResetCondition(ConditionBuff.ConditionCheckParam.HPPrc);
-        base.OnRemove(ent, buff);
+        (target ?? buff.Owner).ResetCondition(ConditionBuff.ConditionCheckParam.HPPrc);
+        base.OnRemove(ent, buff,target);
     }
 }

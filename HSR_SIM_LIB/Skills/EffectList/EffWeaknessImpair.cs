@@ -13,16 +13,16 @@ namespace HSR_SIM_LIB.Skills.EffectList
     {
         public Unit.ElementEnm Element { get; init; }
 
-        public override void OnApply(Event ent, Buff buff)
+        public override void OnApply(Event ent, Buff buff, Unit target = null)
         {
-            buff.Owner.ResetCondition(ConditionBuff.ConditionCheckParam.Weakness);
-            base.OnApply(ent, buff);
+            (target??buff.Owner).ResetCondition(ConditionBuff.ConditionCheckParam.Weakness);
+            base.OnApply(ent, buff,target);
         }
 
-        public override void OnRemove(Event ent, Buff buff)
+        public override void OnRemove(Event ent, Buff buff, Unit target = null)
         {
-            buff.Owner.ResetCondition(ConditionBuff.ConditionCheckParam.Weakness);
-            base.OnRemove(ent, buff);
+            (target??buff.Owner).ResetCondition(ConditionBuff.ConditionCheckParam.Weakness);
+            base.OnRemove(ent, buff, target);
         }
     }
 }

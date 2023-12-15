@@ -28,7 +28,7 @@ public class Bronya : DefaultFighter
             OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
             BuffToApply = new Buff(Parent)
             {
-                Type = Buff.BuffType.Buff, Effects = new List<Effect> { new EffAtkPrc { Value = 0.15 } },
+                Type = Buff.BuffType.Buff, Effects = new List<Effect> { new EffAtkPrc { Value = 0.15 }  },
                 BaseDuration = 2, Dispellable = true
             }
         };

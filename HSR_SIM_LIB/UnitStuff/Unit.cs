@@ -332,10 +332,7 @@ public class Unit : CloneClass
                 .Where(x => x.AppliedBuff.Effects.Any(y => effTypeToSearch == null || y.GetType() == effTypeToSearch))
                 .Concat(conditionBuffs.Where(z => z.AppliedBuff.Effects.Any(y => effTypeToSearch == null || y.GetType() == effTypeToSearch)
                                                   && (excludeCondBuff == null || !excludeCondBuff.Contains(z))))
-         where ((cmod.Target is Unit && cmod.Target == this)
-                || (cmod.Target is Team && cmod.Target == ParentTeam)
-                || (cmod.Target is TargetTypeEnm && cmod.Parent.GetTargetsForUnit((TargetTypeEnm)cmod.Target).Contains(this)))
-               && (cmod is not ConditionBuff mod || mod.Truly(targetForBuff, excludeCondBuff,ent:ent))
+         where cmod.UnitIsAffected(this) && (cmod is not ConditionBuff mod || mod.Truly(targetForBuff, excludeCondBuff,ent:ent))
          select cmod);
         return res;
     }
@@ -349,22 +346,11 @@ public class Unit : CloneClass
         if (ParentTeam == null)
             return res;
 
-
         foreach (var unit in ParentTeam.ParentSim.AllUnits.Where(x => x.IsAlive))
         {
             if (unit.fighter.ConditionBuffs.Concat(unit.fighter.PassiveBuffs).Any())
                 res.AddRange(GetConditionBuffToUnit(unit.fighter.PassiveBuffs, unit.fighter.ConditionBuffs, targetForBuff, effTypeToSearch, excludeCondBuff,ent:ent));
-            if (unit.Fighter is DefaultFighter unitFighter)
-            {
-                //LC
-                if (unitFighter.LightCone != null)
-                    res.AddRange(GetConditionBuffToUnit(unitFighter.LightCone.PassiveMods, unitFighter.LightCone.ConditionMods, targetForBuff, effTypeToSearch, excludeCondBuff,ent:ent));
-                //GEAR
-                foreach (var relic in unitFighter.Relics)
-                    res.AddRange(GetConditionBuffToUnit(relic.PassiveMods, relic.ConditionMods, targetForBuff, effTypeToSearch, excludeCondBuff,ent:ent));
-            }
         }
-
 
         return res;
     }

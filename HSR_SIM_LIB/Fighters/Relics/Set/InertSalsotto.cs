@@ -9,7 +9,7 @@ internal class InertSalsotto : DefaultRelicSet
 {
     public InertSalsotto(IFighter parent, int num) : base(parent, num)
     {
-        if (num >= 2) ConditionMods.Add(GetMod());
+        if (num >= 2) Parent.ConditionBuffs.Add(GetMod());
     }
 
     public ConditionBuff GetMod()

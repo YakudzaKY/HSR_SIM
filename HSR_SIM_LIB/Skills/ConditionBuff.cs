@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
+using static HSR_SIM_LIB.Skills.Ability;
 
 namespace HSR_SIM_LIB.Skills;
 
@@ -24,7 +25,7 @@ public class ConditionBuff(Unit parentUnit) : PassiveBuff(parentUnit)
         HPPrc,
         Buff
     }
-    
+
 
 
     public ConditionRec Condition { get; set; }
@@ -41,6 +42,12 @@ public class ConditionBuff(Unit parentUnit) : PassiveBuff(parentUnit)
 
     private bool truly;
     public bool NeedRecalc { get; set; } = true;
+
+    /// <summary>
+    /// get list of unit affected by condition buff
+    /// </summary>
+    /// <returns></returns>
+
     /// <summary>
     /// Expression are true?
     /// </summary>
@@ -48,7 +55,7 @@ public class ConditionBuff(Unit parentUnit) : PassiveBuff(parentUnit)
     /// <param name="excludeCondBuff">prevent from recursion</param>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
-    public bool Truly(Unit targetUnit = null, List<ConditionBuff> excludeCondBuff = null, Event ent=null)
+    public bool Truly(Unit targetUnit = null, List<ConditionBuff> excludeCondBuff = null, Event ent = null)
     {
         if (excludeCondBuff == null)
             excludeCondBuff = new List<ConditionBuff>();
@@ -69,30 +76,36 @@ public class ConditionBuff(Unit parentUnit) : PassiveBuff(parentUnit)
                 ConditionCheckParam.HPPrc => untToCheck.GetMaxHp(null, excludeCondBuff) != 0 &&
                                              CheckExpression(untToCheck.GetHpPrc(null, excludeCondBuff)),
                 ConditionCheckParam.Weakness => untToCheck.GetWeaknesses(null, excludeCondBuff).Any(x => x == Condition.ElemValue)
-                                                ==(Condition.CondtionExpression == ConditionCheckExpression.Exists),
+                                                == (Condition.CondtionExpression == ConditionCheckExpression.Exists),
                 ConditionCheckParam.Buff => untToCheck.Buffs.Any(x => x.Reference == Condition.BuffValue)
-                                                ==(Condition.CondtionExpression == ConditionCheckExpression.Exists),
+                                                == (Condition.CondtionExpression == ConditionCheckExpression.Exists),
                 _ => throw new NotImplementedException()
             };
             NeedRecalc = false;
-            truly = res;
-            //reset child condition
-            for each target in Condition targets
-            {
 
-                if (truly)
-                    foreach (Effect eff in AppliedBuff.Effects)
-                    {
-                        eff.BeforeApply(ent, AppliedBuff);//todo proxy target
-                        eff.OnApply(ent, AppliedBuff);
-                    }
-                else
-                    foreach (Effect eff in AppliedBuff.Effects)
-                    {
-                        eff.BeforeRemove(ent, AppliedBuff);
-                        eff.OnRemove(ent, AppliedBuff);
-                    }
-            }
+
+
+            //reset depended conditions/buffs if switched "truly"
+            if (res != truly)
+                foreach (Unit target in AffectedUnits())
+                {
+
+                    if (truly)
+                        foreach (Effect eff in AppliedBuff.Effects)
+                        {
+                            eff.BeforeApply(ent, AppliedBuff,target);//todo proxy target
+                            eff.OnApply(ent, AppliedBuff,target);
+                        }
+                    else
+                        foreach (Effect eff in AppliedBuff.Effects)
+                        {
+                            eff.BeforeRemove(ent, AppliedBuff,target);
+                            eff.OnRemove(ent, AppliedBuff,target);
+                        }
+                }
+
+            truly = res;
+
         }
         else
         {
@@ -106,7 +119,7 @@ public class ConditionBuff(Unit parentUnit) : PassiveBuff(parentUnit)
     public record ConditionRec
     {
         public ConditionCheckExpression CondtionExpression { get; set; }
-        public ConditionCheckParam CondtionParam { get; set; } 
+        public ConditionCheckParam CondtionParam { get; set; }
         public Unit.ElementEnm ElemValue { get; set; }
 
         public double Value { get; set; }
