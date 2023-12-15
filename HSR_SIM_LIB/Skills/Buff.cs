@@ -37,7 +37,7 @@ public class Buff(Unit caster, Buff reference = null) : CloneClass
 
     public string CustomIconName { get; set; }
     public List<Effect> Effects { get; set; } = new();
-    public Ability AbilityValue { get; set; }
+
 
     public bool IsOld { get; set; } = false;
 
@@ -97,8 +97,7 @@ public class Buff(Unit caster, Buff reference = null) : CloneClass
                 {
                     var dotProcEvent = new ToughnessBreakDoTDamage(step, Caster, Caster)
                     {
-                        CalculateValue = effect.CalculateValue, TargetUnit = step.Actor, Modification = this,
-                        AbilityValue = AbilityValue
+                        CalculateValue = effect.CalculateValue, TargetUnit = step.Actor, Modification = this
                     };
                     step.Events.Add(dotProcEvent);
                 }
@@ -107,8 +106,7 @@ public class Buff(Unit caster, Buff reference = null) : CloneClass
                 {
                     var dotProcEvent = new DoTDamage(step, Caster, Caster)
                     {
-                        CalculateValue = effect.CalculateValue, TargetUnit = step.Actor, Modification = this,
-                        AbilityValue = AbilityValue
+                        CalculateValue = effect.CalculateValue, TargetUnit = step.Actor, Modification = this
                     };
                     step.Events.Add(dotProcEvent);
                 }

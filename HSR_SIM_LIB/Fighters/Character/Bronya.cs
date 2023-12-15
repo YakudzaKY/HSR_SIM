@@ -25,10 +25,10 @@ public class Bronya : DefaultFighter
         //buff apply
         ApplyBuff eventBuff = new(null, this, Parent)
         {
-            OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue, AbilityValue = ability,
+            OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
             BuffToApply = new Buff(Parent)
             {
-                Type = Buff.BuffType.Buff, Effects = new List<Effect> { new EffAtkPrc { Value = 0.15 } },
+                Type = Buff.BuffType.Buff, Effects = new List<Effect> { new EffAtkPrc { Value = 0.15 }  },
                 BaseDuration = 2, Dispellable = true
             }
         };
@@ -46,10 +46,10 @@ public class Bronya : DefaultFighter
         };
         //dmg events
         SystemWarning.Events.Add(new DirectDamage(null, this, Parent)
-            { CalculateValue = CalculateBasicDmg, AbilityValue = SystemWarning });
-        SystemWarning.Events.Add(new ToughnessShred(null, this, Parent) { Val = 30, AbilityValue = SystemWarning });
+            { CalculateValue = CalculateBasicDmg});
+        SystemWarning.Events.Add(new ToughnessShred(null, this, Parent) { Val = 30 });
         SystemWarning.Events.Add(new EnergyGain(null, this, Parent)
-            { Val = 20, TargetUnit = Parent, AbilityValue = SystemWarning });
+            { Val = 20, TargetUnit = Parent });
         Abilities.Add(SystemWarning);
         //=====================
         //Ascended Traces

@@ -392,7 +392,7 @@ public static class GraphicsCls
 
                     Color nmbrColor;
                     if (ent.IsDamageEvent)
-                        nmbrColor = GetColorByElem(ent.AbilityValue?.Element);
+                        nmbrColor = GetColorByElem(ent.ParentStep.ActorAbility?.Element);
                     else if (ent is ResourceGain or Healing)
                         nmbrColor = Color.GreenYellow;
                     else if (ent is ResourceDrain rdr)

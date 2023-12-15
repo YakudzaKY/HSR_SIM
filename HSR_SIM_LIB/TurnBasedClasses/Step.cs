@@ -174,14 +174,13 @@ public class Step
 
         //set ability to start execute
         Events.Add(new ExecuteAbilityStart(this, ability, ability.Parent.Parent)
-            { AbilityValue = ability, TargetUnit = target });
+            { TargetUnit = target });
 
         //res gaining
         if (ability.SpGain > 0)
             Events.Add(new PartyResourceGain(this, ability.Parent, ability.Parent.Parent)
             {
-                ResType = ResourceType.SP, TargetUnit = ability.Parent.Parent, Val = ability.SpGain,
-                AbilityValue = ability
+                ResType = ResourceType.SP, TargetUnit = ability.Parent.Parent, Val = ability.SpGain
             });
 
         //res spending
@@ -190,13 +189,13 @@ public class Step
             //TP wasted before
             if (ability.CostType != ResourceType.TP)
                 Events.Add(new PartyResourceDrain(this, ability.Parent, ability.Parent.Parent)
-                    { ResType = (ResourceType)ability.CostType, Val = ability.Cost, AbilityValue = ability });
+                    { ResType = (ResourceType)ability.CostType, Val = ability.Cost});
         }
         else if (ability.CostType != null)
         {
             Events.Add(new ResourceDrain(this, ability, ability.Parent.Parent)
             {
-                TargetUnit = Actor, ResType = (ResourceType)ability.CostType, Val = ability.Cost, AbilityValue = ability
+                TargetUnit = Actor, ResType = (ResourceType)ability.CostType, Val = ability.Cost
             });
         }
 
@@ -219,12 +218,11 @@ public class Step
         if (ability.AbilityType == AbilityTypeEnm.Technique)
             Events.Add(new CombatStartSkillDeQueue(this, null, ability.Parent.Parent)
             {
-                ParentStep = this,
-                AbilityValue = ability
+                ParentStep = this
             });
         //set ability to finish  execute
         Events.Add(new ExecuteAbilityFinish(this, ability, ability.Parent.Parent)
-            { AbilityValue = ability, TargetUnit = target });
+            { TargetUnit = target });
     }
 
     /// <summary>
@@ -261,14 +259,12 @@ public class Step
         {
             Events.Add(new CombatStartSkillQueue(this, null, ability.Parent.Parent)
             {
-                ParentStep = this,
-                AbilityValue = ability
+                ParentStep = this
             });
             if (ability.Attack)
                 Events.Add(new EnterCombat(this, null, ability.Parent.Parent)
                 {
-                    ParentStep = this,
-                    AbilityValue = ability
+                    ParentStep = this
                 });
         }
 

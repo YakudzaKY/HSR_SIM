@@ -15,14 +15,13 @@ public class ToughnessShred : Event
     {
         if (!TriggersHandled)
             if ((TargetUnit.Buffs.All(x => x.Effects.All(y => y is not EffBarrier)) &&
-                 TargetUnit.GetWeaknesses(this).Any(x => x == AbilityValue.Element)) || AbilityValue.IgnoreWeakness)
-                ChildEvents.Add(new ResourceDrain(null, null, AbilityValue.Parent.Parent)
+                 TargetUnit.GetWeaknesses(this).Any(x => x == ParentStep.ActorAbility.Element)) || ParentStep.ActorAbility.IgnoreWeakness)
+                ChildEvents.Add(new ResourceDrain(null, null, ParentStep.Actor)
                 {
                     ParentStep = ParentStep,
                     TargetUnit = TargetUnit,
                     ResType = Resource.ResourceType.Toughness,
-                    Val = Val,
-                    AbilityValue = AbilityValue
+                    Val = Val
                 });
         base.ProcEvent(revert);
     }

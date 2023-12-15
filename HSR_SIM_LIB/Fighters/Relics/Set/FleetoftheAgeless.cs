@@ -10,7 +10,7 @@ internal class FleetoftheAgeless : DefaultRelicSet
     public FleetoftheAgeless(IFighter parent, int num) : base(parent, num)
     {
         if (num >= 2)
-            ConditionMods.Add(new ConditionBuff(parent.Parent)
+            Parent.ConditionBuffs.Add(new ConditionBuff(parent.Parent)
             {
                 AppliedBuff = new Buff(Parent.Parent)
                 {

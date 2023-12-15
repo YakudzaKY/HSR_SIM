@@ -137,7 +137,6 @@ public class SimCls : ICloneable
             {
                 Defeat defeatEvent = new(ent.ParentStep, ent.Source, ent.SourceUnit)
                 {
-                    AbilityValue = ent.AbilityValue,
                     TargetUnit = ent.TargetUnit
                 };
                 ent.ChildEvents.Add(defeatEvent);
@@ -152,7 +151,6 @@ public class SimCls : ICloneable
             {
                 Defeat defeatEvent = new(ent.ParentStep, ent.Source, ent.SourceUnit)
                 {
-                    AbilityValue = ent.AbilityValue,
                     TargetUnit = ent.TargetUnit
                 };
                 ent.ParentStep.Events.Add(defeatEvent);
@@ -166,7 +164,6 @@ public class SimCls : ICloneable
                 ent.TargetUnit.GetRes(((ResourceDrain)ent).ResType).ResVal += (double)ent.RealVal;
                 ToughnessBreak shieldBrkEvent = new(ent.ParentStep, ent.Source, ent.SourceUnit)
                 {
-                    AbilityValue = ent.AbilityValue,
                     TargetUnit = ent.TargetUnit
                 };
                 shieldBrkEvent.Val = FighterUtils.CalculateShieldBrokeDmg(shieldBrkEvent);
@@ -174,12 +171,12 @@ public class SimCls : ICloneable
 
                 ModActionValue delayAV = new(ent.ParentStep, ent.Source, ent.SourceUnit)
                 {
-                    AbilityValue = ent.AbilityValue, TargetUnit = ent.TargetUnit,
+                    TargetUnit = ent.TargetUnit,
                     Val = -ent.TargetUnit.GetBaseActionValue(ent) * 0.25
                 }; //default delay
                 ent.ChildEvents.Add(delayAV);
                 // https://honkai-star-rail.fandom.com/wiki/Toughness
-                switch (ent.AbilityValue.Element)
+                switch (ent.ParentStep.ActorAbility.Element)
                 {
                     case ElementEnm.Physical:
                         ent.TryDebuff(new BuffBleedWB(ent.SourceUnit, ent.SourceUnit.Fighter.ShieldBreakMod), 1.5);

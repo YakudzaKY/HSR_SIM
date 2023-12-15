@@ -4,6 +4,7 @@ using System.Linq;
 using HSR_SIM_LIB.Fighters.LightCones;
 using HSR_SIM_LIB.Fighters.Relics;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
@@ -53,7 +54,7 @@ public abstract class DefaultFighter : IFighter
             AdjacentTargets = Ability.AdjacentTargetsEnm.All
         };
         defOpener.Events.Add(new ToughnessShred(null, this, Parent)
-            { OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue, Val = 30, AbilityValue = defOpener });
+        { OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue, Val = 30 });
 
         Abilities.Add(defOpener);
     }
@@ -127,27 +128,37 @@ public abstract class DefaultFighter : IFighter
         }
     }
 
+    private UnitRole? role;
     public UnitRole? Role
     {
         get
         {
-            if (!Parent.IsAlive) return null;
-            var unitsToSearch = Parent.ParentTeam.Units.Where(x => x.IsAlive).OrderByDescending(x => x.Fighter.Cost)
-                .ThenByDescending(x => x.GetAttack(null) * x.Stats.BaseCritChance * x.Stats.BaseCritDmg).ToList();
-            if (Parent == unitsToSearch.First())
-                return UnitRole.MainDPS;
-            //if second on list then second dps
-            if (new List<PathType?> { PathType.Hunt, PathType.Destruction, PathType.Erudition, PathType.Nihility }
-                    .Contains(Path) && Parent == unitsToSearch.ElementAt(1))
-                return UnitRole.SecondDPS;
-            if (new List<PathType?> { PathType.Hunt, PathType.Destruction, PathType.Erudition }.Contains(Path) &&
-                Parent == unitsToSearch.ElementAt(2))
-                return UnitRole.ThirdDPS;
-            //healer here
-            if (Path == PathType.Abundance)
-                return UnitRole.Healer;
-            return UnitRole.Support;
+            if (role == null&&Parent.IsAlive)
+            {
+            
+
+                    var unitsToSearch = Parent.ParentTeam.Units.Where(x => x.IsAlive).OrderByDescending(x => x.Fighter.Cost)
+                        .ThenByDescending(x => (x.Stats.BaseAttack * (1 + x.Stats.AttackPrc) + x.Stats.AttackFix) * x.Stats.BaseCritChance * x.Stats.BaseCritDmg).ToList();
+                    if (Parent == unitsToSearch.First())
+                        role = UnitRole.MainDPS;
+                    //if second on list then second dps
+                    else if (new List<PathType?> { PathType.Hunt, PathType.Destruction, PathType.Erudition, PathType.Nihility }
+                            .Contains(Path) && Parent == unitsToSearch.ElementAt(1))
+                        role = UnitRole.SecondDPS;
+                    else if (new List<PathType?> { PathType.Hunt, PathType.Destruction, PathType.Erudition }.Contains(Path) &&
+                        Parent == unitsToSearch.ElementAt(2))
+                        role = UnitRole.ThirdDPS;
+                    //healer here
+                    else if (Path == PathType.Abundance)
+                        role = UnitRole.Healer;
+                    else
+                        role = UnitRole.Support;
+                
+            }
+
+            return role;
         }
+        set => role = value;
     }
 
     //Try to choose some good ability to cast
@@ -306,7 +317,7 @@ public abstract class DefaultFighter : IFighter
             return Parent.Friends.Where(x => x.IsAlive).OrderBy(x => x.Fighter.Role).First();
         throw new NotImplementedException();
 
-       // return null;
+        // return null;
     }
 
     public object Clone()

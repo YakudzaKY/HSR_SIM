@@ -12,8 +12,7 @@ public class EffFreeze : Effect
             {
                 CalculateValue = CalculateValue,
                 TargetUnit = ent.TargetUnit,
-                Modification = mod,
-                AbilityValue = mod.AbilityValue
+                Modification = mod
             };
             ent.ChildEvents.Add(dotProcEvent);
         }
@@ -23,8 +22,7 @@ public class EffFreeze : Effect
             {
                 CalculateValue = CalculateValue,
                 TargetUnit = ent.TargetUnit,
-                Modification = mod,
-                AbilityValue = mod.AbilityValue
+                Modification = mod
             };
             ent.ChildEvents.Add(dotProcEvent);
         }

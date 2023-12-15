@@ -32,13 +32,13 @@ public class Vagrant : DefaultNPCFighter
         //dmg events
         ability.Events.Add(new ApplyBuff(null, this, Parent)
         {
-            AbilityValue = ability,
+
             BuffToApply = new Buff(Parent)
             {
-                AbilityValue = ability, BaseDuration = 2, Effects = new List<Effect> { new EffAtkPrc { Value = 0.3 } }
+                 BaseDuration = 2, Effects = new List<Effect> { new EffAtkPrc { Value = 0.3 } }
             }
         });
-        ability.Events.Add(new AdvanceAV(null, this, Parent) { AbilityValue = ability });
+        ability.Events.Add(new AdvanceAV(null, this, Parent) );
         Abilities.Add(ability);
 
         Ability myAttackAbility;
@@ -53,8 +53,8 @@ public class Vagrant : DefaultNPCFighter
         };
         //dmg events
         myAttackAbility.Events.Add(new DirectDamage(null, this, Parent)
-            { CalculateValue = CalcMyAttack, AbilityValue = myAttackAbility });
-        myAttackAbility.Events.Add(new EnergyGain(null, this, Parent) { Val = 10, AbilityValue = myAttackAbility });
+            { CalculateValue = CalcMyAttack });
+        myAttackAbility.Events.Add(new EnergyGain(null, this, Parent) { Val = 10 });
         Abilities.Add(myAttackAbility);
     }
 

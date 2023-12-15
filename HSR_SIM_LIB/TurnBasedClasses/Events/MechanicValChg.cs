@@ -1,5 +1,6 @@
 ﻿using System;
 using HSR_SIM_LIB.Fighters;
+using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -7,6 +8,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 //Add value to character mechanic counter
 public class MechanicValChg : Event
 {
+    public Ability AbilityValue { get; set; }
     public MechanicValChg(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
     {
     }

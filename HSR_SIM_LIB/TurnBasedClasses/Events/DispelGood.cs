@@ -13,7 +13,7 @@ internal class DispelGood : Event
 
     public override string GetDescription()
     {
-        return $"{SourceUnit.Name} dispel some buff on {TargetUnit.Name}  with {AbilityValue.Name}";
+        return $"{SourceUnit.Name} dispel some buff on {TargetUnit.Name}  with {ParentStep.ActorAbility.Name}";
     }
 
     public override void ProcEvent(bool revert)
@@ -24,7 +24,7 @@ internal class DispelGood : Event
                 TargetUnit.Buffs.FirstOrDefault(x => x.Type is Buff.BuffType.Buff && x.Dispellable);
             if (buffToDispell != null)
                 ChildEvents.Add(new RemoveBuff(ParentStep, Source, SourceUnit)
-                    { TargetUnit = TargetUnit, AbilityValue = AbilityValue, BuffToApply = buffToDispell });
+                    { TargetUnit = TargetUnit, BuffToApply = buffToDispell });
         }
 
         base.ProcEvent(revert);

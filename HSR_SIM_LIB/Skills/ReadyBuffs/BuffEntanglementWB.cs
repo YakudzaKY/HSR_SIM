@@ -58,7 +58,7 @@ public class BuffEntanglementWB : Buff
     private void EntanglementEventHandler(Event ent)
     {
         //ability cast is finish. 
-        if (ent is ExecuteAbilityFinish && ent.AbilityValue.Attack)
+        if (ent is ExecuteAbilityFinish && ent.ParentStep.ActorAbility.Attack)
             //if got hit by ability and no debuff applied in this action
             if (UnitGotHitByAbility(ent.ParentStep.ProceedEvents) && !UnitGotDebuffByAbility(ent.ParentStep.ProceedEvents))
               ent.ChildEvents.Add(new ApplyBuffStack(ent.ParentStep,this,Caster){Stacks=1,BuffToApply = this,TargetUnit = Owner});  

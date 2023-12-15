@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.Utils;
@@ -25,6 +27,13 @@ public class Team : CloneClass
         GetRes(ResourceType.TP).ResVal = Constant.MaxTp;
     }
 
+    public void ResetRoles()
+    {
+        foreach (Unit unit in this.Units)
+        {
+            unit.Fighter.Role = null;
+        }
+    }
     public SimCls ParentSim { get; set; }
     public TeamTypeEnm TeamType { get; set; }
 
@@ -50,11 +59,11 @@ public class Team : CloneClass
             if (resources == null)
             {
                 resources = new List<Resource>();
-                foreach (var name in Enum.GetNames<ResourceType>())
+                foreach (var resourceType in new ResourceType [] { ResourceType.SP ,ResourceType.TP})
                 {
-                    Resource res = new()
+                    Resource res = new(this)
                     {
-                        ResType = (ResourceType)Enum.Parse(typeof(ResourceType), name, true),
+                        ResType = resourceType,
                         ResVal = 0
                     };
                     resources.Add(res);

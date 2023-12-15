@@ -26,7 +26,7 @@ internal class LongevousDisciple : DefaultRelicSet
         //if friend unit consume our hp or got attack then apply buff
         if (Num >= 4)
             if ((ent is ResourceDrain
-                 && ent.AbilityValue?.Parent.Parent.ParentTeam == Parent.Parent.ParentTeam
+                 && ent.ParentStep.ActorAbility?.Parent.Parent.ParentTeam == Parent.Parent.ParentTeam
                  && ent.TargetUnit == Parent.Parent
                  && ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal != 0)
                 || (ent.TargetUnit == Parent.Parent && ent is DirectDamage && ent.ParentStep!=lastDamageStep))

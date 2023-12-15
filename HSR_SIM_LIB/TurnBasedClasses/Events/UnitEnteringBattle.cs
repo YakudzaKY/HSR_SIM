@@ -14,4 +14,10 @@ public class UnitEnteringBattle : Event
     {
         return $"{TargetUnit?.Name:s} joined the battle";
     }
+
+    public override void ProcEvent(bool revert)
+    {
+        TargetUnit.ParentTeam.ResetRoles();
+        base.ProcEvent(revert);
+    }
 }

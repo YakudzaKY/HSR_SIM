@@ -13,7 +13,6 @@ public interface IRelicSet : ICloneable
     public delegate void StepHandler(Step step);
 
     public List<PassiveBuff> PassiveMods { get; set; }
-    public List<ConditionBuff> ConditionMods { get; set; }
     public int Num { get; set; }
 
     public EventHandler EventHandlerProc { get; set; }

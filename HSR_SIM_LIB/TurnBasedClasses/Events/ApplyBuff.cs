@@ -26,8 +26,6 @@ public class ApplyBuff : BuffEventTemplate
 
     public override void ProcEvent(bool revert)
     {
-        //Apply mod
-        BuffToApply.AbilityValue ??= AbilityValue;
         if (!TargetUnit.IsAlive) return;
         //calc value first
         foreach (var modEffect in BuffToApply.Effects.Where(modEffect =>
