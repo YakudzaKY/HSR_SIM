@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.Utils;
@@ -19,13 +21,13 @@ public class Worker
     private bool replay; //is replay not new gen
     public CallBackStr CbLog { get; set; } //Calback log procedure. Used for output
     public CallBackRender CbRend { get; set; } //Callback render procedure. used for graphical output
+    public CallBackGetDecision CbGetDecision { get; set; } //Callback get decision
     public SimCls Sim { get; set; } //simulation class( combat ,fights etc in this shit)
     public bool Completed { get; set; }
+    public bool DevMode { get; set; } = false;//Developer mode TODO: write documentation about it
+    public DevModeLogger DevModeLog { get; set; }
 
 
-    //TODO вообще надо сделать на старте выбор списка сценариев и количество итераций для каждого
-    //далее в несколько потоков собрать справочник СЦЕНАРИЙ:Результаты(агрегировать при выполнении каждой итерации)
-    //Графическая оболочка только для отладки
     /// <summary>
     ///     Load and parse xml file with scenario
     /// </summary>
@@ -36,8 +38,14 @@ public class Worker
         Sim = XMLLoader.LoadCombatFromXml(scenarioPath, profilePath);
         Sim.Parent = this;
         LogText("Scenario  " + Sim.CurrentScenario.Name + " was loaded");
+        if (DevMode)
+            DevModeLog = new DevModeLogger(GetDevLogPath(scenarioPath,profilePath),this);
     }
 
+    public static string GetDevLogPath(string scenarioPath, string profilePath)
+    {
+        return $"{AppDomain.CurrentDomain.BaseDirectory}DATA\\DevLogs\\{Path.GetFileName(scenarioPath)}_{Path.GetFileName(profilePath)}.dev_log";
+    }
     public RCombatResult GetCombatResult(RCombatResult inRslt = null)
     {
         var res = inRslt ?? new RCombatResult();
@@ -155,6 +163,7 @@ public class Worker
                         {
                             Completed = true;
                             LogText("scenario complete.");
+                            DevModeLog?.WriteToFile();//write dev log 
                         }
 
 

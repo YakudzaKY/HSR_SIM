@@ -6,14 +6,13 @@ using System.Windows.Forms;
 using HSR_SIM_LIB;
 using HSR_SIM_LIB.Utils;
 using static HSR_SIM_GUI.GuiUtils;
+using static HSR_SIM_LIB.Utils.CallBacks;
 
 namespace HSR_SIM_GUI;
 
 public partial class Main : Form
 {
-    private readonly CallBacks.CallBackRender callBackRender;
-    private readonly CallBacks.CallBackStr callBackStr;
-    private readonly Worker wrk;
+    private Worker wrk;
 
     private bool busy;
     private DebugWindow dbg;
@@ -21,12 +20,8 @@ public partial class Main : Form
 
     public Main()
     {
-        callBackStr = WorkerCallBackString;
-        callBackRender = WorkerCallBackImages;
+
         InitializeComponent();
-        wrk = new Worker();
-        wrk.CbLog += callBackStr;
-        wrk.CbRend += callBackRender;
         ApplyDarkLightTheme(this);
     }
 
@@ -54,6 +49,67 @@ public partial class Main : Form
     }
 
     /// <summary>
+    /// ask user what decision
+    /// </summary>
+    /// <param name="items"></param>
+    /// <param name="description"></param>
+    /// <returns></returns>
+    public int WorkerCallBackGetDecision(string[] items, string description)
+    {
+        int yCur = 0;
+        Size size = new(200, 180);
+        Form inputBox = new()
+        {
+            FormBorderStyle = FormBorderStyle.FixedDialog,
+            ClientSize = size,
+            Text = "Chose:",
+            StartPosition = FormStartPosition.CenterScreen
+        };
+        yCur += 5;
+        TextBox lvlDescr = new TextBox()
+        {
+            Size = new Size(size.Width - 10, 105),
+            Text =description,
+            Multiline = true,
+            ScrollBars = ScrollBars.Vertical,
+            ReadOnly = true,
+            Location = new Point(5, yCur)
+            
+        };
+        inputBox.Controls.Add(lvlDescr);
+
+        yCur += 110;
+        ComboBox cbBox = new()
+        {
+            Size = new Size(size.Width - 10, 23),
+            Location = new Point(5, yCur)
+        };
+        foreach (var vaItem in items)
+        {
+            cbBox.Items.Add(vaItem);
+        }
+
+        cbBox.SelectedIndex = 0;
+
+        inputBox.Controls.Add(cbBox);
+        yCur += 34;
+        Button okButton = new()
+        {
+            DialogResult = DialogResult.OK,
+            Name = "okButton",
+            Size = new Size(75, 23),
+            Text = "&OK",
+            Location = new Point(size.Width - 80 - 80, yCur)
+        };
+        inputBox.Controls.Add(okButton);
+        inputBox.AcceptButton = okButton;
+        var result = inputBox.ShowDialog();
+        return cbBox.SelectedIndex;
+
+    }
+
+
+    /// <summary>
     ///     For imagesCallback
     /// </summary>
     /// <param name="kv"></param>
@@ -72,8 +128,18 @@ public partial class Main : Form
         RefreshCbs();
         cbScenario.Text = IniF.IniReadValue("form", "Scenario");
         cbProfile.Text = IniF.IniReadValue("form", "Profile");
+        string boolVal = IniF.IniReadValue("form", "DevMode");
+        
+        chkDevMode.Checked = !String.IsNullOrEmpty(boolVal) && bool.Parse(boolVal);
+
     }
 
+    private void ControlsDispose()
+    {
+        IniF.IniWriteValue("form", "Scenario", cbScenario.Text);
+        IniF.IniWriteValue("form", "Profile", cbProfile.Text);
+        IniF.IniWriteValue("form", "DevMode", chkDevMode.Checked.ToString());
+    }
 
     /// <summary>
     ///     Load scenario click
@@ -82,6 +148,11 @@ public partial class Main : Form
     /// <param name="e"></param>
     private void Button1_Click(object sender, EventArgs e)
     {
+        wrk = new Worker();
+        wrk.CbLog += WorkerCallBackString;
+        wrk.CbRend += WorkerCallBackImages;
+        wrk.CbGetDecision = WorkerCallBackGetDecision;
+        wrk.DevMode = chkDevMode.Checked;
         wrk.LoadScenarioFromXml(AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\" + cbScenario.Text,
             AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\" + cbProfile.Text);
     }
@@ -104,12 +175,12 @@ public partial class Main : Form
 
     private void Button3_Click(object sender, EventArgs e)
     {
-        wrk.MoveStep();
+        wrk?.MoveStep();
     }
 
     private void Button2_Click(object sender, EventArgs e)
     {
-        wrk.MoveStep(true);
+        wrk?.MoveStep(true);
     }
 
     private void Label1_Click(object sender, EventArgs e)
@@ -123,10 +194,11 @@ public partial class Main : Form
 
     private void Button2_Click_1(object sender, EventArgs e)
     {
+        if (wrk is null) return;
         busy = true;
-        wrk.CbRend -= callBackRender;
+        wrk.CbRend -= WorkerCallBackImages;
         wrk.MoveStep(false, 100);
-        wrk.CbRend += callBackRender;
+        wrk.CbRend += WorkerCallBackImages;
         busy = false;
         LogWindow.ScrollToCaret();
         wrk.DrawCombat();
@@ -134,10 +206,11 @@ public partial class Main : Form
 
     private void Button3_Click_1(object sender, EventArgs e)
     {
+        if (wrk is null) return;
         busy = true;
-        wrk.CbRend -= callBackRender;
+        wrk.CbRend -= WorkerCallBackImages;
         wrk.MoveStep(true, -1);
-        wrk.CbRend += callBackRender;
+        wrk.CbRend += WorkerCallBackImages;
         busy = false;
         LogWindow.ScrollToCaret();
         wrk.DrawCombat();
@@ -161,6 +234,7 @@ public partial class Main : Form
 
     private void button6_Click(object sender, EventArgs e)
     {
+        if (wrk is null) return;
         wrk.Completed = false;
         wrk.MoveStep(false, 1, true);
     }
@@ -176,5 +250,16 @@ public partial class Main : Form
 
     private void cbProfile_SelectedIndexChanged(object sender, EventArgs e)
     {
+    }
+
+    private void Main_FormClosed(object sender, FormClosedEventArgs e)
+    {
+        wrk?.DevModeLog?.WriteToFile();
+    }
+
+    private void btnClearDevMode_Click(object sender, EventArgs e)
+    {
+        //delete dev log
+        File.Delete(Worker.GetDevLogPath(cbScenario.Text, cbProfile.Text));
     }
 }

@@ -170,7 +170,7 @@ public static class FighterUtils
         double dotVulnerability = 0;
         if (ent is DirectDamage)
         {
-            ((DirectDamage)ent).IsCrit = new MersenneTwister().NextDouble() <= attacker.GetCritRate(ent);
+            ((DirectDamage)ent).IsCrit = DevModeUtils.IsCrit(ent);
             if (((DirectDamage)ent).IsCrit)
                 critMultiplier = 1 + attacker.GetCritDamage(ent);
         }

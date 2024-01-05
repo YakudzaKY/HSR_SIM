@@ -8,4 +8,6 @@ public static class CallBacks
     public delegate void CallBackRender(Bitmap combatImg);
 
     public delegate void CallBackStr(KeyValuePair<string, string> kv);
+
+    public delegate int CallBackGetDecision(string[] items, string description);
 }

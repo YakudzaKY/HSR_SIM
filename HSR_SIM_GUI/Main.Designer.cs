@@ -14,8 +14,7 @@ namespace HSR_SIM_GUI
         /// <param name="disposing">истинно, если управляемый ресурс должен быть удален; иначе ложно.</param>
         protected override void Dispose(bool disposing)
         {
-            IniF.IniWriteValue("form", "Scenario", cbScenario.Text);
-            IniF.IniWriteValue("form", "Profile", cbProfile.Text);
+            ControlsDispose();
             if (disposing && (components != null))
             {
                 components.Dispose();
@@ -47,6 +46,8 @@ namespace HSR_SIM_GUI
             button5 = new System.Windows.Forms.Button();
             button6 = new System.Windows.Forms.Button();
             BtnStatCheck = new System.Windows.Forms.Button();
+            chkDevMode = new System.Windows.Forms.CheckBox();
+            btnClearDevMode = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)combatOut).BeginInit();
             SuspendLayout();
             // 
@@ -213,10 +214,33 @@ namespace HSR_SIM_GUI
             BtnStatCheck.UseVisualStyleBackColor = true;
             BtnStatCheck.Click += BtnStatCheck_Click;
             // 
+            // chkDevMode
+            // 
+            chkDevMode.AutoSize = true;
+            chkDevMode.Location = new System.Drawing.Point(396, 637);
+            chkDevMode.Name = "chkDevMode";
+            chkDevMode.Size = new System.Drawing.Size(79, 19);
+            chkDevMode.TabIndex = 16;
+            chkDevMode.Text = "dev mode";
+            chkDevMode.UseVisualStyleBackColor = true;
+            // 
+            // btnClearDevMode
+            // 
+            btnClearDevMode.Location = new System.Drawing.Point(396, 607);
+            btnClearDevMode.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            btnClearDevMode.Name = "btnClearDevMode";
+            btnClearDevMode.Size = new System.Drawing.Size(113, 24);
+            btnClearDevMode.TabIndex = 17;
+            btnClearDevMode.Text = "clear dev mode";
+            btnClearDevMode.UseVisualStyleBackColor = true;
+            btnClearDevMode.Click += btnClearDevMode_Click;
+            // 
             // Main
             // 
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             ClientSize = new System.Drawing.Size(1225, 834);
+            Controls.Add(btnClearDevMode);
+            Controls.Add(chkDevMode);
             Controls.Add(BtnStatCheck);
             Controls.Add(button6);
             Controls.Add(button5);
@@ -237,6 +261,7 @@ namespace HSR_SIM_GUI
             Name = "Main";
             StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             Text = "SIM GUI";
+            FormClosed += Main_FormClosed;
             Load += Main_Load;
             ((System.ComponentModel.ISupportInitialize)combatOut).EndInit();
             ResumeLayout(false);
@@ -261,6 +286,8 @@ namespace HSR_SIM_GUI
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Button BtnStatCheck;
+        private System.Windows.Forms.CheckBox chkDevMode;
+        private System.Windows.Forms.Button btnClearDevMode;
     }
 }
 
