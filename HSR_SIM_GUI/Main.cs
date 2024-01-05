@@ -49,7 +49,7 @@ public partial class Main : Form
     }
 
     /// <summary>
-    /// ask user what decision
+    /// ask user what decision are pick from options(do we crit etc...)
     /// </summary>
     /// <param name="items"></param>
     /// <param name="description"></param>
