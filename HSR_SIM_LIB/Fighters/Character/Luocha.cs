@@ -413,7 +413,7 @@ public class Luocha : DefaultFighter
         if (step.StepType is Step.StepTypeEnm.ExecuteAbilityFromQueue or Step.StepTypeEnm.UnitFollowUpAction
             or Step.StepTypeEnm.UnitTurnContinued or Step.StepTypeEnm.UnitTurnStarted)
         {
-            CheckAndAddTarget(step.Actor);
+            CheckAndAddTarget(step.Actor,null);
             //also check self  stacks
             if (!ColBuffAvailable() & (step.Actor == Parent) && (step.ActorAbility == ultimateAbility ||
                                                                  step.ActorAbility == prayerOfAbyssFlowerAuto ||
