@@ -39,7 +39,7 @@ public class Worker
         Sim.Parent = this;
         LogText("Scenario  " + Sim.CurrentScenario.Name + " was loaded");
         if (DevMode)
-            DevModeLog = new DevModeLogger(GetDevLogPath(scenarioPath,profilePath),this);
+            DevModeLog = new DevModeLogger(GetDevLogPath(scenarioPath, profilePath), this);
     }
 
     public static string GetDevLogPath(string scenarioPath, string profilePath)

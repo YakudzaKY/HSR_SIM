@@ -8,6 +8,10 @@ namespace HSR_SIM_LIB.Fighters.NPC;
 
 public class Vagrant : DefaultNPCFighter
 {
+    private static readonly Buff AtkBuff = new Buff(null)
+    {
+        BaseDuration = 2, Effects = new List<Effect> { new EffAtkPrc { Value = 0.3 } }
+    };
     public Vagrant(Unit parent) : base(parent)
     {
         //Elemenet
@@ -33,10 +37,7 @@ public class Vagrant : DefaultNPCFighter
         ability.Events.Add(new ApplyBuff(null, this, Parent)
         {
 
-            BuffToApply = new Buff(Parent)
-            {
-                 BaseDuration = 2, Effects = new List<Effect> { new EffAtkPrc { Value = 0.3 } }
-            }
+            BuffToApply = AtkBuff 
         });
         ability.Events.Add(new AdvanceAV(null, this, Parent) );
         Abilities.Add(ability);

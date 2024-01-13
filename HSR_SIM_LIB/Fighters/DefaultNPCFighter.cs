@@ -30,7 +30,8 @@ public class DefaultNPCFighter : IFighter
     public Unit GetBestTarget(Ability ability)
     {
         if (ability.TargetType == Ability.TargetTypeEnm.Friend)
-            return Parent.Friends.Where(x => x.IsAlive).OrderBy(x => x.Fighter.Role).First();
+            //Pick friend in order that have no buff by ability then order by role
+            return Parent.Friends.Where(x => x.IsAlive).OrderByDescending(x=>x.Buffs.All(y=> ability.Events.Count(z =>( z is ApplyBuff ab) &&  ab.BuffToApply==y.Reference)==0 )).ThenBy(x => x.Fighter.Role).First();
 
         var totalEnemyAggro = Parent.EnemyTeam.TeamAggro;
         var aggroRandomed = new MersenneTwister().NextDouble();

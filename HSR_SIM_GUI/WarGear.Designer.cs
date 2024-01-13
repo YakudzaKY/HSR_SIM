@@ -96,7 +96,6 @@
             dgStats.Location = new System.Drawing.Point(12, 139);
             dgStats.Name = "dgStats";
             dgStats.RowHeadersVisible = false;
-            dgStats.RowTemplate.Height = 25;
             dgStats.Size = new System.Drawing.Size(255, 251);
             dgStats.TabIndex = 3;
             dgStats.CellContentClick += DgStats_CellContentClick;
@@ -183,7 +182,6 @@
             dgSkills.Location = new System.Drawing.Point(706, 139);
             dgSkills.Name = "dgSkills";
             dgSkills.RowHeadersVisible = false;
-            dgSkills.RowTemplate.Height = 25;
             dgSkills.Size = new System.Drawing.Size(353, 251);
             dgSkills.TabIndex = 11;
             dgSkills.CellEndEdit += DgSkills_CellEndEdit;
@@ -278,7 +276,6 @@
             dgSets.Location = new System.Drawing.Point(297, 139);
             dgSets.Name = "dgSets";
             dgSets.RowHeadersVisible = false;
-            dgSets.RowTemplate.Height = 25;
             dgSets.Size = new System.Drawing.Size(286, 251);
             dgSets.TabIndex = 21;
             dgSets.CellEndEdit += DgSets_CellEndEdit;
@@ -324,9 +321,9 @@
             label9.AutoSize = true;
             label9.Location = new System.Drawing.Point(327, 39);
             label9.Name = "label9";
-            label9.Size = new System.Drawing.Size(15, 15);
+            label9.Size = new System.Drawing.Size(13, 15);
             label9.TabIndex = 25;
-            label9.Text = "C";
+            label9.Text = "S";
             // 
             // WarGear
             // 

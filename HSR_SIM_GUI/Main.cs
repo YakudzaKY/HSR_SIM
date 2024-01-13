@@ -148,6 +148,7 @@ public partial class Main : Form
     /// <param name="e"></param>
     private void Button1_Click(object sender, EventArgs e)
     {
+        wrk?.DevModeLog?.WriteToFile();//save prev data
         wrk = new Worker();
         wrk.CbLog += WorkerCallBackString;
         wrk.CbRend += WorkerCallBackImages;
