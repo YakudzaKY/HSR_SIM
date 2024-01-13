@@ -170,7 +170,7 @@ public static class FighterUtils
         double dotVulnerability = 0;
         if (ent is DirectDamage)
         {
-            ((DirectDamage)ent).IsCrit = DevModeUtils.IsCrit(ent);
+            ((DirectDamage)ent).IsCrit = ent.ParentStep.Parent.Parent.DevMode?  DevModeUtils.IsCrit(ent):new MersenneTwister().NextDouble() <= ent.SourceUnit.GetCritRate(ent) ;
             if (((DirectDamage)ent).IsCrit)
                 critMultiplier = 1 + attacker.GetCritDamage(ent);
         }
@@ -221,7 +221,8 @@ public static class FighterUtils
     //debuff is resisted?
     public static bool CalculateDebuffApplied(ApplyBuff ent,double baseChance)
     {
-
+        if (ent.ParentStep.Parent.Parent.DevMode)
+            return DevModeUtils.IsDebuffed(ent);
         var attacker = ent.SourceUnit;
         var defender = ent.TargetUnit;
         var mod = ent.BuffToApply.Effects.FirstOrDefault();

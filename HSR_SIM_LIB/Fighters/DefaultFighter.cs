@@ -133,27 +133,27 @@ public abstract class DefaultFighter : IFighter
     {
         get
         {
-            if (role == null&&Parent.IsAlive)
+            if (role == null && Parent.IsAlive)
             {
-            
 
-                    var unitsToSearch = Parent.ParentTeam.Units.Where(x => x.IsAlive).OrderByDescending(x => x.Fighter.Cost)
-                        .ThenByDescending(x => (x.Stats.BaseAttack * (1 + x.Stats.AttackPrc) + x.Stats.AttackFix) * x.Stats.BaseCritChance * x.Stats.BaseCritDmg).ToList();
-                    if (Parent == unitsToSearch.First())
-                        role = UnitRole.MainDPS;
-                    //if second on list then second dps
-                    else if (new List<PathType?> { PathType.Hunt, PathType.Destruction, PathType.Erudition, PathType.Nihility }
-                            .Contains(Path) && Parent == unitsToSearch.ElementAt(1))
-                        role = UnitRole.SecondDPS;
-                    else if (new List<PathType?> { PathType.Hunt, PathType.Destruction, PathType.Erudition }.Contains(Path) &&
-                        Parent == unitsToSearch.ElementAt(2))
-                        role = UnitRole.ThirdDPS;
-                    //healer here
-                    else if (Path == PathType.Abundance)
-                        role = UnitRole.Healer;
-                    else
-                        role = UnitRole.Support;
-                
+
+                var unitsToSearch = Parent.ParentTeam.Units.Where(x => x.IsAlive).OrderByDescending(x => x.Fighter.Cost)
+                    .ThenByDescending(x => (x.Stats.BaseAttack * (1 + x.Stats.AttackPrc) + x.Stats.AttackFix) * x.Stats.BaseCritChance * x.Stats.BaseCritDmg).ToList();
+                if (Parent == unitsToSearch.First())
+                    role = UnitRole.MainDPS;
+                //if second on list then second dps
+                else if (new List<PathType?> { PathType.Hunt, PathType.Destruction, PathType.Erudition, PathType.Nihility }
+                        .Contains(Path) && Parent == unitsToSearch.ElementAt(1))
+                    role = UnitRole.SecondDPS;
+                else if (new List<PathType?> { PathType.Hunt, PathType.Destruction, PathType.Erudition }.Contains(Path) &&
+                    Parent == unitsToSearch.ElementAt(2))
+                    role = UnitRole.ThirdDPS;
+                //healer here
+                else if (Path == PathType.Abundance)
+                    role = UnitRole.Healer;
+                else
+                    role = UnitRole.Support;
+
             }
 
             return role;
@@ -167,12 +167,16 @@ public abstract class DefaultFighter : IFighter
         //Technique before fight
         if (step.Parent.CurrentFight == null)
         {
+            var abilities = Abilities
+                .Where(x => x.Available() && x.AbilityType == Ability.AbilityTypeEnm.Technique &&
+                            x.Parent.Parent.ParentTeam.GetRes(ResourceType.TP).ResVal >= x.Cost)
+                .OrderBy(x => x.Attack)
+                .ThenByDescending(x => x.Cost);
+            if (step.Parent.Parent.DevMode)
+                return DevModeUtils.ChooseAbilityToCast(this, abilities, true);
+
             //sort by combat then cost. avalable for casting by cost
-            foreach (var ability in Abilities
-                         .Where(x => x.Available() && x.AbilityType == Ability.AbilityTypeEnm.Technique &&
-                                     x.Parent.Parent.ParentTeam.GetRes(ResourceType.TP).ResVal >= x.Cost)
-                         .OrderBy(x => x.Attack)
-                         .ThenByDescending(x => x.Cost))
+            foreach (var ability in abilities)
                 //enter combat skills
                 if (ability.Attack)
                 {
@@ -221,12 +225,14 @@ public abstract class DefaultFighter : IFighter
         {
             Ability chosenAbility = null;
             Parent.ParentTeam.ParentSim?.Parent.LogDebug("========What i can cast=====");
-            var freeSp = HowManySpICanSpend();
+            //if dev mode then give All available sp else get from function
+            var freeSp = step.Parent.Parent.DevMode ?Parent.ParentTeam.GetRes(ResourceType.SP).ResVal: HowManySpICanSpend();
             Parent.ParentTeam.ParentSim?.Parent.LogDebug($"I have {freeSp:f} SP");
-            chosenAbility = Abilities
+            var abilities = Abilities
                 .Where(x => x.Available.Invoke() && (x.Cost <= freeSp || x.CostType != ResourceType.SP) &&
                             (x.AbilityType == Ability.AbilityTypeEnm.Basic ||
-                             x.AbilityType == Ability.AbilityTypeEnm.Ability)).MaxBy(x => x.AbilityType);
+                             x.AbilityType == Ability.AbilityTypeEnm.Ability));
+            chosenAbility = step.Parent.Parent.DevMode ? DevModeUtils.ChooseAbilityToCast(this, abilities) : abilities.MaxBy(x => x.AbilityType);
             Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Choose  {chosenAbility?.Name}");
             return chosenAbility;
         }
@@ -256,15 +262,20 @@ public abstract class DefaultFighter : IFighter
     {
         var leader = Parent.ParentTeam.Units.FirstOrDefault(x => x.Fighter.Role == UnitRole.MainDPS);
         if (ability.TargetType == Ability.TargetTypeEnm.Self) return Parent;
+        if (ability.AdjacentTargets == Ability.AdjacentTargetsEnm.All) return null;
 
         if (ability.TargetType == Ability.TargetTypeEnm.Enemy)
         {
+            if (Parent.ParentTeam.ParentSim.Parent.DevMode)
+            {
+                return DevModeUtils.GetTarget(this, Parent.GetTargetsForUnit(ability.TargetType), ability);
+            }
+
             /*
              * MainDD,SecondDD focus on massive dmg, pref max weakness targets
              * Others- shield breaking
              *
              */
-
             if (ability.AdjacentTargets == Ability.AdjacentTargetsEnm.None)
             {
                 //Support,Healer focus on Shield shred. 
@@ -273,16 +284,18 @@ public abstract class DefaultFighter : IFighter
                         .OrderByDescending(x => x.GetWeaknesses(null).Contains(Element))
                         .ThenBy(x =>
                             x.GetRes(ResourceType.Toughness).ResVal *
-                            (leader?.Fighter.Path is PathType.Destruction or PathType.Erudition ? -1 : 1)).ThenBy(x =>
-                            x.GetRes(ResourceType.HP).ResVal *
-                            (leader?.Fighter.Path is PathType.Destruction or PathType.Erudition ? -1 : 1))
+                            (leader?.Fighter.Path is PathType.Destruction or PathType.Erudition ? -1 : 1)).ThenBy(
+                            x =>
+                                x.GetRes(ResourceType.HP).ResVal *
+                                (leader?.Fighter.Path is PathType.Destruction or PathType.Erudition ? -1 : 1))
                         .FirstOrDefault();
 
                 // focus on High hp if main dps Destruction,Erudition. Other- low hp
                 return Parent.GetTargetsForUnit(ability.TargetType)
                     .OrderByDescending(x => x.GetWeaknesses(null).Contains(Element)).ThenBy(x =>
                         x.GetRes(ResourceType.HP).ResVal *
-                        (leader?.Fighter.Path is PathType.Destruction or PathType.Erudition ? -1 : 1)).FirstOrDefault();
+                        (leader?.Fighter.Path is PathType.Destruction or PathType.Erudition ? -1 : 1))
+                    .FirstOrDefault();
             }
 
             if (ability.AdjacentTargets == Ability.AdjacentTargetsEnm.Blast)
@@ -298,7 +311,8 @@ public abstract class DefaultFighter : IFighter
                     score += 3 * targets.Count(x => x == unit && x.GetWeaknesses(null).Any(x => x == Element));
                     score += 2 * targets.Count(x => x.Fighter is DefaultNPCBossFIghter);
                     //if equal but hp diff go focus big target
-                    if (score > bestScore || (score == bestScore && unit.GetHpPrc(null) > bestTarget.GetHpPrc(null)))
+                    if (score > bestScore ||
+                        (score == bestScore && unit.GetHpPrc(null) > bestTarget.GetHpPrc(null)))
                     {
                         bestTarget = unit;
                         bestScore = score;
@@ -308,13 +322,13 @@ public abstract class DefaultFighter : IFighter
                 return bestTarget;
             }
 
-            if (ability.AdjacentTargets == Ability.AdjacentTargetsEnm.All)
-                return null;
+ 
             throw new NotImplementedException();
+
         }
 
         if (ability.TargetType == Ability.TargetTypeEnm.Friend)
-            return Parent.Friends.Where(x => x.IsAlive).OrderBy(x => x.Fighter.Role).First();
+            return Parent.ParentTeam.ParentSim.Parent.DevMode ? DevModeUtils.GetTarget(this, this.GetAliveFriends(), ability) : GetAliveFriends().OrderBy(x => x.Fighter.Role).First();
         throw new NotImplementedException();
 
         // return null;

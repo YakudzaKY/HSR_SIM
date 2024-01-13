@@ -29,16 +29,23 @@ public class DefaultNPCFighter : IFighter
 
     public Unit GetBestTarget(Ability ability)
     {
+        if (ability.TargetType == Ability.TargetTypeEnm.Self) return Parent;
+
+        if (Parent.ParentTeam.ParentSim.Parent.DevMode)
+        {
+            return DevModeUtils.GetTarget(this, Parent.GetTargetsForUnit(ability.TargetType), ability);
+        }
+
         if (ability.TargetType == Ability.TargetTypeEnm.Friend)
             //Pick friend in order that have no buff by ability then order by role
-            return Parent.Friends.Where(x => x.IsAlive).OrderByDescending(x=>x.Buffs.All(y=> ability.Events.Count(z =>( z is ApplyBuff ab) &&  ab.BuffToApply==y.Reference)==0 )).ThenBy(x => x.Fighter.Role).First();
+            return  GetAliveFriends().OrderByDescending(x=>x.Buffs.All(y=> ability.Events.Count(z =>( z is ApplyBuff ab) &&  ab.BuffToApply==y.Reference)==0 )).ThenBy(x => x.Fighter.Role).First();
 
         var totalEnemyAggro = Parent.EnemyTeam.TeamAggro;
         var aggroRandomed = new MersenneTwister().NextDouble();
         double counter = 1;
         if (totalEnemyAggro > 0)
         {
-            foreach (var unit in GetAoeTargets())
+            foreach (var unit in GetAliveEnemies())
             {
                 counter -= unit.GetAggro(null) / Parent.EnemyTeam.TeamAggro;
                 if (counter <= aggroRandomed)
@@ -48,7 +55,7 @@ public class DefaultNPCFighter : IFighter
         else
         {
             //enemies have NPC? not typycal scenario  go random target then
-            var enemyTargetList = GetAoeTargets().ToList();
+            var enemyTargetList = GetAliveEnemies().ToList();
             foreach (var unit in enemyTargetList)
             {
                 // ReSharper disable once PossibleLossOfFraction
@@ -115,11 +122,10 @@ public class DefaultNPCFighter : IFighter
     {
         Ability chosenAbility = null;
         Parent.ParentTeam.ParentSim?.Parent.LogDebug("========What i can cast=====");
-        //TODO :cooldown
-        chosenAbility = Abilities
+        var abilities = Abilities
             .Where(x => x.Available.Invoke() && x.CooldownTimer == 0 &&
-                        x.AbilityType is Ability.AbilityTypeEnm.Basic or Ability.AbilityTypeEnm.Ability)
-            .MaxBy(x => x.AbilityType);
+                        x.AbilityType is Ability.AbilityTypeEnm.Basic or Ability.AbilityTypeEnm.Ability);
+        chosenAbility = step.Parent.Parent.DevMode ? DevModeUtils.ChooseAbilityToCast(this, abilities) :abilities.MaxBy(x => x.AbilityType);
         Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Choose  {chosenAbility?.Name}");
         return chosenAbility;
     }
@@ -134,12 +140,12 @@ public class DefaultNPCFighter : IFighter
         return MemberwiseClone();
     }
 
-    public IEnumerable<Unit> GetAoeTargets()
+    public IEnumerable<Unit> GetAliveEnemies()
     {
         return Parent.Enemies.Where(x => x.IsAlive);
     }
 
-    public IEnumerable<Unit> GetAoeFriends()
+    public IEnumerable<Unit> GetAliveFriends()
     {
         return Parent.Friends.Where(x => x.IsAlive);
     }

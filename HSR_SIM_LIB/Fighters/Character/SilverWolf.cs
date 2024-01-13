@@ -453,7 +453,7 @@ public class SilverWolf : DefaultFighter
                     reduceResists = false;
                 }
 
-                Unit.ElementEnm elm = (Unit.ElementEnm)Utl.GetRandomObject(elemListToApply);
+                Unit.ElementEnm elm = (Unit.ElementEnm)Utl.GetRandomObject(elemListToApply,Parent.ParentTeam.ParentSim.Parent);
                 ent.ChildEvents.Add(new ApplyBuffEffect(ent.ParentStep, this, Parent) { TargetUnit = ent.TargetUnit, BuffToApply = allowChangesDebuff, Eff = new EffWeaknessImpair() { Element = elm } });
                 if (reduceResists)
                     ent.ChildEvents.Add(new ApplyBuffEffect(ent.ParentStep, this, Parent) { TargetUnit = ent.TargetUnit, BuffToApply = allowChangesDebuff, Eff = new EffElementalResist() { Element = elm, Value = -0.2 } });
@@ -510,14 +510,14 @@ public class SilverWolf : DefaultFighter
                 var notExistsBugs = bugArray.Where(x => !currentBugs.Where(y => y.DurationLeft == i).Select(y=>y.Reference).Contains(x)).ToArray();
                 if (notExistsBugs.Length > 0&&notExistsBugs.Length<bugArray.Length)
                 {
-                    Buff randomBug = (Buff)Utl.GetRandomObject(notExistsBugs);
+                    Buff randomBug = (Buff)Utl.GetRandomObject(notExistsBugs,Parent.ParentTeam.ParentSim.Parent);
                     ent.ChildEvents.Add(new AttemptEffect(ent.ParentStep,this,ent.SourceUnit){BuffToApply = randomBug,BaseChance = chance,TargetUnit = target}) ;
                     break;
                 }
                 //if no debuff founded  then get random from start array
                 if (i == bugDuration)
                 {
-                    Buff randomBug = (Buff)Utl.GetRandomObject(bugArray);
+                    Buff randomBug = (Buff)Utl.GetRandomObject(bugArray, Parent.ParentTeam.ParentSim.Parent);
                     ent.ChildEvents.Add(new AttemptEffect(ent.ParentStep,this,ent.SourceUnit){BuffToApply = randomBug,BaseChance = chance,TargetUnit = target}) ;
                 }
 

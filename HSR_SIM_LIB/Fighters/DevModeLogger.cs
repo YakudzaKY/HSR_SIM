@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace HSR_SIM_LIB.Fighters
 {
     /// <summary>
-    /// dev mode logger
+    /// dev mode logger. Read array from file and write array to file
     /// </summary>
     public class DevModeLogger
     {

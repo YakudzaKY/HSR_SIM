@@ -26,28 +26,30 @@ public class ApplyBuff : BuffEventTemplate
 
     public override void ProcEvent(bool revert)
     {
-        if (!TargetUnit.IsAlive) return;
-        //calc value first
-        foreach (var modEffect in BuffToApply.Effects.Where(modEffect =>
-                     modEffect.CalculateValue != null && modEffect.Value == null))
-            modEffect.Value = modEffect.CalculateValue(this);
-
-        if (!revert)
+        if (TargetUnit.IsAlive)
         {
-            stacksApplied = TargetUnit.ApplyBuff(this, BuffToApply);
+            //calc value first
+            foreach (var modEffect in BuffToApply.Effects.Where(modEffect =>
+                         modEffect.CalculateValue != null && modEffect.Value == null))
+                modEffect.Value = modEffect.CalculateValue(this);
 
-        }
-        else
-        {
-            if (TargetUnit.GetStacks(BuffToApply) - stacksApplied > 0)
-                TargetUnit.AddStack(BuffToApply, -stacksApplied);
+            if (!revert)
+            {
+                stacksApplied = TargetUnit.ApplyBuff(this, BuffToApply);
+
+            }
             else
             {
-                TargetUnit.RemoveBuff(this, BuffToApply);
+                if (TargetUnit.GetStacks(BuffToApply) - stacksApplied > 0)
+                    TargetUnit.AddStack(BuffToApply, -stacksApplied);
+                else
+                {
+                    TargetUnit.RemoveBuff(this, BuffToApply);
+                }
+
+
+
             }
-
-
-
         }
 
 

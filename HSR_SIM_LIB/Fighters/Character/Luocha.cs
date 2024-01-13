@@ -289,6 +289,14 @@ public class Luocha : DefaultFighter
             });
     }
 
+    public override Unit GetBestTarget(Ability ability)
+    {
+        //Auto heal should heal first tracked unit
+        if (ability == prayerOfAbyssFlowerAuto)
+            return Parent.ParentTeam.ParentSim.Parent.DevMode? DevModeUtils.GetTarget(this, trackedUnits, ability): trackedUnits.First();
+        return base.GetBestTarget(ability);
+    }
+
     public double? CalculateE2Shield(Event ent)
     {
 
@@ -310,9 +318,9 @@ public class Luocha : DefaultFighter
     public sealed override Unit.ElementEnm Element { get; } = Unit.ElementEnm.Imaginary;
 
     //If unit hp<=50% for Luocha follow up heals
-    private bool UnitAtLowHpForAuto(Unit unit)
+    private bool UnitAtLowHpForAuto(Unit unit, Event ent)
     {
-        return unit.GetRes(Resource.ResourceType.HP).ResVal / unit.GetMaxHp(null) <= 0.5;
+        return unit.GetRes(Resource.ResourceType.HP).ResVal / unit.GetMaxHp(ent) <= 0.5;
     }
 
     public double? CalcCoLHealing(Event ent)
@@ -335,9 +343,9 @@ public class Luocha : DefaultFighter
         {
             trackedUnits = new List<Unit>();
         }
-        else if (ent is ResourceDrain or DamageEventTemplate or Healing or ResourceGain)
+        else if (ent is ResourceDrain or DamageEventTemplate or Healing or ResourceGain or Defeat)
         {
-            CheckAndAddTarget(ent.TargetUnit);
+            CheckAndAddTarget(ent.TargetUnit,ent);
         }
         else if (ent is ExecuteAbilityFinish && Parent.Friends.Any(x => x == ent.SourceUnit) &&
                  ent.ParentStep.ActorAbility.Attack && ent.SourceUnit.IsAlive && ColBuffAvailable())
@@ -377,18 +385,18 @@ public class Luocha : DefaultFighter
 
 
     //check unit alive and hp status and add/or remove
-    private void CheckAndAddTarget(Unit entTargetUnit)
+    private void CheckAndAddTarget(Unit entTargetUnit,Event ent)
     {
         //if friend have low hp then add to track
         if (Parent.Friends.Any(x => x == entTargetUnit))
         {
-            if (trackedUnits.All(x => x != entTargetUnit) && entTargetUnit.IsAlive && UnitAtLowHpForAuto(entTargetUnit))
+            if (trackedUnits.All(x => x != entTargetUnit) && entTargetUnit.IsAlive && UnitAtLowHpForAuto(entTargetUnit,ent))
             {
                 trackedUnits.Add(entTargetUnit);
                 Parent.ParentTeam.ParentSim.Parent.LogDebug($"{Parent.Name} add {entTargetUnit.Name} to track list");
             }
             else if (trackedUnits.Any(x => x == entTargetUnit) &&
-                     (!UnitAtLowHpForAuto(entTargetUnit) || !entTargetUnit.IsAlive))
+                     (!UnitAtLowHpForAuto(entTargetUnit,ent) || !entTargetUnit.IsAlive))
             {
                 //remove high hp unit from track
                 trackedUnits.Remove(entTargetUnit);

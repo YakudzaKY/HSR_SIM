@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.UnitStuff;
 using HSR_SIM_LIB.Utils.Utils;
 using ImageMagick;
@@ -31,9 +32,12 @@ public static class Utl
     /// Get one item from list by random
     /// </summary>
     /// <param name="items"></param>
+    /// <param name="wrk">link to Worker</param>
     /// <returns></returns>
-    public static object GetRandomObject(object items)
+    public static object GetRandomObject(object items, Worker wrk =null)
     {
+        if (wrk.DevMode)
+            return DevModeUtils.GetFixedObject(items,wrk);
         double rNextDouble = new MersenneTwister().NextDouble();//get rand [0-1)
         object res = null;
         if (items is IEnumerable ie)

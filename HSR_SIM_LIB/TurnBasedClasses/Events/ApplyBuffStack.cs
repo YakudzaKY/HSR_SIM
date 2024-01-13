@@ -24,14 +24,15 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
         public override void ProcEvent(bool revert)
         {
 
-            if (!TargetUnit.IsAlive) return;
-            if (!TriggersHandled)
-                RealStacks = Math.Min(BuffToApply.MaxStack - TargetUnit.GetStacks(BuffToApply), Stacks);
+            if (TargetUnit.IsAlive)
+            {
+                if (!TriggersHandled)
+                    RealStacks = Math.Min(BuffToApply.MaxStack - TargetUnit.GetStacks(BuffToApply), Stacks);
 
-            TargetUnit.AddStack( BuffToApply,!revert?1:-1*RealStacks);
-            
-        
-            
+                TargetUnit.AddStack(BuffToApply, !revert ? 1 : -1 * RealStacks);
+            }
+
+
 
             base.ProcEvent(revert);
         }

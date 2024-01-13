@@ -503,7 +503,6 @@ public class Unit : CloneClass
             return Friends.Where(x => x.IsAlive);
         if (targetType == TargetTypeEnm.Enemy)
             return Enemies?.Where(x => x.IsAlive) ?? new List<Unit>();
-
         throw new NotImplementedException();
     }
 

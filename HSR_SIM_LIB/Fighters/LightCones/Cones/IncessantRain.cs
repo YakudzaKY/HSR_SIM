@@ -63,7 +63,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
                 {
                     ent.ChildEvents.Add(new AttemptEffect(ent.ParentStep, this, Parent.Parent)
                     {
-                        TargetUnit = (Unit)Utl.GetRandomObject(targetHits), BaseChance = 1,
+                        TargetUnit = (Unit)Utl.GetRandomObject(targetHits,Parent.Parent.ParentTeam.ParentSim.Parent), BaseChance = 1,
                         BuffToApply = aetherCodeDebuff
                     });
                 }
