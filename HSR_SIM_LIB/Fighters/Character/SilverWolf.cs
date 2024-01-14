@@ -254,11 +254,11 @@ public class SilverWolf : DefaultFighter
 
         bugDuration=Atraces.HasFlag(ATracesEnm.A2)?4:3;
         talentAtkDebuff = new Buff(Parent, null)
-        { Type = Buff.BuffType.Debuff, BaseDuration = bugDuration, Effects = new List<Effect>() { new EffAtkPrc() { Value = -talentATKMods[talentLvl] } } };
+        { Type = Buff.BuffType.Debuff, BaseDuration = bugDuration, Effects = new List<Effect>() { new EffAtkPrc() { Value = -talentATKMods[talentLvl-1] } } };
         talentDefDebuff = new Buff(Parent, null)
-        { Type = Buff.BuffType.Debuff, BaseDuration = bugDuration, Effects = new List<Effect>() { new EffDefPrc() { Value = -talentDEFMods[talentLvl] } } };
+        { Type = Buff.BuffType.Debuff, BaseDuration = bugDuration, Effects = new List<Effect>() { new EffDefPrc() { Value = -talentDEFMods[talentLvl-1] } } };
         talentSpdDebuff = new Buff(Parent, null)
-        { Type = Buff.BuffType.Debuff, BaseDuration = bugDuration, Effects = new List<Effect>() { new EffSpeedPrc() { Value = -talentSPDMods[talentLvl] } } };
+        { Type = Buff.BuffType.Debuff, BaseDuration = bugDuration, Effects = new List<Effect>() { new EffSpeedPrc() { Value = -talentSPDMods[talentLvl - 1] } } };
         bugArray = new[] { talentAtkDebuff, talentSpdDebuff, talentDefDebuff };
         //=====================
         //Abilities

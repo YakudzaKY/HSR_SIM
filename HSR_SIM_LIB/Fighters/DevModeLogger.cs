@@ -60,6 +60,8 @@ namespace HSR_SIM_LIB.Fighters
 
             System.IO.Directory.CreateDirectory(Path.GetDirectoryName(logFilePath));
             File.AppendAllText(logFilePath, stringBuilder.ToString());
+            curPos = 0;
+            Array.Resize(ref intArr,curPos );
         }
     }
 }

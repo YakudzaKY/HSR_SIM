@@ -61,7 +61,7 @@ public class ConditionBuff(Unit parentUnit) : PassiveBuff(parentUnit)
             excludeCondBuff = new List<ConditionBuff>();
         excludeCondBuff.Add(this);
         //if target check, then check conditions by target. Else get parent
-        Unit untToCheck = IsTargetCheck ? targetUnit : Parent;
+        Unit untToCheck = IsTargetCheck ? ent?.TargetUnit : targetUnit??Parent;
         if (untToCheck == null)
             return false;
 
@@ -71,11 +71,11 @@ public class ConditionBuff(Unit parentUnit) : PassiveBuff(parentUnit)
         {
             res = Condition.CondtionParam switch
             {
-                ConditionCheckParam.SPD => CheckExpression(untToCheck.GetSpeed(null, excludeCondBuff)),
-                ConditionCheckParam.CritRate => CheckExpression(untToCheck.GetCritRate(null, excludeCondBuff)),
-                ConditionCheckParam.HPPrc => untToCheck.GetMaxHp(null, excludeCondBuff) != 0 &&
-                                             CheckExpression(untToCheck.GetHpPrc(null, excludeCondBuff)),
-                ConditionCheckParam.Weakness => untToCheck.GetWeaknesses(null, excludeCondBuff).Any(x => x == Condition.ElemValue)
+                ConditionCheckParam.SPD => CheckExpression(untToCheck.GetSpeed(ent, excludeCondBuff)),
+                ConditionCheckParam.CritRate => CheckExpression(untToCheck.GetCritRate(ent, excludeCondBuff)),
+                ConditionCheckParam.HPPrc => untToCheck.GetMaxHp(ent, excludeCondBuff) != 0 &&
+                                             CheckExpression(untToCheck.GetHpPrc(ent, excludeCondBuff)),
+                ConditionCheckParam.Weakness => untToCheck.GetWeaknesses(ent, excludeCondBuff).Any(x => x == Condition.ElemValue)
                                                 == (Condition.CondtionExpression == ConditionCheckExpression.Exists),
                 ConditionCheckParam.Buff => untToCheck.Buffs.Any(x => x.Reference == Condition.BuffValue)
                                                 == (Condition.CondtionExpression == ConditionCheckExpression.Exists),

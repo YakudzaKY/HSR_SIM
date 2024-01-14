@@ -10,10 +10,10 @@ internal class GeniusofBrilliantStars : DefaultRelicSet
     public GeniusofBrilliantStars(IFighter parent, int num) : base(parent, num)
     {
         if (num >= 2)
-            PassiveMods.Add(new PassiveBuff(Parent.Parent)
+            Parent.PassiveBuffs.Add(new PassiveBuff(Parent.Parent)
             {
                 AppliedBuff = new Buff(Parent.Parent)
-                    { Effects = new List<Effect> { new EffDefIgnore { Value = 0.10 } } },
+                { Effects = new List<Effect> { new EffDefIgnore { Value = 0.10 } } },
                 Target = Parent.Parent
             });
 

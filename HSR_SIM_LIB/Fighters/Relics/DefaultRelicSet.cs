@@ -16,7 +16,6 @@ public class DefaultRelicSet : IRelicSet
     }
 
     public IFighter Parent { get; set; }
-    public List<PassiveBuff> PassiveMods { get; set; } = new(); // 100% uptime
 
     public int Num { get; set; }
     public IRelicSet.EventHandler EventHandlerProc { get; set; }

@@ -653,7 +653,7 @@ public class Unit : CloneClass
 
     public double GetDef(Event ent)
     {
-        return Stats.BaseDef * (1 + GetBuffSumByType(typeof(EffDefPrc), ent: ent) + Stats.DefPrc) +
+        return Stats.BaseDef * (1 + GetBuffSumByType(typeof(EffDefPrc), ent: ent) - ent.SourceUnit?.DefIgnore(ent)??0 + Stats.DefPrc) +
                GetBuffSumByType(typeof(EffDef), ent: ent);
     }
 

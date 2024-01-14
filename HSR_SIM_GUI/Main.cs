@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
 using HSR_SIM_LIB;
 using HSR_SIM_LIB.Utils;
 using static HSR_SIM_GUI.GuiUtils;
@@ -149,6 +150,7 @@ public partial class Main : Form
     private void Button1_Click(object sender, EventArgs e)
     {
         wrk?.DevModeLog?.WriteToFile();//save prev data
+        
         wrk = new Worker();
         wrk.CbLog += WorkerCallBackString;
         wrk.CbRend += WorkerCallBackImages;

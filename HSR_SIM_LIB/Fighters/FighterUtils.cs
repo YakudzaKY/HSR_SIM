@@ -134,16 +134,14 @@ public static class FighterUtils
 
         var breakEffect = 1 + attacker.GetBreakDmg(ent);
         var def = defender.GetDef(ent);
-        var defWithIgnore = def * (1 - attacker.DefIgnore(ent));
-        var defMultiplier = 1 - defWithIgnore / (defWithIgnore + 200 + 10 * attacker.Level);
+        var defMultiplier = 1 - def / (def + 200 + 10 * attacker.Level);
         var resPen = 1 - (defender.GetResists(attackElem, ent) - attacker.ResistsPenetration(attackElem, ent));
         var vulnMult = 1 + defender.GetElemVulnerability(attackElem, ent) + defender.GetAllDamageVulnerability(ent);
         var brokenMultiplier = defender.GetBrokenMultiplier();
         var totalDmg = baseDmg * breakEffect * defMultiplier * resPen * vulnMult * brokenMultiplier;
         ent.ParentStep.Parent.Parent?.LogDebug($"baseDmg({baseDmg:f}) ; breakEffect({breakEffect:f})");
-        ent.ParentStep.Parent.Parent?.LogDebug($"Def {def:f} -> ignored to {defWithIgnore:f} ");
         ent.ParentStep.Parent.Parent?.LogDebug(
-            $"defMultiplier({defMultiplier:f}) = 1-(defender.Stats.Def({defWithIgnore:f})/(defender.Stats.Def({defWithIgnore:f})+200+(10*attacker.Level({attacker.Level:d}))))");
+            $"defMultiplier({defMultiplier:f}) = 1-(defender.Stats.Def({def:f})/(defender.Stats.Def({def:f})+200+(10*attacker.Level({attacker.Level:d}))))");
         ent.ParentStep.Parent.Parent?.LogDebug(
             $"resPen= {resPen:f} ; vulnMult= {vulnMult:f} ; brokenMultiplier= {brokenMultiplier:f}");
         ent.ParentStep.Parent.Parent?.LogDebug($"TOTAL DAMAGE= {totalDmg:f}");
@@ -189,8 +187,7 @@ public static class FighterUtils
             ;
 
         var def = defender.GetDef(ent);
-        var defWithIgnore = def * (1 - attacker.DefIgnore(ent));
-        var defMultiplier = 1 - defWithIgnore / (defWithIgnore + 200 + 10 * attacker.Level);
+        var defMultiplier = 1 - def / (def + 200 + 10 * attacker.Level);
 
         var resPen = 1 - (defender.GetResists(attackElem, ent) - attacker.ResistsPenetration(attackElem, ent));
 
@@ -208,9 +205,8 @@ public static class FighterUtils
             $"{attacker.Name:s} ({attacker.ParentTeam.Units.IndexOf(attacker) + 1:d}) Damaging {defender.Name} ({defender.ParentTeam.Units.IndexOf(defender) + 1:d})");
         ent.ParentStep.Parent.Parent?.LogDebug(
             $"damageBoost({damageBoost:f}) = 1+ GetElemBoostValue({attacker.GetElemBoostValue(attackElem, ent):f})  +AllDmgBoost({attacker.AllDmgBoost(ent):f}) + dotMultiplier({dotMultiplier:f})");
-        ent.ParentStep.Parent.Parent?.LogDebug($"Def {def:f} -> ignored to {defWithIgnore:f} ");
         ent.ParentStep.Parent.Parent?.LogDebug(
-            $"defMultiplier({defMultiplier:f}) = 1-(defender.Stats.Def({defWithIgnore:f})/(defender.Stats.Def({defWithIgnore:f})+200+(10*attacker.Level({attacker.Level:d}))))");
+            $"defMultiplier({defMultiplier:f}) = 1-(defender.Stats.Def({def:f})/(defender.Stats.Def({def:f})+200+(10*attacker.Level({attacker.Level:d}))))");
         ent.ParentStep.Parent.Parent?.LogDebug(
             $"resPen= {resPen:f} ; vulnMult= {vulnMult:f} ; critMultiplier={critMultiplier:f} ; dmgReduction= {dmgReduction:f} ; brokenMultiplier= {brokenMultiplier:f} ; abilityTypeMultiplier {attacker.GetAbilityTypeMultiplier(ent):f} dmg proportion={((DamageEventTemplate)ent).CalculateProportion:f}");
         ent.ParentStep.Parent.Parent?.LogDebug($"TOTAL DAMAGE= {totalDmg:f}");
