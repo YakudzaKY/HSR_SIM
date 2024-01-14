@@ -169,44 +169,6 @@ public class SimCls : ICloneable
                 shieldBrkEvent.Val = FighterUtils.CalculateShieldBrokeDmg(shieldBrkEvent);
                 ent.ChildEvents.Add(shieldBrkEvent);
 
-                ModActionValue delayAV = new(ent.ParentStep, ent.Source, ent.SourceUnit)
-                {
-                    TargetUnit = ent.TargetUnit,
-                    Val = -ent.TargetUnit.GetBaseActionValue(ent) * 0.25
-                }; //default delay
-                ent.ChildEvents.Add(delayAV);
-                // https://honkai-star-rail.fandom.com/wiki/Toughness
-                switch (ent.ParentStep.ActorAbility.Element)
-                {
-                    case ElementEnm.Physical:
-                        ent.TryDebuff(new BuffBleedWB(ent.SourceUnit, ent.SourceUnit.Fighter.ShieldBreakMod), 1.5);
-                        break;
-                    case ElementEnm.Fire:
-                        ent.TryDebuff(new BuffBurnWB(ent.SourceUnit, ent.SourceUnit.Fighter.ShieldBreakMod), 1.5);
-                        break;
-                    case ElementEnm.Ice:
-                        ent.TryDebuff(new BuffFreezeWB(ent.SourceUnit, ent.SourceUnit.Fighter.ShieldBreakMod), 1.5);
-                        break;
-                    case ElementEnm.Lightning:
-                        ent.TryDebuff(new BuffShockWB(ent.SourceUnit, ent.SourceUnit.Fighter.ShieldBreakMod), 1.5);
-                        break;
-                    case ElementEnm.Wind:
-                        ent.TryDebuff(
-                            new BuffWindShearWB(ent.SourceUnit, ent.SourceUnit.Fighter.ShieldBreakMod)
-                                { Stack = ent.TargetUnit.Fighter is DefaultNPCBossFIghter ? 3 : 1 }, 1.5);
-                        break;
-                    case ElementEnm.Quantum:
-                        ent.TryDebuff(new BuffEntanglementWB(ent.SourceUnit, ent.SourceUnit.Fighter.ShieldBreakMod,ent),
-                            1.5);
-
-                        break;
-                    case ElementEnm.Imaginary:
-                        ent.TryDebuff(new BuffImprisonmentWB(ent.SourceUnit, ent.SourceUnit.Fighter.ShieldBreakMod,ent),
-                            1.5);
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
 
                 //reduce THG  again
                 ent.TargetUnit.GetRes(((ResourceDrain)ent).ResType).ResVal -= (double)ent.RealVal;
