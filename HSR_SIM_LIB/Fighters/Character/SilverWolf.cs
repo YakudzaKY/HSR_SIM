@@ -307,22 +307,16 @@ public class SilverWolf : DefaultFighter
             SpGain = 1
         };
         //dmg events
-        bool initTrg = false;
         foreach (double proportion in new[] { 0.25, 0.25, 0.5 })
         {
             SystemWarning.Events.Add(new DirectDamage(null, this, Parent)
             { CalculateValue = CalculateBasicDmg, CalculateProportion = proportion });
-            if (!initTrg)
-            {
-                SystemWarning.Events.Add(trgEnt);
-                initTrg = true;
-            }
 
             SystemWarning.Events.Add(new ToughnessShred(null, this, Parent) { Val = 30, CalculateProportion = proportion });
             SystemWarning.Events.Add(new EnergyGain(null, this, Parent)
             { Val = 20, TargetUnit = Parent, CalculateProportion = proportion });
         }
-
+        SystemWarning.Events.Add(trgEnt);
         Abilities.Add(SystemWarning);
 
 
@@ -343,8 +337,8 @@ public class SilverWolf : DefaultFighter
         //dmg events
         AllowChanges.Events.Add(new DirectDamage(null, this, Parent)
         { CalculateValue = CalculateAbilityDmg });
-        AllowChanges.Events.Add(trgEnt);
         AllowChanges.Events.Add(new ToughnessShred(null, this, Parent) { Val = 60 });
+        AllowChanges.Events.Add(trgEnt);
         AllowChanges.Events.Add(new EnergyGain(null, this, Parent)
         { Val = 30, TargetUnit = Parent });
         Abilities.Add(AllowChanges);
@@ -366,8 +360,8 @@ public class SilverWolf : DefaultFighter
         //dmg events
         UserBanned.Events.Add(new DirectDamage(null, this, Parent)
         { CalculateValue = CalculateUltimateDmg });
-        UserBanned.Events.Add(trgEnt);
         UserBanned.Events.Add(new ToughnessShred(null, this, Parent) { Val = 90 });
+        UserBanned.Events.Add(trgEnt);
         UltimateHitLastEvent = new EnergyGain(null, this, Parent)
         { Val = 5, TargetUnit = Parent };
         UserBanned.Events.Add(UltimateHitLastEvent);
