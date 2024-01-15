@@ -11,7 +11,7 @@ using static HSR_SIM_LIB.Utils.CallBacks;
 
 namespace HSR_SIM_GUI;
 
-public partial class Main : Form
+public partial class GUIForm : Form
 {
     private Worker wrk;
 
@@ -19,7 +19,7 @@ public partial class Main : Form
     private DebugWindow dbg;
 
 
-    public Main()
+    public GUIForm()
     {
 
         InitializeComponent();
@@ -221,11 +221,7 @@ public partial class Main : Form
 
     private void Button4_Click(object sender, EventArgs e)
     {
-        WarGear wg = new()
-        {
-            StartPosition = FormStartPosition.CenterScreen
-        };
-        wg.Show();
+     
     }
 
     private void Button5_Click(object sender, EventArgs e)

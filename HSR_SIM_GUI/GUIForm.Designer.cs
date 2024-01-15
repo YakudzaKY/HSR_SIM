@@ -1,7 +1,7 @@
 ﻿using static HSR_SIM_GUI.GuiUtils;
 namespace HSR_SIM_GUI
 {
-    partial class Main
+    partial class GUIForm
     {
         /// <summary>
         /// Обязательная переменная конструктора.
@@ -42,10 +42,8 @@ namespace HSR_SIM_GUI
             button1 = new System.Windows.Forms.Button();
             button2 = new System.Windows.Forms.Button();
             button3 = new System.Windows.Forms.Button();
-            button4 = new System.Windows.Forms.Button();
             button5 = new System.Windows.Forms.Button();
             button6 = new System.Windows.Forms.Button();
-            BtnStatCheck = new System.Windows.Forms.Button();
             chkDevMode = new System.Windows.Forms.CheckBox();
             btnClearDevMode = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)combatOut).BeginInit();
@@ -170,20 +168,9 @@ namespace HSR_SIM_GUI
             button3.UseVisualStyleBackColor = true;
             button3.Click += Button3_Click_1;
             // 
-            // button4
-            // 
-            button4.Location = new System.Drawing.Point(368, 714);
-            button4.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            button4.Name = "button4";
-            button4.Size = new System.Drawing.Size(120, 30);
-            button4.TabIndex = 12;
-            button4.Text = "Wargear Import";
-            button4.UseVisualStyleBackColor = true;
-            button4.Click += Button4_Click;
-            // 
             // button5
             // 
-            button5.Location = new System.Drawing.Point(368, 750);
+            button5.Location = new System.Drawing.Point(13, 779);
             button5.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             button5.Name = "button5";
             button5.Size = new System.Drawing.Size(120, 30);
@@ -202,17 +189,6 @@ namespace HSR_SIM_GUI
             button6.Text = "force new next";
             button6.UseVisualStyleBackColor = true;
             button6.Click += button6_Click;
-            // 
-            // BtnStatCheck
-            // 
-            BtnStatCheck.Location = new System.Drawing.Point(13, 777);
-            BtnStatCheck.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            BtnStatCheck.Name = "BtnStatCheck";
-            BtnStatCheck.Size = new System.Drawing.Size(120, 30);
-            BtnStatCheck.TabIndex = 15;
-            BtnStatCheck.Text = "Stat check";
-            BtnStatCheck.UseVisualStyleBackColor = true;
-            BtnStatCheck.Click += BtnStatCheck_Click;
             // 
             // chkDevMode
             // 
@@ -235,16 +211,14 @@ namespace HSR_SIM_GUI
             btnClearDevMode.UseVisualStyleBackColor = true;
             btnClearDevMode.Click += btnClearDevMode_Click;
             // 
-            // Main
+            // GUIForm
             // 
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             ClientSize = new System.Drawing.Size(1225, 834);
             Controls.Add(btnClearDevMode);
             Controls.Add(chkDevMode);
-            Controls.Add(BtnStatCheck);
             Controls.Add(button6);
             Controls.Add(button5);
-            Controls.Add(button4);
             Controls.Add(button3);
             Controls.Add(button2);
             Controls.Add(button1);
@@ -258,7 +232,7 @@ namespace HSR_SIM_GUI
             Controls.Add(BtnOpen);
             Controls.Add(LogWindow);
             Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            Name = "Main";
+            Name = "GUIForm";
             StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             Text = "SIM GUI";
             FormClosed += Main_FormClosed;
@@ -282,10 +256,8 @@ namespace HSR_SIM_GUI
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button button6;
-        private System.Windows.Forms.Button BtnStatCheck;
         private System.Windows.Forms.CheckBox chkDevMode;
         private System.Windows.Forms.Button btnClearDevMode;
     }

@@ -13,11 +13,11 @@ using static HSR_SIM_GUI.GuiUtils;
 
 namespace HSR_SIM_GUI;
 
-public partial class WarGear : Form
+public partial class CharImport : Form
 {
     private Character mainCharacter;
 
-    public WarGear()
+    public CharImport()
     {
         InitializeComponent();
         ApplyDarkLightTheme(this);
@@ -144,9 +144,6 @@ public partial class WarGear : Form
         return result;
     }
 
-    private void WarGear_Load(object sender, EventArgs e)
-    {
-    }
 
     private static void FillAttributes(DataGridView view, List<Attribute> attributes)
     {

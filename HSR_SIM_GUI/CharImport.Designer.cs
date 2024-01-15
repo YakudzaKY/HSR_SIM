@@ -1,6 +1,6 @@
 ﻿namespace HSR_SIM_GUI
 {
-    partial class WarGear
+    partial class CharImport
     {
         /// <summary>
         /// Required designer variable.
@@ -325,7 +325,7 @@
             label9.TabIndex = 25;
             label9.Text = "S";
             // 
-            // WarGear
+            // CharImport
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -353,9 +353,8 @@
             Controls.Add(AvatarBox);
             Controls.Add(dgStats);
             Controls.Add(ImportAPI);
-            Name = "WarGear";
-            Text = "WarGear import";
-            Load += WarGear_Load;
+            Name = "CharImport";
+            Text = "Character import";
             ((System.ComponentModel.ISupportInitialize)AvatarBox).EndInit();
             ((System.ComponentModel.ISupportInitialize)dgStats).EndInit();
             ((System.ComponentModel.ISupportInitialize)txtLvl).EndInit();

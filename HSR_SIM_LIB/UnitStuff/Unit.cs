@@ -324,7 +324,16 @@ public class Unit : CloneClass
     }
 
 
-
+    /// <summary>
+    /// Get list of buffs affection unit
+    /// </summary>
+    /// <param name="passiveBuffs"></param>
+    /// <param name="conditionBuffs"></param>
+    /// <param name="targetForBuff"></param>
+    /// <param name="effTypeToSearch"></param>
+    /// <param name="excludeCondBuff"></param>
+    /// <param name="ent"></param>
+    /// <returns></returns>
     public IEnumerable<PassiveBuff> GetConditionBuffToUnit(List<PassiveBuff> passiveBuffs, List<ConditionBuff> conditionBuffs, Unit targetForBuff, Type effTypeToSearch, List<ConditionBuff> excludeCondBuff = null, Event ent = null)
     {
         IEnumerable<PassiveBuff> res =
@@ -337,7 +346,7 @@ public class Unit : CloneClass
         return res;
     }
     /// <summary>
-    ///     search avalable for unit condition mods(planars self or ally)
+    ///     search available for unit condition mods(planars self or ally)
     /// </summary>
     /// <returns></returns>
     public List<PassiveBuff> GetConditionBuffs(Unit targetForBuff, Type effTypeToSearch, List<ConditionBuff> excludeCondBuff = null, Event ent = null)
@@ -444,9 +453,6 @@ public class Unit : CloneClass
                         srchBuff.Effects.Add(eff);
                     }
                 }
-
-
-
             }
 
             else
