@@ -23,7 +23,7 @@ public class Team : CloneClass
     public Team(SimCls parent)
     {
         ParentSim = parent;
-        GetRes(ResourceType.TP).ResVal = Constant.MaxTp;
+
     }
 
     public void ResetRoles()

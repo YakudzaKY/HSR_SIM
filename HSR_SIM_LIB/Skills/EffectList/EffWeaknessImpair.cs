@@ -12,6 +12,7 @@ namespace HSR_SIM_LIB.Skills.EffectList
     internal class EffWeaknessImpair:Effect
     {
         public Unit.ElementEnm Element { get; init; }
+        public override bool DynamicValue { get; } = true;
 
         public override void OnApply(Event ent, Buff buff, Unit target = null)
         {

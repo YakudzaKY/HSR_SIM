@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using HSR_SIM_LIB.UnitStuff;
 using HSR_SIM_LIB.Utils;
 
@@ -29,7 +30,8 @@ internal class StartCombat : Event
             if (!TriggersHandled)
                 ChildEvents.Add(new PartyResourceGain(ParentStep, this, null)
                 {
-                    Val = Constant.StartSp, TargetTeam = ParentStep.Parent.PartyTeam, ResType = Resource.ResourceType.SP
+                    Val =   ParentStep.Parent.PreLaunch.First(x => x.OptionType == PreLaunchOption.PreLaunchOptionEnm.SetSp)?.Value??0
+                    , TargetTeam = ParentStep.Parent.PartyTeam, ResType = Resource.ResourceType.SP
                 });
         }
         else

@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
+using System.Xml.Linq;
 using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.UnitStuff;
+using static HSR_SIM_LIB.TurnBasedClasses.PreLaunchOption;
 using static HSR_SIM_LIB.UnitStuff.Unit;
 
 namespace HSR_SIM_LIB.Utils;
@@ -35,8 +37,8 @@ public static class XMLLoader
             foreach (XmlElement xnode in xRoot)
             {
                 if (xnode.Name == "Fights") FillFights(xnode, Combat);
+                if (xnode.Name == "Prelaunch") Combat.PreLaunch= ExtractPreLaunch(xnode);
                 if (xnode.Name == "Party") Combat.CurrentScenario.Party = ExtractUnits(xnode);
-
                 if (xnode.Name == "Special") Combat.CurrentScenario.SpecialUnits = ExtractUnits(xnode);
             }
         }
@@ -166,7 +168,6 @@ public static class XMLLoader
         List<Unit> units = new();
         foreach (XmlElement unitNode in unitPack.SelectNodes("Unit"))
         {
-            XmlDocument unitDoc = new();
             Unit unit = new();
             //load xml by 
             var unitCode = unitNode.Attributes.GetNamedItem("template").Value.Trim();
@@ -195,6 +196,28 @@ public static class XMLLoader
         }
 
         return units;
+    }
+
+    /// <summary>
+    ///     Exctract pre launch options from xml
+    /// </summary>
+
+    private static List<PreLaunchOption> ExtractPreLaunch(XmlElement preLaunchOptionsXml)
+    {
+        List<PreLaunchOption> preLaunchOptions = new();
+        foreach (XmlElement optionNode in preLaunchOptionsXml.SelectNodes("Option"))
+        {
+
+            PreLaunchOption option = new();
+            option.OptionType = (PreLaunchOptionEnm)Enum.Parse(typeof(PreLaunchOptionEnm), optionNode.Attributes.GetNamedItem("type").Value.Trim(), true);
+            option.Value = SafeToDouble(optionNode.Attributes.GetNamedItem("value")?.Value.Trim());
+
+
+
+            preLaunchOptions.Add(option);
+        }
+
+        return preLaunchOptions;
     }
 
     private static string GetWarGearFile(string param)

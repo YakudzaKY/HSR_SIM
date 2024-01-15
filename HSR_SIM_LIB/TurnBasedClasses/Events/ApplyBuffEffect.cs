@@ -12,7 +12,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
     /// <summary>
     /// Add effect to existing buff
     /// </summary>
-    internal class ApplyBuffEffect: Event
+    internal class ApplyBuffEffect : Event
     {
         public Effect Eff;
         public Buff BuffToApply { get; set; }
@@ -27,11 +27,10 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
         }
 
 
-        
+
         public override void ProcEvent(bool revert)
         {
-           
-            
+
             Buff currentBuff = TargetUnit.Buffs.First(x => x.Reference == BuffToApply);
             if (!revert)
             {
@@ -39,9 +38,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             }
             else
             {
-                currentBuff.Effects.Remove(Eff); 
+                currentBuff.Effects.Remove(Eff);
             }
-           
+
 
             base.ProcEvent(revert);
         }

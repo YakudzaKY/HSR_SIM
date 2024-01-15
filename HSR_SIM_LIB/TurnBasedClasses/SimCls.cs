@@ -25,6 +25,7 @@ public class SimCls : ICloneable
 
     public delegate void StepHandler(Step step);
 
+    public List<PreLaunchOption> PreLaunch;
 
     //ForgottenHall Cycles
 
@@ -229,6 +230,16 @@ public class SimCls : ICloneable
         team.TeamType = TeamTypeEnm.UnitPack;
         team.controledTeam = true;
         Teams.Add(team);
+        /*
+         * pre launch options
+         */
+        //load TP
+        team.GetRes(ResourceType.TP).ResVal = PreLaunch.First(x => x.OptionType == PreLaunchOption.PreLaunchOptionEnm.SetTp)?.Value??0;
+        //load energy
+        foreach (Unit unit in team.Units)
+        {
+            unit.CurrentEnergy=unit.Stats.BaseMaxEnergy* PreLaunch.First(x => x.OptionType == PreLaunchOption.PreLaunchOptionEnm.SetEnergy)?.Value??0;
+        }
 
 
         //Special
