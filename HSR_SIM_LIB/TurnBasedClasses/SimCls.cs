@@ -140,6 +140,7 @@ public class SimCls : ICloneable
                 {
                     TargetUnit = ent.TargetUnit
                 };
+                defeatEvent.RemovedMods.AddRange(ent.TargetUnit.Buffs);
                 ent.ChildEvents.Add(defeatEvent);
             }
         }
@@ -154,6 +155,7 @@ public class SimCls : ICloneable
                 {
                     TargetUnit = ent.TargetUnit
                 };
+                defeatEvent.RemovedMods.AddRange(ent.TargetUnit.Buffs);
                 ent.ParentStep.Events.Add(defeatEvent);
             }
 
@@ -234,11 +236,11 @@ public class SimCls : ICloneable
          * pre launch options
          */
         //load TP
-        team.GetRes(ResourceType.TP).ResVal = PreLaunch.First(x => x.OptionType == PreLaunchOption.PreLaunchOptionEnm.SetTp)?.Value??0;
+        team.GetRes(ResourceType.TP).ResVal = PreLaunch.FirstOrDefault(x => x.OptionType == PreLaunchOption.PreLaunchOptionEnm.SetTp)?.Value??0;
         //load energy
         foreach (Unit unit in team.Units)
         {
-            unit.CurrentEnergy=unit.Stats.BaseMaxEnergy* PreLaunch.First(x => x.OptionType == PreLaunchOption.PreLaunchOptionEnm.SetEnergy)?.Value??0;
+            unit.CurrentEnergy=unit.Stats.BaseMaxEnergy* PreLaunch.FirstOrDefault(x => x.OptionType == PreLaunchOption.PreLaunchOptionEnm.SetEnergy)?.Value??0;
         }
 
 
