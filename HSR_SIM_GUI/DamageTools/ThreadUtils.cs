@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading;
 using HSR_SIM_LIB;
@@ -12,6 +13,10 @@ internal static class ThreadUtils
 {
     public class ThreadWork
     {
+        public static int GetDecision(string[] items, string description)
+        {
+            throw   new NotImplementedException();
+        }
         /// <summary>
         ///     child thread func
         /// </summary>
@@ -20,8 +25,10 @@ internal static class ThreadUtils
         {
             var rLinks = links as RLinksToOjbects;
             var wrk = new Worker();
-            wrk.LoadScenarioFromXml(AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\" + rLinks.Task.Scenario,
-                AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\" + rLinks.Task.Profile);
+            wrk.DevMode = rLinks.Task.DevMode;
+            if (wrk.DevMode)
+                wrk.CbGetDecision += GetDecision;
+            wrk.LoadScenarioFromXml(rLinks.Task.Scenario, rLinks.Task.Profile);
             wrk.ApplyModes(rLinks.Task.StatMods);
             wrk.GetCombatResult(rLinks.Result);
         }
@@ -30,7 +37,8 @@ internal static class ThreadUtils
         /// <summary>
         ///     main thread work func
         /// </summary>
-        /// <param name="taskList"></param>
+        /// <param name="taskList">list of task to do</param>
+        /// 
         public static void DoWork(object taskList)
         {
             var myThreads = new List<Thread>();
@@ -41,9 +49,9 @@ internal static class ThreadUtils
                 myThreads.Add(thd);
             }
 
-            var mainQuery = (from p in myTaskList.Tasks
-                    from c in p.Subtasks
-                    select c).Union(from p in myTaskList.Tasks select p)
+            var mainQuery = (from p in myTaskList.Tasks.Where(x => x.Subtasks is not null)
+                             from c in p.Subtasks
+                             select c).Union(from p in myTaskList.Tasks select p)
                 .Distinct();
 
             while (mainQuery.Any(x => !x.Fetched))
@@ -69,68 +77,77 @@ internal static class ThreadUtils
                     }
                 }
 
-                //fetch data
-                foreach (var fetchTask in mainQuery.Where(x =>
-                             !x.Fetched && x.Results.Count(y => y.Success != null) == x.Iterations))
-                {
-                    var winResults =
-                        fetchTask.Results.Where(x => x.Success ?? false).ToList();
-                    var defeatResults =
-                        fetchTask.Results.Where(x => !(x.Success ?? false)).ToList();
-                    fetchTask.Fetched = true;
-                    fetchTask.Data.WinRate = fetchTask.Results.Average(x => x.Success ?? false ? 100 : 0);
-                    if (defeatResults.Any())
-                        fetchTask.Data.DefeatCycles = defeatResults.DefaultIfEmpty().Average(x => x.Cycles);
-                    if (winResults.Any())
+                if (!myTaskList.FetchAndAggregateData)
+                    foreach (var fetchTask in mainQuery.Where(x =>
+                                 !x.Fetched && x.Results.Count(y => y.Success != null) == x.Iterations))
                     {
-                        fetchTask.Data.TotalAV = winResults.Average(x => x.TotalAv);
-                        fetchTask.Data.Cycles = winResults.Average(x => x.Cycles);
-                        fetchTask.Data.avgDPAV = winResults.Average(x => x.Combatants
-                            .Sum(z =>
-                                z.Damages.Sum(x => x.Value) / x.TotalAv));
-                        fetchTask.Data.minDPAV = winResults.Min(x => x.Combatants
-                            .Sum(z =>
-                                z.Damages.Sum(x => x.Value) / x.TotalAv));
-                        fetchTask.Data.maxDPAV = winResults.Max(x => x.Combatants
-                            .Sum(z =>
-                                z.Damages.Sum(x => x.Value) / x.TotalAv));
-
-                        foreach (var unit in winResults.First()
-                                     .Combatants
-                                     .Select(y => y.CombatUnit))
+                        fetchTask.Fetched = true;
+                    }
+                else
+                    //fetch data
+                    foreach (var fetchTask in mainQuery.Where(x =>
+                                 !x.Fetched && x.Results.Count(y => y.Success != null) == x.Iterations))
+                    {
+                        var winResults =
+                            fetchTask.Results.Where(x => x.Success ?? false).ToList();
+                        var defeatResults =
+                            fetchTask.Results.Where(x => !(x.Success ?? false)).ToList();
+                        fetchTask.Fetched = true;
+                        fetchTask.Data.WinRate = fetchTask.Results.Average(x => x.Success ?? false ? 100 : 0);
+                        if (defeatResults.Any())
+                            fetchTask.Data.DefeatCycles = defeatResults.DefaultIfEmpty().Average(x => x.Cycles);
+                        if (winResults.Any())
                         {
-                            var prUnit = new PartyUnit();
-                            prUnit.CombatUnit = unit;
-
-                            prUnit.avgDPAV = winResults.Average(x => x.Combatants
-                                .Where(y => y.CombatUnit == unit).Sum(z =>
+                            fetchTask.Data.TotalAV = winResults.Average(x => x.TotalAv);
+                            fetchTask.Data.Cycles = winResults.Average(x => x.Cycles);
+                            fetchTask.Data.avgDPAV = winResults.Average(x => x.Combatants
+                                .Sum(z =>
                                     z.Damages.Sum(x => x.Value) / x.TotalAv));
-                            prUnit.minDPAV = winResults.Min(x => x.Combatants.Where(y => y.CombatUnit == unit).Sum(z =>
-                                z.Damages.Sum(x => x.Value) / x.TotalAv));
-                            prUnit.maxDPAV = winResults.Max(x => x.Combatants.Where(y => y.CombatUnit == unit)
+                            fetchTask.Data.minDPAV = winResults.Min(x => x.Combatants
+                                .Sum(z =>
+                                    z.Damages.Sum(x => x.Value) / x.TotalAv));
+                            fetchTask.Data.maxDPAV = winResults.Max(x => x.Combatants
                                 .Sum(z =>
                                     z.Damages.Sum(x => x.Value) / x.TotalAv));
 
-                            Type[] typeArray =
+                            foreach (var unit in winResults.First()
+                                         .Combatants
+                                         .Select(y => y.CombatUnit))
                             {
+                                var prUnit = new PartyUnit();
+                                prUnit.CombatUnit = unit;
+
+                                prUnit.avgDPAV = winResults.Average(x => x.Combatants
+                                    .Where(y => y.CombatUnit == unit).Sum(z =>
+                                        z.Damages.Sum(x => x.Value) / x.TotalAv));
+                                prUnit.minDPAV = winResults.Min(x => x.Combatants.Where(y => y.CombatUnit == unit).Sum(z =>
+                                    z.Damages.Sum(x => x.Value) / x.TotalAv));
+                                prUnit.maxDPAV = winResults.Max(x => x.Combatants.Where(y => y.CombatUnit == unit)
+                                    .Sum(z =>
+                                        z.Damages.Sum(x => x.Value) / x.TotalAv));
+
+                                Type[] typeArray =
+                                {
                                 typeof(DirectDamage), typeof(DoTDamage), typeof(ToughnessBreakDoTDamage),
                                 typeof(ToughnessBreak)
                             };
 
-                            foreach (var typ in typeArray)
-                                prUnit.avgByTypeDPAV.Add(typ, winResults.Average(x => x.Combatants
-                                    .Where(y => y.CombatUnit == unit).Sum(z =>
-                                        z.Damages[typ] / x.TotalAv
-                                    )));
+                                foreach (var typ in typeArray)
+                                    prUnit.avgByTypeDPAV.Add(typ, winResults.Average(x => x.Combatants
+                                        .Where(y => y.CombatUnit == unit).Sum(z =>
+                                            z.Damages[typ] / x.TotalAv
+                                        )));
 
-                            fetchTask.Data.PartyUnits.Add(prUnit);
+                                fetchTask.Data.PartyUnits.Add(prUnit);
+                            }
                         }
-                    }
 
-                    //clear resources
-                    foreach (var sd in fetchTask.Results) sd.Combatants = null;
-                    GC.Collect();
-                }
+
+                        foreach (var sd in fetchTask.Results) sd.Combatants = null;
+
+
+                        GC.Collect();
+                    }
 
 
                 Thread.Sleep(10);

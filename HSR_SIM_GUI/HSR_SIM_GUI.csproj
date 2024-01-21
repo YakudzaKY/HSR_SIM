@@ -16,6 +16,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Data\api.txt" />
+    <None Remove="Data\AutoTest\SW_LUOCHA.xml" />
+    <None Remove="Data\AutoTest\SW_LUOCHA.xml.dev_log" />
+    <None Remove="Data\AutoTest\SW_LUOCHA.xml.json" />
     <None Remove="Data\Images\Abyss_Flower_CD.webp" />
     <None Remove="Data\Images\Allow_Changes .webp" />
     <None Remove="Data\Images\Allow_Changes.webp" />
@@ -126,6 +129,15 @@
     <None Remove="tessdata\rus.xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Data\AutoTest\SW_LUOCHA.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\AutoTest\SW_LUOCHA.xml.dev_log">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\AutoTest\SW_LUOCHA.xml.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Data\Images\Abyss_Flower_CD.webp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

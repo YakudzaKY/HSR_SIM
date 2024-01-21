@@ -44,7 +44,7 @@ public static class XMLLoader
         }
 
         //Profile
-        if (profilePath != null) Combat.CurrentScenario.Party = ExctractPartyFromXml(profilePath);
+        if (!String.IsNullOrEmpty(profilePath)) Combat.CurrentScenario.Party = ExctractPartyFromXml(profilePath);
 
         return Combat;
     }
@@ -180,17 +180,17 @@ public static class XMLLoader
                           "1"); //will be overwriten by wargear if possible
             unit.Rank = int.Parse(unitNode.Attributes.GetNamedItem("rank")?.Value?.Trim() ??
                                   "0"); //will be overwriten by wargear if possible
-            var unitFile = Utl.DataFolder + "UnitTemplates\\" + unitCode + ".xml";
-            unit.Name = Path.GetFileNameWithoutExtension(unitFile);
+            unit.Name = words[1];
             //override by wargear
             var warGear = unitNode.Attributes.GetNamedItem("wargear")?.Value.Trim();
             //if wargear filled but no file 
             if (!string.IsNullOrEmpty(warGear) && !File.Exists(GetWarGearFile(warGear)))
                 throw new Exception(string.Format("WarGear file {0:s} not found", warGear));
 
-            if (File.Exists(GetWarGearFile(warGear ?? unitCode)))
-                ExctractWargear(warGear ?? unitCode, unit);
-
+            if (File.Exists(GetWarGearFile(warGear??unitCode)))
+                ExctractWargear(warGear??unitCode, unit);
+            else
+                ExctractUnitSkillsAndGear(unitNode,unit);
 
             units.Add(unit);
         }
@@ -225,23 +225,19 @@ public static class XMLLoader
         return Utl.DataFolder + "WarGear\\" + param + ".xml";
     }
 
-    private static void ExctractWargear(string wargear, Unit unit)
+    private static void ExctractUnitSkillsAndGear(XmlElement xmlElement, Unit unit)
     {
-        XmlDocument unitDoc = new();
-        unitDoc.Load(GetWarGearFile(wargear));
-        var xRoot = unitDoc.DocumentElement;
-        var unitCode = xRoot.Attributes.GetNamedItem("name").Value.Trim();
-        var newLevel = xRoot.Attributes.GetNamedItem("level")?.Value.Trim();
-        var newRank = xRoot.Attributes.GetNamedItem("rank")?.Value.Trim();
+       
+        var newLevel = xmlElement.Attributes.GetNamedItem("level")?.Value.Trim();
+        var newRank = xmlElement.Attributes.GetNamedItem("rank")?.Value.Trim();
         if (!string.IsNullOrEmpty(newLevel))
             unit.Level = SafeToInt(newLevel);
         if (!string.IsNullOrEmpty(newRank))
             unit.Rank = SafeToInt(newRank);
-        if (unitCode != unit.Name)
-            throw new Exception(string.Format("Looking wargear for {0:s} but loaded for {1:s}", unit.Name, unitCode));
-        unit.Stats = ExctractStats(xRoot, unit.Level, unit);
 
-        foreach (XmlElement xmlSkill in xRoot.SelectNodes("Skill"))
+        unit.Stats = ExctractStats(xmlElement, unit.Level, unit);
+
+        foreach (XmlElement xmlSkill in xmlElement.SelectNodes("Skill"))
         {
             Skill skill = new()
             {
@@ -253,14 +249,14 @@ public static class XMLLoader
 
         if (unit.Fighter is DefaultFighter)
         {
-            foreach (XmlElement xmlLcone in xRoot.SelectNodes("LightCone"))
+            foreach (XmlElement xmlLcone in xmlElement.SelectNodes("LightCone"))
             {
                 unit.LightConeStringPath =
                     $"HSR_SIM_LIB.Fighters.LightCones.Cones.{xmlLcone.Attributes.GetNamedItem("name").Value.Trim().Replace(" ", "").Replace("-", "").Replace(":", "")}";
                 unit.LightConeInitRank = int.Parse(xmlLcone.Attributes.GetNamedItem("rank").Value.Trim());
             }
 
-            foreach (XmlElement xmlRelic in xRoot.SelectNodes("RelicSet"))
+            foreach (XmlElement xmlRelic in xmlElement.SelectNodes("RelicSet"))
             {
                 KeyValuePair<string, int> newRec = new(
                     $"HSR_SIM_LIB.Fighters.Relics.Set.{xmlRelic.Attributes.GetNamedItem("name").Value.Trim().Replace(" ", "").Replace("-", "").Replace(":", "")}",
@@ -269,6 +265,16 @@ public static class XMLLoader
             }
 
         }
+    }
+    private static void ExctractWargear(string wargear, Unit unit)
+    {
+        XmlDocument unitDoc = new();
+        unitDoc.Load(GetWarGearFile(wargear));
+        var xRoot = unitDoc.DocumentElement;
+        var unitCode = xRoot.Attributes.GetNamedItem("name").Value.Trim();
+        ExctractUnitSkillsAndGear(xRoot,unit);
+        if (unitCode != unit.Name)
+            throw new Exception(string.Format("Looking wargear for {0:s} but loaded for {1:s}", unit.Name, unitCode));
     }
 
 

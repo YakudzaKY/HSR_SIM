@@ -16,6 +16,7 @@ internal static class TaskUtils
         public int Iterations { get; set; }
         public List<RTask> Subtasks { get; set; }
         public List<Worker.RStatMod> StatMods { get; set; }
+        public bool DevMode { get; set; }
     }
 
     public record RLinksToOjbects
@@ -50,5 +51,6 @@ internal static class TaskUtils
     {
         public List<RTask> Tasks;
         public int ThreadCount = 0;
+        public bool FetchAndAggregateData = true;//Aggregate result data
     }
 }

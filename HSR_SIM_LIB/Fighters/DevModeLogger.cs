@@ -1,6 +1,9 @@
-﻿using System;
+﻿using HSR_SIM_LIB.UnitStuff;
+using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace HSR_SIM_LIB.Fighters
 {
@@ -60,6 +63,15 @@ namespace HSR_SIM_LIB.Fighters
 
             System.IO.Directory.CreateDirectory(Path.GetDirectoryName(logFilePath));
             File.WriteAllText(logFilePath, stringBuilder.ToString());
+
+        }
+
+        
+        public void WriteResToFile()
+        {  
+            Worker.RCombatResult res = parentWorker.GetCombatResult();
+            System.IO.Directory.CreateDirectory(Path.GetDirectoryName(logFilePath));
+            File.WriteAllText(logFilePath+"_res.json",  JsonConvert.SerializeObject(res));
 
         }
     }

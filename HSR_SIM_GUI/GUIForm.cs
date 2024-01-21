@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Text;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using HSR_SIM_LIB;
 using HSR_SIM_LIB.Utils;
 using static HSR_SIM_GUI.GuiUtils;
 using static HSR_SIM_LIB.Utils.CallBacks;
+using static HSR_SIM_LIB.Worker;
 
 namespace HSR_SIM_GUI;
 
@@ -70,12 +72,12 @@ public partial class GUIForm : Form
         TextBox lvlDescr = new TextBox()
         {
             Size = new Size(size.Width - 10, 105),
-            Text =description,
+            Text = description,
             Multiline = true,
             ScrollBars = ScrollBars.Vertical,
             ReadOnly = true,
             Location = new Point(5, yCur)
-            
+
         };
         inputBox.Controls.Add(lvlDescr);
 
@@ -130,7 +132,7 @@ public partial class GUIForm : Form
         cbScenario.Text = IniF.IniReadValue("form", "Scenario");
         cbProfile.Text = IniF.IniReadValue("form", "Profile");
         string boolVal = IniF.IniReadValue("form", "DevMode");
-        
+
         chkDevMode.Checked = !String.IsNullOrEmpty(boolVal) && bool.Parse(boolVal);
 
     }
@@ -150,14 +152,14 @@ public partial class GUIForm : Form
     private void Button1_Click(object sender, EventArgs e)
     {
         wrk?.DevModeLog?.WriteToFile();//save prev data
-        
+
         wrk = new Worker();
         wrk.CbLog += WorkerCallBackString;
         wrk.CbRend += WorkerCallBackImages;
         wrk.CbGetDecision = WorkerCallBackGetDecision;
         wrk.DevMode = chkDevMode.Checked;
         wrk.LoadScenarioFromXml(AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\" + cbScenario.Text,
-            AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\" + cbProfile.Text);
+            String.IsNullOrEmpty(cbProfile.Text)?"":AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\" + cbProfile.Text);
     }
 
 
@@ -165,13 +167,13 @@ public partial class GUIForm : Form
     {
         cbScenario.Items.Clear();
         cbProfile.Items.Clear();
-        var files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\");
+        var files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\","*.xml");
 
         foreach (var file in files) cbScenario.Items.Add(Path.GetFileName(file));
 
         var profilePath = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\";
         Directory.CreateDirectory(profilePath);
-        files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\");
+        files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\","*.xml");
 
         foreach (var file in files) cbProfile.Items.Add(Path.GetFileName(file));
     }
@@ -221,7 +223,7 @@ public partial class GUIForm : Form
 
     private void Button4_Click(object sender, EventArgs e)
     {
-     
+
     }
 
     private void Button5_Click(object sender, EventArgs e)
@@ -260,5 +262,11 @@ public partial class GUIForm : Form
     {
         //delete dev log
         File.Delete(Worker.GetDevLogPath(cbScenario.Text, cbProfile.Text));
+    }
+
+    private void button4_Click_1(object sender, EventArgs e)
+    {
+      
+        wrk?.DevModeLog?.WriteResToFile();
     }
 }

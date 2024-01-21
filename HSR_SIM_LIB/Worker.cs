@@ -44,7 +44,7 @@ public class Worker
 
     public static string GetDevLogPath(string scenarioPath, string profilePath)
     {
-        return $"{AppDomain.CurrentDomain.BaseDirectory}DATA\\DevLogs\\{Path.GetFileName(scenarioPath)}_{Path.GetFileName(profilePath)}.dev_log";
+        return $"{Path.GetDirectoryName(scenarioPath)}\\{Path.GetFileName(scenarioPath)}{Path.GetFileName(profilePath)}.dev_log";
     }
     public RCombatResult GetCombatResult(RCombatResult inRslt = null)
     {

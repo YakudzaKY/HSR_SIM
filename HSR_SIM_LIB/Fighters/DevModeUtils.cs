@@ -9,6 +9,7 @@ using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using HSR_SIM_LIB.Utils.Utils;
+using Newtonsoft.Json;
 
 namespace HSR_SIM_LIB.Fighters
 {

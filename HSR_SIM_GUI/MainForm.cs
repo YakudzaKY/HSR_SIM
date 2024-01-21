@@ -46,5 +46,19 @@ namespace HSR_SIM_GUI
             };
             form.Show();
         }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            AutoTest form = new()
+            {
+                StartPosition = FormStartPosition.CenterScreen
+            };
+            form.Show();
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

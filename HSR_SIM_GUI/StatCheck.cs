@@ -39,10 +39,10 @@ public partial class StatCheck : Form
     {
         cbScenario.Items.Clear();
         chkProfiles.Items.Clear();
-        var files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\");
+        var files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\", "*.xml");
 
         foreach (var file in files) cbScenario.Items.Add(Path.GetFileName(file));
-        files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\");
+        files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\","*.xml");
 
         foreach (var file in files) chkProfiles.Items.Add(Path.GetFileName(file));
     }
@@ -179,8 +179,8 @@ public partial class StatCheck : Form
                     for (var i = 1; i <= nmbSteps.Value; i++)
                         res.Add(new RTask
                         {
-                            Scenario = cbScenario.Text,
-                            Profile = profile,
+                            Scenario = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\" +cbScenario.Text,
+                            Profile = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\" +profile,
                             Iterations = (int)NmbIterations.Value,
                             StatMods = GetStatMods(cbCharacter.Text, (string)item,
                                 i * (int)nmbUpgradesPerStep.Value, cbStatToReplace.Text)
@@ -218,8 +218,8 @@ public partial class StatCheck : Form
                     statModList.Insert(0, new RStatMod { Stat = "NEW GEAR", Step = 1 });
                     res.Add(new RTask
                     {
-                        Scenario = cbScenario.Text,
-                        Profile = profile,
+                        Scenario = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\" +cbScenario.Text,
+                        Profile = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\" +profile,
                         Iterations = (int)NmbIterations.Value,
                         StatMods = statModList
                     });
@@ -243,8 +243,8 @@ public partial class StatCheck : Form
         foreach (var item in chkProfiles.CheckedItems)
             myTaskList.Tasks.Add(new RTask
             {
-                Scenario = cbScenario.Text,
-                Profile = (string)item,
+                Scenario = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\" + cbScenario.Text,
+                Profile = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\"+(string)item,
                 Iterations = (int)NmbIterations.Value,
                 Subtasks = getStatsSubTasks((string)item)
             });

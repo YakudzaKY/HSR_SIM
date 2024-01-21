@@ -45,7 +45,8 @@ namespace HSR_SIM_GUI
             button5 = new System.Windows.Forms.Button();
             button6 = new System.Windows.Forms.Button();
             chkDevMode = new System.Windows.Forms.CheckBox();
-            btnClearDevMode = new System.Windows.Forms.Button();
+            btnClearDevLog = new System.Windows.Forms.Button();
+            button4 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)combatOut).BeginInit();
             SuspendLayout();
             // 
@@ -193,29 +194,41 @@ namespace HSR_SIM_GUI
             // chkDevMode
             // 
             chkDevMode.AutoSize = true;
-            chkDevMode.Location = new System.Drawing.Point(396, 637);
+            chkDevMode.Location = new System.Drawing.Point(396, 738);
             chkDevMode.Name = "chkDevMode";
             chkDevMode.Size = new System.Drawing.Size(79, 19);
             chkDevMode.TabIndex = 16;
             chkDevMode.Text = "dev mode";
             chkDevMode.UseVisualStyleBackColor = true;
             // 
-            // btnClearDevMode
+            // btnClearDevLog
             // 
-            btnClearDevMode.Location = new System.Drawing.Point(396, 607);
-            btnClearDevMode.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            btnClearDevMode.Name = "btnClearDevMode";
-            btnClearDevMode.Size = new System.Drawing.Size(113, 24);
-            btnClearDevMode.TabIndex = 17;
-            btnClearDevMode.Text = "clear dev mode";
-            btnClearDevMode.UseVisualStyleBackColor = true;
-            btnClearDevMode.Click += btnClearDevMode_Click;
+            btnClearDevLog.Location = new System.Drawing.Point(396, 763);
+            btnClearDevLog.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            btnClearDevLog.Name = "btnClearDevLog";
+            btnClearDevLog.Size = new System.Drawing.Size(113, 24);
+            btnClearDevLog.TabIndex = 17;
+            btnClearDevLog.Text = "clear dev mode";
+            btnClearDevLog.UseVisualStyleBackColor = true;
+            btnClearDevLog.Click += btnClearDevMode_Click;
+            // 
+            // button4
+            // 
+            button4.Location = new System.Drawing.Point(396, 793);
+            button4.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            button4.Name = "button4";
+            button4.Size = new System.Drawing.Size(113, 24);
+            button4.TabIndex = 18;
+            button4.Text = "save results";
+            button4.UseVisualStyleBackColor = true;
+            button4.Click += button4_Click_1;
             // 
             // GUIForm
             // 
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             ClientSize = new System.Drawing.Size(1225, 834);
-            Controls.Add(btnClearDevMode);
+            Controls.Add(button4);
+            Controls.Add(btnClearDevLog);
             Controls.Add(chkDevMode);
             Controls.Add(button6);
             Controls.Add(button5);
@@ -259,7 +272,8 @@ namespace HSR_SIM_GUI
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.CheckBox chkDevMode;
-        private System.Windows.Forms.Button btnClearDevMode;
+        private System.Windows.Forms.Button btnClearDevLog;
+        private System.Windows.Forms.Button button4;
     }
 }
 
