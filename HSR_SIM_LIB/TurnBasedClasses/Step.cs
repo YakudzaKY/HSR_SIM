@@ -201,19 +201,27 @@ public class Step
 
         //clone events by targets
         foreach (var ent in ability.Events.Where(x => x.OnStepType == StepType || x.OnStepType == null))
-            if (ent.CalculateTargets != null || ent.TargetUnit == null) //need set targets
+            //check ratio cooldown
+            if (!ent.IsReady)
             {
-                var targetsUnits =
-                    ent.CalculateTargets != null
-                        ? ent.CalculateTargets()
-                        : ability.GetTargets(target, ent.TargetType, ent.CurrentTargetType);
-                foreach (var unit in targetsUnits) CloneEvent(ability, ent, unit);
+                ent.ReduceRatioCounter();
             }
             else
             {
-                CloneEvent(ability, ent, null);
+                ent.ResetCounter();
+                if (ent.CalculateTargets != null || ent.TargetUnit == null) //need set targets
+                {
+                    var targetsUnits =
+                        ent.CalculateTargets != null
+                            ? ent.CalculateTargets()
+                            : ability.GetTargets(target, ent.TargetType, ent.CurrentTargetType);
+                    foreach (var unit in targetsUnits) CloneEvent(ability, ent, unit);
+                }
+                else
+                {
+                    CloneEvent(ability, ent, null);
+                }
             }
-
 
         if (ability.AbilityType == AbilityTypeEnm.Technique)
             Events.Add(new CombatStartSkillDeQueue(this, null, ability.Parent.Parent)

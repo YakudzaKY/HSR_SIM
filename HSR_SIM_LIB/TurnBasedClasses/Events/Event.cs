@@ -33,6 +33,28 @@ public abstract class Event : CloneClass
     public ICloneable Source { get; }
     public Ability.TargetTypeEnm? TargetType { get; set; }
 
+    public int ProcRatio
+    {
+        get => procRatio;
+        init
+        {
+            if (value < 1)
+            {
+                throw new Exception("ProcRatio cant be lower than 1");
+            }
+            procRatio = value;
+
+        }
+    } //how ofter event proc?
+
+    private int procRatioCounter  =1;//counter
+    private readonly int procRatio = 1;
+
+    public bool IsReady
+    {
+        get => (procRatioCounter == 1);
+    }//event is ready to be aplied on target
+
     public Ability.AbilityCurrentTargetEnm? CurrentTargetType { get; set; }
     public Unit SourceUnit { get; set; }
     public Unit TargetUnit { get; set; }
@@ -153,5 +175,21 @@ public abstract class Event : CloneClass
             };
             ChildEvents.Add(failEvent);
         }
+    }
+
+    //reduce the ratio counter by 1
+    public void ReduceRatioCounter()
+    {
+        procRatioCounter--;
+        if (procRatioCounter == 0)
+        {
+            throw new Exception("procRatioCounter cant be lower than 1");
+        }
+    }
+
+    //set counter on max value
+    public void ResetCounter()
+    {
+        procRatioCounter = ProcRatio;
     }
 }
