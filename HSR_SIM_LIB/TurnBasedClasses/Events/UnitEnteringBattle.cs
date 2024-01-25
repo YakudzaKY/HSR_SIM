@@ -17,6 +17,7 @@ public class UnitEnteringBattle : Event
 
     public override void ProcEvent(bool revert)
     {
+        TargetUnit.OnEnteringBattle();
         TargetUnit.ParentTeam.ResetRoles();
         base.ProcEvent(revert);
     }

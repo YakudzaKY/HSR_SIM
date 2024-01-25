@@ -86,7 +86,7 @@ public class Ability : CloneClass
     }
     public bool IgnoreWeakness { get; set; }
 
-    public int Cooldown { get; set; } = 0;
+    public int Cooldown { get; init; } = 0;
     public int CooldownTimer { get; set; } = 0;
     public bool EndTheTurn { get; set; } = true; //If ability used - end the turn
 
@@ -94,6 +94,16 @@ public class Ability : CloneClass
 
     public DCanUsePrc Available { get; init; } = DefaultAbilityAvailable;
     public int SpGain { get; set; } = 0;
+
+    //reset ability params
+    public void OnEnteringBattle()
+    {
+        CooldownTimer = 0;
+        foreach (Event ent in Events)
+        {
+            ent.OnEnteringBattle();
+        }
+    }
 
 
     //default all abilities are ok

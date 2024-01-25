@@ -210,7 +210,7 @@ public class SimCls : ICloneable
             var newUnit = (Unit)unit.Clone();
             newUnit.Reference = unit;
             res.Add(newUnit);
-            newUnit.InitToCombat();
+            newUnit.Init();
         }
 
         return res;
@@ -393,6 +393,7 @@ public class SimCls : ICloneable
                     //reset CD
                     foreach (var ability in CurrentFight.Turn.Actor.Fighter.Abilities.Where(x => x.CooldownTimer > 0))
                         ability.CooldownTimer -= 1;
+
 
                     //remove buffs
                     foreach (var dot in CurrentFight.Turn.Actor.Buffs.Where(x =>

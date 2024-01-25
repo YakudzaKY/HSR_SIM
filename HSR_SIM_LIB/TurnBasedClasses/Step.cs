@@ -208,7 +208,7 @@ public class Step
             }
             else
             {
-                ent.ResetCounter();
+                ent.SetMaxCounter();
                 if (ent.CalculateTargets != null || ent.TargetUnit == null) //need set targets
                 {
                     var targetsUnits =

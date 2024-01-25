@@ -171,11 +171,20 @@ public class Unit : CloneClass
     /// <summary>
     ///     Prepare to combat
     /// </summary>
-    public void InitToCombat()
+    public void Init()
     {
         GetRes(ResourceType.HP).ResVal = GetMaxHp(null);
         GetRes(ResourceType.Toughness).ResVal = Stats.MaxToughness;
         Fighter = null;
+    }
+
+    //call when unit enter battle
+    public void OnEnteringBattle()
+    {
+        foreach (Ability ability in Fighter.Abilities)
+        {
+            ability.OnEnteringBattle();
+        }
     }
 
     /// <summary>

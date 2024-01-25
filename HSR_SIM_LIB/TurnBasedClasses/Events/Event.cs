@@ -50,6 +50,35 @@ public abstract class Event : CloneClass
     private int procRatioCounter  =1;//counter
     private readonly int procRatio = 1;
 
+    /*
+    public int Cooldown { get; init; } = 0;
+    public int CooldownTimer { get; set; } = 0;*/
+
+    //reset event params
+    public void OnEnteringBattle()
+    {
+
+        //reset cd
+        //CooldownTimer = Cooldown;
+
+        //reset Ratio counter
+        if (ProcRatioDirection == ProcRatioDirectionEnm.Descending)
+            procRatioCounter = 1;
+        else
+        {
+            SetMaxCounter();
+        }
+    }
+
+
+    public ProcRatioDirectionEnm ProcRatioDirection { get; init; } = ProcRatioDirectionEnm.Descending;
+
+    public enum ProcRatioDirectionEnm
+    {
+        Descending,//proc on first use then counter
+        Ascending//counter and proc at finish
+    }
+
     public bool IsReady
     {
         get => (procRatioCounter == 1);
@@ -188,7 +217,7 @@ public abstract class Event : CloneClass
     }
 
     //set counter on max value
-    public void ResetCounter()
+    public void SetMaxCounter()
     {
         procRatioCounter = ProcRatio;
     }

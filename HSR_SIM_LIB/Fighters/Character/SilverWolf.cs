@@ -336,7 +336,7 @@ public class SilverWolf : DefaultFighter
         AllowChanges.Events.Add(new AttemptEffect(null, this, Parent) { BaseChance = 1, BuffToApply = allowChangesDebuffAllDmgRes });
         //dmg events
         AllowChanges.Events.Add(new DirectDamage(null, this, Parent)
-        { CalculateValue = CalculateAbilityDmg });
+        { CalculateValue = CalculateAbilityDmg});
         AllowChanges.Events.Add(new ToughnessShred(null, this, Parent) { Val = 60 });
         AllowChanges.Events.Add(trgEnt);
         AllowChanges.Events.Add(new EnergyGain(null, this, Parent)

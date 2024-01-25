@@ -81,7 +81,7 @@ public class DefaultNPCFighter : IFighter
         return null;
     }
 
-    public virtual double Cost =>  ((Parent.Stats.BaseAttack * (1 + Parent.Stats.AttackPrc) + Parent.Stats.AttackFix) * Parent.Stats.BaseCritChance * Parent.Stats.BaseCritDmg)/
+    public virtual double Cost =>  ((Parent.Stats.BaseAttack * (1 + Parent.Stats.AttackPrc) + Parent.Stats.AttackFix) )/
                                   (Parent.Fighter.Abilities.Count(x => x.TargetType == Ability.TargetTypeEnm.Friend) +
                                    1);
 
