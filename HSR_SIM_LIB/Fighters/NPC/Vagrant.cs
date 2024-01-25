@@ -49,8 +49,7 @@ public class Vagrant : DefaultNPCFighter
             AbilityType = Ability.AbilityTypeEnm.Basic,
             Name = "Shovel Attack",
             Element = Element,
-            AdjacentTargets = Ability.AdjacentTargetsEnm.None,
-            SpGain = 1
+            AdjacentTargets = Ability.AdjacentTargetsEnm.None
         };
         //dmg events
         myAttackAbility.Events.Add(new DirectDamage(null, this, Parent)

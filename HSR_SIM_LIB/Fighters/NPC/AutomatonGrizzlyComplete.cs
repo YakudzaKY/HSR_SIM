@@ -29,9 +29,7 @@ internal class AutomatonGrizzlyComplete : DefaultNPCBossFIghter
         {
             AbilityType = Ability.AbilityTypeEnm.Basic,
             Name = "Shovel Attack",
-            Element = Element,
-            AdjacentTargets = Ability.AdjacentTargetsEnm.None,
-            SpGain = 1
+            Element = Element
         };
         //dmg events
         myAttackAbility.Events.Add(new DirectDamage(null, this, Parent)

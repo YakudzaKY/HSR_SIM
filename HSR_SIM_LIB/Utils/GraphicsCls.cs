@@ -38,8 +38,23 @@ public static class GraphicsCls
 
             //TP/SP draw
             if (sim.CurrentFight != null)
+            {
                 DrawText(PartyResourceX, PartyResourceY, gfx,
                     $"SP: {(int)sim.PartyTeam.GetRes(ResourceType.SP).ResVal:d}/{MaxSp:d}");
+                
+                //render points gain/draw
+                int i = 0;
+                foreach (var ent in sim.CurrentStep.Events.Where(x => x is PartyResourceDrain or PartyResourceGain))
+                {
+                    i++;
+                    if (ent is PartyResourceGain)
+                        DrawText(PartyResourceX, PartyResourceY + (int)Math.Round((double)DefaultFontSize*1.3*i), gfx, $"+{ent.Val}",new SolidBrush(Color.Green));
+                    else
+                        DrawText(PartyResourceX, PartyResourceY + (int)Math.Round((double)DefaultFontSize*1.3*i), gfx, $"-{ent.Val}",new SolidBrush(Color.DarkRed));
+                    
+                }
+            }
+
             else
                 DrawText(PartyResourceX, PartyResourceY, gfx,
                     $"TP: {(int)sim.PartyTeam.GetRes(ResourceType.TP).ResVal:d}/{MaxTp:d}");
@@ -256,13 +271,13 @@ public static class GraphicsCls
                 new Point(portraitPoint.X + PortraitSize.Width - ElemSizeMini.Width, portraitPoint.Y));
             //weaknesses
             short j = 0;
-       
+
             foreach (var weak in unit.GetWeaknesses(null))
             {
-                    gfx.DrawImage(new Bitmap(Utl.LoadBitmap(weak.ToString()), ElemSizeMini),
-                        new Point(portraitPoint.X + j * ElemSizeMini.Width,
-                            portraitPoint.Y + (int)(PortraitSize.Height * 0.2)));
-                    j++;
+                gfx.DrawImage(new Bitmap(Utl.LoadBitmap(weak.ToString()), ElemSizeMini),
+                    new Point(portraitPoint.X + j * ElemSizeMini.Width,
+                        portraitPoint.Y + (int)(PortraitSize.Height * 0.2)));
+                j++;
             }
 
             //healthbar
@@ -403,7 +418,7 @@ public static class GraphicsCls
                     DrawText(portraitPoint.X + DmgIconSize.Width
                         , pointY
                         , gfx
-                        , $"{(int)Math.Floor(ent.Val?? 0):D}{(ent is DirectDamage damage && damage.IsCrit ? " crit" : "")}"
+                        , $"{(int)Math.Floor(ent.Val ?? 0):D}{(ent is DirectDamage damage && damage.IsCrit ? " crit" : "")}"
                         , new SolidBrush(nmbrColor)
                         , new Font("Tahoma", BarFontSize, FontStyle.Bold));
 
@@ -452,7 +467,7 @@ public static class GraphicsCls
                         , new SolidBrush(Color.Coral)
                         , new Font("Tahoma", (int)Math.Round(BarFontSize * 0.8), FontStyle.Bold), true);
                 if (!buff.Dispellable)
-                    DrawText(buffPoint.X+ (int)(ElemSizeMini.Height * 0.5)
+                    DrawText(buffPoint.X + (int)(ElemSizeMini.Height * 0.5)
                         , buffPoint.Y + (int)(ElemSizeMini.Height * 0.5)
                         , gfx
                         , "\u26ca"
@@ -470,7 +485,7 @@ public static class GraphicsCls
                 gfx.DrawImage(
                     new Bitmap(Utl.LoadBitmap(buff.AppliedBuff.CustomIconName ?? buff.AppliedBuff.Effects.First().GetType().Name),
                         ElemSizeMini), buffPoint);
-                gfx.DrawRectangle(new Pen((buff.AppliedBuff.Type== Buff.BuffType.Buff )?Color.Blue:Color.DarkRed, 1), buffPoint.X, buffPoint.Y, ElemSizeMini.Width,
+                gfx.DrawRectangle(new Pen((buff.AppliedBuff.Type == Buff.BuffType.Buff) ? Color.Blue : Color.DarkRed, 1), buffPoint.X, buffPoint.Y, ElemSizeMini.Width,
                     ElemSizeMini.Height);
 
 
