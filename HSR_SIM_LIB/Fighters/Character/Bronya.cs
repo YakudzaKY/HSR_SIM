@@ -5,6 +5,7 @@ using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
+using static HSR_SIM_LIB.Fighters.FighterUtils;
 
 namespace HSR_SIM_LIB.Fighters.Character;
 
@@ -64,6 +65,20 @@ public class Bronya : DefaultFighter
             });
     }
 
+    /*
+     * if 2+ turns left we dont need SP.
+     * duration 2= turn+ next from bronya turn or double turn between support turn
+     */
+    public override double WillSpend()
+    {
+        return WillCastE() ? 1 + GetFriendSpender(UnitRole.MainDPS)  : 0;
+    }
+
+    //todo analyse mainDPS action value
+    private bool WillCastE()
+    {
+        return true;
+    }
     public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Harmony;
     public override Unit.ElementEnm Element { get; } = Unit.ElementEnm.Wind;
 

@@ -368,7 +368,7 @@ public abstract class DefaultFighter : IFighter
     ///     I will spend in next turn
     /// </summary>
     /// <returns></returns>
-    public double WillSpend()
+    public virtual double WillSpend()
     {
         return 1; //todo get ability cost by default
     }
@@ -413,7 +413,7 @@ public abstract class DefaultFighter : IFighter
             //Cut Free  res to total-reserve
             res = Math.Min(res, totalRes - reservedSp);
             Parent.ParentTeam.ParentSim?.Parent.LogDebug(
-                $"Im {Role},I care about reserve+ MainDps spenders({addSpenders})");
+                $"Im {Role},I care about (reserve+ MainDps spenders)={addSpenders}");
         }
         else if (Role is UnitRole.SecondDPS or UnitRole.ThirdDPS)
         {
@@ -422,7 +422,7 @@ public abstract class DefaultFighter : IFighter
             //Cut Free  res to total-reserve
             res = Math.Min(res, totalRes - reservedSp);
             Parent.ParentTeam.ParentSim?.Parent.LogDebug(
-                $"Im {Role},I care about reserve+ MainDps+Support spenders({addSpenders})");
+                $"Im {Role},I care about (reserve+ MainDps+Support spenders)={addSpenders}");
         }
         else if (Role is UnitRole.Healer)
         {

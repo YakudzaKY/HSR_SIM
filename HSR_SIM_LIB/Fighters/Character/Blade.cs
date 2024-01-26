@@ -191,6 +191,16 @@ public class Blade : DefaultFighter
 
     private int ssSkillLvl;
     //Blade constructor
+
+    /*
+     * if 2+ turns left we dont need SP.
+     * duration 2= turn+ next from bronya turn or double turn between support turn
+     */
+    public override double WillSpend()
+    {
+        return (Parent.Buffs.FirstOrDefault(x => x.Reference == hellscapeBuff)?.DurationLeft??0) > 2 ? 0 : 1;
+    }
+
     public Blade(Unit parent) : base(parent)
     {
         Parent.Stats.BaseMaxEnergy = 130;
