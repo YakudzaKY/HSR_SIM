@@ -282,29 +282,38 @@ public static class FighterUtils
     /// <summary>
     /// Get Skill Modifier By min, max and level
     /// </summary>
-    /// <param name="min"></param>
-    /// <param name="max"></param>
-    /// <param name="level"></param>
+    /// <param name="modAt1">skill mod at 1 lvl</param>
+    /// <param name="modAt10">skill mod at 10 lvl </param>
+    /// <param name="level">level can be higher than 10</param>
     /// <returns></returns>
-    public static double GetStatMod(double min, double max, int level)
+    public static double GetAbilityScaling(double modAt1, double modAt10, int level)
     {
-        int maxLvl = 10;//without eidolon
+        int maxLvl = 10;//without E
         int firstModLvl = 6;
         if (level <= firstModLvl)
         {
-            return min+(max-min)*(level-1)/maxLvl;
+            return modAt1+(modAt10-modAt1)*(level-1)/maxLvl;
         }
-        else if (level <= maxLvl)
+        if (level <= maxLvl)
         {
             //first get val from 6 lvl
-            double preMod=GetStatMod(min, max, firstModLvl);
-            return preMod + (max - preMod) * 1 / (maxLvl - firstModLvl) *(level-firstModLvl);
+            double preMod=GetAbilityScaling(modAt1, modAt10, firstModLvl);
+            return preMod + (modAt10 - preMod) * 1 / (maxLvl - firstModLvl) *(level-firstModLvl);
+        }
+        return modAt10+((modAt10-modAt1)*1/maxLvl*(level-maxLvl));
+    }
 
-        }
-        else
-        {
-            return max+((max-min)*1/maxLvl*(level-maxLvl));
-  
-        }
+    /// <summary>
+    /// Get Basic ability Modifier By min, max and level
+    /// </summary>
+    /// <param name="modAt1">skill mod at 1 lvl</param>
+    /// <param name="modAt6">skill mod at 6 lvl </param>
+    /// <param name="level">level can be higher than 10</param>
+    /// <returns></returns>
+    public static double GetBasicScaling(double modAt1, double modAt6, int level)
+    {
+        int maxLvl = 6;//without E
+       
+        return modAt1+(level-1)/(maxLvl-1)*(modAt6-modAt6);
     }
 }

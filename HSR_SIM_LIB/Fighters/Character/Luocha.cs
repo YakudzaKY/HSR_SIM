@@ -12,39 +12,9 @@ namespace HSR_SIM_LIB.Fighters.Character;
 
 public class Luocha : DefaultFighter
 {
-    private readonly double[]  coLfAtkMods = 
-    {
-         0.12 ,  0.1275, 0.135,  0.1425 ,  0.15 ,  0.156,  0.162 ,  0.168 ,
-         0.174 ,  0.18 ,  0.186 , 0.192 
-    };
-
-    private readonly double[]    coLfFixMods =
-    {
-        60 ,  96 ,  123 ,  150,  168 , 186 ,  199.5, 213 ,
-       226.5 , 240 ,  253.5 ,  267 
-    };
-
+   
     private readonly Ability cycleOfLife;
     private readonly double cycleOfLifeMaxCnt = 2;
-
-    private readonly double[]  deathWishMods =
-    {
-         1.20 ,  1.28 ,  1.36 ,  1.44 ,  1.52 ,  1.60 ,  1.70,  1.80 ,
-         1.90 ,  2 , 2.08 ,  2.16
-    };
-
-    private readonly double[]  poAfAtkMods = 
-    {
-         0.40 ,  0.425 ,  0.45 ,  0.475 ,  0.50 ,  0.52,  0.54 ,  0.56 ,
-         0.58 ,  0.60 ,  0.62 , 0.64
-
-    };
-
-    private readonly double[]  poAfFixMods =
-    {
-         200 ,  320 ,  410 ,  500 ,  560 ,  620 ,  665 ,  710 ,
-         755 , 800 ,  845 ,  890 
-    };
 
     private readonly Ability prayerOfAbyssFlower;
     private readonly Ability prayerOfAbyssFlowerAuto;
@@ -74,11 +44,11 @@ public class Luocha : DefaultFighter
         totALvl=Parent.Skills.First(x => x.Name == "Thorns of the Abyss")!.Level;
         poALvl = Parent.Skills.First(x => x.Name == "Prayer of Abyss Flower")!.Level;
 
-        coLfAtk = coLfAtkMods[coLLvl-1];
-        coLfFix = coLfFixMods[coLLvl-1];
-        deathWish = deathWishMods[dWLvl-1];
-        poAfAtk= poAfAtkMods[poALvl-1];
-        poAfFix= poAfFixMods[poALvl-1];
+        coLfAtk =  FighterUtils.GetAbilityScaling(0.12, 0.18, coLLvl); 
+        coLfFix = FighterUtils.GetAbilityScaling(60, 240, coLLvl); 
+        deathWish = FighterUtils.GetAbilityScaling(1.20, 2, dWLvl); 
+        poAfAtk= FighterUtils.GetAbilityScaling(0.4, 0.6, poALvl); 
+        poAfFix=  FighterUtils.GetAbilityScaling(200, 800, poALvl); 
 
         uniqueBuff = new Buff(Parent)
         {

@@ -15,20 +15,18 @@ namespace HSR_SIM_LIB.Fighters.Character;
 
 public class SilverWolf : DefaultFighter
 {
-    private Buff allowChangesDebuff;
-    private Buff ultDefDebuff;
-    private Buff allowChangesDebuffAllDmgRes;
-    private Event UltimateHitLastEvent;
+    private readonly Buff allowChangesDebuff;
+    private readonly Buff ultDefDebuff;
+    private readonly Buff allowChangesDebuffAllDmgRes;
+    private readonly Event ultimateHitLastEvent;
 
-    private Buff talentAtkDebuff;
-    private Buff talentSpdDebuff;
-    private Buff talentDefDebuff;
-    private Buff[] bugArray;
-    private int bugDuration;
-    private int weaknessDuration;
-    private TriggerEvent trgEnt;
-
-
+    private readonly Buff talentAtkDebuff;
+    private readonly Buff talentSpdDebuff;
+    private readonly Buff talentDefDebuff;
+    private readonly Buff[] bugArray;
+    private readonly int bugDuration;
+    private readonly int weaknessDuration;
+    private readonly TriggerEvent trgEnt;
 
 
     private readonly double alwChgChnc;
@@ -44,17 +42,17 @@ public class SilverWolf : DefaultFighter
     {
         trgEnt = new TriggerEvent(null, null, Parent);
         Parent.Stats.BaseMaxEnergy = 110;
-        alwChgChnc = FighterUtils.GetStatMod(0.75, 0.85, Parent.Skills.First(x => x.Name == "Allow Changes?").Level);
-        alwChgAtk = FighterUtils.GetStatMod(0.98, 1.96, Parent.Skills.First(x => x.Name == "Allow Changes?").Level);
+        alwChgChnc = FighterUtils.GetAbilityScaling(0.75, 0.85, Parent.Skills.First(x => x.Name == "Allow Changes?").Level);
+        alwChgAtk = FighterUtils.GetAbilityScaling(0.98, 1.96, Parent.Skills.First(x => x.Name == "Allow Changes?").Level);
         swSkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "System Warning").Level;
-        allowChangesDebuffAllDmgVal = FighterUtils.GetStatMod(0.075, 0.1, Parent.Skills.First(x => x.Name == "Allow Changes?").Level);
+        allowChangesDebuffAllDmgVal = FighterUtils.GetAbilityScaling(0.075, 0.10, Parent.Skills.First(x => x.Name == "Allow Changes?").Level);
 
-        ultDmg = FighterUtils.GetStatMod(2.28, 3.80, Parent.Skills.First(x => x.Name == "User Banned").Level); 
-        ultDef = FighterUtils.GetStatMod(0.36, 0.45, Parent.Skills.First(x => x.Name == "User Banned").Level); 
-        ultChance =FighterUtils.GetStatMod(0.85, 1, Parent.Skills.First(x => x.Name == "User Banned").Level); 
+        ultDmg = FighterUtils.GetAbilityScaling(2.28, 3.80, Parent.Skills.First(x => x.Name == "User Banned").Level); 
+        ultDef = FighterUtils.GetAbilityScaling(0.36, 0.45, Parent.Skills.First(x => x.Name == "User Banned").Level); 
+        ultChance =FighterUtils.GetAbilityScaling(0.85, 100, Parent.Skills.First(x => x.Name == "User Banned").Level); 
 
         talentLvl = Parent.Skills.First(x => x.Name == "Awaiting System Response...").Level;
-        talentDebuffChance =FighterUtils.GetStatMod(0.60, 0.72,talentLvl);
+        talentDebuffChance =FighterUtils.GetAbilityScaling(0.60, 0.72,talentLvl);
 
         weaknessDuration = Atraces.HasFlag(ATracesEnm.A4) ? 3 : 2;
 
@@ -69,11 +67,11 @@ public class SilverWolf : DefaultFighter
 
         bugDuration = Atraces.HasFlag(ATracesEnm.A2) ? 4 : 3;
         talentAtkDebuff = new Buff(Parent, null)
-        { Type = Buff.BuffType.Debuff, BaseDuration = bugDuration, Effects = new List<Effect>() { new EffAtkPrc() { Value = -FighterUtils.GetStatMod(0.05, 0.1,talentLvl) } } };
+        { Type = Buff.BuffType.Debuff, BaseDuration = bugDuration, Effects = new List<Effect>() { new EffAtkPrc() { Value = -FighterUtils.GetAbilityScaling(0.05, 0.1,talentLvl) } } };
         talentDefDebuff = new Buff(Parent, null)
-        { Type = Buff.BuffType.Debuff, BaseDuration = bugDuration, Effects = new List<Effect>() { new EffDefPrc() { Value = -FighterUtils.GetStatMod(0.04, 0.08,talentLvl) } } };
+        { Type = Buff.BuffType.Debuff, BaseDuration = bugDuration, Effects = new List<Effect>() { new EffDefPrc() { Value = -FighterUtils.GetAbilityScaling(0.04, 0.08,talentLvl) } } };
         talentSpdDebuff = new Buff(Parent, null)
-        { Type = Buff.BuffType.Debuff, BaseDuration = bugDuration, Effects = new List<Effect>() { new EffSpeedPrc() { Value = -FighterUtils.GetStatMod(0.03, 0.06,talentLvl)  } } };
+        { Type = Buff.BuffType.Debuff, BaseDuration = bugDuration, Effects = new List<Effect>() { new EffSpeedPrc() { Value = -FighterUtils.GetAbilityScaling(0.03, 0.06,talentLvl)  } } };
         bugArray = new[] { talentAtkDebuff, talentSpdDebuff, talentDefDebuff };
         //=====================
         //Abilities
@@ -174,9 +172,9 @@ public class SilverWolf : DefaultFighter
         { CalculateValue = CalculateUltimateDmg });
         UserBanned.Events.Add(new ToughnessShred(null, this, Parent) { Val = 90 });
         UserBanned.Events.Add(trgEnt);
-        UltimateHitLastEvent = new EnergyGain(null, this, Parent)
+        ultimateHitLastEvent = new EnergyGain(null, this, Parent)
         { Val = 5, TargetUnit = Parent };
-        UserBanned.Events.Add(UltimateHitLastEvent);
+        UserBanned.Events.Add(ultimateHitLastEvent);
 
         Abilities.Add(UserBanned);
 
@@ -281,7 +279,7 @@ public class SilverWolf : DefaultFighter
             }
         }
         //E2-4
-        else if (Parent.Rank >= 2 && ent.Reference == UltimateHitLastEvent)//EnergyGain event
+        else if (Parent.Rank >= 2 && ent.Reference == ultimateHitLastEvent)//EnergyGain event
         {
             double debuffs;
             Unit tarUnit = ent.ParentStep.Target;
