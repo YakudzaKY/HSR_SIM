@@ -1,94 +1,100 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 
 <Unit name="Vagrant">
-	<Stats level="1 " hp="112 " atk="12 " spd="100 " def="210 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="2 " hp="146 " atk="14 " spd="100 " def="220 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="3 " hp="153 " atk="15 " spd="100 " def="230 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="4 " hp="190 " atk="20 " spd="100 " def="240 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="5 " hp="199 " atk="21 " spd="100 " def="250 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="6 " hp="209 " atk="22 " spd="100 " def="260 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="7 " hp="218 " atk="23 " spd="100 " def="270 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="8 " hp="228 " atk="25 " spd="100 " def="280 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="9 " hp="238 " atk="26 " spd="100 " def="290 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="10 " hp="248 " atk="26 " spd="100 " def="300 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="11 " hp="265 " atk="29 " spd="100 " def="310 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="12 " hp="283 " atk="32 " spd="100 " def="320 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="13 " hp="300 " atk="34 " spd="100 " def="330 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="14 " hp="318 " atk="37 " spd="100 " def="340 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="15 " hp="335 " atk="40 " spd="100 " def="350 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="16 " hp="352 " atk="42 " spd="100 " def="360 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="17 " hp="370 " atk="45 " spd="100 " def="370 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="18 " hp="387 " atk="48 " spd="100 " def="380 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="19 " hp="405 " atk="50 " spd="100 " def="390 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="20 " hp="422 " atk="53 " spd="100 " def="400 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="21 " hp="453 " atk="57 " spd="100 " def="410 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="22 " hp="484 " atk="62 " spd="100 " def="420 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="23 " hp="515 " atk="66 " spd="100 " def="430 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="24 " hp="546 " atk="71 " spd="100 " def="440 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="25 " hp="577 " atk="75 " spd="100 " def="450 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="26 " hp="608 " atk="80 " spd="100 " def="460 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="27 " hp="639 " atk="84 " spd="100 " def="470 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="28 " hp="669 " atk="89 " spd="100 " def="480 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="29 " hp="700 " atk="93 " spd="100 " def="490 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="30 " hp="731 " atk="94 " spd="100 " def="500 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="31 " hp="791 " atk="104 " spd="100 " def="510 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="32 " hp="851 " atk="109 " spd="100 " def="520 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="33 " hp="911 " atk="115 " spd="100 " def="530 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="34 " hp="970 " atk="121 " spd="100 " def="540 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="35 " hp="1030 " atk="127 " spd="100 " def="550 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="36 " hp="1090 " atk="132 " spd="100 " def="560 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="37 " hp="1149 " atk="138 " spd="100 " def="570 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="38 " hp="1209 " atk="144 " spd="100 " def="580 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="39 " hp="1269 " atk="150 " spd="100 " def="590 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="40 " hp="1329 " atk="155 " spd="100 " def="600 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="41 " hp="1505 " atk="163 " spd="100 " def="610 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="42 " hp="1681 " atk="171 " spd="100 " def="620 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="43 " hp="1857 " atk="179 " spd="100 " def="630 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="44 " hp="2033 " atk="187 " spd="100 " def="640 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="45 " hp="2209 " atk="195 " spd="100 " def="650 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="46 " hp="2385 " atk="203 " spd="100 " def="660 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="47 " hp="2561 " atk="210 " spd="100 " def="670 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="48 " hp="2737 " atk="218 " spd="100 " def="680 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="49 " hp="2913 " atk="226 " spd="100 " def="690 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="50 " hp="3089 " atk="234 " spd="100 " def="700 " effect_hit="0.0" effect_res="0.10" tgh="60" />
-	<Stats level="51 " hp="3515 " atk="244 " spd="100 " def="710 " effect_hit="0.08" effect_res="0.104" tgh="60" />
-	<Stats level="52 " hp="3942 " atk="255 " spd="100 " def="720 " effect_hit="0.16" effect_res="0.108" tgh="60" />
-	<Stats level="53 " hp="4368 " atk="265 " spd="100 " def="730 " effect_hit="0.24" effect_res="0.112" tgh="60" />
-	<Stats level="54 " hp="4795 " atk="276 " spd="100 " def="740 " effect_hit="0.32" effect_res="0.116" tgh="60" />
-	<Stats level="55 " hp="5222 " atk="286 " spd="100 " def="750 " effect_hit="0.4" effect_res="0.12" tgh="60" />
-	<Stats level="56 " hp="5648 " atk="297 " spd="100 " def="760 " effect_hit="0.48" effect_res="0.124" tgh="60" />
-	<Stats level="57 " hp="6075 " atk="307 " spd="100 " def="770 " effect_hit="0.56" effect_res="0.128" tgh="60" />
-	<Stats level="58 " hp="6502 " atk="317 " spd="100 " def="780 " effect_hit="0.64" effect_res="0.132" tgh="60" />
-	<Stats level="59 " hp="6928 " atk="328 " spd="100 " def="790 " effect_hit="0.72" effect_res="0.136" tgh="60" />
-	<Stats level="60 " hp="7355 " atk="338 " spd="100 " def="800 " effect_hit="0.8" effect_res="0.14" tgh="60" />
-	<Stats level="61 " hp="7945 " atk="348 " spd="100 " def="810 " effect_hit="0.88" effect_res="0.144" tgh="60" />
-	<Stats level="62 " hp="8534 " atk="358 " spd="100 " def="820 " effect_hit="0.96" effect_res="0.148" tgh="60" />
-	<Stats level="63 " hp="9124 " atk="368 " spd="100 " def="830 " effect_hit="0.104" effect_res="0.152" tgh="60" />
-	<Stats level="64 " hp="9713 " atk="377 " spd="100 " def="840 " effect_hit="0.112" effect_res="0.156" tgh="60" />
-	<Stats level="65 " hp="10303 " atk="387 " spd="110 " def="850 " effect_hit="0.12" effect_res="0.16" tgh="60" />
-	<Stats level="66 " hp="10892 " atk="397 " spd="110 " def="860 " effect_hit="0.128" effect_res="0.164" tgh="60" />
-	<Stats level="67 " hp="11482 " atk="407 " spd="110 " def="870 " effect_hit="0.136" effect_res="0.168" tgh="60" />
-	<Stats level="68 " hp="12072 " atk="416 " spd="110 " def="880 " effect_hit="0.144" effect_res="0.172" tgh="60" />
-	<Stats level="69 " hp="12661 " atk="426 " spd="110 " def="890 " effect_hit="0.152" effect_res="0.176" tgh="60" />
-	<Stats level="70 " hp="13251 " atk="436 " spd="110 " def="900 " effect_hit="0.16" effect_res="0.18" tgh="60" />
-	<Stats level="71 " hp="13990 " atk="447 " spd="110 " def="910 " effect_hit="0.168" effect_res="0.184" tgh="60" />
-	<Stats level="72 " hp="14730 " atk="459 " spd="110 " def="920 " effect_hit="0.176" effect_res="0.188" tgh="60" />
-	<Stats level="73 " hp="15470 " atk="471 " spd="110 " def="930 " effect_hit="0.184" effect_res="0.192" tgh="60" />
-	<Stats level="74 " hp="16209 " atk="482 " spd="110 " def="940 " effect_hit="0.192" effect_res="0.196" tgh="60" />
-	<Stats level="75 " hp="16949 " atk="494 " spd="110 " def="950 " effect_hit="0.20" effect_res="0.20" tgh="60" />
-	<Stats level="76 " hp="17689 " atk="506 " spd="110 " def="960 " effect_hit="0.208" effect_res="0.20" tgh="60" />
-	<Stats level="77 " hp="18428 " atk="517 " spd="110 " def="970 " effect_hit="0.216" effect_res="0.20" tgh="60" />
-	<Stats level="78 " hp="19168 " atk="529 " spd="120 " def="980 " effect_hit="0.224" effect_res="0.20" tgh="60" />
-	<Stats level="79 " hp="19908 " atk="541 " spd="120 " def="990 " effect_hit="0.232" effect_res="0.20" tgh="60" />
-	<Stats level="80 " hp="20648 " atk="552 " spd="120 " def="1000 " effect_hit="0.24" effect_res="0.20" tgh="60" />
-	<Stats level="81 " hp="21690 " atk="563 " spd="120 " def="1010 " effect_hit="0.248" effect_res="0.20" tgh="60" />
-	<Stats level="82 " hp="22772 " atk="574 " spd="120 " def="1020 " effect_hit="0.256" effect_res="0.20" tgh="60" />
-	<Stats level="83 " hp="23894 " atk="585 " spd="120 " def="1030 " effect_hit="0.264" effect_res="0.20" tgh="60" />
-	<Stats level="84 " hp="25057 " atk="597 " spd="120 " def="1040 " effect_hit="0.272" effect_res="0.20" tgh="60" />
-	<Stats level="85 " hp="26263 " atk="608 " spd="120 " def="1050 " effect_hit="0.28" effect_res="0.20" tgh="60" />
-	<Stats level="86 " hp="27513 " atk="619 " spd="132 " def="1060 " effect_hit="0.288" effect_res="0.20" tgh="60" />
-	<Stats level="87 " hp="28810 " atk="630 " spd="132 " def="1070 " effect_hit="0.296" effect_res="0.20" tgh="60" />
-	<Stats level="88 " hp="30155 " atk="641 " spd="132 " def="1080 " effect_hit="0.304" effect_res="0.20" tgh="60" />
-	<Stats level="89 " hp="31550 " atk="652 " spd="132 " def="1090 " effect_hit="0.312" effect_res="0.20" tgh="60" />
-	<Stats level="90 " hp="32997 " atk="663 " spd="132 " def="1100 " effect_hit="0.32" effect_res="0.20" tgh="60" />
+<Stats level="1" hp="112" atk="12" spd="100" def="210" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="2" hp="146" atk="14" spd="100" def="220" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="3" hp="153" atk="15" spd="100" def="230" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="4" hp="190" atk="20" spd="100" def="240" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="5" hp="199" atk="21" spd="100" def="250" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="6" hp="209" atk="22" spd="100" def="260" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="7" hp="218" atk="23" spd="100" def="270" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="8" hp="228" atk="25" spd="100" def="280" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="9" hp="238" atk="26" spd="100" def="290" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="10" hp="248" atk="26" spd="100" def="300" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="11" hp="265" atk="29" spd="100" def="310" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="12" hp="283" atk="32" spd="100" def="320" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="13" hp="300" atk="34" spd="100" def="330" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="14" hp="318" atk="37" spd="100" def="340" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="15" hp="335" atk="40" spd="100" def="350" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="16" hp="352" atk="42" spd="100" def="360" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="17" hp="370" atk="45" spd="100" def="370" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="18" hp="387" atk="48" spd="100" def="380" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="19" hp="405" atk="50" spd="100" def="390" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="20" hp="422" atk="53" spd="100" def="400" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="21" hp="453" atk="57" spd="100" def="410" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="22" hp="484" atk="62" spd="100" def="420" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="23" hp="515" atk="66" spd="100" def="430" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="24" hp="546" atk="71" spd="100" def="440" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="25" hp="577" atk="75" spd="100" def="450" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="26" hp="608" atk="80" spd="100" def="460" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="27" hp="639" atk="84" spd="100" def="470" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="28" hp="669" atk="89" spd="100" def="480" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="29" hp="700" atk="93" spd="100" def="490" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="30" hp="731" atk="98" spd="100" def="500" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="31" hp="791" atk="104" spd="100" def="510" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="32" hp="851" atk="109" spd="100" def="520" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="33" hp="911" atk="115" spd="100" def="530" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="34" hp="970" atk="121" spd="100" def="540" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="35" hp="1030" atk="127" spd="100" def="550" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="36" hp="1090" atk="132" spd="100" def="560" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="37" hp="1149" atk="138" spd="100" def="570" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="38" hp="1209" atk="144" spd="100" def="580" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="39" hp="1269" atk="150" spd="100" def="590" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="40" hp="1329" atk="155" spd="100" def="600" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="41" hp="1505" atk="163" spd="100" def="610" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="42" hp="1681" atk="171" spd="100" def="620" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="43" hp="1857" atk="179" spd="100" def="630" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="44" hp="2033" atk="187" spd="100" def="640" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="45" hp="2209" atk="195" spd="100" def="650" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="46" hp="2385" atk="203" spd="100" def="660" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="47" hp="2561" atk="210" spd="100" def="670" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="48" hp="2737" atk="218" spd="100" def="680" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="49" hp="2913" atk="226" spd="100" def="690" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="50" hp="3089" atk="234" spd="100" def="700" effect_hit="0.0" effect_res="0.10" tgh="60" />
+<Stats level="51" hp="3515" atk="244" spd="100" def="710" effect_hit="0.08" effect_res="0.104" tgh="60" />
+<Stats level="52" hp="3942" atk="255" spd="100" def="720" effect_hit="0.16" effect_res="0.108" tgh="60" />
+<Stats level="53" hp="4368" atk="265" spd="100" def="730" effect_hit="0.24" effect_res="0.112" tgh="60" />
+<Stats level="54" hp="4795" atk="276" spd="100" def="740" effect_hit="0.32" effect_res="0.116" tgh="60" />
+<Stats level="55" hp="5222" atk="286" spd="100" def="750" effect_hit="0.4" effect_res="0.12" tgh="60" />
+<Stats level="56" hp="5648" atk="297" spd="100" def="760" effect_hit="0.48" effect_res="0.124" tgh="60" />
+<Stats level="57" hp="6075" atk="307" spd="100" def="770" effect_hit="0.56" effect_res="0.128" tgh="60" />
+<Stats level="58" hp="6502" atk="317" spd="100" def="780" effect_hit="0.64" effect_res="0.132" tgh="60" />
+<Stats level="59" hp="6928" atk="328" spd="100" def="790" effect_hit="0.72" effect_res="0.136" tgh="60" />
+<Stats level="60" hp="7355" atk="338" spd="100" def="800" effect_hit="0.8" effect_res="0.14" tgh="60" />
+<Stats level="61" hp="7945" atk="348" spd="100" def="810" effect_hit="0.88" effect_res="0.144" tgh="60" />
+<Stats level="62" hp="8534" atk="358" spd="100" def="820" effect_hit="0.96" effect_res="0.148" tgh="60" />
+<Stats level="63" hp="9124" atk="368" spd="100" def="830" effect_hit="0.104" effect_res="0.152" tgh="60" />
+<Stats level="64" hp="9713" atk="377" spd="100" def="840" effect_hit="0.112" effect_res="0.156" tgh="60" />
+<Stats level="65" hp="10303" atk="387" spd="110" def="850" effect_hit="0.12" effect_res="0.16" tgh="60" />
+<Stats level="66" hp="10892" atk="397" spd="110" def="860" effect_hit="0.128" effect_res="0.164" tgh="60" />
+<Stats level="67" hp="11482" atk="407" spd="110" def="870" effect_hit="0.136" effect_res="0.168" tgh="60" />
+<Stats level="68" hp="12072" atk="416" spd="110" def="880" effect_hit="0.144" effect_res="0.172" tgh="60" />
+<Stats level="69" hp="12661" atk="426" spd="110" def="890" effect_hit="0.152" effect_res="0.176" tgh="60" />
+<Stats level="70" hp="13251" atk="436" spd="110" def="900" effect_hit="0.16" effect_res="0.18" tgh="60" />
+<Stats level="71" hp="13990" atk="447" spd="110" def="910" effect_hit="0.168" effect_res="0.184" tgh="60" />
+<Stats level="72" hp="14730" atk="459" spd="110" def="920" effect_hit="0.176" effect_res="0.188" tgh="60" />
+<Stats level="73" hp="15470" atk="471" spd="110" def="930" effect_hit="0.184" effect_res="0.192" tgh="60" />
+<Stats level="74" hp="16209" atk="482" spd="110" def="940" effect_hit="0.192" effect_res="0.196" tgh="60" />
+<Stats level="75" hp="16949" atk="494" spd="110" def="950" effect_hit="0.20" effect_res="0.20" tgh="60" />
+<Stats level="76" hp="17689" atk="506" spd="110" def="960" effect_hit="0.208" effect_res="0.20" tgh="60" />
+<Stats level="77" hp="18428" atk="517" spd="110" def="970" effect_hit="0.216" effect_res="0.20" tgh="60" />
+<Stats level="78" hp="19168" atk="529" spd="120" def="980" effect_hit="0.224" effect_res="0.20" tgh="60" />
+<Stats level="79" hp="19908" atk="541" spd="120" def="990" effect_hit="0.232" effect_res="0.20" tgh="60" />
+<Stats level="80" hp="20648" atk="552" spd="120" def="1000" effect_hit="0.24" effect_res="0.20" tgh="60" />
+<Stats level="81" hp="21690" atk="563" spd="120" def="1010" effect_hit="0.248" effect_res="0.20" tgh="60" />
+<Stats level="82" hp="22772" atk="574" spd="120" def="1020" effect_hit="0.256" effect_res="0.20" tgh="60" />
+<Stats level="83" hp="23894" atk="585" spd="120" def="1030" effect_hit="0.264" effect_res="0.20" tgh="60" />
+<Stats level="84" hp="25057" atk="597" spd="120" def="1040" effect_hit="0.272" effect_res="0.20" tgh="60" />
+<Stats level="85" hp="26263" atk="608" spd="120" def="1050" effect_hit="0.28" effect_res="0.20" tgh="60" />
+<Stats level="86" hp="27513" atk="619" spd="132" def="1060" effect_hit="0.288" effect_res="0.20" tgh="60" />
+<Stats level="87" hp="28810" atk="630" spd="132" def="1070" effect_hit="0.296" effect_res="0.20" tgh="60" />
+<Stats level="88" hp="30155" atk="641" spd="132" def="1080" effect_hit="0.304" effect_res="0.20" tgh="60" />
+<Stats level="89" hp="31550" atk="652" spd="132" def="1090" effect_hit="0.312" effect_res="0.20" tgh="60" />
+<Stats level="90" hp="32997" atk="663" spd="132" def="1100" effect_hit="0.32" effect_res="0.20" tgh="60" />
+<Stats level="91" hp="34496" atk="674" spd="132" def="1110" effect_hit="0.328" effect_res="0.20" tgh="60" />
+<Stats level="92" hp="36052" atk="685" spd="132" def="1120" effect_hit="0.336" effect_res="0.20" tgh="60" />
+<Stats level="93" hp="37665" atk="696" spd="132" def="1130" effect_hit="0.344" effect_res="0.20" tgh="60" />
+<Stats level="94" hp="39337" atk="707" spd="132" def="1140" effect_hit="0.352" effect_res="0.20" tgh="60" />
+<Stats level="95" hp="41072" atk="718" spd="132" def="1150" effect_hit="0.36" effect_res="0.20" tgh="60" />
+
 </Unit>

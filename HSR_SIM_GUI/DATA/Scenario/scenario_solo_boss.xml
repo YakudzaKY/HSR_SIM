@@ -13,15 +13,15 @@
 	<Fights>
 		<Fight name="First fight">
 			<Wave>
-				<Unit template="NPC\AutomatonGrizzlyComplete" level="80" />
+				<Unit template="NPC\AutomatonGrizzlyComplete" level="85" />
 			</Wave>
 		</Fight>
 		<Fight name="Second fight">
 			<Wave>
-				<Unit template="NPC\AutomatonGrizzlyComplete" level="85" />
+				<Unit template="NPC\AutomatonGrizzlyComplete" level="90" />
 			</Wave>
 			<Wave>
-				<Unit template="NPC\AutomatonGrizzlyComplete" level="86" />
+				<Unit template="NPC\AutomatonGrizzlyComplete" level="95" />
 			</Wave>
 		</Fight>
 	</Fights>

@@ -73,6 +73,7 @@
     <None Remove="Data\Images\EffFreeze.webp" />
     <None Remove="Data\Images\EffImprisonment.webp" />
     <None Remove="Data\Images\EffMaxHpPrc.webp" />
+    <None Remove="Data\Images\EffRebirth.webp" />
     <None Remove="Data\Images\EffReduceBAV.webp" />
     <None Remove="Data\Images\EffShield.webp" />
     <None Remove="Data\Images\EffShock.webp" />
@@ -120,6 +121,7 @@
     <None Remove="Data\Other\GenerateLevelMultiplier.ods" />
     <None Remove="Data\Other\GenerateStats.ods" />
     <None Remove="Data\Scenario\Scenario1.xml" />
+    <None Remove="Data\Scenario\scenario_solo_boss.xml" />
     <None Remove="Data\WarGear\NPC\Automaton Beetle.xml" />
     <None Remove="Data\WarGear\NPC\AutomatonGrizzlyComplete.xml" />
     <None Remove="Data\WarGear\NPC\Mara Struck Soldier.xml" />
@@ -297,6 +299,9 @@
     <Content Include="Data\Images\EffMaxHpPrc.webp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Data\Images\EffRebirth.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Data\Images\EffReduceBAV.webp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -434,6 +439,9 @@
     </Content>
     <Content Include="Data\Other\GenerateStats.ods" />
     <Content Include="Data\Scenario\Scenario1.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Scenario\scenario_solo_boss.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\WarGear\NPC\Automaton Beetle.xml">

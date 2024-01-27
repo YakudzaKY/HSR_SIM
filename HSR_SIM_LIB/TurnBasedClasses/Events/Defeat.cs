@@ -26,7 +26,7 @@ public class Defeat : Event
             ChildEvents.Add(new EnergyGain(ParentStep, TargetUnit, ParentStep.Actor)
                 { Val = 10, TargetUnit = ParentStep.Actor });
         //got defeated
-
+        //todo if have no EffRebirth
         TargetUnit.IsAlive = revert;
         TargetUnit.ParentTeam.ResetRoles();
 
@@ -36,7 +36,7 @@ public class Defeat : Event
         else
             foreach (var mod in RemovedMods)
                 TargetUnit.ApplyBuff(this, mod);
-
+        //else todo: do rebirth event and remove buff also proceed rebirth follow up action
 
         base.ProcEvent(revert);
     }
