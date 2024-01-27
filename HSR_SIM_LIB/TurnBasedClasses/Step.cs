@@ -316,7 +316,7 @@ public class Step
     {
         //all alive and NO-cced units
         foreach (var prio in Enum.GetValues(typeof(PriorityEnm)).Cast<PriorityEnm>())
-        foreach (var unit in Parent.AllUnits.Where(x => !x.Controlled && x.IsAlive))
+        foreach (var unit in Parent.AllUnits.Where(x => !x.Controlled && x.IsAlive).OrderByDescending(x=>x.Fighter.Role))//supports cast ultimate first
         foreach (var ability in unit.Fighter.Abilities.Where(x => x.Priority == prio &&
                                                                   (x.AbilityType == AbilityTypeEnm.FollowUpAction ||
                                                                    x.AbilityType == AbilityTypeEnm.Ultimate) &&

@@ -11,16 +11,27 @@ namespace HSR_SIM_LIB.Fighters.Character;
 
 public class Bronya : DefaultFighter
 {
+    private readonly int wbSkillLvl;
     public Bronya(Unit parent) : base(parent)
     {
+
         Parent.Stats.BaseMaxEnergy = 120;
-        var ability =
-            //buff tech
+        wbSkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Windrider Bullet").Level;
+
+        //=====================
+        //Abilities
+        //=====================
+
+        var techniqueAbility =
             new Ability(this)
             {
-                AbilityType = Ability.AbilityTypeEnm.Technique, Name = "Banner of Command", Cost = 1,
-                CostType = Resource.ResourceType.TP, Element = Element,
-                AdjacentTargets = Ability.AdjacentTargetsEnm.All, TargetType = Ability.TargetTypeEnm.Friend
+                AbilityType = Ability.AbilityTypeEnm.Technique,
+                Name = "Banner of Command",
+                Cost = 1,
+                CostType = Resource.ResourceType.TP,
+                Element = Element,
+                AdjacentTargets = Ability.AdjacentTargetsEnm.All,
+                TargetType = Ability.TargetTypeEnm.Friend
             };
 
         //buff apply
@@ -29,29 +40,38 @@ public class Bronya : DefaultFighter
             OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
             BuffToApply = new Buff(Parent)
             {
-                Type = Buff.BuffType.Buff, Effects = new List<Effect> { new EffAtkPrc { Value = 0.15 }  },
-                BaseDuration = 2, Dispellable = true
+                Type = Buff.BuffType.Buff,
+                Effects = new List<Effect> { new EffAtkPrc { Value = 0.15 } },
+                BaseDuration = 2,
+                Dispellable = true
             }
         };
-        ability.Events.Add(eventBuff);
+        techniqueAbility.Events.Add(eventBuff);
 
-        Abilities.Add(ability);
+        Abilities.Add(techniqueAbility);
 
 
-        Ability SystemWarning;
-        //System Warning
-        SystemWarning = new Ability(this)
+        //Windrider Bullet
+        Ability windriderBullet;
+        windriderBullet = new Ability(this)
         {
-            AbilityType = Ability.AbilityTypeEnm.Basic, Name = "FIX THIS SHIT!!!", Element = Element,
-            AdjacentTargets = Ability.AdjacentTargetsEnm.None, SpGain = 1
+            AbilityType = Ability.AbilityTypeEnm.Basic,
+            Name = "Windrider Bullet",
+            AdjacentTargets = Ability.AdjacentTargetsEnm.None,
+            SpGain = 1
         };
         //dmg events
-        SystemWarning.Events.Add(new DirectDamage(null, this, Parent)
-            { CalculateValue = CalculateBasicDmg});
-        SystemWarning.Events.Add(new ToughnessShred(null, this, Parent) { Val = 30 });
-        SystemWarning.Events.Add(new EnergyGain(null, this, Parent)
-            { Val = 20, TargetUnit = Parent });
-        Abilities.Add(SystemWarning);
+
+        windriderBullet.Events.Add(new DirectDamage(null, this, Parent)
+        { CalculateValue = CalculateBasicDmg });
+        windriderBullet.Events.Add(new ToughnessShred(null, this, Parent) { Val = 30 });
+        windriderBullet.Events.Add(new EnergyGain(null, this, Parent)
+        { Val = 20, TargetUnit = Parent });
+
+
+        Abilities.Add(windriderBullet);
+
+
         //=====================
         //Ascended Traces
         //=====================
@@ -60,7 +80,7 @@ public class Bronya : DefaultFighter
             PassiveBuffs.Add(new PassiveBuff(Parent)
             {
                 AppliedBuff = new Buff(Parent)
-                    { Effects = new List<Effect> { new EffAllDamageBoost { Value = 0.10 } } },
+                { Effects = new List<Effect> { new EffAllDamageBoost { Value = 0.10 } } },
                 Target = Parent.ParentTeam
             });
     }
@@ -71,7 +91,7 @@ public class Bronya : DefaultFighter
      */
     public override double WillSpend()
     {
-        return WillCastE() ? 1 + GetFriendSpender(UnitRole.MainDPS)  : 0;
+        return WillCastE() ? 1 + GetFriendSpender(UnitRole.MainDPS) : 0;
     }
 
     //todo analyse mainDPS action value
@@ -82,10 +102,13 @@ public class Bronya : DefaultFighter
     public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Harmony;
     public override Unit.ElementEnm Element { get; } = Unit.ElementEnm.Wind;
 
-    public double? CalculateBasicDmg(Event ent)
+
+    //50-110
+    private double? CalculateBasicDmg(Event ent)
     {
         return FighterUtils.CalculateDmgByBasicVal(
-            Parent.GetAttack(null) *
-            (0.4 + Parent.Skills.FirstOrDefault(x => x.Name == "Windrider Bullet").Level * 0.1), ent);
+            Parent.GetAttack(ent) * (0.4 + wbSkillLvl * 0.1),
+            ent);
     }
+
 }

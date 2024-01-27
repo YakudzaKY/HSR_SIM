@@ -29,194 +29,8 @@ public class SilverWolf : DefaultFighter
     private TriggerEvent trgEnt;
 
 
-    private readonly double[] alwChgAtkMods = {
-        0.98,
-        1.078,
-        1.176,
-        1.274,
-        1.372,
-        1.47,
-        1.5925,
-        1.715,
-        1.8375,
-        1.96,
-        2.058,
-        2.156,
-        2.254,
-        2.352,
-        2.45,
-    };
 
-    private readonly double[] alwChgChncMods =
-    {
-        0.75,
-        0.76,
-        0.77,
-        0.78,
-        0.79,
-        0.8,
-        0.8125,
-        0.825,
-        0.8375,
-        0.85,
-        0.86,
-        0.87,
-        0.88,
-        0.89,
-        0.9,
-    };
 
-    private readonly double[] alwChgAllTypeResMods =
-    {
-        0.075,
-        0.0775,
-        0.08,
-        0.0825,
-        0.085,
-        0.0875,
-        0.090625,
-        0.09375,
-        0.096875,
-        0.1,
-        0.1025,
-        0.105,
-        0.1075,
-        0.11,
-        0.1125,
-    };
-
-    private readonly double[] ultDmgMods =
-    {
-        2.28,
-        2.432,
-        2.584,
-        2.736,
-        2.888,
-        3.04,
-        3.23,
-        3.42,
-        3.61,
-        3.8,
-        3.952,
-        4.104,
-        4.256,
-        4.408,
-        4.56,
-    };
-
-    private readonly double[] ultDefMods =
-    {
-        0.36,
-        0.369,
-        0.378,
-        0.387,
-        0.396,
-        0.405,
-        0.41625,
-        0.4275,
-        0.43875,
-        0.45,
-        0.459,
-        0.468,
-        0.477,
-        0.486,
-        0.495,
-    };
-
-    private readonly double[] ultChanceMods =
-    {
-        0.85,
-        0.865,
-        0.88,
-        0.895,
-        0.91,
-        0.925,
-        0.94375,
-        0.9625,
-        0.98125,
-        1.0,
-        1.015,
-        1.03,
-        1.045,
-        1.06,
-        1.075,
-    };
-
-    private readonly double[] talentChanceMods =
-    {
-        0.6,
-        0.612,
-        0.624,
-        0.636,
-        0.648,
-        0.66,
-        0.675,
-        0.69,
-        0.705,
-        0.72,
-        0.732,
-        0.744,
-        0.756,
-        0.768,
-        0.78,
-    };
-
-    private readonly double[] talentATKMods =
-    {
-        0.05,
-        0.055,
-        0.06,
-        0.065,
-        0.07,
-        0.075,
-        0.08125,
-        0.0875,
-        0.09375,
-        0.1,
-        0.105,
-        0.11,
-        0.115,
-        0.12,
-        0.125,
-    };
-
-    private readonly double[] talentDEFMods =
-    {
-        0.04,
-        0.044,
-        0.048,
-        0.052,
-        0.056,
-        0.06,
-        0.065,
-        0.07,
-        0.075,
-        0.08,
-        0.084,
-        0.088,
-        0.092,
-        0.096,
-        0.1,
-    };
-
-    private readonly double[] talentSPDMods =
-    {
-        0.03,
-        0.033,
-        0.036,
-        0.039,
-        0.042,
-        0.045,
-        0.04875,
-        0.0525,
-        0.05625,
-        0.06,
-        0.063,
-        0.066,
-        0.069,
-        0.072,
-        0.075,
-    };
     private readonly double alwChgChnc;
     private readonly double alwChgAtk;
     private readonly double allowChangesDebuffAllDmgVal;
@@ -230,17 +44,17 @@ public class SilverWolf : DefaultFighter
     {
         trgEnt = new TriggerEvent(null, null, Parent);
         Parent.Stats.BaseMaxEnergy = 110;
-        alwChgChnc = alwChgChncMods[Parent.Skills.First(x => x.Name == "Allow Changes?").Level - 1];
-        alwChgAtk = alwChgAtkMods[Parent.Skills.First(x => x.Name == "Allow Changes?").Level - 1];
+        alwChgChnc = FighterUtils.GetStatMod(0.75, 0.85, Parent.Skills.First(x => x.Name == "Allow Changes?").Level);
+        alwChgAtk = FighterUtils.GetStatMod(0.98, 1.96, Parent.Skills.First(x => x.Name == "Allow Changes?").Level);
         swSkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "System Warning").Level;
-        allowChangesDebuffAllDmgVal = alwChgAllTypeResMods[Parent.Skills.First(x => x.Name == "Allow Changes?").Level - 1];
+        allowChangesDebuffAllDmgVal = FighterUtils.GetStatMod(0.075, 0.1, Parent.Skills.First(x => x.Name == "Allow Changes?").Level);
 
-        ultDmg = ultDmgMods[Parent.Skills.First(x => x.Name == "User Banned").Level - 1];
-        ultDef = ultDefMods[Parent.Skills.First(x => x.Name == "User Banned").Level - 1];
-        ultChance = ultChanceMods[Parent.Skills.First(x => x.Name == "User Banned").Level - 1];
+        ultDmg = FighterUtils.GetStatMod(2.28, 3.80, Parent.Skills.First(x => x.Name == "User Banned").Level); 
+        ultDef = FighterUtils.GetStatMod(0.36, 0.45, Parent.Skills.First(x => x.Name == "User Banned").Level); 
+        ultChance =FighterUtils.GetStatMod(0.85, 1, Parent.Skills.First(x => x.Name == "User Banned").Level); 
 
         talentLvl = Parent.Skills.First(x => x.Name == "Awaiting System Response...").Level;
-        talentDebuffChance = talentChanceMods[talentLvl - 1];
+        talentDebuffChance =FighterUtils.GetStatMod(0.60, 0.72,talentLvl);
 
         weaknessDuration = Atraces.HasFlag(ATracesEnm.A4) ? 3 : 2;
 
@@ -255,11 +69,11 @@ public class SilverWolf : DefaultFighter
 
         bugDuration = Atraces.HasFlag(ATracesEnm.A2) ? 4 : 3;
         talentAtkDebuff = new Buff(Parent, null)
-        { Type = Buff.BuffType.Debuff, BaseDuration = bugDuration, Effects = new List<Effect>() { new EffAtkPrc() { Value = -talentATKMods[talentLvl - 1] } } };
+        { Type = Buff.BuffType.Debuff, BaseDuration = bugDuration, Effects = new List<Effect>() { new EffAtkPrc() { Value = -FighterUtils.GetStatMod(0.05, 0.1,talentLvl) } } };
         talentDefDebuff = new Buff(Parent, null)
-        { Type = Buff.BuffType.Debuff, BaseDuration = bugDuration, Effects = new List<Effect>() { new EffDefPrc() { Value = -talentDEFMods[talentLvl - 1] } } };
+        { Type = Buff.BuffType.Debuff, BaseDuration = bugDuration, Effects = new List<Effect>() { new EffDefPrc() { Value = -FighterUtils.GetStatMod(0.04, 0.08,talentLvl) } } };
         talentSpdDebuff = new Buff(Parent, null)
-        { Type = Buff.BuffType.Debuff, BaseDuration = bugDuration, Effects = new List<Effect>() { new EffSpeedPrc() { Value = -talentSPDMods[talentLvl - 1] } } };
+        { Type = Buff.BuffType.Debuff, BaseDuration = bugDuration, Effects = new List<Effect>() { new EffSpeedPrc() { Value = -FighterUtils.GetStatMod(0.03, 0.06,talentLvl)  } } };
         bugArray = new[] { talentAtkDebuff, talentSpdDebuff, talentDefDebuff };
         //=====================
         //Abilities
@@ -302,7 +116,6 @@ public class SilverWolf : DefaultFighter
         {
             AbilityType = Ability.AbilityTypeEnm.Basic,
             Name = "System Warning",
-            Element = Element,
             AdjacentTargets = Ability.AdjacentTargetsEnm.None,
             SpGain = 1
         };
@@ -327,7 +140,6 @@ public class SilverWolf : DefaultFighter
         {
             AbilityType = Ability.AbilityTypeEnm.Ability,
             Name = "Allow Changes?",
-            Element = Element,
             AdjacentTargets = Ability.AdjacentTargetsEnm.None,
             CostType = Resource.ResourceType.SP,
             Cost = 1
@@ -336,7 +148,7 @@ public class SilverWolf : DefaultFighter
         AllowChanges.Events.Add(new AttemptEffect(null, this, Parent) { BaseChance = 1, BuffToApply = allowChangesDebuffAllDmgRes });
         //dmg events
         AllowChanges.Events.Add(new DirectDamage(null, this, Parent)
-        { CalculateValue = CalculateAbilityDmg});
+        { CalculateValue = CalculateAbilityDmg });
         AllowChanges.Events.Add(new ToughnessShred(null, this, Parent) { Val = 60 });
         AllowChanges.Events.Add(trgEnt);
         AllowChanges.Events.Add(new EnergyGain(null, this, Parent)
@@ -487,7 +299,7 @@ public class SilverWolf : DefaultFighter
 
         }
 
-        else if (ent.Reference==trgEnt && ent.SourceUnit == Parent )
+        else if (ent.Reference == trgEnt && ent.SourceUnit == Parent)
         {
             ImplantBug(ent.TargetUnit, ent, talentDebuffChance);
         }

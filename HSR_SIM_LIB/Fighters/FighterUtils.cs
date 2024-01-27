@@ -278,4 +278,33 @@ public static class FighterUtils
             $"Heal val is {res:f} = baseHeal{baseHeal:f} * outMod{outMod:f} *  inMod{inMod:f}");
         return res;
     }
+
+    /// <summary>
+    /// Get Skill Modifier By min, max and level
+    /// </summary>
+    /// <param name="min"></param>
+    /// <param name="max"></param>
+    /// <param name="level"></param>
+    /// <returns></returns>
+    public static double GetStatMod(double min, double max, int level)
+    {
+        int maxLvl = 10;//without eidolon
+        int firstModLvl = 6;
+        if (level <= firstModLvl)
+        {
+            return min+(max-min)*(level-1)/maxLvl;
+        }
+        else if (level <= maxLvl)
+        {
+            //first get val from 6 lvl
+            double preMod=GetStatMod(min, max, firstModLvl);
+            return preMod + (max - preMod) * 1 / (maxLvl - firstModLvl) *(level-firstModLvl);
+
+        }
+        else
+        {
+            return max+((max-min)*1/maxLvl*(level-maxLvl));
+  
+        }
+    }
 }
