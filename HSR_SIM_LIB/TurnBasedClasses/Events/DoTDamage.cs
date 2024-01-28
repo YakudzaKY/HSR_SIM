@@ -6,8 +6,10 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 // Damage by DoTs(when turn started)
 public class DoTDamage : DamageEventTemplate
 {
-    public DoTDamage(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
+    public Unit.ElementEnm Element { get; set; }
+    public DoTDamage(Step parent, ICloneable source, Unit sourceUnit,Unit.ElementEnm element) : base(parent, source, sourceUnit)
     {
+        Element = element;
     }
 
     public override string GetDescription()

@@ -23,7 +23,7 @@ public class Luocha : DefaultFighter
     private readonly Ability ultimateAbility;
     private readonly Buff uniqueBuff;
 
-    private List<Unit> trackedUnits = new();
+    private List<KeyValuePair<Unit,Unit>> trackedUnits = new();
 
     private double coLfAtk;
     private double coLfFix;
@@ -120,13 +120,13 @@ public class Luocha : DefaultFighter
             Available = PoAFAvailable,
             Priority = PriorityEnm.High,
             TargetType = TargetTypeEnm.Friend,
+            FollowUpTargets = trackedUnits
         };
         if (Atraces.HasFlag(ATracesEnm.A2))
-            prayerOfAbyssFlowerAuto.Events.Add(new DispelShit(null, this, Parent)
-            { CalculateTargets = CalcFollowPoAFTarget });
+            prayerOfAbyssFlowerAuto.Events.Add(new DispelShit(null, this, Parent));
         prayerOfAbyssFlowerAuto.Events.Add(new Healing(null, this, Parent)
         {
-            CalculateTargets = CalcFollowPoAFTarget,
+           
             CalculateValue = CalculatePrayerOfAbyssFlower
         });
         prayerOfAbyssFlowerAuto.Events.Add(new EnergyGain(null, this, Parent)
@@ -259,13 +259,6 @@ public class Luocha : DefaultFighter
             });
     }
 
-    public override Unit GetBestTarget(Ability ability)
-    {
-        //Auto heal should heal first tracked unit
-        if (ability == prayerOfAbyssFlowerAuto)
-            return Parent.ParentTeam.ParentSim.Parent.DevMode? DevModeUtils.GetTarget(this, trackedUnits, ability): trackedUnits.First();
-        return base.GetBestTarget(ability);
-    }
 
     public double? CalculateE2Shield(Event ent)
     {
@@ -311,7 +304,7 @@ public class Luocha : DefaultFighter
 
         if (ent is FinishCombat)
         {
-            trackedUnits = new List<Unit>();
+            trackedUnits = new ();
         }
         else if (ent is ResourceDrain or DamageEventTemplate or Healing or ResourceGain or Defeat)
         {
@@ -360,16 +353,17 @@ public class Luocha : DefaultFighter
         //if friend have low hp then add to track
         if (Parent.Friends.Any(x => x == entTargetUnit))
         {
-            if (trackedUnits.All(x => x != entTargetUnit) && entTargetUnit.IsAlive && UnitAtLowHpForAuto(entTargetUnit,ent))
+            if (trackedUnits.All(x => x.Key != entTargetUnit) && entTargetUnit.IsAlive && UnitAtLowHpForAuto(entTargetUnit,ent))
             {
-                trackedUnits.Add(entTargetUnit);
+                trackedUnits.Add( new (entTargetUnit,Parent) );
                 Parent.ParentTeam.ParentSim.Parent.LogDebug($"{Parent.Name} add {entTargetUnit.Name} to track list");
             }
-            else if (trackedUnits.Any(x => x == entTargetUnit) &&
+            else if (trackedUnits.Any(x => x.Key == entTargetUnit) &&
                      (!UnitAtLowHpForAuto(entTargetUnit,ent) || !entTargetUnit.IsAlive))
             {
                 //remove high hp unit from track
-                trackedUnits.Remove(entTargetUnit);
+                KeyValuePair<Unit, Unit> tarPair = trackedUnits.FirstOrDefault(x => x.Key == entTargetUnit);
+                trackedUnits.Remove(tarPair);
                 Parent.ParentTeam.ParentSim.Parent.LogDebug(
                     $"{Parent.Name} remove {entTargetUnit.Name} from track list");
             }
@@ -409,7 +403,7 @@ public class Luocha : DefaultFighter
 
     public bool PoAFAvailable()
     {
-        return Parent.Buffs.All(x => x.Reference != triggerCdBuff) && (trackedUnits?.Any(x => x.IsAlive) ?? false);
+        return Parent.Buffs.All(x => x.Reference != triggerCdBuff);
     }
 
     public bool ColBuffAvailable()
@@ -441,7 +435,7 @@ public class Luocha : DefaultFighter
     //get targets for auto heal. One target for Luocha
     public IEnumerable<Unit> CalcFollowPoAFTarget()
     {
-        IEnumerable<Unit> targets = new List<Unit> { trackedUnits.First() };
+        IEnumerable<Unit> targets = new List<Unit> { trackedUnits.First().Key };
 
         return targets;
     }

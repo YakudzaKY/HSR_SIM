@@ -20,7 +20,7 @@ public class Effect:CloneClass
     /// <summary>
     ///     on natural (by timer) expire but not expired
     /// </summary>
-    public virtual void OnNaturalExpire(Event ent, Buff mod)
+    public virtual void OnNaturalExpire(Event ent, Buff buff)
     {
     }
 

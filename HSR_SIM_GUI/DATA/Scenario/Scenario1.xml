@@ -16,6 +16,8 @@
 				<Unit template="NPC\Vagrant" level="74" />
 				<Unit template="NPC\Automaton Beetle" level="74" />
 				<Unit template="NPC\Vagrant" level="74" />
+				<Unit template="NPC\MaraStruckSoldier" level="85" />
+				<Unit template="NPC\MaraStruckSoldier" level="85" />
 				<!--<Unit template="NPC\Vagrant"  level="74"/>
 				<Unit template="NPC\Automaton Beetle"  level="74"/>
 				<Unit template="NPC\Vagrant"  level="74"/>

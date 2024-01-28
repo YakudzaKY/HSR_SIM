@@ -12,6 +12,6 @@ public class BuffBleedWB : Buff
         DoNotClone = true;
         Type = BuffType.Dot;
         BaseDuration = 2;
-        Effects = new List<Effect> { new EffBleed { CalculateValue = FighterUtils.CalculateShieldBrokeDmg } };
+        Effects = new List<Effect> { new EffBleed { DoTCalculateValue = FighterUtils.CalculateShieldBrokeDmg } };
     }
 }

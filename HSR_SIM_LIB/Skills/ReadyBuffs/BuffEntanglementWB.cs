@@ -18,7 +18,7 @@ public class BuffEntanglementWB : Buff
         MaxStack = 5;
         Effects = new List<Effect>
         {
-            new EffEntanglement { CalculateValue = FighterUtils.CalculateShieldBrokeDmg },
+            new EffEntanglement { DoTCalculateValue = FighterUtils.CalculateShieldBrokeDmg },
             new EffDelay
             {
                 Value = 0.20 * (1 + caster.GetBreakDmg(ent)),

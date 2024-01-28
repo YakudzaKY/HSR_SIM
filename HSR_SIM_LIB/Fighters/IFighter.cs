@@ -22,7 +22,7 @@ public interface IFighter : ICloneable
     public List<PassiveBuff> PassiveBuffs { get; set; }
 
     //need of unique effect on shield break
-    public Buff ShieldBreakMod { get; set; }
+    public Buff ShieldBreakDebuff { get; set; }
     public Unit.ElementEnm Element { get; }
     public PathType? Path { get; }
     public List<Unit.ElementEnm> NativeWeaknesses { get; set; }

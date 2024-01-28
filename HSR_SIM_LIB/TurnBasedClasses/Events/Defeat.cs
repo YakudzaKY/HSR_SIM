@@ -10,6 +10,7 @@ public class Defeat : Event
 {
     public Defeat(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
     {
+       
     }
     public List<Buff> RemovedMods { get; set; } = new();
 
@@ -23,10 +24,12 @@ public class Defeat : Event
     {
         //attacker got 10 energy
         if (!TriggersHandled)
-            ChildEvents.Add(new EnergyGain(ParentStep, TargetUnit, ParentStep.Actor)
-                { Val = 10, TargetUnit = ParentStep.Actor });
-        //got defeated
-        //todo if have no EffRebirth
+        {
+            RemovedMods.AddRange(TargetUnit.Buffs);
+            ChildEvents.Add(new EnergyGain(ParentStep, TargetUnit, SourceUnit)
+                { Val = 10, TargetUnit = SourceUnit });
+        }
+
         TargetUnit.IsAlive = revert;
         TargetUnit.ParentTeam.ResetRoles();
 
@@ -36,8 +39,6 @@ public class Defeat : Event
         else
             foreach (var mod in RemovedMods)
                 TargetUnit.ApplyBuff(this, mod);
-        //else todo: do rebirth event and remove buff also proceed rebirth follow up action
-
         base.ProcEvent(revert);
     }
 }

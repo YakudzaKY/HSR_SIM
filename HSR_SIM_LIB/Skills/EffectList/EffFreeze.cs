@@ -1,32 +1,35 @@
 ﻿using HSR_SIM_LIB.TurnBasedClasses.Events;
+using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Skills.EffectList;
 
-public class EffFreeze : Effect
+public class EffFreeze : EffDotTemplate
 {
-    public override void OnNaturalExpire(Event ent, Buff mod)
+    public override void OnNaturalExpire(Event ent, Buff buff)
     {
-        if (mod == mod.Caster.Fighter.ShieldBreakMod)
+        if (buff.Reference == buff.Caster.Fighter.ShieldBreakDebuff)
         {
-            var dotProcEvent = new ToughnessBreakDoTDamage(ent.ParentStep, mod.Caster, mod.Caster)
+            var dotProcEvent = new ToughnessBreakDoTDamage(ent.ParentStep, buff.Caster, buff.Caster,Element)
             {
-                CalculateValue = CalculateValue,
+                CalculateValue = DoTCalculateValue,
                 TargetUnit = ent.TargetUnit,
-                Modification = mod
+                Modification = buff
             };
             ent.ChildEvents.Add(dotProcEvent);
         }
         else
         {
-            var dotProcEvent = new DoTDamage(ent.ParentStep, mod.Caster, mod.Caster)
+            var dotProcEvent = new DoTDamage(ent.ParentStep, buff.Caster, buff.Caster, Element)
             {
-                CalculateValue = CalculateValue,
+                CalculateValue = DoTCalculateValue,
                 TargetUnit = ent.TargetUnit,
-                Modification = mod
+                Modification = buff
             };
             ent.ChildEvents.Add(dotProcEvent);
         }
 
-        base.OnNaturalExpire(ent, mod);
+        base.OnNaturalExpire(ent, buff);
     }
+
+    public override Unit.ElementEnm Element { get; init; } = Unit.ElementEnm.Ice;
 }

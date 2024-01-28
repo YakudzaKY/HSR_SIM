@@ -16,7 +16,7 @@ public class BuffImprisonmentWB : Buff
         BaseDuration = 1;
         Effects = new List<Effect>
         {
-            new EffImprisonment { CalculateValue = FighterUtils.CalculateShieldBrokeDmg },
+            new EffImprisonment { },
             new EffDelay { Value = 0.30 * (1 + caster.GetBreakDmg(ent)) },
             new EffSpeedPrc() { Value = -0.1 }
         };

@@ -13,7 +13,7 @@ public class BuffFreezeWB : Buff
         DoNotClone = true;
         Type = BuffType.Debuff;
         BaseDuration = 1;
-        Effects = new List<Effect> { new EffFreeze { CalculateValue = FighterUtils.CalculateShieldBrokeDmg } };
+        Effects = new List<Effect> { new EffFreeze { DoTCalculateValue = FighterUtils.CalculateShieldBrokeDmg } };
         EventHandlerProc += FreezeEventHandler;
     }
 

@@ -42,6 +42,7 @@ public class Ability : CloneClass
 
     public enum PriorityEnm
     {
+        DefeatHandler,//top 1
         High,
         Medium,
         Ultimate,
@@ -61,6 +62,7 @@ public class Ability : CloneClass
         Parent = parent;
         if (Element == ElementEnm.None)
             Element = parent.Element;
+        FollowUpQueueAvailable ??= DefaultAbilityQueueAvailable;
     }
 
 
@@ -94,6 +96,8 @@ public class Ability : CloneClass
 
     public DCanUsePrc Available { get; init; } = DefaultAbilityAvailable;
     public int SpGain { get; set; } = 0;
+    public List<KeyValuePair<Unit,Unit>> FollowUpTargets { get; set; }=new ();// key=target unit ,value=Queued by unit
+    public DCanUsePrc FollowUpQueueAvailable { get; init; } 
 
     //reset ability params
     public void OnEnteringBattle()
@@ -110,6 +114,13 @@ public class Ability : CloneClass
     public static bool DefaultAbilityAvailable()
     {
         return true;
+    }
+
+    
+    //default followup queue available if target list empty
+    public  bool DefaultAbilityQueueAvailable()
+    {
+        return !FollowUpTargets.Any();
     }
 
     //get targets by event from ability

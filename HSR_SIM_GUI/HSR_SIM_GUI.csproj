@@ -102,6 +102,7 @@
     <None Remove="Data\Images\NPC\Automaton Beetle.png" />
     <None Remove="Data\Images\NPC\AutomatonGrizzlyComplete.png" />
     <None Remove="Data\Images\NPC\Mara Struck Soldier.png" />
+    <None Remove="Data\Images\NPC\MaraStruckSoldier.png" />
     <None Remove="Data\Images\NPC\Vagrant.png" />
     <None Remove="Data\Images\physical.webp" />
     <None Remove="Data\Images\quantum.webp" />
@@ -124,7 +125,7 @@
     <None Remove="Data\Scenario\scenario_solo_boss.xml" />
     <None Remove="Data\WarGear\NPC\Automaton Beetle.xml" />
     <None Remove="Data\WarGear\NPC\AutomatonGrizzlyComplete.xml" />
-    <None Remove="Data\WarGear\NPC\Mara Struck Soldier.xml" />
+    <None Remove="Data\WarGear\NPC\MaraStruckSoldier.xml" />
     <None Remove="Data\WarGear\NPC\Vagrant.xml" />
     <None Remove="Data\WarGear\Special\Forgotten Hall.xml" />
     <None Remove="tessdata\rus.traineddata" />
@@ -386,6 +387,9 @@
     <Content Include="Data\Images\NPC\Mara Struck Soldier.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Data\Images\NPC\MaraStruckSoldier.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Data\Images\NPC\Vagrant.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -450,7 +454,7 @@
     <Content Include="Data\WarGear\NPC\AutomatonGrizzlyComplete.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Data\WarGear\NPC\Mara Struck Soldier.xml">
+    <Content Include="Data\WarGear\NPC\MaraStruckSoldier.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\WarGear\NPC\Vagrant.xml">

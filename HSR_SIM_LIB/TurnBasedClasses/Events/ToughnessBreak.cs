@@ -33,31 +33,31 @@ public class ToughnessBreak : DamageEventTemplate
             switch (this.ParentStep.ActorAbility.Element)
             {
                 case ElementEnm.Physical:
-                    this.TryDebuff(new BuffBleedWB(this.SourceUnit, this.SourceUnit.Fighter.ShieldBreakMod), 1.5);
+                    this.TryDebuff(new BuffBleedWB(this.SourceUnit, this.SourceUnit.Fighter.ShieldBreakDebuff), 1.5);
                     break;
                 case ElementEnm.Fire:
-                    this.TryDebuff(new BuffBurnWB(this.SourceUnit, this.SourceUnit.Fighter.ShieldBreakMod), 1.5);
+                    this.TryDebuff(new BuffBurnWB(this.SourceUnit, this.SourceUnit.Fighter.ShieldBreakDebuff), 1.5);
                     break;
                 case ElementEnm.Ice:
-                    this.TryDebuff(new BuffFreezeWB(this.SourceUnit, this.SourceUnit.Fighter.ShieldBreakMod), 1.5);
+                    this.TryDebuff(new BuffFreezeWB(this.SourceUnit, this.SourceUnit.Fighter.ShieldBreakDebuff), 1.5);
                     break;
                 case ElementEnm.Lightning:
-                    this.TryDebuff(new BuffShockWB(this.SourceUnit, this.SourceUnit.Fighter.ShieldBreakMod), 1.5);
+                    this.TryDebuff(new BuffShockWB(this.SourceUnit, this.SourceUnit.Fighter.ShieldBreakDebuff), 1.5);
                     break;
                 case ElementEnm.Wind:
                     this.TryDebuff(
-                        new BuffWindShearWB(this.SourceUnit, this.SourceUnit.Fighter.ShieldBreakMod)
+                        new BuffWindShearWB(this.SourceUnit, this.SourceUnit.Fighter.ShieldBreakDebuff)
                         { Stack = this.TargetUnit.Fighter is DefaultNPCBossFIghter ? 3 : 1 }, 1.5);
                     break;
                 case ElementEnm.Quantum:
                     this.TryDebuff(
-                        new BuffEntanglementWB(this.SourceUnit, this.SourceUnit.Fighter.ShieldBreakMod, this),
+                        new BuffEntanglementWB(this.SourceUnit, this.SourceUnit.Fighter.ShieldBreakDebuff, this),
                         1.5);
 
                     break;
                 case ElementEnm.Imaginary:
                     this.TryDebuff(
-                        new BuffImprisonmentWB(this.SourceUnit, this.SourceUnit.Fighter.ShieldBreakMod, this),
+                        new BuffImprisonmentWB(this.SourceUnit, this.SourceUnit.Fighter.ShieldBreakDebuff, this),
                         1.5);
                     break;
                 default:

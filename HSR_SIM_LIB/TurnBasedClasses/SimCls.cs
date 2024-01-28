@@ -118,8 +118,43 @@ public class SimCls : ICloneable
         return MemberwiseClone();
     }
 
+    public void HandleZeroHp(Event ent)
+    {
+        //HP reduced to 0
+        if (ent.RealVal != 0 && ent.TargetUnit.GetRes(ResourceType.HP).ResVal == 0)
+        {
+            //TODO: remove all buffs with dispelable независимо от того выжиивет или не
 
-    public virtual void HandleEvent(Event ent)
+            //if someone have battle res for this unit or other defeat handler
+            if (!UnitDefeatHandled(ent, ent.TargetUnit))
+            {
+                Defeat defeatEvent = new(ent.ParentStep, ent.Source, ent.SourceUnit)
+                {
+                    TargetUnit = ent.TargetUnit
+                };
+                
+                ent.ChildEvents.Add(defeatEvent);
+            }
+        }
+    }
+
+    private bool UnitDefeatHandled(Event ent, Unit target)
+    {
+        /*Ability battleRes = target.ParentTeam.Units.OrderByDescending(x=>x==target).Select(x => x.Fighter.Abilities.FirstOrDefault(y =>
+           y.Priority== Ability.PriorityEnm.DefeatHandler && y.Available()&&y.FollowUpTarget==null && y.GetTargets(target, y.TargetType, Ability.AbilityCurrentTargetEnm.AbilityMain)
+                .Contains(target))).FirstOrDefault();*/
+        Ability battleRes = target.ParentTeam.Units.OrderByDescending(x => x == target).Select(x =>
+            x.Fighter.Abilities.FirstOrDefault(y => y.Priority == Ability.PriorityEnm.DefeatHandler&& y.Available() && y.GetTargets(target, y.TargetType, Ability.AbilityCurrentTargetEnm.AbilityMain)
+                .Contains(target))).MaxBy(y => y is not null);
+        if (battleRes != null)
+        {
+            battleRes.FollowUpTargets.Add( new KeyValuePair<Unit, Unit>(target,ent.SourceUnit)); 
+        }
+        
+        return battleRes != null;
+    }
+
+    public void HandleEvent(Event ent)
     {
         if (ent is StartWave)
             foreach (var unit in AllUnits)
@@ -133,31 +168,12 @@ public class SimCls : ICloneable
             //dispell zero shields
             foreach (var mod in toDispell) ent.DispelMod(mod, true);
 
-            //HP reduced to 0
-            if (ent.RealVal != 0 && ent.TargetUnit.GetRes(ResourceType.HP).ResVal == 0)
-            {
-                Defeat defeatEvent = new(ent.ParentStep, ent.Source, ent.SourceUnit)
-                {
-                    TargetUnit = ent.TargetUnit
-                };
-                defeatEvent.RemovedMods.AddRange(ent.TargetUnit.Buffs);
-                ent.ChildEvents.Add(defeatEvent);
-            }
+            HandleZeroHp(ent);
         }
 
         if (ent is ResourceDrain)
         {
-            //HP reduced to 0
-            if (((ResourceDrain)ent).ResType == ResourceType.HP && ent.RealVal != 0 &&
-                ent.TargetUnit.GetRes(((ResourceDrain)ent).ResType).ResVal == 0)
-            {
-                Defeat defeatEvent = new(ent.ParentStep, ent.Source, ent.SourceUnit)
-                {
-                    TargetUnit = ent.TargetUnit
-                };
-                defeatEvent.RemovedMods.AddRange(ent.TargetUnit.Buffs);
-                ent.ParentStep.Events.Add(defeatEvent);
-            }
+            HandleZeroHp(ent);
 
             //THG reduced tp 0
             if (((ResourceDrain)ent).ResType == ResourceType.Toughness && ent.RealVal != 0 &&
@@ -177,7 +193,6 @@ public class SimCls : ICloneable
                 ent.TargetUnit.GetRes(((ResourceDrain)ent).ResType).ResVal -= (double)ent.RealVal;
             }
         }
-
 
         //next handlers 
         foreach (var unit in AllUnits)

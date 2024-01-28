@@ -12,6 +12,6 @@ public class BuffShockWB : Buff
         DoNotClone = true;
         Type = BuffType.Dot;
         BaseDuration = 2;
-        Effects = new List<Effect> { new EffShock { CalculateValue = FighterUtils.CalculateShieldBrokeDmg } };
+        Effects = new List<Effect> { new EffShock { DoTCalculateValue = FighterUtils.CalculateShieldBrokeDmg } };
     }
 }

@@ -95,7 +95,7 @@ public abstract class DefaultFighter : IFighter
         set { }
     }
 
-    public Buff ShieldBreakMod { get; set; } = new(null);
+    public Buff ShieldBreakDebuff { get; set; } = new(null);
     public List<ConditionBuff> ConditionBuffs { get; set; } = new();
     public List<PassiveBuff> PassiveBuffs { get; set; } = new();
     public abstract PathType? Path { get; }

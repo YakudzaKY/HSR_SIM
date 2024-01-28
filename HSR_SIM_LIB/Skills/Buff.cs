@@ -92,21 +92,21 @@ public class Buff(Unit caster, Buff reference = null) : CloneClass
     {
         //do some shit
         if (Type == BuffType.Dot)
-            foreach (var effect in Effects)
-                if (Reference == Caster.Fighter.ShieldBreakMod)
+            foreach (EffDotTemplate effect in Effects.Where(x=>x is EffDotTemplate))
+                if (Reference == Caster.Fighter.ShieldBreakDebuff)
                 {
-                    var dotProcEvent = new ToughnessBreakDoTDamage(step, Caster, Caster)
+                    var dotProcEvent = new ToughnessBreakDoTDamage(step, Caster, Caster,effect.Element)
                     {
-                        CalculateValue = effect.CalculateValue, TargetUnit = step.Actor, Modification = this
+                        CalculateValue = effect.DoTCalculateValue, TargetUnit = step.Actor, Modification = this
                     };
                     step.Events.Add(dotProcEvent);
                 }
 
                 else
                 {
-                    var dotProcEvent = new DoTDamage(step, Caster, Caster)
+                    var dotProcEvent = new DoTDamage(step, Caster, Caster,effect.Element)
                     {
-                        CalculateValue = effect.CalculateValue, TargetUnit = step.Actor, Modification = this
+                        CalculateValue = effect.DoTCalculateValue, TargetUnit = step.Actor, Modification = this
                     };
                     step.Events.Add(dotProcEvent);
                 }

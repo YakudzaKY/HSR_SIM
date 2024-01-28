@@ -318,14 +318,34 @@ public class Step
         foreach (var prio in Enum.GetValues(typeof(PriorityEnm)).Cast<PriorityEnm>())
         foreach (var unit in Parent.AllUnits.Where(x => !x.Controlled && x.IsAlive).OrderByDescending(x=>x.Fighter.Role))//supports cast ultimate first
         foreach (var ability in unit.Fighter.Abilities.Where(x => x.Priority == prio &&
-                                                                  (x.AbilityType == AbilityTypeEnm.FollowUpAction ||
+                                                                  //follow up abilities only with target  or All adjacent or self ability
+                                                                  ((x.AbilityType == AbilityTypeEnm.FollowUpAction &&(x.FollowUpTargets.Any(x=>x.Key.IsAlive) 
+                                                                                                                    ||x.AdjacentTargets==AdjacentTargetsEnm.All
+                                                                                                                    )
+                                                                       )||
                                                                    x.AbilityType == AbilityTypeEnm.Ultimate) &&
                                                                   x.Available()))
         {
             StepType = StepTypeEnm.UnitFollowUpAction;
             Actor = unit;
             ActorAbility = ability;
-            ExecuteAbility(ability, Actor.Fighter.GetBestTarget(ability));
+            if (ability.AbilityType == AbilityTypeEnm.Ultimate)
+                ExecuteAbility(ability, Actor.Fighter.GetBestTarget(ability));
+            if (ability.AbilityType == AbilityTypeEnm.FollowUpAction)
+            {
+                //get target from queue
+                KeyValuePair<Unit,Unit> tar = ability.FollowUpTargets.FirstOrDefault(x=>x.Key.IsAlive);
+                //remove from q
+                ability.FollowUpTargets.Remove(tar);
+                ExecuteAbility(ability, tar.Key);
+                //Check for Defeat handlers
+                if (ability.Priority == PriorityEnm.DefeatHandler)
+                {
+                    Events.Add( new CheckForDefeat(this,ability,unit){TargetSourcePair = tar});   
+                  
+                }
+            }
+
             return true;
         }
 

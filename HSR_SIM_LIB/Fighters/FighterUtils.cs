@@ -159,8 +159,13 @@ public static class FighterUtils
     {
         var attacker = ent.SourceUnit;
         var defender = ent.TargetUnit;
-
-        var attackElem = ent.ParentStep.ActorAbility.Element;
+        ElementEnm attackElem;
+        if (ent is DoTDamage ed)
+        {
+            attackElem = ed.Element;
+        }
+        else
+            attackElem = ent.ParentStep.ActorAbility.Element;
 
         //crit multiplier
         double critMultiplier = 1;
