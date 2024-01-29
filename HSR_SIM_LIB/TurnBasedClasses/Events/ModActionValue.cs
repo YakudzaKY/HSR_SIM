@@ -17,8 +17,7 @@ public class ModActionValue : Event
 
     public override void ProcEvent(bool revert)
     {
-        //SetAV
-
+            
         //if no target - reduce all units
         if (TargetUnit != null)
         {

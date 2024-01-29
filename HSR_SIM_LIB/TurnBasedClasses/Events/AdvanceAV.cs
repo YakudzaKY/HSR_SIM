@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -20,7 +21,7 @@ public class AdvanceAV : Event
         if (!TriggersHandled)
             Val = TargetUnit.Stats.PerformedActionValue;
         if (!revert)
-            TargetUnit.Stats.PerformedActionValue = TargetUnit.GetActionValue(this);
+            TargetUnit.Stats.PerformedActionValue = TargetUnit.GetActionValue(this)- ParentStep.Parent.CurrentFight.AllAliveUnits.Select(x => x.GetCurrentActionValue(null)).Min()+1;
         else
             TargetUnit.Stats.PerformedActionValue = (double)Val;
 

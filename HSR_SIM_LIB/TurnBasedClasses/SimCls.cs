@@ -348,8 +348,11 @@ public class SimCls : ICloneable
                     TurnStage = newStep.StepType
                 };
                 newStep.Actor = CurrentFight.Turn.Actor;
+                double reduceAv = CurrentFight.Turn.Actor.GetCurrentActionValue(null);
+                if (reduceAv < 0)
+                    reduceAv = 0;
                 newStep.Events.Add(new ModActionValue(newStep, this, null)
-                { Val = CurrentFight.Turn.Actor.GetCurrentActionValue(null) });
+                { Val = reduceAv });
                 //set all Buffs are "old"
                 foreach (var mod in CurrentFight.Turn.Actor.Buffs) mod.IsOld = true;
                 //dot proc
@@ -401,7 +404,7 @@ public class SimCls : ICloneable
         else if (newStep.StepType == StepTypeEnm.Idle && CurrentFight.Turn.TurnStage == StepTypeEnm.UnitTurnStarted)
         {
             //try follow up actions before target do something
-            if (!newStep.FollowUpActions())
+            if (!newStep.FollowUpActions(CurrentFight.Turn.Actor.ParentTeam))
                 if (!newStep.Actions())
                 {
                     newStep.StepType = StepTypeEnm.UnitTurnEnded;

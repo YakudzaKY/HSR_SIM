@@ -79,7 +79,8 @@ public class Luocha : DefaultFighter
             Element = Element,
             Available = ColAvailable,
             Priority = PriorityEnm.Medium,
-            TargetType = TargetTypeEnm.Self
+            TargetType = TargetTypeEnm.Self,
+            AdjacentTargets=AdjacentTargetsEnm.All
         };
         cycleOfLife.Events.Add(new MechanicValChg(null, this, Parent)
         { TargetUnit = Parent, AbilityValue = cycleOfLife, Val = -cycleOfLifeMaxCnt });
