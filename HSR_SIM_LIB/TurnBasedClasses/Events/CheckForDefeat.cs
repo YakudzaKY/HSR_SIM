@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,8 +27,16 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
                 if (TargetSourcePair.Key.IsAlive && TargetSourcePair.Key.GetRes(Resource.ResourceType.HP).ResVal == 0)
                 {
                     ChildEvents.Add(new Defeat(this.ParentStep,this,TargetSourcePair.Value){TargetUnit = TargetSourcePair.Key});
+                    
+                }
+                else
+                {
+                    ChildEvents.Add(new SetLiveStatus(ParentStep, this, TargetSourcePair.Value)
+                        { ToState = Unit.LivingStatusEnm.Alive, TargetUnit = TargetSourcePair.Key });
                 }
             }
+     
+
             base.ProcEvent(revert);
         }
 

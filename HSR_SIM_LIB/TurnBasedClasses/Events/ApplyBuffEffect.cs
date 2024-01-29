@@ -31,15 +31,16 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
         public override void ProcEvent(bool revert)
         {
 
-            Buff currentBuff = TargetUnit.Buffs.First(x => x.Reference == BuffToApply);
-            if (!revert)
-            {
-                currentBuff.Effects.Add(Eff);
-            }
-            else
-            {
-                currentBuff.Effects.Remove(Eff);
-            }
+            Buff currentBuff = TargetUnit.Buffs.FirstOrDefault(x => x.Reference == BuffToApply);
+            if (currentBuff != null)
+                if (!revert)
+                {
+                    currentBuff.Effects.Add(Eff);
+                }
+                else
+                {
+                    currentBuff.Effects.Remove(Eff);
+                }
 
 
             base.ProcEvent(revert);

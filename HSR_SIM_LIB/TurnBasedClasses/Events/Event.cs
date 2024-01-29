@@ -184,15 +184,15 @@ public abstract class Event : CloneClass
     public void TryDebuff(Buff mod, double baseChance)
     {
         //add Dots and debuffs
-        ApplyBuff dotEvent = new(ParentStep, Source, SourceUnit)
+        ApplyBuff applyBuff = new(ParentStep, Source, SourceUnit)
         {
             TargetUnit = TargetUnit,
             BuffToApply = mod
         };
 
-        if (FighterUtils.CalculateDebuffApplied(dotEvent, baseChance))
+        if (FighterUtils.CalculateDebuffApplied(applyBuff, baseChance))
         {
-            ChildEvents.Add(dotEvent);
+            ChildEvents.Add(applyBuff);
         }
         else
         {
@@ -200,7 +200,7 @@ public abstract class Event : CloneClass
             DebuffResisted failEvent = new(ParentStep, Source, SourceUnit)
             {
                 TargetUnit = TargetUnit,
-                BuffToApply = dotEvent.BuffToApply
+                BuffToApply = applyBuff.BuffToApply
             };
             ChildEvents.Add(failEvent);
         }

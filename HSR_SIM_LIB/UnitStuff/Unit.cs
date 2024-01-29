@@ -41,11 +41,19 @@ public class Unit : CloneClass
     private List<DamageBoostRec> baseDamageBoost; //Elemental damage boost list
 
     private IFighter fighter;
-    public bool IsAlive = true;
+
+    public bool IsAlive => LivingStatus != LivingStatusEnm.Defeated;
+
+    public LivingStatusEnm LivingStatus { get; set; } = LivingStatusEnm.Alive;
     private Bitmap portrait;
     private List<Resource> resources;
     private UnitStats stats;
-
+    public enum LivingStatusEnm
+    {
+        Alive,
+        WaitingForRez,
+        Defeated
+    }
 
     public Team ParentTeam { get; set; } = null;
 
@@ -618,11 +626,15 @@ public class Unit : CloneClass
                GetBuffSumByType(typeof(EffMaxHp), ent: ent, excludeCondBuff: excludeCondBuff) + Stats.MaxHpFix;
     }
 
+    public double GetCurrentActionValue(Event ent)
+    {
+        return GetActionValue(ent) - Stats.PerformedActionValue;
+    }
+
     public double GetActionValue(Event ent)
     {
         return GetBaseActionValue(ent) *
-               (1 - GetBuffSumByType(typeof(EffAdvance), ent: ent) + GetBuffSumByType(typeof(EffDelay), ent: ent)) -
-               Stats.PerformedActionValue;
+               (1 - GetBuffSumByType(typeof(EffAdvance), ent: ent) + GetBuffSumByType(typeof(EffDelay), ent: ent));
     }
 
     public double GetBaseActionValue(Event ent)

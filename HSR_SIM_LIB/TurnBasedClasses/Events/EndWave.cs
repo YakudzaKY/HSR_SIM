@@ -11,7 +11,7 @@ public class EndWave : Event
     {
     }
 
-    public List<Unit> UnloadedUnits { get; set; }
+    public List<Unit> UnloadedUnits { get; set; }=new List<Unit>();
 
     public override string GetDescription()
     {
@@ -25,7 +25,7 @@ public class EndWave : Event
         if (!revert)
         {
             if (!TriggersHandled)
-                UnloadedUnits = ParentStep.Parent.HostileTeam.Units;
+                UnloadedUnits.AddRange(ParentStep.Parent.HostileTeam.Units);
 
             ParentStep.Parent.HostileTeam.UnBindUnits();
             ParentStep.Parent.CurrentFight.CurrentWave = null;

@@ -370,7 +370,7 @@ public abstract class DefaultFighter : IFighter
     /// <returns></returns>
     public virtual double WillSpend()
     {
-        return 1; //todo get ability cost by default
+        return 1; 
     }
 
     public double GetFriendSpender(UnitRole role)

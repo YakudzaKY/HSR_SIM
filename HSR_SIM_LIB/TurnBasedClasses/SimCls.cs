@@ -123,18 +123,15 @@ public class SimCls : ICloneable
         //HP reduced to 0
         if (ent.RealVal != 0 && ent.TargetUnit.GetRes(ResourceType.HP).ResVal == 0)
         {
-            //TODO: remove all buffs with dispelable независимо от того выжиивет или не
 
-            //if someone have battle res for this unit or other defeat handler
-            if (!UnitDefeatHandled(ent, ent.TargetUnit))
+            Defeat defeatEvent = new(ent.ParentStep, ent.Source, ent.SourceUnit)
             {
-                Defeat defeatEvent = new(ent.ParentStep, ent.Source, ent.SourceUnit)
-                {
-                    TargetUnit = ent.TargetUnit
-                };
-                
-                ent.ChildEvents.Add(defeatEvent);
-            }
+                TargetUnit = ent.TargetUnit,
+                DefeatPrevented = UnitDefeatHandled(ent, ent.TargetUnit)
+            };
+
+            ent.ChildEvents.Add(defeatEvent);
+
         }
     }
 
@@ -144,13 +141,13 @@ public class SimCls : ICloneable
            y.Priority== Ability.PriorityEnm.DefeatHandler && y.Available()&&y.FollowUpTarget==null && y.GetTargets(target, y.TargetType, Ability.AbilityCurrentTargetEnm.AbilityMain)
                 .Contains(target))).FirstOrDefault();*/
         Ability battleRes = target.ParentTeam.Units.OrderByDescending(x => x == target).Select(x =>
-            x.Fighter.Abilities.FirstOrDefault(y => y.Priority == Ability.PriorityEnm.DefeatHandler&& y.Available() && y.GetTargets(target, y.TargetType, Ability.AbilityCurrentTargetEnm.AbilityMain)
+            x.Fighter.Abilities.FirstOrDefault(y => y.Priority == Ability.PriorityEnm.DefeatHandler && y.Available() && y.FollowUpQueueAvailable() && y.GetTargets(target, y.TargetType, Ability.AbilityCurrentTargetEnm.AbilityMain)
                 .Contains(target))).MaxBy(y => y is not null);
         if (battleRes != null)
         {
-            battleRes.FollowUpTargets.Add( new KeyValuePair<Unit, Unit>(target,ent.SourceUnit)); 
+            battleRes.FollowUpTargets.Add(new KeyValuePair<Unit, Unit>(target, ent.SourceUnit));
         }
-        
+
         return battleRes != null;
     }
 
@@ -251,11 +248,11 @@ public class SimCls : ICloneable
          * pre launch options
          */
         //load TP
-        team.GetRes(ResourceType.TP).ResVal = PreLaunch.FirstOrDefault(x => x.OptionType == PreLaunchOption.PreLaunchOptionEnm.SetTp)?.Value??0;
+        team.GetRes(ResourceType.TP).ResVal = PreLaunch.FirstOrDefault(x => x.OptionType == PreLaunchOption.PreLaunchOptionEnm.SetTp)?.Value ?? 0;
         //load energy
         foreach (Unit unit in team.Units)
         {
-            unit.CurrentEnergy=unit.Stats.BaseMaxEnergy* PreLaunch.FirstOrDefault(x => x.OptionType == PreLaunchOption.PreLaunchOptionEnm.SetEnergy)?.Value??0;
+            unit.CurrentEnergy = unit.Stats.BaseMaxEnergy * PreLaunch.FirstOrDefault(x => x.OptionType == PreLaunchOption.PreLaunchOptionEnm.SetEnergy)?.Value ?? 0;
         }
 
 
@@ -338,15 +335,21 @@ public class SimCls : ICloneable
             if (!newStep.FollowUpActions())
             {
                 newStep.StepType = StepTypeEnm.UnitTurnSelected;
+                //clear dead units in enemy team
+                foreach (Unit unit in HostileTeam.Units.Where(x => !x.IsAlive))
+                {
+                    newStep.Events.Add( new UnbindUnit(newStep,unit,unit){TargetUnit = unit});
+                }
+                
                 //get first by AV unit
                 CurrentFight.Turn = new TurnR
                 {
-                    Actor = CurrentFight.AllAliveUnits.OrderBy(x => x.GetActionValue(null)).First(),
+                    Actor = CurrentFight.AllAliveUnits.OrderBy(x => x.GetCurrentActionValue(null)).First(),
                     TurnStage = newStep.StepType
                 };
                 newStep.Actor = CurrentFight.Turn.Actor;
                 newStep.Events.Add(new ModActionValue(newStep, this, null)
-                    { Val = CurrentFight.Turn.Actor.GetActionValue(null) });
+                { Val = CurrentFight.Turn.Actor.GetCurrentActionValue(null) });
                 //set all Buffs are "old"
                 foreach (var mod in CurrentFight.Turn.Actor.Buffs) mod.IsOld = true;
                 //dot proc
@@ -373,7 +376,8 @@ public class SimCls : ICloneable
                     {
                         Event gainThg = new ResourceGain(newStep, this, CurrentFight.Turn.Actor)
                         {
-                            TargetUnit = CurrentFight.Turn.Actor, ResType = ResourceType.Toughness,
+                            TargetUnit = CurrentFight.Turn.Actor,
+                            ResType = ResourceType.Toughness,
                             Val = CurrentFight.Turn.Actor.Stats.MaxToughness
                         };
                         newStep.Events.Add(gainThg);
@@ -403,7 +407,7 @@ public class SimCls : ICloneable
                     newStep.StepType = StepTypeEnm.UnitTurnEnded;
                     newStep.Actor = CurrentFight.Turn.Actor;
                     newStep.Events.Add(new ResetAV(newStep, this, null)
-                        { TargetUnit = CurrentFight.Turn.Actor });
+                    { TargetUnit = CurrentFight.Turn.Actor });
 
                     //reset CD
                     foreach (var ability in CurrentFight.Turn.Actor.Fighter.Abilities.Where(x => x.CooldownTimer > 0))

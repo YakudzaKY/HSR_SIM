@@ -14,6 +14,7 @@ public class MaraStruckSoldier : DefaultNPCFighter
     //static because max 5 stacks by all units this type
     private static Buff myDoTRef= new Buff(null, null);
     private Buff myDotDeBuff;
+    private Ability Rejuvenate;
 
     public static double? CalcMyDoT(Event ent)
     {
@@ -56,8 +57,8 @@ public class MaraStruckSoldier : DefaultNPCFighter
         //=====================
         //Abilities
         //=====================
-        //Cycle of life
-        Ability Rejuvenate = new Ability(this)
+        //Rejuvenate
+        Rejuvenate = new Ability(this)
         {
             AbilityType = Ability.AbilityTypeEnm.FollowUpAction,
             Name = "Rejuvenate",
@@ -65,8 +66,9 @@ public class MaraStruckSoldier : DefaultNPCFighter
             Priority = Ability.PriorityEnm.DefeatHandler,
             TargetType = Ability.TargetTypeEnm.Self
         };
-        Rejuvenate.Events.Add(new RemoveBuff(null,this,Parent) {TargetUnit = Parent,BuffToApply = uniqueBuff});
+       // Rejuvenate.Events.Add(new RemoveBuff(null,this,Parent) {TargetUnit = Parent,BuffToApply = uniqueBuff});
         Rejuvenate.Events.Add(new Healing(null, this, Parent) {  CalculateValue = CalculateReHeal });
+        Rejuvenate.Events.Add(new ResourceGain(null, this, Parent) { ResType = Resource.ResourceType.Toughness,Val = Parent.Stats.MaxToughness});
         Abilities.Add(Rejuvenate);
 
         Ability myAttackAbility;
@@ -117,7 +119,7 @@ public class MaraStruckSoldier : DefaultNPCFighter
 
     private bool RejuvenateAvailable()
     {
-        return Parent.Buffs.Any(x => x.Reference == uniqueBuff);
+        return Parent.Buffs.Any(x => x.Reference == uniqueBuff)||Rejuvenate.FollowUpTargets.Count>0;
     }
 
     public double? CalcMyAttack(Event ent)

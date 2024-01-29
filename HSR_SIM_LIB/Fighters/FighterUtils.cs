@@ -207,7 +207,7 @@ public static class FighterUtils
         ent.ParentStep.Parent.Parent?.LogDebug("=======================");
         ent.ParentStep.Parent.Parent?.LogDebug($"baseDmg={baseDmg:f} crit chance={attacker.GetCritRate(ent):f} ");
         ent.ParentStep.Parent.Parent?.LogDebug(
-            $"{attacker.Name:s} ({attacker.ParentTeam.Units.IndexOf(attacker) + 1:d}) Damaging {defender.Name} ({defender.ParentTeam.Units.IndexOf(defender) + 1:d})");
+            $"{attacker.Name:s} ({attacker.ParentTeam?.Units.IndexOf(attacker) + 1:d}) Damaging {defender.Name} ({defender.ParentTeam?.Units.IndexOf(defender) + 1:d})");
         ent.ParentStep.Parent.Parent?.LogDebug(
             $"damageBoost({damageBoost:f}) = 1+ GetElemBoostValue({attacker.GetElemBoostValue(attackElem, ent):f})  +AllDmgBoost({attacker.AllDmgBoost(ent):f}) + dotMultiplier({dotMultiplier:f})");
         ent.ParentStep.Parent.Parent?.LogDebug(

@@ -20,7 +20,7 @@ public class AdvanceAV : Event
         if (!TriggersHandled)
             Val = TargetUnit.Stats.PerformedActionValue;
         if (!revert)
-            TargetUnit.Stats.PerformedActionValue = TargetUnit.GetBaseActionValue(this);
+            TargetUnit.Stats.PerformedActionValue = TargetUnit.GetActionValue(this);
         else
             TargetUnit.Stats.PerformedActionValue = (double)Val;
 

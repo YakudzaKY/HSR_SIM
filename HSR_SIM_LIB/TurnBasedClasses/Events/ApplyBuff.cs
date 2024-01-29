@@ -26,7 +26,8 @@ public class ApplyBuff : BuffEventTemplate
 
     public override void ProcEvent(bool revert)
     {
-        if (TargetUnit.IsAlive)
+  
+        if (TargetUnit.LivingStatus==Unit.LivingStatusEnm.Alive)
         {
             //calc value first
             foreach (var modEffect in BuffToApply.Effects.Where(modEffect =>

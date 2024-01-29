@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
+using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.Utils;
 using static HSR_SIM_LIB.UnitStuff.Resource;
 
@@ -37,7 +38,7 @@ public class Team : CloneClass
     public TeamTypeEnm TeamType { get; set; }
 
 
-    public List<Unit> Units { get; private set; }
+    public List<Unit> Units { get; }=new();
 
     public double TeamAggro
     {
@@ -74,21 +75,47 @@ public class Team : CloneClass
         set => resources = value;
     }
 
+
+    /// <summary>
+    ///     unbind unit from team
+    /// </summary>
+    public int UnBindUnit(Unit unit)
+    {
+        int ndx;
+        ndx = Units.IndexOf(unit);
+        unit.ParentTeam = null;
+        Units.RemoveAt(ndx);
+        return ndx;
+    }
+
+    
+    /// <summary>
+    ///     bind unit to team
+    /// </summary>
+    public void BindUnit(Unit unit,int ndx)
+    {
+       
+        unit.ParentTeam = this;
+        Units.Insert(ndx,unit);
+    
+    }
+
     /// <summary>
     ///     unbind units from team
     /// </summary>
     public void UnBindUnits()
     {
-        foreach (var unit in Units) unit.ParentTeam = null;
+        List<Unit> UnitsToUnbind =  new List<Unit>();
+        UnitsToUnbind.AddRange(Units);
+        foreach (var unit in UnitsToUnbind) UnBindUnit(unit);
         //Units.Clear(); disable this clear coz need save team into event field
-        Units = null;
+        //Units = null;
     }
 
     //bind units to team
     public void BindUnits(List<Unit> bindUnits)
     {
-        Units = bindUnits;
-        foreach (var unit in Units) unit.ParentTeam = this;
+        foreach (var unit in bindUnits) BindUnit(unit,Units.Count);
     }
 
     /// <summary>

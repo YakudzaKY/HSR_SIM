@@ -506,7 +506,7 @@ public static class GraphicsCls
 
                 //AV
                 DrawText(portraitPoint.X + 5, portraitPoint.Y + (int)(PortraitSize.Height * 0.4), gfx,
-                    Math.Ceiling(unit.GetActionValue(null)).ToString(), new SolidBrush(fntColor),
+                    Math.Ceiling(unit.GetCurrentActionValue(null)).ToString(), new SolidBrush(fntColor),
                     new Font("Tahoma", DefaultFontSize), true);
             }
 

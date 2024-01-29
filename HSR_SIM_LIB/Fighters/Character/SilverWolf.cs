@@ -130,8 +130,6 @@ public class SilverWolf : DefaultFighter
         SystemWarning.Events.Add(trgEnt);
         Abilities.Add(SystemWarning);
 
-
-        //todo best target is who can be main dps target and does not have element
         //Allow Changes?
         Ability AllowChanges;
         AllowChanges = new Ability(this)
