@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -11,6 +12,7 @@ public class RemoveBuff : BuffEventTemplate
     {
     }
 
+    private bool buffWasFound = false;
     public override string GetDescription()
     {
         return
@@ -21,9 +23,12 @@ public class RemoveBuff : BuffEventTemplate
     {
         //remove mod
         if (!revert)
-            TargetUnit.RemoveBuff(this, BuffToApply);
+            buffWasFound = TargetUnit.RemoveBuff(this, BuffToApply);
         else
-            TargetUnit.ApplyBuff(this, BuffToApply);
+        if (buffWasFound)
+            TargetUnit.RestoreBuff(this, BuffToApply);
+
+
 
         base.ProcEvent(revert);
     }

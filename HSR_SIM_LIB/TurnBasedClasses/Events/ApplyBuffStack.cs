@@ -28,7 +28,6 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             {
                 if (!TriggersHandled)
                     RealStacks = Math.Min(BuffToApply.MaxStack - TargetUnit.GetStacks(BuffToApply), Stacks);
-
                 TargetUnit.AddStack(BuffToApply, !revert ? 1 : -1 * RealStacks);
             }
 

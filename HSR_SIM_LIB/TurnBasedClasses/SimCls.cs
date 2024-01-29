@@ -123,23 +123,23 @@ public class SimCls : ICloneable
         //HP reduced to 0
         if (ent.RealVal != 0 && ent.TargetUnit.GetRes(ResourceType.HP).ResVal == 0)
         {
+            if (!UnitDefeatHandled(ent, ent.TargetUnit))
+                ent.ChildEvents.Add(new Defeat(ent.ParentStep, ent.Source, ent.SourceUnit)
+                {
+                    TargetUnit = ent.TargetUnit,
+                });
 
-            Defeat defeatEvent = new(ent.ParentStep, ent.Source, ent.SourceUnit)
-            {
-                TargetUnit = ent.TargetUnit,
-                DefeatPrevented = UnitDefeatHandled(ent, ent.TargetUnit)
-            };
-
-            ent.ChildEvents.Add(defeatEvent);
+            else
+                ent.ChildEvents.Add(new DefeatHandled(ent.ParentStep, ent.Source, ent.SourceUnit)
+                {
+                    TargetUnit = ent.TargetUnit,
+                });
 
         }
     }
 
     private bool UnitDefeatHandled(Event ent, Unit target)
     {
-        /*Ability battleRes = target.ParentTeam.Units.OrderByDescending(x=>x==target).Select(x => x.Fighter.Abilities.FirstOrDefault(y =>
-           y.Priority== Ability.PriorityEnm.DefeatHandler && y.Available()&&y.FollowUpTarget==null && y.GetTargets(target, y.TargetType, Ability.AbilityCurrentTargetEnm.AbilityMain)
-                .Contains(target))).FirstOrDefault();*/
         Ability battleRes = target.ParentTeam.Units.OrderByDescending(x => x == target).Select(x =>
             x.Fighter.Abilities.FirstOrDefault(y => y.Priority == Ability.PriorityEnm.DefeatHandler && y.Available() && y.FollowUpQueueAvailable() && y.GetTargets(target, y.TargetType, Ability.AbilityCurrentTargetEnm.AbilityMain)
                 .Contains(target))).MaxBy(y => y is not null);
@@ -338,9 +338,9 @@ public class SimCls : ICloneable
                 //clear dead units in enemy team
                 foreach (Unit unit in HostileTeam.Units.Where(x => !x.IsAlive))
                 {
-                    newStep.Events.Add( new UnbindUnit(newStep,unit,unit){TargetUnit = unit});
+                    newStep.Events.Add(new UnbindUnit(newStep, unit, unit) { TargetUnit = unit });
                 }
-                
+
                 //get first by AV unit
                 CurrentFight.Turn = new TurnR
                 {

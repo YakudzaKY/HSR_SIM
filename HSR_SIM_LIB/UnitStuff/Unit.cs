@@ -51,7 +51,7 @@ public class Unit : CloneClass
     public enum LivingStatusEnm
     {
         Alive,
-        WaitingForRez,
+        WaitingForFollowUp,
         Defeated
     }
 
@@ -397,16 +397,18 @@ public class Unit : CloneClass
         };
     }
 
-    /// <summary>
-    ///     Search buff by ref. and add stack or reset duration.
-    ///     If buff have no ref then search by itself
-    ///     also search by SourceObject+effects
-    ///
-    /// return stacks applied
-    /// </summary>
-    /// <param name="buff"></param>
-    /// <param name="abilityValue"></param>
-    public int ApplyBuff(Event ent, Buff buff)
+
+    //   restore the buff
+    public void RestoreBuff(Event ent, Buff buff)
+    {
+        int res = 0;
+        foreach (var effect in buff.Effects) effect.BeforeApply(ent, buff);
+        Buffs.Add(buff);
+        this.ResetCondition(ConditionBuff.ConditionCheckParam.Buff);
+        foreach (var effect in buff.Effects) effect.OnApply(ent, buff);
+    }
+
+        public int ApplyBuff(Event ent, Buff buff)
     {
         int res = 0;
         var srchBuff = Buffs.FirstOrDefault(x =>
@@ -489,37 +491,39 @@ public class Unit : CloneClass
     }
 
     /// <summary>
-    ///     remove buff by ref
+    ///     remove buff by ref. Return buff was found or not
     /// </summary>
-    /// <param name="mod"></param>
-    public void RemoveBuff(Event ent, Buff mod)
+    /// <param name="buff"></param>
+    public bool RemoveBuff(Event ent, Buff buff)
     {
-
-        if (Buffs.Any(x => x.Reference == (mod.Reference ?? mod)))
+        bool res = false;
+        if (Buffs.Any(x => x.Reference == (buff.Reference ?? buff)))
         {
-            var foundBuff = Buffs.First(x => x.Reference == (mod.Reference ?? mod));
+            var foundBuff = Buffs.First(x => x.Reference == (buff.Reference ?? buff));
             foreach (var effect in foundBuff.Effects) effect.BeforeRemove(ent, foundBuff);
             Buffs.Remove(foundBuff);
             foreach (var effect in foundBuff.Effects) effect.OnRemove(ent, foundBuff);
+            res = true;
         }
         this.ResetCondition(ConditionBuff.ConditionCheckParam.Buff);
+        return res;
     }
 
 
-    public void AddStack(Buff mod, int stackCount = 1)
+    public void AddStack(Buff buff, int stackCount = 1)
     {
-        if (Buffs.Any(x => x.Reference == (mod.Reference ?? mod)))
+        if (Buffs.Any(x => x.Reference == (buff.Reference ?? buff)))
         {
-            var foundBuff = Buffs.First(x => x.Reference == (mod.Reference ?? mod));
+            var foundBuff = Buffs.First(x => x.Reference == (buff.Reference ?? buff));
             foundBuff.Stack += stackCount;
         }
     }
 
-    public int GetStacks(Buff mod)
+    public int GetStacks(Buff buff)
     {
-        if (Buffs.Any(x => x.Reference == (mod.Reference ?? mod)))
+        if (Buffs.Any(x => x.Reference == (buff.Reference ?? buff)))
         {
-            var foundBuff = Buffs.First(x => x.Reference == (mod.Reference ?? mod));
+            var foundBuff = Buffs.First(x => x.Reference == (buff.Reference ?? buff));
             return foundBuff.Stack;
         }
 
