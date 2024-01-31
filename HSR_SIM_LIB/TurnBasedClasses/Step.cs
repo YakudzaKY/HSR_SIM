@@ -31,6 +31,7 @@ public class Step
         UnitTurnStarted,
         UnitTurnEnded,
         UnitFollowUpAction,
+        UnitUltimate,
         FinishCombat,
         UnitTurnContinued,
         EndWave
@@ -103,6 +104,8 @@ public class Step
                   (ActorAbility != null ? $" with {ActorAbility.Name}" : "");
         else if (StepType == StepTypeEnm.UnitFollowUpAction)
             res = $"{Actor.Name:s} FOLLOW UP" + (ActorAbility != null ? $" with {ActorAbility.Name}" : "");
+        else if (StepType == StepTypeEnm.UnitUltimate)
+            res = $"{Actor.Name:s} ULTIMATE" + (ActorAbility != null ? $" with {ActorAbility.Name}" : "");
         else
             throw new NotImplementedException();
         return res;
@@ -317,7 +320,7 @@ public class Step
         //all alive and NO-cced units
         foreach (var prio in Enum.GetValues(typeof(PriorityEnm)).Cast<PriorityEnm>())
         foreach (var unit in Parent.AllUnits.Where(x => !x.Controlled && x.LivingStatus!=Unit.LivingStatusEnm.Defeated).OrderByDescending(x=>x.Fighter.Role))//supports cast ultimate first
-        foreach (var ability in unit.Fighter.Abilities.Where(x => x.Priority == prio &&
+        foreach (var ability in unit.Fighter.Abilities.Where(x => (x.Priority == prio||(prio==PriorityEnm.Ultimate&&x.AbilityType==AbilityTypeEnm.Ultimate ))&&
                                                                   //follow up abilities only with target  or All adjacent or self ability
                                                                   ((x.AbilityType == AbilityTypeEnm.FollowUpAction &&(x.FollowUpTargets.Any(x=>x.Key.IsAlive) 
                                                                                                                     ||x.AdjacentTargets==AdjacentTargetsEnm.All
@@ -326,7 +329,15 @@ public class Step
                                                                    x.AbilityType == AbilityTypeEnm.Ultimate) &&
                                                                   x.Available()))
         {
-            StepType = StepTypeEnm.UnitFollowUpAction;
+            if (ability.AbilityType == AbilityTypeEnm.Ultimate && prio == PriorityEnm.Ultimate)
+            {
+                StepType = StepTypeEnm.UnitUltimate;
+            }
+            else
+            {
+                StepType = StepTypeEnm.UnitFollowUpAction;
+            }
+            
             Actor = unit;
             ActorAbility = ability;
             if (ability.AbilityType == AbilityTypeEnm.Ultimate)

@@ -202,7 +202,7 @@ public class Bronya : DefaultFighter
     private bool WillCastE()
     {
         Unit mainDPS = GetFriendByRole(UnitRole.MainDPS).Parent;
-        if (mainDPS != Parent && (mainDPS.Controlled || mainDPS.Stats.PerformedActionValue < mainDPS.GetActionValue(null) * 0.5)||Parent.ParentTeam.GetRes(Resource.ResourceType.SP).ResVal>=Constant.MaxSp)
+        if (mainDPS != Parent && (mainDPS.Controlled || mainDPS.Stats.PerformedActionValue < mainDPS.GetActionValue(null) * 0.5)||Parent.ParentTeam.GetRes(Resource.ResourceType.SP).ResVal>=Constant.MaxSp-1)
             return true;
         return false;
     }

@@ -375,7 +375,7 @@ public class Luocha : DefaultFighter
     public override void DefaultFighter_HandleStep(Step step)
     {
         //check if friendly unit do action
-        if (step.StepType is Step.StepTypeEnm.ExecuteAbilityFromQueue or Step.StepTypeEnm.UnitFollowUpAction
+        if (step.StepType is Step.StepTypeEnm.ExecuteAbilityFromQueue or Step.StepTypeEnm.UnitFollowUpAction  or Step.StepTypeEnm.UnitUltimate
             or Step.StepTypeEnm.UnitTurnContinued or Step.StepTypeEnm.UnitTurnStarted)
         {
             CheckAndAddTarget(step.Actor,null);

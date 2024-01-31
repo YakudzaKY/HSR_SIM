@@ -15,7 +15,7 @@ internal class MessengerTraversingHackerspace : DefaultRelicSet
     public override void DefaultRelicSet_HandleStep(Step step)
     {
         if (Num >= 4)
-            if (step.StepType == Step.StepTypeEnm.UnitFollowUpAction && step.Actor == Parent.Parent)
+            if (step.StepType == Step.StepTypeEnm.UnitUltimate && step.Actor == Parent.Parent)
                 //buf spd 12
                 if (step.ActorAbility.AbilityType == Ability.AbilityTypeEnm.Ultimate)
                     foreach (var unit in step.Actor.GetTargetsForUnit(Ability.TargetTypeEnm.Friend))

@@ -5,6 +5,7 @@ using System.Linq;
 using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
+using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.Utils;
 using static HSR_SIM_LIB.Utils.Constant;
@@ -284,7 +285,7 @@ public class Unit : CloneClass
     ///     Get total stat by Buffs by type
     /// </summary>
     /// <returns></returns>
-    public List<KeyValuePair<Buff, List<Effect>>> GetBuffEffectsByType(Type srchBuffType, ElementEnm? elem = null, Event ent = null, List<ConditionBuff> excludeCondBuff = null, Buff.BuffType? buffType = null)
+    public List<KeyValuePair<Buff, List<Effect>>> GetBuffEffectsByType(Type srchBuffType, ElementEnm? elem = null, Event ent = null, List<ConditionBuff> excludeCondBuff = null, Buff.BuffType? buffType = null, Ability.AbilityTypeEnm? abilityType = null)
     {
         List<KeyValuePair<Buff, List<Effect>>> res = new();
 
@@ -299,9 +300,8 @@ public class Unit : CloneClass
             List<Effect> effectList = new();
             effectList.AddRange(mod.Effects.Where(y => y.GetType() == srchBuffType
                                                        && (y is not EffElementalTemplate eft || eft.Element == elem)
-                                                       && (y is not EffAbilityTypeBoost efAbility ||
-                                                           (ent?.ParentStep.ActorAbility != null && efAbility.AbilityType ==
-                                                               ent.ParentStep.ActorAbility.AbilityType))));
+                                                       && (y is not EffAbilityTypeBoost efa || efa.AbilityType == abilityType)
+                                                  ));
             if (effectList.Count > 0)
             {
                 res.Add(new KeyValuePair<Buff, List<Effect>>(mod, effectList));
@@ -317,17 +317,17 @@ public class Unit : CloneClass
     ///     Get total stat by Buffs by type
     /// </summary>
     /// <returns></returns>
-    public double GetBuffSumByType(Type srchBuffType, ElementEnm? elem = null, Event ent = null, List<ConditionBuff> excludeCondBuff = null, Buff.BuffType? buffType = null)
+    public double GetBuffSumByType(Type srchBuffType, ElementEnm? elem = null, Event ent = null, List<ConditionBuff> excludeCondBuff = null, Buff.BuffType? buffType = null, Ability.AbilityTypeEnm? abilityType = null)
     {
         double res = 0;
-        List<KeyValuePair<Buff, List<Effect>>> effList = GetBuffEffectsByType(srchBuffType, elem, ent, excludeCondBuff, buffType);
+        List<KeyValuePair<Buff, List<Effect>>> effList = GetBuffEffectsByType(srchBuffType, elem, ent, excludeCondBuff, buffType, abilityType);
 
         foreach (var kp in effList)
         {
             foreach (var effect in kp.Value)
             {
                 double finalValue;
-                if (effect.CalculateValue != null&&effect.RealTimeRecalculateValue)
+                if (effect.CalculateValue != null && effect.RealTimeRecalculateValue)
                     finalValue = (double)effect.CalculateValue(ent);
                 else
                     finalValue = (double)effect.Value;
@@ -408,7 +408,7 @@ public class Unit : CloneClass
         foreach (var effect in buff.Effects) effect.OnApply(ent, buff);
     }
 
-        public int ApplyBuff(Event ent, Buff buff)
+    public int ApplyBuff(Event ent, Buff buff)
     {
         int res = 0;
         var srchBuff = Buffs.FirstOrDefault(x =>
@@ -599,9 +599,11 @@ public class Unit : CloneClass
     /// <param name="entAbilityValue"></param>
     /// <param name="ent"></param>
     /// <returns></returns>
-    public double GetAbilityTypeMultiplier(Event ent = null)
+    public double GetAbilityTypeMultiplier(Event ent, Ability ability)
     {
-        return GetBuffSumByType(typeof(EffAbilityTypeBoost), ent: ent);
+        return GetBuffSumByType(typeof(EffAbilityTypeBoost), ent: ent,abilityType:ability.AbilityType)
+               // plus follow up bonus for non follow up attacks in follow up step
+               + (ability.AbilityType != AbilityTypeEnm.FollowUpAction && ent.ParentStep.StepType == Step.StepTypeEnm.UnitFollowUpAction ? GetBuffSumByType(typeof(EffAbilityTypeBoost), ent: ent,abilityType:AbilityTypeEnm.FollowUpAction) : 0);
     }
 
     public double GetOutgoingHealMultiplier(Event ent)
