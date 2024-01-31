@@ -30,7 +30,7 @@ namespace HSR_SIM_LIB.Fighters.LightCones.Cones
                 Parent.PassiveBuffs.Add(new PassiveBuff(Parent.Parent)
                 {
                     AppliedBuff = new Buff(Parent.Parent)
-                        { Effects = new List<Effect> { new EffCritPrc() { CalculateValue = calcCrit } } },
+                        { Effects = new List<Effect> { new EffCritPrc() { CalculateValue = calcCrit, RealTimeRecalculateValue = true} } },
                     Target = Parent.Parent,
                     IsTargetCheck = true
                 });

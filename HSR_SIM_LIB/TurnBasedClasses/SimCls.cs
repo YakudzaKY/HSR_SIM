@@ -32,7 +32,7 @@ public class SimCls : ICloneable
     public List<Step> steps = new();
 
     /// <summary>
-    ///     construcotor
+    ///     constructor
     /// </summary>
     public SimCls()
     {

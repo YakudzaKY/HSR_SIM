@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Pipes;
 using System.Xml;
 using System.Xml.Linq;
 using HSR_SIM_LIB.Fighters;
@@ -159,6 +160,16 @@ public static class XMLLoader
 
 
     /// <summary>
+    /// remove special chars from string
+    /// </summary>
+    /// <param name="str"></param>
+    /// <returns></returns>
+    private static string EscapeReplaceString(string str)
+    {
+        return str.Trim().Replace(" ", "").Replace("'","").Replace("-", "").Replace(":", "");
+    }
+
+    /// <summary>
     ///     Exctract unit list from xml elemenet
     /// </summary>
     /// <param name="wave"></param>
@@ -173,7 +184,7 @@ public static class XMLLoader
             var unitCode = unitNode.Attributes.GetNamedItem("template").Value.Trim();
             var words = unitCode.Split('\\');
             unit.FighterClassName =
-                $"HSR_SIM_LIB.Fighters.{words[0]}.{words[1].Replace(" ", "")}";
+                $"HSR_SIM_LIB.Fighters.{words[0]}.{EscapeReplaceString(words[1])}";
             unit.UnitType = (TypeEnm)Enum.Parse(typeof(TypeEnm), words[0], true);
             unit.Level =
                 int.Parse(unitNode.Attributes.GetNamedItem("level")?.Value?.Trim() ??
@@ -252,14 +263,14 @@ public static class XMLLoader
             foreach (XmlElement xmlLcone in xmlElement.SelectNodes("LightCone"))
             {
                 unit.LightConeStringPath =
-                    $"HSR_SIM_LIB.Fighters.LightCones.Cones.{xmlLcone.Attributes.GetNamedItem("name").Value.Trim().Replace(" ", "").Replace("-", "").Replace(":", "")}";
+                    $"HSR_SIM_LIB.Fighters.LightCones.Cones.{EscapeReplaceString(xmlLcone.Attributes.GetNamedItem("name").Value).Trim()}";
                 unit.LightConeInitRank = int.Parse(xmlLcone.Attributes.GetNamedItem("rank").Value.Trim());
             }
 
             foreach (XmlElement xmlRelic in xmlElement.SelectNodes("RelicSet"))
             {
                 KeyValuePair<string, int> newRec = new(
-                    $"HSR_SIM_LIB.Fighters.Relics.Set.{xmlRelic.Attributes.GetNamedItem("name").Value.Trim().Replace(" ", "").Replace("-", "").Replace(":", "")}",
+                    $"HSR_SIM_LIB.Fighters.Relics.Set.{EscapeReplaceString(xmlRelic.Attributes.GetNamedItem("name").Value)}",
                     int.Parse(xmlRelic.Attributes.GetNamedItem("num").Value.Trim()));
                 unit.RelicsClasses.Add(newRec);
             }

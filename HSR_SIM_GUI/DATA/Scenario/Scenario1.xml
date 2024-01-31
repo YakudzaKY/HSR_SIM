@@ -1,7 +1,7 @@
 <Scenario name="Default test scenario">
 	<Prelaunch>
 		<!--Set enegry at sim loaded-->
-		<Option type="SetEnergy" value="0.5" />
+		<Option type="SetEnergy" value="1" />
 		<!--Set team points at sim loaded-->
 		<Option type="SetTp" value="5" />
 		<!--Set skill points when Fight start-->

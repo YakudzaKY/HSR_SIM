@@ -373,10 +373,13 @@ public abstract class DefaultFighter : IFighter
         return 1; 
     }
 
+    public DefaultFighter GetFriendByRole(UnitRole role)
+    {
+        return (DefaultFighter)GetAliveFriends().FirstOrDefault(x => x != Parent && x.Fighter.Role == role) ?.Fighter;
+    }
     public double GetFriendSpender(UnitRole role)
     {
-        var fhgt = (DefaultFighter)GetAliveFriends().FirstOrDefault(x => x != Parent && x.Fighter.Role == role)
-            ?.Fighter;
+        var fhgt = GetFriendByRole(role);
         if (fhgt != null)
             return fhgt.WillSpend();
         return 0;

@@ -327,7 +327,7 @@ public class Unit : CloneClass
             foreach (var effect in kp.Value)
             {
                 double finalValue;
-                if (effect.CalculateValue != null)
+                if (effect.CalculateValue != null&&effect.RealTimeRecalculateValue)
                     finalValue = (double)effect.CalculateValue(ent);
                 else
                     finalValue = (double)effect.Value;

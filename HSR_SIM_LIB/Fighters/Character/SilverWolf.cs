@@ -180,7 +180,7 @@ public class SilverWolf : DefaultFighter
             PassiveBuffs.Add(new PassiveBuff(Parent)
             {
                 AppliedBuff = new Buff(Parent)
-                { Effects = new List<Effect> { new EffAllDamageBoost { CalculateValue = CalculateE6 } } },
+                { Effects = new List<Effect> { new EffAllDamageBoost { CalculateValue = CalculateE6,RealTimeRecalculateValue = true} } },
                 Target = Parent,
                 IsTargetCheck = true
             });

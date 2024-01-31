@@ -22,7 +22,7 @@ public class BuffFreezeWB : Buff
         if (ent is ResetAV && ent.TargetUnit == Owner) //50% reduce av if frosted
             ent.ChildEvents.Add(new ModActionValue(ent.ParentStep, Owner, Owner)
             {
-                TargetUnit = Owner, Val = Owner.GetBaseActionValue(ent) * 0.5
+                TargetUnit = Owner, Val = Owner.GetActionValue(ent) * 0.5
             });
     }
 }

@@ -26,7 +26,7 @@ public class ToughnessBreak : DamageEventTemplate
             ModActionValue delayAV = new(this.ParentStep, this.Source, this.SourceUnit)
             {
                 TargetUnit = this.TargetUnit,
-                Val = -this.TargetUnit.GetCurrentActionValue(this) * 0.25
+                Val = -this.TargetUnit.GetActionValue(this) * 0.25
             }; //default delay
             this.ChildEvents.Add(delayAV);
             // https://honkai-star-rail.fandom.com/wiki/Toughness

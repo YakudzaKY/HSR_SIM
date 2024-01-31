@@ -115,6 +115,7 @@
     <None Remove="Data\Images\Scratch.png" />
     <None Remove="Data\Images\Special\Forgotten Hall.png" />
     <None Remove="Data\Images\Sword.png" />
+    <None Remove="Data\Images\The_Belobog_March.webp" />
     <None Remove="Data\Images\Traces\A2.png" />
     <None Remove="Data\Images\Traces\A4.png" />
     <None Remove="Data\Images\Traces\A6.png" />
@@ -424,6 +425,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Images\Sword.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Images\The_Belobog_March.webp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Images\Traces\A2.png">

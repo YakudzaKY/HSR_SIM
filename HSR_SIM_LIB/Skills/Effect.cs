@@ -6,6 +6,10 @@ namespace HSR_SIM_LIB.Skills;
 
 public class Effect:CloneClass
 {
+    /// <summary>
+    /// func ref that Calculate effect value on buff apply.
+    /// if RealTimeRecalculateValue== true then recalc will be every time on buff parsing 
+    /// </summary>
     public Event.CalculateValuePrc CalculateValue { get; init; }
 
     public double? Value { get; set; }
@@ -14,6 +18,12 @@ public class Effect:CloneClass
     /// DynamicValue - value of effect can be changed
     /// </summary>
     public virtual bool DynamicValue => CalculateValue != null;
+
+    /// <summary>
+    /// Do recalc value when we parse buff on unit
+    /// (!) Should use on  ConditionBuff && PassiveBuff because no buff apply event for them
+    /// </summary>
+    public virtual bool RealTimeRecalculateValue { get; init; } = false;
 
     public bool StackAffectValue { get; set; } = true; // do we multiply final value by stack count ?
 
