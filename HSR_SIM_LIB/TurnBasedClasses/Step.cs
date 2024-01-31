@@ -312,11 +312,11 @@ public class Step
     /// <summary>
     ///     Do some folow up actions and unltimates
     /// </summary>
-    public bool FollowUpActions(Team tm=null)
+    public bool FollowUpActions()
     {
         //all alive and NO-cced units
         foreach (var prio in Enum.GetValues(typeof(PriorityEnm)).Cast<PriorityEnm>())
-        foreach (var unit in Parent.AllUnits.Where(x => (tm==null || x.ParentTeam==tm) &&!x.Controlled && x.LivingStatus!=Unit.LivingStatusEnm.Defeated).OrderByDescending(x=>x.Fighter.Role))//supports cast ultimate first
+        foreach (var unit in Parent.AllUnits.Where(x => !x.Controlled && x.LivingStatus!=Unit.LivingStatusEnm.Defeated).OrderByDescending(x=>x.Fighter.Role))//supports cast ultimate first
         foreach (var ability in unit.Fighter.Abilities.Where(x => x.Priority == prio &&
                                                                   //follow up abilities only with target  or All adjacent or self ability
                                                                   ((x.AbilityType == AbilityTypeEnm.FollowUpAction &&(x.FollowUpTargets.Any(x=>x.Key.IsAlive) 
@@ -352,8 +352,5 @@ public class Step
         return false;
     }
 
-    public bool Actions()
-    {
-        return false;
-    }
+ 
 }

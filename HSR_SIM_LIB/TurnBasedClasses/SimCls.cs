@@ -94,20 +94,17 @@ public class SimCls : ICloneable
     public Team PartyTeam
     {
         get { return Teams.First(x => x.controledTeam); }
-        set => throw new NotImplementedException();
     }
 
     public Team HostileTeam
     {
         get { return Teams.First(x => x.controledTeam == false && x.TeamType == TeamTypeEnm.UnitPack); }
-        set => throw new NotImplementedException();
     }
 
 
     public Team SpecialTeam
     {
         get { return Teams.First(x => x.TeamType == TeamTypeEnm.Special); }
-        set => throw new NotImplementedException();
     }
 
     //Total action value per run
@@ -403,25 +400,25 @@ public class SimCls : ICloneable
         }
         else if (newStep.StepType == StepTypeEnm.Idle && CurrentFight.Turn.TurnStage == StepTypeEnm.UnitTurnStarted)
         {
-            //try follow up actions before target do something
-            if (!newStep.FollowUpActions(CurrentFight.Turn.Actor.ParentTeam))
-                if (!newStep.Actions())
-                {
-                    newStep.StepType = StepTypeEnm.UnitTurnEnded;
-                    newStep.Actor = CurrentFight.Turn.Actor;
-                    newStep.Events.Add(new ResetAV(newStep, this, null)
-                    { TargetUnit = CurrentFight.Turn.Actor });
+            //try follow up actions before target do something.
+            //follow up actions disabled at NPC turn end
+            if (CurrentFight.Turn.Actor.Fighter is DefaultNPCFighter || !newStep.FollowUpActions())
+            {
+                newStep.StepType = StepTypeEnm.UnitTurnEnded;
+                newStep.Actor = CurrentFight.Turn.Actor;
+                newStep.Events.Add(new ResetAV(newStep, this, null)
+                { TargetUnit = CurrentFight.Turn.Actor });
 
-                    //reset CD
-                    foreach (var ability in CurrentFight.Turn.Actor.Fighter.Abilities.Where(x => x.CooldownTimer > 0))
-                        ability.CooldownTimer -= 1;
+                //reset CD
+                foreach (var ability in CurrentFight.Turn.Actor.Fighter.Abilities.Where(x => x.CooldownTimer > 0))
+                    ability.CooldownTimer -= 1;
 
 
-                    //remove buffs
-                    foreach (var dot in CurrentFight.Turn.Actor.Buffs.Where(x =>
-                                 x.Type != BuffType.Dot && !x.IsEarlyProc())) dot.Proceed(newStep);
-                    CurrentFight.Turn = null;
-                }
+                //remove buffs
+                foreach (var dot in CurrentFight.Turn.Actor.Buffs.Where(x =>
+                             x.Type != BuffType.Dot && !x.IsEarlyProc())) dot.Proceed(newStep);
+                CurrentFight.Turn = null;
+            }
         }
 
 
