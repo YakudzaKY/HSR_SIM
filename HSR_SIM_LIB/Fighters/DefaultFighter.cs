@@ -168,7 +168,7 @@ public abstract class DefaultFighter : IFighter
         if (step.Parent.CurrentFight == null)
         {
             var abilities = Abilities
-                .Where(x => x.Available() && x.AbilityType == Ability.AbilityTypeEnm.Technique &&
+                .Where(x => x.Available()&& x.IWannaUseIt()&& x.AbilityType == Ability.AbilityTypeEnm.Technique &&
                             x.Parent.Parent.ParentTeam.GetRes(ResourceType.TP).ResVal >= x.Cost)
                 .OrderBy(x => x.Attack)
                 .ThenByDescending(x => x.Cost);
@@ -229,7 +229,7 @@ public abstract class DefaultFighter : IFighter
             var freeSp = step.Parent.Parent.DevMode ?Parent.ParentTeam.GetRes(ResourceType.SP).ResVal: HowManySpICanSpend();
             Parent.ParentTeam.ParentSim?.Parent.LogDebug($"I have {freeSp:f} SP");
             var abilities = Abilities
-                .Where(x => x.Available.Invoke() && (x.Cost <= freeSp || x.CostType != ResourceType.SP) &&
+                .Where(x => x.Available.Invoke() && x.IWannaUseIt.Invoke() && (x.Cost <= freeSp || x.CostType != ResourceType.SP) &&
                             (x.AbilityType == Ability.AbilityTypeEnm.Basic ||
                              x.AbilityType == Ability.AbilityTypeEnm.Ability));
             chosenAbility = step.Parent.Parent.DevMode ? DevModeUtils.ChooseAbilityToCast(this, abilities) : abilities.MaxBy(x => x.AbilityType);

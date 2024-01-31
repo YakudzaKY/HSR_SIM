@@ -5,6 +5,7 @@ using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
+using HSR_SIM_LIB.Utils;
 using static HSR_SIM_LIB.Fighters.FighterUtils;
 using static HSR_SIM_LIB.Skills.Ability;
 
@@ -17,6 +18,7 @@ public class Bronya : DefaultFighter
     private readonly int ultimateSkillLvl;
     private readonly int talentSkillLvl;
     private Ability ability;
+    private Ability windriderBullet;
     public Bronya(Unit parent) : base(parent)
     {
 
@@ -60,7 +62,7 @@ public class Bronya : DefaultFighter
 
 
         //Windrider Bullet
-        Ability windriderBullet;
+        
         windriderBullet = new Ability(this)
         {
             AbilityType = Ability.AbilityTypeEnm.Basic,
@@ -69,24 +71,29 @@ public class Bronya : DefaultFighter
             SpGain = 1
         };
         //dmg events
-
+        windriderBullet.Events.Add(new MechanicValChg(null, this, Parent)
+            { TargetUnit = Parent, AbilityValue = windriderBullet, Val = 1 });
         windriderBullet.Events.Add(new DirectDamage(null, this, Parent)
         { CalculateValue = CalculateBasicDmg });
         windriderBullet.Events.Add(new ToughnessShred(null, this, Parent) { Val = 30 });
-        windriderBullet.Events.Add(new ModActionValue(null, this, Parent){CalculateValue = CalcTalentAV });
         windriderBullet.Events.Add(new EnergyGain(null, this, Parent)
         { Val = 20, TargetUnit = Parent });
-
+        Mechanics.AddVal(windriderBullet);
 
         Abilities.Add(windriderBullet);
 
+
+        
         //Ability
         ability = new Ability(this)
         {
             AbilityType = Ability.AbilityTypeEnm.Ability,
             TargetType = Ability.TargetTypeEnm.Friend,
             Name = "Combat Redeployment",
-            Cooldown = 2
+            Cooldown = 2,
+            CostType = Resource.ResourceType.SP,
+            Cost = 1,
+            IWannaUseIt=WillCastE
         };
         ability.Events.Add(new DispelShit(null, this, Parent));
         //dmg events
@@ -112,6 +119,7 @@ public class Bronya : DefaultFighter
                 AdjacentTargets = Ability.AdjacentTargetsEnm.All,
                 TargetType = Ability.TargetTypeEnm.Friend,
                 Available = UltimateAvailable
+               
             };
 
         //buff apply
@@ -156,6 +164,16 @@ public class Bronya : DefaultFighter
         return Parent.GetActionValue(ent) * GetAbilityScaling(0.15, 0.30, talentSkillLvl);
     }
 
+    public override void DefaultFighter_HandleStep(Step step)
+    {
+        if (((step.StepType is Step.StepTypeEnm.UnitFollowUpAction&&step.ActorAbility==ability) ||step.StepType is  Step.StepTypeEnm.UnitTurnEnded )&& step.Actor == Parent && Mechanics.Values[windriderBullet]>0)
+        {
+            step.Events.Add(new ModActionValue(step, this, Parent){CalculateValue = CalcTalentAV ,TargetUnit = Parent});
+            step.Events.Add(new MechanicValChg(step, this, Parent) { TargetUnit = Parent, AbilityValue = windriderBullet, Val = -Mechanics.Values[windriderBullet] });
+        }
+        base.DefaultFighter_HandleStep(step);
+    }
+
     public override void DefaultFighter_HandleEvent(Event ent)
     {
         //if E castet not on self
@@ -169,6 +187,7 @@ public class Bronya : DefaultFighter
         base.DefaultFighter_HandleEvent(ent);
     }
 
+    //windriderBullet.Events.Add(new ModActionValue(null, this, Parent){CalculateValue = CalcTalentAV });
 
     /*
      * if 2+ turns left we dont need SP.
@@ -179,11 +198,11 @@ public class Bronya : DefaultFighter
         return WillCastE() ? 1 + GetFriendSpender(UnitRole.MainDPS) : 0;
     }
 
-    //mainDPS have >=50% action value or got CC
+    //mainDPS have >=50% action value or got CC or 5 sp
     private bool WillCastE()
     {
         Unit mainDPS = GetFriendByRole(UnitRole.MainDPS).Parent;
-        if (mainDPS != Parent && (mainDPS.Controlled || mainDPS.Stats.PerformedActionValue < mainDPS.GetActionValue(null) * 0.5))
+        if (mainDPS != Parent && (mainDPS.Controlled || mainDPS.Stats.PerformedActionValue < mainDPS.GetActionValue(null) * 0.5)||Parent.ParentTeam.GetRes(Resource.ResourceType.SP).ResVal>=Constant.MaxSp)
             return true;
         return false;
     }

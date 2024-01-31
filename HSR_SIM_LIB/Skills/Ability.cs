@@ -95,6 +95,11 @@ public class Ability : CloneClass
     public PriorityEnm Priority { get; set; } = PriorityEnm.Low;
 
     public DCanUsePrc Available { get; init; } = DefaultAbilityAvailable;
+
+    /// <summary>
+    /// do we pref cast this or not
+    /// </summary>
+    public DCanUsePrc IWannaUseIt { get; init; } = DefaultAbilityWannaUse;
     public int SpGain { get; set; } = 0;
     public List<KeyValuePair<Unit,Unit>> FollowUpTargets { get; set; }=new ();// key=target unit ,value=Queued by unit
     public DCanUsePrc FollowUpQueueAvailable { get; init; } 
@@ -115,6 +120,14 @@ public class Ability : CloneClass
     {
         return true;
     }
+
+    
+    //default all abilities we wanna cast
+    public static bool DefaultAbilityWannaUse()
+    {
+        return true;
+    }
+
 
     
     //default followup queue available if target list empty
