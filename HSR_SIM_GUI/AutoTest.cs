@@ -86,7 +86,7 @@ namespace HSR_SIM_GUI
                
                 string jsonFile = File.ReadAllText(myTaskList.Tasks[i].Scenario + ".json");
                 //null some fields
-                string jsonRes = JsonConvert.SerializeObject(myTaskList.Tasks[i].Results[0]);
+                string jsonRes = JsonConvert.SerializeObject(myTaskList.Tasks[i].Data);
                 bool successTest = String.Equals(jsonFile, jsonRes);
                 dgTest.Rows[i].Cells[1].Value=successTest?"Ok":"FALSE";
                 if (successTest)

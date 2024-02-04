@@ -343,7 +343,7 @@ public class Worker
     {
         public List<RCombatant> Combatants = new();
         public int Cycles;
-        public bool? Success;
+        public bool Success;
         public double TotalAv;
     }
 

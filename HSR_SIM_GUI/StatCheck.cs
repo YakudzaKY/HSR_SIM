@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using HSR_SIM_GUI.ChartTools;
 using HSR_SIM_GUI.DamageTools;
@@ -27,7 +28,7 @@ public partial class StatCheck : Form
 
     private Thread mainThread;
 
-
+    private bool interruptFlag;
     private RTaskList myTaskList;
 
     public StatCheck()
@@ -42,7 +43,7 @@ public partial class StatCheck : Form
         var files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\", "*.xml");
 
         foreach (var file in files) cbScenario.Items.Add(Path.GetFileName(file));
-        files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\","*.xml");
+        files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\", "*.xml");
 
         foreach (var file in files) chkProfiles.Items.Add(Path.GetFileName(file));
     }
@@ -95,7 +96,7 @@ public partial class StatCheck : Form
 
             {
                 var newCb = new ComboBox
-                    { Name = $"cb{str}Stat{i:d}", Location = new Point(startX, startY + 22 * i), Width = 100 };
+                { Name = $"cb{str}Stat{i:d}", Location = new Point(startX, startY + 22 * i), Width = 100 };
                 Control tbBox;
                 if (i == 0)
                     tbBox = new Label
@@ -158,37 +159,40 @@ public partial class StatCheck : Form
     {
         var res = new List<RStatMod>();
         res.Add(new RStatMod
-            { Character = character, Step = step, Stat = item, Val = SearchStatDeltaByName(item) * step });
+        { Character = character, Step = step, Stat = item, Val = SearchStatDeltaByName(item) * step });
         if (!string.IsNullOrEmpty(minusItem))
             res.Add(new RStatMod
             {
-                Character = character, Step = step, Stat = minusItem, Val = -SearchStatDeltaByName(minusItem) * step
+                Character = character,
+                Step = step,
+                Stat = minusItem,
+                Val = -SearchStatDeltaByName(minusItem) * step
             });
         return res;
     }
 
 
     //generate subtask by profile
-    private List<RTask> getStatsSubTasks(string profile)
+    private List<RTask> getStatsSubTasks(string profile, string character, string scenario, string statToReplace, string characterGrp )
     {
         var res = new List<RTask>();
         if (rbStatImpcat.Checked)
         {
-            if (!string.IsNullOrEmpty(cbCharacter.Text))
+            if (!string.IsNullOrEmpty(character))
                 foreach (var item in chkStats.CheckedItems)
                     for (var i = 1; i <= nmbSteps.Value; i++)
                         res.Add(new RTask
                         {
-                            Scenario = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\" +cbScenario.Text,
-                            Profile = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\" +profile,
+                            Scenario = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\" + scenario,
+                            Profile = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\" + profile,
                             Iterations = (int)NmbIterations.Value,
-                            StatMods = GetStatMods(cbCharacter.Text, (string)item,
-                                i * (int)nmbUpgradesPerStep.Value, cbStatToReplace.Text)
+                            StatMods = GetStatMods(character, (string)item,
+                                i * (int)nmbUpgradesPerStep.Value, statToReplace)
                         });
         }
         else if (rbGearReplace.Checked)
         {
-            if (!string.IsNullOrEmpty(cbCharacterGrp.Text))
+            if (!string.IsNullOrEmpty(characterGrp))
             {
                 var statModList = new List<RStatMod>();
                 foreach (var str in (RectModeEnm[])Enum.GetValues(typeof(RectModeEnm)))
@@ -204,7 +208,7 @@ public partial class StatCheck : Form
                             if (!string.IsNullOrEmpty(statName) && !string.IsNullOrEmpty(statVal))
                                 statModList.Add(new RStatMod
                                 {
-                                    Character = cbCharacterGrp.Text,
+                                    Character = characterGrp,
                                     Stat = statName,
                                     Step = 1,
                                     Val = (str == RectModeEnm.Minus ? -1 : 1) * ExctractDoubleVal(statVal)
@@ -218,8 +222,8 @@ public partial class StatCheck : Form
                     statModList.Insert(0, new RStatMod { Stat = "NEW GEAR", Step = 1 });
                     res.Add(new RTask
                     {
-                        Scenario = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\" +cbScenario.Text,
-                        Profile = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\" +profile,
+                        Scenario = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\" + cbScenario.Text,
+                        Profile = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\" + profile,
                         Iterations = (int)NmbIterations.Value,
                         StatMods = statModList
                     });
@@ -230,12 +234,23 @@ public partial class StatCheck : Form
         return res;
     }
 
-    private void BtnGo_Click(object sender, EventArgs e)
+    private void DoJob(string scenario, string character, string statToReplace,string characterGrp)
     {
+        interruptFlag = false;
         SaveGearReplaceValues();
         if (mainThread?.IsAlive ?? false)
             return;
-        BtnGo.Enabled = false;
+
+        BtnGo.Invoke((MethodInvoker)delegate
+        {
+            BtnGo.Enabled = false;
+        });
+
+        btnCancel.Invoke((MethodInvoker)delegate
+        {
+            btnCancel.Visible = true;
+        });
+
         mainThread = new Thread(ThreadWork.DoWork);
         myTaskList = new RTaskList();
         myTaskList.Tasks = new List<RTask>();
@@ -243,29 +258,59 @@ public partial class StatCheck : Form
         foreach (var item in chkProfiles.CheckedItems)
             myTaskList.Tasks.Add(new RTask
             {
-                Scenario = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\" + cbScenario.Text,
-                Profile = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\"+(string)item,
+                Scenario = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\" + scenario,
+                Profile = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\" + (string)item,
                 Iterations = (int)NmbIterations.Value,
-                Subtasks = getStatsSubTasks((string)item)
+                Subtasks = getStatsSubTasks((string)item, character, scenario, statToReplace,characterGrp)
             });
 
 
-        PB1.Value = 0;
-        PB1.Maximum = myTaskList.Tasks.Sum(x => x.Iterations + x.Subtasks.Sum(y => y.Iterations));
+        PB1.Invoke((MethodInvoker)delegate
+        {
+            PB1.Value = 0;
+        });
+
+        PB1.Invoke((MethodInvoker)delegate
+        {
+            PB1.Maximum = myTaskList.Tasks.Sum(x => x.Iterations + x.Subtasks.Sum(y => y.Iterations));
+        });
+
         mainThread.Start(myTaskList);
 
         while (mainThread.IsAlive)
         {
-            Thread.Sleep(100);
-            PB1.Value = myTaskList.Tasks.Sum(x => x.Results.Count + x.Subtasks.Sum(y => y.Results.Count));
-            Refresh();
-        }
 
+            if (interruptFlag)
+                mainThread.Interrupt();
+
+            PB1.Invoke((MethodInvoker)delegate
+            {
+                PB1.Value = myTaskList.Tasks.Sum(x => x.ResultCount + x.Subtasks.Sum(y => y.ResultCount));
+            });
+            lblProgressCnt.Invoke((MethodInvoker)delegate
+            {
+                lblProgressCnt.Text = $"{PB1.Value}\\{PB1.Maximum}";
+            });
+            //Refresh();
+            Thread.Sleep(100);
+        }
+        PB1.Invoke((MethodInvoker)delegate
+        {
+            PB1.Value = myTaskList.Tasks.Sum(x => x.ResultCount + x.Subtasks.Sum(y => y.ResultCount));
+        });
+        lblProgressCnt.Invoke((MethodInvoker)delegate
+        {
+            lblProgressCnt.Text = $"{PB1.Value}\\{PB1.Maximum}";
+        });
         //clear old
         var ctr = pnlCharts.Controls.Find("Chart", false).FirstOrDefault();
         while (ctr != null)
         {
-            pnlCharts.Controls.Remove(ctr);
+            pnlCharts.Invoke((MethodInvoker)delegate
+            {
+                pnlCharts.Controls.Remove(ctr);
+            });
+
             ctr.Dispose();
             ctr = pnlCharts.Controls.Find("Chart", false).FirstOrDefault();
         }
@@ -274,10 +319,33 @@ public partial class StatCheck : Form
         {
             var newChart = ChartUtils.getChart(task);
             newChart.Name = "Chart";
-            pnlCharts.Controls.Add(newChart);
+            pnlCharts.Invoke((MethodInvoker)delegate
+            {
+                pnlCharts.Controls.Add(newChart);
+            });
+
         }
 
-        BtnGo.Enabled = true;
+        btnCancel.Invoke((MethodInvoker)delegate
+        {
+            btnCancel.Visible = false;
+        });
+
+        BtnGo.Invoke((MethodInvoker)delegate
+        {
+            BtnGo.Enabled = true;
+        });
+
+
+    }
+
+    private async Task DoSomeJob(string scenario, string character, string statToReplace, string characterGrp)
+    {
+        await Task.Run(() => DoJob(scenario, character, statToReplace,characterGrp));
+    }
+    private void BtnGo_Click(object sender, EventArgs e)
+    {
+        DoSomeJob(cbScenario.Text, cbCharacter.Text, cbStatToReplace.Text,cbCharacterGrp.Text);
     }
 
     //load distinct characters from profiles
@@ -321,8 +389,25 @@ public partial class StatCheck : Form
 
     private void SaveGearReplaceValues()
     {
-        foreach (Control ctrl in gbMinus.Controls) IniF.IniWriteValue("StatCheckForm", ctrl.Name, ctrl.Text);
-        foreach (Control ctrl in gbPlus.Controls) IniF.IniWriteValue("StatCheckForm", ctrl.Name, ctrl.Text);
+
+
+        foreach (Control ctrl in gbMinus.Controls)
+        {
+            ctrl.Invoke((MethodInvoker)delegate
+            {
+                IniF.IniWriteValue("StatCheckForm", ctrl.Name, ctrl.Text);
+            });
+
+
+        }
+
+        foreach (Control ctrl in gbPlus.Controls)
+        {
+            ctrl.Invoke((MethodInvoker)delegate
+            {
+                IniF.IniWriteValue("StatCheckForm", ctrl.Name, ctrl.Text);
+            });
+        }
     }
 
     private void StatCheck_FormClosing(object sender, FormClosingEventArgs e)
@@ -377,5 +462,10 @@ public partial class StatCheck : Form
         nmbSteps.Value = 1;
         nmbUpgradesPerStep.Value = 15;
         LoadStatTable(mainStatsUpgrades);
+    }
+
+    private void btnCancel_Click(object sender, EventArgs e)
+    {
+        interruptFlag = true;
     }
 }

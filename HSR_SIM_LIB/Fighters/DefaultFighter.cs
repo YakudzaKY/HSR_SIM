@@ -375,7 +375,7 @@ public abstract class DefaultFighter : IFighter
 
     public DefaultFighter GetFriendByRole(UnitRole role)
     {
-        return (DefaultFighter)GetAliveFriends().FirstOrDefault(x => x != Parent && x.Fighter.Role == role) ?.Fighter;
+        return (DefaultFighter)GetAliveFriends().FirstOrDefault(x =>x.Fighter.Role == role) ?.Fighter;
     }
     public double GetFriendSpender(UnitRole role)
     {

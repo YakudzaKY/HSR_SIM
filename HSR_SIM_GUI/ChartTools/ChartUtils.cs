@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using HSR_SIM_GUI.DamageTools;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
+using Newtonsoft.Json.Linq;
 
 namespace HSR_SIM_GUI.ChartTools;
 
@@ -20,9 +21,9 @@ internal static class ChartUtils
         var newChart = new Chart();
         newChart.Size = new Size(380, 380);
         newChart.Palette = ChartColorPalette.Chocolate;
-        newChart.Titles.Add(new Title($"{task.Profile} wr:{task.Data.WinRate:f}%"));
+        newChart.Titles.Add(new Title($"{task.Profile} wr:{task.WinRate:f}%"));
         newChart.Titles.Add(new Title($"Win stats: cycles:{task.Data.Cycles:f}     totalAV:{task.Data.TotalAV:f}"));
-        if (task.Data.WinRate < 100)
+        if (task.WinRate < 100)
             newChart.Titles.Add(new Title($"Defeat stats: cycles:{task.Data.DefeatCycles:f}"));
         //CharArea
         var dpsArea = new ChartArea("primaryArea");
@@ -72,15 +73,15 @@ internal static class ChartUtils
 
 
         //Unit bar
-        foreach (var unit in task.Data.PartyUnits.OrderByDescending(x => x.avgDPAV))
+        foreach (var unit in task.Data.PartyUnits.OrderByDescending(x => x.Value.avgDPAV))
         {
             i++;
-            var unitLabel = new CustomLabel(i, i + 0.001, unit.CombatUnit, 0, LabelMarkStyle.None);
+            var unitLabel = new CustomLabel(i, i + 0.001, unit.Key, 0, LabelMarkStyle.None);
             dpsArea.AxisX.CustomLabels.Add(unitLabel);
-            newChart.Series[dpsPartyCharting].Points.AddXY(i, unit.avgDPAV);
-            newChart.Series[dpsPartyCharting].Points[i].Label = $"{unit.avgDPAV:f}";
+            newChart.Series[dpsPartyCharting].Points.AddXY(i, unit.Value.avgDPAV);
+            newChart.Series[dpsPartyCharting].Points[i].Label = $"{unit.Value.avgDPAV:f}";
 
-            foreach (var kindDmg in unit.avgByTypeDPAV.Where(x => x.Value > 0))
+            foreach (var kindDmg in unit.Value.avgByTypeDPAV.Where(x => x.Value > 0))
             {
                 var ndx = newChart.Series[kindDmg.Key.Name].Points.AddXY(i, kindDmg.Value);
                 newChart.Series[kindDmg.Key.Name].Points[ndx].Label = $"{kindDmg.Value:f}";
@@ -130,7 +131,7 @@ internal static class ChartUtils
             {
                 var statMod = subtask.StatMods.First();
                 newChart.Series[statMod.Stat].Points.AddXY(statMod.Step, subtask.Data.avgDPAV - task.Data.avgDPAV);
-                newChart.Series[statMod.Stat].Points.Last().Label = $"wr:{subtask.Data.WinRate:f}%";
+                newChart.Series[statMod.Stat].Points.Last().Label = $"wr:{subtask.WinRate:f}%";
                 //newChart.Series[statMod.Stat].Points.Last().Label = $"wr:{subtask.Data.WinRate:f}% wcl:{subtask.Data.Cycles:f} dcl:{subtask.Data.DefeatCycles:f}";// extended stats
             }
         }

@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using HSR_SIM_LIB;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
+using ImageMagick;
 using static HSR_SIM_GUI.DamageTools.TaskUtils;
 
 namespace HSR_SIM_GUI.DamageTools;
@@ -15,7 +18,7 @@ internal static class ThreadUtils
     {
         public static int GetDecision(string[] items, string description)
         {
-            throw   new NotImplementedException();
+            throw new NotImplementedException();
         }
         /// <summary>
         ///     child thread func
@@ -31,6 +34,8 @@ internal static class ThreadUtils
             wrk.LoadScenarioFromXml(rLinks.Task.Scenario, rLinks.Task.Profile);
             wrk.ApplyModes(rLinks.Task.StatMods);
             wrk.GetCombatResult(rLinks.Result);
+            rLinks.Task.Aggregate(rLinks.Result);
+
         }
 
 
@@ -49,9 +54,9 @@ internal static class ThreadUtils
                 myThreads.Add(thd);
             }
 
-            var mainQuery = (from p in myTaskList.Tasks.Where(x => x.Subtasks is not null)
+            var mainQuery = (from p in myTaskList.Tasks select p).Union(from p in myTaskList.Tasks.Where(x => x.Subtasks is not null)
                              from c in p.Subtasks
-                             select c).Union(from p in myTaskList.Tasks select p)
+                             select c)
                 .Distinct();
 
             while (mainQuery.Any(x => !x.Fetched))
@@ -59,12 +64,14 @@ internal static class ThreadUtils
                 //queue tasks
                 foreach (var thr in myThreads.Where(x => x.IsAlive == false).ToList())
                 {
-                    var task = mainQuery.FirstOrDefault(x => x.Results != null && x.Results.Count() < x.Iterations);
+                    //get first task where result count < target iterations
+                    var task = mainQuery.FirstOrDefault(x => x.StartCount < x.Iterations);
 
                     if (task != null)
                     {
+                        task.StartCount++;
+                        //result will be filled in worker class
                         var result = new Worker.RCombatResult();
-                        task.Results.Add(result);
                         var thThread = myThreads[myThreads.IndexOf(thr)];
                         var ndx = myThreads.IndexOf(thr);
                         myThreads[ndx] = null;
@@ -77,83 +84,29 @@ internal static class ThreadUtils
                     }
                 }
 
-                if (!myTaskList.FetchAndAggregateData)
-                    foreach (var fetchTask in mainQuery.Where(x =>
-                                 !x.Fetched && x.Results.Count(y => y.Success != null) == x.Iterations))
-                    {
-                        fetchTask.Fetched = true;
-                    }
-                else
-                    //fetch data
-                    foreach (var fetchTask in mainQuery.Where(x =>
-                                 !x.Fetched && x.Results.Count(y => y.Success != null) == x.Iterations))
-                    {
-                        var winResults =
-                            fetchTask.Results.Where(x => x.Success ?? false).ToList();
-                        var defeatResults =
-                            fetchTask.Results.Where(x => !(x.Success ?? false)).ToList();
-                        fetchTask.Fetched = true;
-                        fetchTask.Data.WinRate = fetchTask.Results.Average(x => x.Success ?? false ? 100 : 0);
-                        if (defeatResults.Any())
-                            fetchTask.Data.DefeatCycles = defeatResults.DefaultIfEmpty().Average(x => x.Cycles);
-                        if (winResults.Any())
-                        {
-                            fetchTask.Data.TotalAV = winResults.Average(x => x.TotalAv);
-                            fetchTask.Data.Cycles = winResults.Average(x => x.Cycles);
-                            fetchTask.Data.avgDPAV = winResults.Average(x => x.Combatants
-                                .Sum(z =>
-                                    z.Damages.Sum(x => x.Value) / x.TotalAv));
-                            fetchTask.Data.minDPAV = winResults.Min(x => x.Combatants
-                                .Sum(z =>
-                                    z.Damages.Sum(x => x.Value) / x.TotalAv));
-                            fetchTask.Data.maxDPAV = winResults.Max(x => x.Combatants
-                                .Sum(z =>
-                                    z.Damages.Sum(x => x.Value) / x.TotalAv));
+                try
+                {
+                    Thread.Sleep(10);
+                }
+                catch(ThreadInterruptedException e)
+                {
+                    Console.WriteLine("thread interrupted");
+                    break;
 
-                            foreach (var unit in winResults.First()
-                                         .Combatants
-                                         .Select(y => y.CombatUnit))
-                            {
-                                var prUnit = new PartyUnit();
-                                prUnit.CombatUnit = unit;
+                }
 
-                                prUnit.avgDPAV = winResults.Average(x => x.Combatants
-                                    .Where(y => y.CombatUnit == unit).Sum(z =>
-                                        z.Damages.Sum(x => x.Value) / x.TotalAv));
-                                prUnit.minDPAV = winResults.Min(x => x.Combatants.Where(y => y.CombatUnit == unit).Sum(z =>
-                                    z.Damages.Sum(x => x.Value) / x.TotalAv));
-                                prUnit.maxDPAV = winResults.Max(x => x.Combatants.Where(y => y.CombatUnit == unit)
-                                    .Sum(z =>
-                                        z.Damages.Sum(x => x.Value) / x.TotalAv));
-
-                                Type[] typeArray =
-                                {
-                                typeof(DirectDamage), typeof(DoTDamage), typeof(ToughnessBreakDoTDamage),
-                                typeof(ToughnessBreak)
-                            };
-
-                                foreach (var typ in typeArray)
-                                    prUnit.avgByTypeDPAV.Add(typ, winResults.Average(x => x.Combatants
-                                        .Where(y => y.CombatUnit == unit).Sum(z =>
-                                            z.Damages[typ] / x.TotalAv
-                                        )));
-
-                                fetchTask.Data.PartyUnits.Add(prUnit);
-                            }
-                        }
-
-
-                        foreach (var sd in fetchTask.Results) sd.Combatants = null;
-
-
-                        GC.Collect();
-                    }
-
-
-                Thread.Sleep(10);
+               
             }
 
-            while (myThreads.Count(x => x.IsAlive) > 0) Thread.Sleep(100);
+            try
+            {
+                while (myThreads.Count(x => x.IsAlive) > 0) Thread.Sleep(100);
+            }
+            catch(ThreadInterruptedException e)
+            {
+                Console.WriteLine("thread interrupted");
+            }
+         
 
             GC.Collect();
         }

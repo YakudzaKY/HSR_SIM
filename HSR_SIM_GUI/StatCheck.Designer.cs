@@ -71,6 +71,8 @@ namespace HSR_SIM_GUI
             panel1 = new System.Windows.Forms.Panel();
             rbGearReplace = new System.Windows.Forms.RadioButton();
             rbStatImpcat = new System.Windows.Forms.RadioButton();
+            lblProgressCnt = new System.Windows.Forms.Label();
+            btnCancel = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)NmbIterations).BeginInit();
             ((System.ComponentModel.ISupportInitialize)NmbThreadsCount).BeginInit();
             flowLayoutPanel1.SuspendLayout();
@@ -260,7 +262,6 @@ namespace HSR_SIM_GUI
             dgStatUpgrades.Location = new System.Drawing.Point(487, 15);
             dgStatUpgrades.Name = "dgStatUpgrades";
             dgStatUpgrades.RowHeadersVisible = false;
-            dgStatUpgrades.RowTemplate.Height = 25;
             dgStatUpgrades.Size = new System.Drawing.Size(218, 127);
             dgStatUpgrades.TabIndex = 31;
             // 
@@ -441,11 +442,32 @@ namespace HSR_SIM_GUI
             rbStatImpcat.UseVisualStyleBackColor = true;
             rbStatImpcat.CheckedChanged += radioButton1_CheckedChanged;
             // 
+            // lblProgressCnt
+            // 
+            lblProgressCnt.AutoSize = true;
+            lblProgressCnt.Location = new System.Drawing.Point(23, 172);
+            lblProgressCnt.Name = "lblProgressCnt";
+            lblProgressCnt.Size = new System.Drawing.Size(0, 15);
+            lblProgressCnt.TabIndex = 27;
+            // 
+            // btnCancel
+            // 
+            btnCancel.Location = new System.Drawing.Point(134, 168);
+            btnCancel.Name = "btnCancel";
+            btnCancel.Size = new System.Drawing.Size(116, 23);
+            btnCancel.TabIndex = 28;
+            btnCancel.Text = "CANCEL!";
+            btnCancel.UseVisualStyleBackColor = true;
+            btnCancel.Visible = false;
+            btnCancel.Click += btnCancel_Click;
+            // 
             // StatCheck
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(1165, 816);
+            Controls.Add(btnCancel);
+            Controls.Add(lblProgressCnt);
             Controls.Add(panel1);
             Controls.Add(flowLayoutPanel1);
             Controls.Add(BtnGo);
@@ -517,5 +539,7 @@ namespace HSR_SIM_GUI
         private System.Windows.Forms.GroupBox gbMinus;
         private System.Windows.Forms.Button btnImport;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Label lblProgressCnt;
+        private System.Windows.Forms.Button btnCancel;
     }
 }
