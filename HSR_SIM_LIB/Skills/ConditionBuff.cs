@@ -23,7 +23,8 @@ public class ConditionBuff(Unit parentUnit) : PassiveBuff(parentUnit)
         Weakness,
         CritRate,
         HPPrc,
-        Buff
+        Buff,
+        AnyDebuff
     }
 
 
@@ -79,6 +80,8 @@ public class ConditionBuff(Unit parentUnit) : PassiveBuff(parentUnit)
                                                 == (Condition.CondtionExpression == ConditionCheckExpression.Exists),
                 ConditionCheckParam.Buff => untToCheck.Buffs.Any(x => x.Reference == Condition.BuffValue)
                                                 == (Condition.CondtionExpression == ConditionCheckExpression.Exists),
+                ConditionCheckParam.AnyDebuff => untToCheck.Buffs.Any(x => x.Type is Buff.BuffType.Debuff or Buff.BuffType.Dot)
+                                            == (Condition.CondtionExpression == ConditionCheckExpression.Exists),
                 _ => throw new NotImplementedException()
             };
             NeedRecalc = false;
