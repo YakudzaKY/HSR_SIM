@@ -71,7 +71,7 @@ public class SimCls : ICloneable
         set => steps = value;
     }
 
-    internal CombatFight CurrentFight { get; set; } = null;
+    public CombatFight CurrentFight { get; set; } = null;
     public int CurrentFightStep { get; set; } = 0;
 
     /// <summary>
@@ -137,6 +137,9 @@ public class SimCls : ICloneable
 
     private bool UnitDefeatHandled(Event ent, Unit target)
     {
+        //if already wating for rezz then nothing happened
+        if (target.LivingStatus == LivingStatusEnm.WaitingForFollowUp)
+            return true;
         Ability battleRes = target.ParentTeam.Units.OrderByDescending(x => x == target).Select(x =>
             x.Fighter.Abilities.FirstOrDefault(y => y.FollowUpPriority == Ability.PriorityEnm.DefeatHandler && y.Available() && y.FollowUpQueueAvailable() && y.GetTargets(target, y.TargetType, Ability.AbilityCurrentTargetEnm.AbilityMain)
                 .Contains(target))).MaxBy(y => y is not null);
@@ -402,7 +405,7 @@ public class SimCls : ICloneable
         {
             //try follow up actions before target do something.
             //follow up actions disabled at NPC turn end
-            if (CurrentFight.Turn.Actor.Fighter is DefaultNPCFighter || !newStep.FollowUpActions())
+            if (CurrentFight.Turn.Actor.Fighter .IsNpcUnit || !newStep.FollowUpActions())
             {
                 newStep.StepType = StepTypeEnm.UnitTurnEnded;
                 newStep.Actor = CurrentFight.Turn.Actor;

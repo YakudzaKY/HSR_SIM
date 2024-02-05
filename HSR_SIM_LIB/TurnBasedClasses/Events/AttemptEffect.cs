@@ -7,7 +7,7 @@ using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events
 {
-    internal class AttemptEffect:BuffEventTemplate
+    public class AttemptEffect:BuffEventTemplate
     {
         /// <summary>
         /// attempt place debuff on target

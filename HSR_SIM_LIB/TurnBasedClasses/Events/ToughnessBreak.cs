@@ -47,7 +47,7 @@ public class ToughnessBreak : DamageEventTemplate
                 case ElementEnm.Wind:
                     this.TryDebuff(
                         new BuffWindShearWB(this.SourceUnit, this.SourceUnit.Fighter.ShieldBreakDebuff)
-                        { Stack = this.TargetUnit.Fighter is DefaultNPCBossFIghter ? 3 : 1 }, 1.5);
+                        { Stack = this.TargetUnit.Fighter.IsEliteUnit ? 3 : 1 }, 1.5);
                     break;
                 case ElementEnm.Quantum:
                     this.TryDebuff(

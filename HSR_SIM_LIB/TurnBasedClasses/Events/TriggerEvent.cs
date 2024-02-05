@@ -7,7 +7,7 @@ using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events
 {
-    internal class TriggerEvent: Event
+    public class TriggerEvent: Event
     {
         public TriggerEvent(Step parentStep, ICloneable source, Unit sourceUnit) : base(parentStep, source, sourceUnit)
         {

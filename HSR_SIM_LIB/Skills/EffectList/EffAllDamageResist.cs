@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HSR_SIM_LIB.Skills.EffectList
 {
-    internal class EffAllDamageResist:Effect
+    public class EffAllDamageResist:Effect
     {
     }
 }

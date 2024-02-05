@@ -7,7 +7,7 @@ using HSR_SIM_LIB.TurnBasedClasses.Events;
 
 namespace HSR_SIM_LIB.Skills.EffectList
 {
-    internal class EffRebirth:Effect
+    public class EffRebirth:Effect
     {
     }
 }

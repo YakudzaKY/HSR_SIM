@@ -74,7 +74,7 @@ public class Ability : CloneClass
 
     public IFighter Parent { get; set; }
 
-    public string Name { get; internal set; }
+    public string Name { get;  set; }
     public List<Event> Events { get; set; } = new();
     public double Cost { get; set; } = 0;
     public ResourceType? CostType { get; set; }

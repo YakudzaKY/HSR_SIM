@@ -3,7 +3,7 @@ using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 
-internal class ExecuteAbilityFinish : Event
+public class ExecuteAbilityFinish : Event
 {
     public ExecuteAbilityFinish(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
     {

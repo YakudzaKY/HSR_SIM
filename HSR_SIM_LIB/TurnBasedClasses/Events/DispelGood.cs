@@ -5,7 +5,7 @@ using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 
-internal class DispelGood : Event
+public class DispelGood : Event
 {
     public DispelGood(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
     {

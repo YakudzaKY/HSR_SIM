@@ -5,7 +5,7 @@ using static HSR_SIM_LIB.TurnBasedClasses.Step;
 
 namespace HSR_SIM_LIB.TurnBasedClasses;
 
-internal class CombatFight
+public class CombatFight
 {
     public CombatFight(Fight refFight, SimCls parent)
     {

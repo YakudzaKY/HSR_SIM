@@ -475,6 +475,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\HSR_SIM_CONTENT\HSR_SIM_CONTENT.csproj" />
     <ProjectReference Include="..\HSR_SIM_LIB\HSR_SIM_LIB.csproj" />
   </ItemGroup>
   <ItemGroup>

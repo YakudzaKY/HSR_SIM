@@ -1,0 +1,16 @@
+D:\git\HSR_SIM\HSR_SIM_CONTENT\obj\Debug\net8.0\HSR_SIM_CONTENT.csproj.AssemblyReference.cache
+D:\git\HSR_SIM\HSR_SIM_CONTENT\obj\Debug\net8.0\HSR_SIM_CONTENT.GeneratedMSBuildEditorConfig.editorconfig
+D:\git\HSR_SIM\HSR_SIM_CONTENT\obj\Debug\net8.0\HSR_SIM_CONTENT.AssemblyInfoInputs.cache
+D:\git\HSR_SIM\HSR_SIM_CONTENT\obj\Debug\net8.0\HSR_SIM_CONTENT.AssemblyInfo.cs
+D:\git\HSR_SIM\HSR_SIM_CONTENT\obj\Debug\net8.0\HSR_SIM_CONTENT.csproj.CoreCompileInputs.cache
+D:\git\HSR_SIM\HSR_SIM_CONTENT\obj\Debug\net8.0\HSR_SIM_CONTENT.sourcelink.json
+D:\git\HSR_SIM\HSR_SIM_CONTENT\bin\Debug\net8.0\HSR_SIM_CONTENT.deps.json
+D:\git\HSR_SIM\HSR_SIM_CONTENT\bin\Debug\net8.0\HSR_SIM_CONTENT.dll
+D:\git\HSR_SIM\HSR_SIM_CONTENT\bin\Debug\net8.0\HSR_SIM_CONTENT.pdb
+D:\git\HSR_SIM\HSR_SIM_CONTENT\bin\Debug\net8.0\HSR_SIM_LIB.dll
+D:\git\HSR_SIM\HSR_SIM_CONTENT\bin\Debug\net8.0\HSR_SIM_LIB.pdb
+D:\git\HSR_SIM\HSR_SIM_CONTENT\obj\Debug\net8.0\HSR_SIM_CONTENT.csproj.CopyComplete
+D:\git\HSR_SIM\HSR_SIM_CONTENT\obj\Debug\net8.0\HSR_SIM_CONTENT.dll
+D:\git\HSR_SIM\HSR_SIM_CONTENT\obj\Debug\net8.0\refint\HSR_SIM_CONTENT.dll
+D:\git\HSR_SIM\HSR_SIM_CONTENT\obj\Debug\net8.0\HSR_SIM_CONTENT.pdb
+D:\git\HSR_SIM\HSR_SIM_CONTENT\obj\Debug\net8.0\ref\HSR_SIM_CONTENT.dll

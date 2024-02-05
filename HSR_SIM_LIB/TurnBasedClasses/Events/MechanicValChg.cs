@@ -20,7 +20,7 @@ public class MechanicValChg : Event
 
     public override void ProcEvent(bool revert)
     {
-        ((DefaultFighter)TargetUnit.Fighter).Mechanics.Values[AbilityValue] += (double)(revert ? -Val : Val);
+        (TargetUnit.Fighter).Mechanics.Values[AbilityValue] += (double)(revert ? -Val : Val);
         base.ProcEvent(revert);
     }
 }

@@ -7,7 +7,7 @@ using HSR_SIM_LIB.UnitStuff;
 namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 
 //Combat was finished
-internal class FinishCombat : Event
+public class FinishCombat : Event
 {
     private CombatFight oldCombatFight;
     private Dictionary<Unit, MechDictionary> oldMechDictionary;
@@ -46,7 +46,7 @@ internal class FinishCombat : Event
                 {
                     removedBuffs.Add(unit, unit.Buffs);
                     var md = new MechDictionary();
-                    foreach (var mch in ((DefaultFighter)unit.Fighter).Mechanics.Values)
+                    foreach (var mch in (unit.Fighter).Mechanics.Values)
                     {
                         md.AddVal(mch.Key);
                         md.Values[mch.Key] = mch.Value;
@@ -89,7 +89,7 @@ internal class FinishCombat : Event
 
             foreach (var omd in oldMechDictionary)
             foreach (var mec in omd.Value.Values)
-                ((DefaultFighter)omd.Key.Fighter).Mechanics.Values[mec.Key] = mec.Value;
+                (omd.Key.Fighter).Mechanics.Values[mec.Key] = mec.Value;
         }
 
         base.ProcEvent(revert);

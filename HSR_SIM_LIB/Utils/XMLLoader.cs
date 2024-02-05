@@ -8,6 +8,7 @@ using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.UnitStuff;
+using static HSR_SIM_LIB.Fighters.FighterUtils;
 using static HSR_SIM_LIB.TurnBasedClasses.PreLaunchOption;
 using static HSR_SIM_LIB.UnitStuff.Unit;
 
@@ -38,7 +39,7 @@ public static class XMLLoader
             foreach (XmlElement xnode in xRoot)
             {
                 if (xnode.Name == "Fights") FillFights(xnode, Combat);
-                if (xnode.Name == "Prelaunch") Combat.PreLaunch= ExtractPreLaunch(xnode);
+                if (xnode.Name == "Prelaunch") Combat.PreLaunch = ExtractPreLaunch(xnode);
                 if (xnode.Name == "Party") Combat.CurrentScenario.Party = ExtractUnits(xnode);
                 if (xnode.Name == "Special") Combat.CurrentScenario.SpecialUnits = ExtractUnits(xnode);
             }
@@ -166,7 +167,7 @@ public static class XMLLoader
     /// <returns></returns>
     private static string EscapeReplaceString(string str)
     {
-        return str.Trim().Replace(" ", "").Replace("'","").Replace("-", "").Replace(":", "");
+        return str.Trim().Replace(" ", "").Replace("'", "").Replace("-", "").Replace(":", "");
     }
 
     /// <summary>
@@ -182,9 +183,10 @@ public static class XMLLoader
             Unit unit = new();
             //load xml by 
             var unitCode = unitNode.Attributes.GetNamedItem("template").Value.Trim();
+            var assemblyName = unitNode.Attributes.GetNamedItem("assembly")?.Value.Trim()??"HSR_SIM_CONTENT";
             var words = unitCode.Split('\\');
             unit.FighterClassName =
-                $"HSR_SIM_LIB.Fighters.{words[0]}.{EscapeReplaceString(words[1])}";
+                $"{assemblyName}.Content.{words[0]}.{EscapeReplaceString(words[1])}, {assemblyName}";
             unit.UnitType = (TypeEnm)Enum.Parse(typeof(TypeEnm), words[0], true);
             unit.Level =
                 int.Parse(unitNode.Attributes.GetNamedItem("level")?.Value?.Trim() ??
@@ -198,10 +200,10 @@ public static class XMLLoader
             if (!string.IsNullOrEmpty(warGear) && !File.Exists(GetWarGearFile(warGear)))
                 throw new Exception(string.Format("WarGear file {0:s} not found", warGear));
 
-            if (File.Exists(GetWarGearFile(warGear??unitCode)))
-                ExctractWargear(warGear??unitCode, unit);
+            if (File.Exists(GetWarGearFile(warGear ?? unitCode)))
+                ExctractWargear(warGear ?? unitCode, unit);
             else
-                ExctractUnitSkillsAndGear(unitNode,unit);
+                ExctractUnitSkillsAndGear(unitNode, unit);
 
             units.Add(unit);
         }
@@ -238,7 +240,7 @@ public static class XMLLoader
 
     private static void ExctractUnitSkillsAndGear(XmlElement xmlElement, Unit unit)
     {
-       
+
         var newLevel = xmlElement.Attributes.GetNamedItem("level")?.Value.Trim();
         var newRank = xmlElement.Attributes.GetNamedItem("rank")?.Value.Trim();
         if (!string.IsNullOrEmpty(newLevel))
@@ -258,24 +260,25 @@ public static class XMLLoader
             unit.Skills.Add(skill);
         }
 
-        if (unit.Fighter is DefaultFighter)
+
+        foreach (XmlElement xmlLcone in xmlElement.SelectNodes("LightCone"))
         {
-            foreach (XmlElement xmlLcone in xmlElement.SelectNodes("LightCone"))
-            {
-                unit.LightConeStringPath =
-                    $"HSR_SIM_LIB.Fighters.LightCones.Cones.{EscapeReplaceString(xmlLcone.Attributes.GetNamedItem("name").Value).Trim()}";
-                unit.LightConeInitRank = int.Parse(xmlLcone.Attributes.GetNamedItem("rank").Value.Trim());
-            }
-
-            foreach (XmlElement xmlRelic in xmlElement.SelectNodes("RelicSet"))
-            {
-                KeyValuePair<string, int> newRec = new(
-                    $"HSR_SIM_LIB.Fighters.Relics.Set.{EscapeReplaceString(xmlRelic.Attributes.GetNamedItem("name").Value)}",
-                    int.Parse(xmlRelic.Attributes.GetNamedItem("num").Value.Trim()));
-                unit.RelicsClasses.Add(newRec);
-            }
-
+            var assemblyName = xmlLcone.Attributes.GetNamedItem("assembly")?.Value.Trim()??"HSR_SIM_CONTENT";
+            unit.LightConeStringPath =
+                $"{assemblyName}.Content.LightCones.{EscapeReplaceString(xmlLcone.Attributes.GetNamedItem("name").Value).Trim()}, {assemblyName}";
+            unit.LightConeInitRank = int.Parse(xmlLcone.Attributes.GetNamedItem("rank").Value.Trim());
         }
+
+        foreach (XmlElement xmlRelic in xmlElement.SelectNodes("RelicSet"))
+        {
+            var assemblyName = xmlRelic.Attributes.GetNamedItem("assembly")?.Value.Trim()??"HSR_SIM_CONTENT";
+            KeyValuePair<string, int> newRec = new(
+                $"{assemblyName}.Content.Relics.{EscapeReplaceString(xmlRelic.Attributes.GetNamedItem("name").Value)}, {assemblyName}",
+                int.Parse(xmlRelic.Attributes.GetNamedItem("num").Value.Trim()));
+            unit.RelicsClasses.Add(newRec);
+        }
+
+
     }
     private static void ExctractWargear(string wargear, Unit unit)
     {
@@ -283,7 +286,7 @@ public static class XMLLoader
         unitDoc.Load(GetWarGearFile(wargear));
         var xRoot = unitDoc.DocumentElement;
         var unitCode = xRoot.Attributes.GetNamedItem("name").Value.Trim();
-        ExctractUnitSkillsAndGear(xRoot,unit);
+        ExctractUnitSkillsAndGear(xRoot, unit);
         if (unitCode != unit.Name)
             throw new Exception(string.Format("Looking wargear for {0:s} but loaded for {1:s}", unit.Name, unitCode));
     }

@@ -61,7 +61,7 @@ public class Unit : CloneClass
     public IFighter Fighter
     {
         get =>
-            fighter ??= (IFighter)Activator.CreateInstance(Type.GetType(FighterClassName)!, this);
+            fighter ??= (IFighter)Activator.CreateInstance(Type.GetType(FighterClassName,true)!, this);
         set => fighter = value;
     }
 

@@ -12,7 +12,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
     /// <summary>
     /// Add effect to existing buff
     /// </summary>
-    internal class ApplyBuffEffect : Event
+    public class ApplyBuffEffect : Event
     {
         public Effect Eff;
         public Buff BuffToApply { get; set; }

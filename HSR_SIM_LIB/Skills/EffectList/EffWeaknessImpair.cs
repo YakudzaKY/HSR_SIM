@@ -9,7 +9,7 @@ using HSR_SIM_LIB.UnitStuff;
 namespace HSR_SIM_LIB.Skills.EffectList
 {
     
-    internal class EffWeaknessImpair:Effect
+    public class EffWeaknessImpair:Effect
     {
         public Unit.ElementEnm Element { get; init; }
         public override bool DynamicValue { get; } = true;
