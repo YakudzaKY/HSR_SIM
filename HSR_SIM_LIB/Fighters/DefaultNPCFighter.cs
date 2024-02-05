@@ -122,7 +122,7 @@ public class DefaultNPCFighter : IFighter
         Ability chosenAbility = null;
         Parent.ParentTeam.ParentSim?.Parent.LogDebug("========What i can cast=====");
         var abilities = Abilities
-            .Where(x => x.Available.Invoke() && x.CooldownTimer == 0 &&
+            .Where(x => x.Available()&& x.CooldownTimer == 0 &&
                         x.AbilityType is Ability.AbilityTypeEnm.Basic or Ability.AbilityTypeEnm.Ability);
         chosenAbility = step.Parent.Parent.DevMode ? DevModeUtils.ChooseAbilityToCast(this, abilities) :abilities.MaxBy(x => x.AbilityType);
         Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Choose  {chosenAbility?.Name}");

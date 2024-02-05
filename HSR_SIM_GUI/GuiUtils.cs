@@ -142,6 +142,15 @@ internal static class GuiUtils
         return 0;
     }
 
+    public static string GetScenarioPath()
+    {
+        return AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\";
+    }
+
+    public static string GetProfilePath()
+    {
+        return AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\";
+    }
     public static void ApplyDarkLightTheme(Form form)
     {
         [DllImport("UXTheme.dll", SetLastError = true, EntryPoint = "#138")]

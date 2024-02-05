@@ -45,7 +45,7 @@ public class Ability : CloneClass
         DefeatHandler,//top 1
         High,
         Medium,
-        Ultimate,
+        UltimateShouldBeHere,
         Low
     }
 
@@ -62,7 +62,9 @@ public class Ability : CloneClass
         Parent = parent;
         if (Element == ElementEnm.None)
             Element = parent.Element;
-        FollowUpQueueAvailable ??= DefaultAbilityQueueAvailable;
+        Available= DefaultAbilityAvailable;//add default then custom
+        IWannaUseIt= DefaultAbilityWannaUse;//set default if no init val
+        FollowUpQueueAvailable= DefaultAbilityQueueAvailable;//set default if no init val
     }
 
 
@@ -92,14 +94,14 @@ public class Ability : CloneClass
     public int CooldownTimer { get; set; } = 0;
     public bool EndTheTurn { get; set; } = true; //If ability used - end the turn
 
-    public PriorityEnm Priority { get; set; } = PriorityEnm.Low;
+    public PriorityEnm FollowUpPriority { get; set; } = PriorityEnm.Low;
 
-    public DCanUsePrc Available { get; init; } = DefaultAbilityAvailable;
+    public DCanUsePrc Available { get; init; }
 
     /// <summary>
     /// do we pref cast this or not
     /// </summary>
-    public DCanUsePrc IWannaUseIt { get; init; } = DefaultAbilityWannaUse;
+    public DCanUsePrc IWannaUseIt { get; init; } 
     public int SpGain { get; set; } = 0;
     public List<KeyValuePair<Unit,Unit>> FollowUpTargets { get; set; }=new ();// key=target unit ,value=Queued by unit
     public DCanUsePrc FollowUpQueueAvailable { get; init; } 
@@ -116,14 +118,23 @@ public class Ability : CloneClass
 
 
     //default all abilities are ok
-    public static bool DefaultAbilityAvailable()
+    public  bool DefaultAbilityAvailable()
     {
-        return true;
+        //if no cost type then always true
+        if (CostType is null) 
+            return true;
+        //if type in team res type
+        if (CostType is ResourceType.SP or ResourceType.TP)
+            return Parent.Parent.ParentTeam.GetRes((ResourceType)CostType).ResVal >= Cost;
+        //else get unit res
+        return Parent.Parent.GetRes((ResourceType)CostType).ResVal>=Cost;
+        
+            
     }
 
     
     //default all abilities we wanna cast
-    public static bool DefaultAbilityWannaUse()
+    public  bool DefaultAbilityWannaUse()
     {
         return true;
     }

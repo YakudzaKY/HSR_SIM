@@ -158,8 +158,8 @@ public partial class GUIForm : Form
         wrk.CbRend += WorkerCallBackImages;
         wrk.CbGetDecision = WorkerCallBackGetDecision;
         wrk.DevMode = chkDevMode.Checked;
-        wrk.LoadScenarioFromXml(AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\" + cbScenario.Text,
-            String.IsNullOrEmpty(cbProfile.Text)?"":AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\" + cbProfile.Text);
+        wrk.LoadScenarioFromXml(GetScenarioPath() + cbScenario.Text,
+            String.IsNullOrEmpty(cbProfile.Text)?"":GetProfilePath() + cbProfile.Text);
     }
 
 
@@ -167,13 +167,12 @@ public partial class GUIForm : Form
     {
         cbScenario.Items.Clear();
         cbProfile.Items.Clear();
-        var files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\","*.xml");
+        var files = Directory.GetFiles(GetScenarioPath(),"*.xml");
 
         foreach (var file in files) cbScenario.Items.Add(Path.GetFileName(file));
 
-        var profilePath = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\";
-        Directory.CreateDirectory(profilePath);
-        files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\","*.xml");
+        Directory.CreateDirectory(GetProfilePath());
+        files = Directory.GetFiles(GetProfilePath(),"*.xml");
 
         foreach (var file in files) cbProfile.Items.Add(Path.GetFileName(file));
     }

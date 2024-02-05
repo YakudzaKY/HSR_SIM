@@ -78,9 +78,10 @@ public class Luocha : DefaultFighter
             Name = "Cycle of life",
             Element = Element,
             Available = ColAvailable,
-            Priority = PriorityEnm.Medium,
+            FollowUpPriority = PriorityEnm.Medium,
             TargetType = TargetTypeEnm.Self,
             AdjacentTargets=AdjacentTargetsEnm.All
+
         };
         cycleOfLife.Events.Add(new MechanicValChg(null, this, Parent)
         { TargetUnit = Parent, AbilityValue = cycleOfLife, Val = -cycleOfLifeMaxCnt });
@@ -119,7 +120,7 @@ public class Luocha : DefaultFighter
             Name = "Prayer of Abyss Flower (auto)",
             Element = Element,
             Available = PoAFAvailable,
-            Priority = PriorityEnm.High,
+            FollowUpPriority = PriorityEnm.High,
             TargetType = TargetTypeEnm.Friend,
             FollowUpTargets = trackedUnits
         };
@@ -173,11 +174,9 @@ public class Luocha : DefaultFighter
             AbilityType = AbilityTypeEnm.Ultimate,
             Name = "Death Wish",
             AdjacentTargets = AdjacentTargetsEnm.All,
-            Available = UltimateAvailable,
-            Priority = PriorityEnm.Ultimate,
-            EndTheTurn = false,
             CostType = Resource.ResourceType.Energy,
-            Cost = Parent.Stats.BaseMaxEnergy
+            Cost = Parent.Stats.BaseMaxEnergy,
+            IWannaUseIt = IWannaUseDW
         };
         //dmg events
         //E6
@@ -260,6 +259,13 @@ public class Luocha : DefaultFighter
             });
     }
 
+
+    //default all abilities we wanna cast
+    public  bool IWannaUseDW()
+    {
+        //if we have no CoL or enemy have buff
+        return ultimateAbility.DefaultAbilityWannaUse() && (!ColBuffAvailable()||GetAliveEnemies().Count(x=>x.Buffs.Any(y=>y.Dispellable&&y.Type==Buff.BuffType.Buff))>0);
+    }
 
     public double? CalculateE2Shield(Event ent)
     {
@@ -399,7 +405,7 @@ public class Luocha : DefaultFighter
 
     public bool ColAvailable()
     {
-        return Mechanics.Values[cycleOfLife] >= cycleOfLifeMaxCnt;
+        return cycleOfLife.DefaultAbilityAvailable()&& Mechanics.Values[cycleOfLife] >= cycleOfLifeMaxCnt;
     }
 
     public bool PoAFAvailable()
@@ -433,11 +439,4 @@ public class Luocha : DefaultFighter
         return FighterUtils.CalculateDmgByBasicVal(Parent.GetAttack(null) * deathWish, ent);
     }
 
-    //get targets for auto heal. One target for Luocha
-    public IEnumerable<Unit> CalcFollowPoAFTarget()
-    {
-        IEnumerable<Unit> targets = new List<Unit> { trackedUnits.First().Key };
-
-        return targets;
-    }
 }

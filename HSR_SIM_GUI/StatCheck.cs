@@ -40,10 +40,10 @@ public partial class StatCheck : Form
     {
         cbScenario.Items.Clear();
         chkProfiles.Items.Clear();
-        var files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\", "*.xml");
+        var files = Directory.GetFiles(GetScenarioPath(), "*.xml");
 
         foreach (var file in files) cbScenario.Items.Add(Path.GetFileName(file));
-        files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\", "*.xml");
+        files = Directory.GetFiles(GetProfilePath(), "*.xml");
 
         foreach (var file in files) chkProfiles.Items.Add(Path.GetFileName(file));
     }
@@ -173,26 +173,26 @@ public partial class StatCheck : Form
 
 
     //generate subtask by profile
-    private List<RTask> getStatsSubTasks(string profile, string character, string scenario, string statToReplace, string characterGrp )
+    private List<RTask> GetStatsSubTasks(string profile)
     {
         var res = new List<RTask>();
         if (rbStatImpcat.Checked)
         {
-            if (!string.IsNullOrEmpty(character))
+            if (!string.IsNullOrEmpty(cbCharacter.Text))
                 foreach (var item in chkStats.CheckedItems)
                     for (var i = 1; i <= nmbSteps.Value; i++)
                         res.Add(new RTask
                         {
-                            Scenario = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\" + scenario,
-                            Profile = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\" + profile,
+                            Scenario = GetScenarioPath() + cbScenario.Text,
+                            Profile =  GetProfilePath()+ profile,
                             Iterations = (int)NmbIterations.Value,
-                            StatMods = GetStatMods(character, (string)item,
-                                i * (int)nmbUpgradesPerStep.Value, statToReplace)
+                            StatMods = GetStatMods(cbCharacter.Text, (string)item,
+                                i * (int)nmbUpgradesPerStep.Value,  cbStatToReplace.Text)
                         });
         }
         else if (rbGearReplace.Checked)
         {
-            if (!string.IsNullOrEmpty(characterGrp))
+            if (!string.IsNullOrEmpty(cbCharacterGrp.Text))
             {
                 var statModList = new List<RStatMod>();
                 foreach (var str in (RectModeEnm[])Enum.GetValues(typeof(RectModeEnm)))
@@ -208,7 +208,7 @@ public partial class StatCheck : Form
                             if (!string.IsNullOrEmpty(statName) && !string.IsNullOrEmpty(statVal))
                                 statModList.Add(new RStatMod
                                 {
-                                    Character = characterGrp,
+                                    Character = cbCharacterGrp.Text,
                                     Stat = statName,
                                     Step = 1,
                                     Val = (str == RectModeEnm.Minus ? -1 : 1) * ExctractDoubleVal(statVal)
@@ -222,8 +222,8 @@ public partial class StatCheck : Form
                     statModList.Insert(0, new RStatMod { Stat = "NEW GEAR", Step = 1 });
                     res.Add(new RTask
                     {
-                        Scenario = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\" + cbScenario.Text,
-                        Profile = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\" + profile,
+                        Scenario = GetScenarioPath() + cbScenario.Text,
+                        Profile = GetProfilePath() + profile,
                         Iterations = (int)NmbIterations.Value,
                         StatMods = statModList
                     });
@@ -234,7 +234,7 @@ public partial class StatCheck : Form
         return res;
     }
 
-    private void DoJob(string scenario, string character, string statToReplace,string characterGrp)
+    private void DoJob()
     {
         interruptFlag = false;
         SaveGearReplaceValues();
@@ -252,17 +252,7 @@ public partial class StatCheck : Form
         });
 
         mainThread = new Thread(ThreadWork.DoWork);
-        myTaskList = new RTaskList();
-        myTaskList.Tasks = new List<RTask>();
-        myTaskList.ThreadCount = (int)NmbThreadsCount.Value;
-        foreach (var item in chkProfiles.CheckedItems)
-            myTaskList.Tasks.Add(new RTask
-            {
-                Scenario = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Scenario\\" + scenario,
-                Profile = AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\" + (string)item,
-                Iterations = (int)NmbIterations.Value,
-                Subtasks = getStatsSubTasks((string)item, character, scenario, statToReplace,characterGrp)
-            });
+      
 
 
         PB1.Invoke((MethodInvoker)delegate
@@ -339,13 +329,25 @@ public partial class StatCheck : Form
 
     }
 
-    private async Task DoSomeJob(string scenario, string character, string statToReplace, string characterGrp)
+    private async Task DoSomeJob()
     {
-        await Task.Run(() => DoJob(scenario, character, statToReplace,characterGrp));
+        await Task.Run(DoJob);
     }
     private void BtnGo_Click(object sender, EventArgs e)
     {
-        DoSomeJob(cbScenario.Text, cbCharacter.Text, cbStatToReplace.Text,cbCharacterGrp.Text);
+        myTaskList = new RTaskList();
+        myTaskList.Tasks = new List<RTask>();
+        myTaskList.ThreadCount = (int)NmbThreadsCount.Value;
+        foreach (var item in chkProfiles.CheckedItems)
+            myTaskList.Tasks.Add(new RTask
+            {
+                Scenario = GetScenarioPath() + cbScenario.Text,
+                Profile = GetProfilePath() + (string)item,
+                Iterations = (int)NmbIterations.Value,
+                Subtasks = GetStatsSubTasks((string)item)
+            });
+
+        DoSomeJob();
     }
 
     //load distinct characters from profiles
@@ -356,7 +358,7 @@ public partial class StatCheck : Form
         foreach (var item in chkProfiles.CheckedItems)
         {
             var units =
-                XMLLoader.ExctractPartyFromXml(AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\" + item);
+                XMLLoader.ExctractPartyFromXml(GetProfilePath() + item);
             cbCharacter.Items.AddRange(units.Where(x => !cbCharacter.Items.Contains(x.Name)).Select(x => x.Name)
                 .ToArray());
         }

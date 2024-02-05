@@ -138,7 +138,7 @@ public class SimCls : ICloneable
     private bool UnitDefeatHandled(Event ent, Unit target)
     {
         Ability battleRes = target.ParentTeam.Units.OrderByDescending(x => x == target).Select(x =>
-            x.Fighter.Abilities.FirstOrDefault(y => y.Priority == Ability.PriorityEnm.DefeatHandler && y.Available() && y.FollowUpQueueAvailable() && y.GetTargets(target, y.TargetType, Ability.AbilityCurrentTargetEnm.AbilityMain)
+            x.Fighter.Abilities.FirstOrDefault(y => y.FollowUpPriority == Ability.PriorityEnm.DefeatHandler && y.Available() && y.FollowUpQueueAvailable() && y.GetTargets(target, y.TargetType, Ability.AbilityCurrentTargetEnm.AbilityMain)
                 .Contains(target))).MaxBy(y => y is not null);
         if (battleRes != null)
         {

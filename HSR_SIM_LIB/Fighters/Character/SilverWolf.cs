@@ -159,10 +159,7 @@ public class SilverWolf : DefaultFighter
             Name = "User Banned",
             AdjacentTargets = Ability.AdjacentTargetsEnm.None,
             CostType = Resource.ResourceType.Energy,
-            Cost = Parent.Stats.BaseMaxEnergy,
-            Priority = PriorityEnm.Ultimate,
-            EndTheTurn = false,
-            Available = UltimateAvailable,
+            Cost = Parent.Stats.BaseMaxEnergy
         };
         UserBanned.Events.Add(new AttemptEffect(null, this, Parent) { BaseChance = ultChance, BuffToApply = ultDefDebuff });
         //dmg events

@@ -112,13 +112,11 @@ public class Bronya : DefaultFighter
             new Ability(this)
             {
                 AbilityType = Ability.AbilityTypeEnm.Ultimate,
-                Priority = PriorityEnm.Ultimate,
                 Name = "The Belobog March",
                 CostType = Resource.ResourceType.Energy,
                 Cost = Parent.Stats.BaseMaxEnergy,
                 AdjacentTargets = Ability.AdjacentTargetsEnm.All,
-                TargetType = Ability.TargetTypeEnm.Friend,
-                Available = UltimateAvailable
+                TargetType = Ability.TargetTypeEnm.Friend
                
             };
 

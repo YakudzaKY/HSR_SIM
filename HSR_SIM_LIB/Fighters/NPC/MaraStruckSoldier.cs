@@ -63,7 +63,7 @@ public class MaraStruckSoldier : DefaultNPCFighter
             AbilityType = Ability.AbilityTypeEnm.FollowUpAction,
             Name = "Rejuvenate",
             Available = RejuvenateAvailable,
-            Priority = Ability.PriorityEnm.DefeatHandler,
+            FollowUpPriority = Ability.PriorityEnm.DefeatHandler,
             TargetType = Ability.TargetTypeEnm.Self
         };
        // Rejuvenate.Events.Add(new RemoveBuff(null,this,Parent) {TargetUnit = Parent,BuffToApply = uniqueBuff});

@@ -96,7 +96,7 @@ public class Blade : DefaultFighter
             TargetType = TargetTypeEnm.Enemy,
             AdjacentTargets = AdjacentTargetsEnm.All,
             Available = SGAvailable,
-            Priority = PriorityEnm.Medium
+            FollowUpPriority = PriorityEnm.Medium
         };
         shuHuMaxCnt = parent.Rank >= 6 ? 4 : 5; //4 stacks on 6 eidolon 
         foreach (double proportion in new[] { 0.33000000030733645, 0.33000000030733645, 0.3400000003166497 })
@@ -204,9 +204,6 @@ public class Blade : DefaultFighter
             AbilityType = AbilityTypeEnm.Ultimate,
             Name = "Death Sentence",
             AdjacentTargets = AdjacentTargetsEnm.Blast,
-            Available = UltimateAvailable,
-            Priority = PriorityEnm.Ultimate,
-            EndTheTurn = false,
             CostType = Resource.ResourceType.Energy,
             Cost = Parent.Stats.BaseMaxEnergy
         };
