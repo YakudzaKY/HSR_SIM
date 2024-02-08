@@ -1,8 +1,11 @@
-﻿using System.Drawing;
+﻿using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using HSR_SIM_GUI.DamageTools;
+using HSR_SIM_GUI.TaskTools;
+using HSR_SIM_GUI.ThreadTools;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using Newtonsoft.Json.Linq;
 
@@ -14,24 +17,26 @@ internal static class ChartUtils
     ///     generate Chart control by results
     /// </summary>
     /// <param name="task"></param>
+    /// <param name="childs">Child runs</param>
     /// <returns></returns>
-    public static Chart getChart(TaskUtils.RTask task)
+    public static Chart getChart(KeyValuePair<SimTask, ThreadJob.RAggregatedData> task,
+        IEnumerable<KeyValuePair<SimTask, ThreadJob.RAggregatedData>> childs)
     {
         var i = 0;
         var newChart = new Chart();
         newChart.Size = new Size(380, 380);
         newChart.Palette = ChartColorPalette.Chocolate;
-        newChart.Titles.Add(new Title($"{task.Profile} wr:{task.WinRate:f}%"));
-        newChart.Titles.Add(new Title($"Win stats: cycles:{task.Data.Cycles:f}     totalAV:{task.Data.TotalAV:f}"));
-        if (task.WinRate < 100)
-            newChart.Titles.Add(new Title($"Defeat stats: cycles:{task.Data.DefeatCycles:f}"));
+        newChart.Titles.Add(new Title($"{task.Key.Profile} wr:{task.Value.WinRate:f}%"));
+        newChart.Titles.Add(new Title($"Win stats: cycles:{task.Value.Cycles:f}     totalAV:{task.Value.TotalAV:f}"));
+        if (task.Value.WinRate < 100)
+            newChart.Titles.Add(new Title($"Defeat stats: cycles:{task.Value.DefeatCycles:f}"));
         //CharArea
         var dpsArea = new ChartArea("primaryArea");
 
         //Axis
         dpsArea.AxisY.IntervalType = DateTimeIntervalType.Number;
         dpsArea.AxisY.Minimum = 0;
-        dpsArea.AxisY.Maximum = task.Data.maxDPAV;
+        dpsArea.AxisY.Maximum = task.Value.maxDPAV;
         dpsArea.AxisY.Interval = 100;
         dpsArea.AxisX.CustomLabels.Add(new CustomLabel(i, i + 0.001, "Party", 0, LabelMarkStyle.None));
         dpsArea.AxisX.IsLabelAutoFit = false;
@@ -68,12 +73,12 @@ internal static class ChartUtils
 
 
         //Fill party bar
-        newChart.Series[dpsPartyCharting].Points.AddXY(i, task.Data.avgDPAV);
-        newChart.Series[dpsPartyCharting].Points[i].Label = $"{task.Data.avgDPAV:f}";
+        newChart.Series[dpsPartyCharting].Points.AddXY(i, task.Value.avgDPAV);
+        newChart.Series[dpsPartyCharting].Points[i].Label = $"{task.Value.avgDPAV:f}";
 
 
         //Unit bar
-        foreach (var unit in task.Data.PartyUnits.OrderByDescending(x => x.Value.avgDPAV))
+        foreach (var unit in task.Value.PartyUnits.OrderByDescending(x => x.Value.avgDPAV))
         {
             i++;
             var unitLabel = new CustomLabel(i, i + 0.001, unit.Key, 0, LabelMarkStyle.None);
@@ -95,7 +100,7 @@ internal static class ChartUtils
         newChart.Legends.Add(partyDpsLegend);
         newChart.Dock = DockStyle.Top;
 
-        if (task.Subtasks.Count > 0)
+        if (childs.Any())
         {
             //extend size 
             newChart.Size = new Size(newChart.Size.Width, newChart.Size.Height * 2);
@@ -109,9 +114,9 @@ internal static class ChartUtils
 
             //create series 
 
-            var mainQuery = (from p in task.Subtasks
+            var mainQuery = (from p in childs
                     // from c in p.StatMods                               
-                    select p.StatMods.First().Stat)
+                    select p.Key.StatMods.First().Stat)
                 .Distinct();
 
             foreach (var stat in mainQuery)
@@ -127,11 +132,11 @@ internal static class ChartUtils
                 statsChartArea.AxisY.Title = "Party DPAV increase(vs normal)";
             }
 
-            foreach (var subtask in task.Subtasks)
+            foreach (var subtask in childs)
             {
-                var statMod = subtask.StatMods.First();
-                newChart.Series[statMod.Stat].Points.AddXY(statMod.Step, subtask.Data.avgDPAV - task.Data.avgDPAV);
-                newChart.Series[statMod.Stat].Points.Last().Label = $"wr:{subtask.WinRate:f}%";
+                var statMod = subtask.Key.StatMods.First();
+                newChart.Series[statMod.Stat].Points.AddXY(statMod.Step, subtask.Value.avgDPAV - task.Value.avgDPAV);
+                newChart.Series[statMod.Stat].Points.Last().Label = $"wr:{subtask.Value.WinRate:f}%";
                 //newChart.Series[statMod.Stat].Points.Last().Label = $"wr:{subtask.Data.WinRate:f}% wcl:{subtask.Data.Cycles:f} dcl:{subtask.Data.DefeatCycles:f}";// extended stats
             }
         }

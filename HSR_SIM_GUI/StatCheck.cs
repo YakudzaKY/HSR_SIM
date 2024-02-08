@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -8,13 +9,14 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using HSR_SIM_GUI.ChartTools;
 using HSR_SIM_GUI.DamageTools;
+using HSR_SIM_GUI.TaskTools;
+using HSR_SIM_GUI.ThreadTools;
 using HSR_SIM_LIB.Utils;
 using static HSR_SIM_GUI.GuiUtils;
 using static HSR_SIM_LIB.Worker;
 using static HSR_SIM_GUI.DamageTools.OcrUtils;
-using static HSR_SIM_GUI.DamageTools.TaskUtils;
-using static HSR_SIM_GUI.DamageTools.ThreadUtils;
 using static HSR_SIM_GUI.Data.StatData;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace HSR_SIM_GUI;
@@ -26,10 +28,10 @@ public partial class StatCheck : Form
     /// </summary>
     private bool forceNewRect;
 
-    private Thread mainThread;
+    private AggregateThread aggThread;
 
     private bool interruptFlag;
-    private RTaskList myTaskList;
+    private List<SimTask> myTaskList;
 
     public StatCheck()
     {
@@ -81,7 +83,7 @@ public partial class StatCheck : Form
             }
 
         NmbThreadsCount.Value = Environment.ProcessorCount - 2;
-        mainThread = null;
+        aggThread = null;
         reloadProfileCharacters();
 
         //replace calc items
@@ -173,19 +175,19 @@ public partial class StatCheck : Form
 
 
     //generate subtask by profile
-    private List<RTask> GetStatsSubTasks(string profile)
+    private List<SimTask> GetStatsSubTasks(string profile, SimTask simTask)
     {
-        var res = new List<RTask>();
+        var res = new List<SimTask>();
         if (rbStatImpcat.Checked)
         {
             if (!string.IsNullOrEmpty(cbCharacter.Text))
                 foreach (var item in chkStats.CheckedItems)
                     for (var i = 1; i <= nmbSteps.Value; i++)
-                        res.Add(new RTask
+                        res.Add(new SimTask
                         {
                             Scenario = GetScenarioPath() + cbScenario.Text,
                             Profile =  GetProfilePath()+ profile,
-                            Iterations = (int)NmbIterations.Value,
+                            Parent = simTask,
                             StatMods = GetStatMods(cbCharacter.Text, (string)item,
                                 i * (int)nmbUpgradesPerStep.Value,  cbStatToReplace.Text)
                         });
@@ -220,12 +222,12 @@ public partial class StatCheck : Form
                 if (statModList.Count > 0)
                 {
                     statModList.Insert(0, new RStatMod { Stat = "NEW GEAR", Step = 1 });
-                    res.Add(new RTask
+                    res.Add(new SimTask
                     {
                         Scenario = GetScenarioPath() + cbScenario.Text,
                         Profile = GetProfilePath() + profile,
-                        Iterations = (int)NmbIterations.Value,
-                        StatMods = statModList
+                        StatMods = statModList,
+                        Parent = simTask
                     });
                 }
             }
@@ -236,9 +238,15 @@ public partial class StatCheck : Form
 
     private void DoJob()
     {
+        ThreadJob threadJob = new ThreadJob(myTaskList, (int)NmbIterations.Value);
+
+
         interruptFlag = false;
+        //save ini file(because app can crash may be if CPU overheated depend)
         SaveGearReplaceValues();
-        if (mainThread?.IsAlive ?? false)
+
+        //check four double call this proc
+        if (this.aggThread?.IsAlive ?? false)
             return;
 
         BtnGo.Invoke((MethodInvoker)delegate
@@ -251,7 +259,7 @@ public partial class StatCheck : Form
             btnCancel.Visible = true;
         });
 
-        mainThread = new Thread(ThreadWork.DoWork);
+        this.aggThread = new AggregateThread(threadJob,(int)NmbThreadsCount.Value);
       
 
 
@@ -262,20 +270,21 @@ public partial class StatCheck : Form
 
         PB1.Invoke((MethodInvoker)delegate
         {
-            PB1.Maximum = myTaskList.Tasks.Sum(x => x.Iterations + x.Subtasks.Sum(y => y.Iterations));
+            PB1.Maximum = myTaskList.Count *threadJob.Iterations;
         });
 
-        mainThread.Start(myTaskList);
+        this.aggThread.Start();
+   
 
-        while (mainThread.IsAlive)
+        while (this.aggThread.IsAlive)
         {
 
             if (interruptFlag)
-                mainThread.Interrupt();
+                this.aggThread.Interrupt();
 
             PB1.Invoke((MethodInvoker)delegate
             {
-                PB1.Value = myTaskList.Tasks.Sum(x => x.ResultCount + x.Subtasks.Sum(y => y.ResultCount));
+                PB1.Value = aggThread.Progress();
             });
             lblProgressCnt.Invoke((MethodInvoker)delegate
             {
@@ -286,7 +295,7 @@ public partial class StatCheck : Form
         }
         PB1.Invoke((MethodInvoker)delegate
         {
-            PB1.Value = myTaskList.Tasks.Sum(x => x.ResultCount + x.Subtasks.Sum(y => y.ResultCount));
+            PB1.Value = aggThread.Progress();
         });
         lblProgressCnt.Invoke((MethodInvoker)delegate
         {
@@ -304,10 +313,10 @@ public partial class StatCheck : Form
             ctr.Dispose();
             ctr = pnlCharts.Controls.Find("Chart", false).FirstOrDefault();
         }
-
-        foreach (var task in myTaskList.Tasks)
+        
+        foreach (var task in threadJob.CombatData.Where(x=>x.Key.Parent is null))
         {
-            var newChart = ChartUtils.getChart(task);
+            var newChart = ChartUtils.getChart(task,threadJob.CombatData.Where(x=>x.Key.Parent ==task.Key));
             newChart.Name = "Chart";
             pnlCharts.Invoke((MethodInvoker)delegate
             {
@@ -326,7 +335,11 @@ public partial class StatCheck : Form
             BtnGo.Enabled = true;
         });
 
-
+       /* BtnGo.Invoke((MethodInvoker)delegate
+        {
+            BtnGo_Click(null, null);
+        });*/
+       
     }
 
     private async Task DoSomeJob()
@@ -335,17 +348,22 @@ public partial class StatCheck : Form
     }
     private void BtnGo_Click(object sender, EventArgs e)
     {
-        myTaskList = new RTaskList();
-        myTaskList.Tasks = new List<RTask>();
-        myTaskList.ThreadCount = (int)NmbThreadsCount.Value;
+        //generate task list
+        myTaskList = new List<SimTask>();
+
         foreach (var item in chkProfiles.CheckedItems)
-            myTaskList.Tasks.Add(new RTask
+        {
+            // first parent task
+            SimTask prnt = new SimTask()
             {
                 Scenario = GetScenarioPath() + cbScenario.Text,
-                Profile = GetProfilePath() + (string)item,
-                Iterations = (int)NmbIterations.Value,
-                Subtasks = GetStatsSubTasks((string)item)
-            });
+                Profile = GetProfilePath() + (string)item
+            };
+            myTaskList.Add(prnt);
+            //childs
+            myTaskList.AddRange(GetStatsSubTasks((string)item,prnt));
+
+        }
 
         DoSomeJob();
     }
@@ -419,7 +437,7 @@ public partial class StatCheck : Form
 
     private void btnImport_Click(object sender, EventArgs e)
     {
-        var keyVal = new OcrUtils().GetComparisonItemStat(this, forceNewRect);
+        var keyVal = new OcrUtils().GetComparisonItemStat(this,ref forceNewRect);
         foreach (Control ctrl in gbPlus.Controls)
             if (ctrl is not Label)
                 ctrl.Text = string.Empty;

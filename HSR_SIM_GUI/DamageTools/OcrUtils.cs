@@ -84,14 +84,14 @@ internal class OcrUtils
     /// <param name="parentForm">form that call this func(will be focus set)</param>
     /// <param name="forceNewRect">ask for select new screen zones(false for use INI file saves) </param>
     /// <returns></returns>
-    public Dictionary<int, RStatWordRec> GetComparisonItemStat(Form parentForm, bool forceNewRect)
+    public Dictionary<int, RStatWordRec> GetComparisonItemStat(Form parentForm, ref bool forceNewRect)
     {
         var res = new Dictionary<int, RStatWordRec>();
         var hsrWindow = FindWindow(null, "Honkai: Star Rail");
         SetForegroundWindow(hsrWindow);
         WaitForActiveWindow(hsrWindow, 5);
         var hsrScreen = GraphicsCls.ConvertBlackAndWhite(CaptureScreen(false));
-        var loc = "rus";
+        var loc = "rus";//todo: into settings ?
         //init engines LSTM for text, Legacy for numbers
         var engine = new TesseractEngine(AppDomain.CurrentDomain.BaseDirectory + "tessdata", loc, EngineMode.LstmOnly);
         var engineNumbers = new TesseractEngine(AppDomain.CurrentDomain.BaseDirectory + "tessdata", loc,

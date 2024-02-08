@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -10,9 +11,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using HSR_SIM_GUI.ChartTools;
+using HSR_SIM_GUI.TaskTools;
+using HSR_SIM_GUI.ThreadTools;
 using Newtonsoft.Json;
-using static HSR_SIM_GUI.DamageTools.TaskUtils;
-using static HSR_SIM_GUI.DamageTools.ThreadUtils;
 using static HSR_SIM_GUI.GuiUtils;
 
 namespace HSR_SIM_GUI
@@ -54,24 +55,25 @@ namespace HSR_SIM_GUI
         private void GoBtn_Click(object sender, EventArgs e)
         {
             GoBtn.Enabled = false;
-            Thread mainThread = new Thread(ThreadWork.DoWork);
-            RTaskList myTaskList = new RTaskList();
-            myTaskList.Tasks = new List<RTask>();
-            myTaskList.ThreadCount = 8;
-            myTaskList.FetchAndAggregateData = false;
+            
+            List<SimTask> myTaskList = new List<SimTask>();
+      
+
+
             //generate thread task
             for (int i = 0; i < dgTest.Rows.Count; i++)
             {
-                myTaskList.Tasks.Add(new RTask
+                myTaskList.Add(new SimTask
                 {
                     Scenario = testFolder + dgTest.Rows[i].Cells[0].Value,
-                    DevMode=true,
-                    Iterations = 1
+                    DevMode=true
 
                 });
             }
+            ThreadJob thdJob = new ThreadJob(myTaskList, 1);
+            AggregateThread mainThread = new AggregateThread(thdJob,8);
             //start
-            mainThread.Start(myTaskList);
+            mainThread.Start();
 
             while (mainThread.IsAlive)
             {
@@ -81,10 +83,10 @@ namespace HSR_SIM_GUI
 
             int successTestCount = 0;
             //fetch result and compare with json file
+            /*
             for (int i = 0; i < dgTest.Rows.Count; i++)
             {
-               
-                string jsonFile = File.ReadAllText(myTaskList.Tasks[i].Scenario + ".json");
+                /string jsonFile = File.ReadAllText(myTaskList.Tasks[i].Scenario + ".json");
                 //null some fields
                 string jsonRes = JsonConvert.SerializeObject(myTaskList.Tasks[i].Data);
                 bool successTest = String.Equals(jsonFile, jsonRes);
@@ -92,7 +94,7 @@ namespace HSR_SIM_GUI
                 if (successTest)
                     successTestCount++;
 
-            }
+            }*/
 
             lblRes.Text = $"{successTestCount} of {dgTest.Rows.Count} success";
             GoBtn.Enabled = true;
