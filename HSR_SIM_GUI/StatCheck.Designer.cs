@@ -281,9 +281,9 @@ namespace HSR_SIM_GUI
             label6.AutoSize = true;
             label6.Location = new System.Drawing.Point(6, 104);
             label6.Name = "label6";
-            label6.Size = new System.Drawing.Size(35, 15);
+            label6.Size = new System.Drawing.Size(104, 15);
             label6.TabIndex = 29;
-            label6.Text = "Steps";
+            label6.Text = "Upgrade iterations";
             // 
             // nmbSteps
             // 
@@ -298,9 +298,9 @@ namespace HSR_SIM_GUI
             label5.AutoSize = true;
             label5.Location = new System.Drawing.Point(6, 62);
             label5.Name = "label5";
-            label5.Size = new System.Drawing.Size(102, 15);
+            label5.Size = new System.Drawing.Size(120, 15);
             label5.TabIndex = 27;
-            label5.Text = "Upgrades per step";
+            label5.Text = "Upgrades per iteraion";
             // 
             // nmbUpgradesPerStep
             // 

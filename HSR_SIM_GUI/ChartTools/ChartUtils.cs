@@ -130,7 +130,7 @@ internal static class ChartUtils
 
             }
             statsChartArea.AxisX.Minimum = 0;
-            statsChartArea.AxisX.Title = "Step";
+            statsChartArea.AxisX.Title = "Upgrade";
             statsChartArea.AxisY.Title = "Party DPAV increase(vs normal run)";
 
             foreach (var subtask in childs.OrderBy(x=>x.Key.Step))
