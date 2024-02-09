@@ -336,7 +336,7 @@ public class Worker
         public string Character { get; set; }
         public string Stat { get; set; }
         public double Val { get; set; }
-        public int Step { get; set; }
+  
     }
 
     public record RCombatResult

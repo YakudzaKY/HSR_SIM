@@ -31,8 +31,10 @@ namespace HSR_SIM_GUI.ThreadTools
         {
             while (true)
             {
+
                 if (qRef.TryDequeue(out var task))
                 {
+                    
                     var wrk = new Worker();
                     wrk.DevMode = task.DevMode;
                     if (wrk.DevMode)
@@ -44,9 +46,10 @@ namespace HSR_SIM_GUI.ThreadTools
                     rRef.Enqueue(new KeyValuePair<SimTask, Worker.RCombatResult>(task,combatRes));
                 }
 
+                
                 try
                 {
-                    Thread.Sleep(10);
+                    Thread.Sleep(0);
                 }
                 catch (ThreadInterruptedException e)
                 {
@@ -62,6 +65,7 @@ namespace HSR_SIM_GUI.ThreadTools
         public void Interrupt()
         {
             thread.Interrupt();
+            
         }
     }
 }

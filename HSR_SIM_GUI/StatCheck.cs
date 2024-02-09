@@ -82,7 +82,7 @@ public partial class StatCheck : Form
                 break;
             }
 
-        NmbThreadsCount.Value = Environment.ProcessorCount - 2;
+        NmbThreadsCount.Value = Math.Max((Environment.ProcessorCount/2) - 1,1);
         aggThread = null;
         reloadProfileCharacters();
 
@@ -161,12 +161,11 @@ public partial class StatCheck : Form
     {
         var res = new List<RStatMod>();
         res.Add(new RStatMod
-        { Character = character, Step = step, Stat = item, Val = SearchStatDeltaByName(item) * step });
+        { Character = character, Stat = item, Val = SearchStatDeltaByName(item) * step });
         if (!string.IsNullOrEmpty(minusItem))
             res.Add(new RStatMod
             {
                 Character = character,
-                Step = step,
                 Stat = minusItem,
                 Val = -SearchStatDeltaByName(minusItem) * step
             });
@@ -188,6 +187,7 @@ public partial class StatCheck : Form
                             Scenario = GetScenarioPath() + cbScenario.Text,
                             Profile =  GetProfilePath()+ profile,
                             Parent = simTask,
+                            Step=i * (int)nmbUpgradesPerStep.Value,
                             StatMods = GetStatMods(cbCharacter.Text, (string)item,
                                 i * (int)nmbUpgradesPerStep.Value,  cbStatToReplace.Text)
                         });
@@ -212,7 +212,6 @@ public partial class StatCheck : Form
                                 {
                                     Character = cbCharacterGrp.Text,
                                     Stat = statName,
-                                    Step = 1,
                                     Val = (str == RectModeEnm.Minus ? -1 : 1) * ExctractDoubleVal(statVal)
                                 });
                         }
@@ -221,12 +220,13 @@ public partial class StatCheck : Form
 
                 if (statModList.Count > 0)
                 {
-                    statModList.Insert(0, new RStatMod { Stat = "NEW GEAR", Step = 1 });
+                    statModList.Insert(0, new RStatMod { Stat = "NEW GEAR"});
                     res.Add(new SimTask
                     {
                         Scenario = GetScenarioPath() + cbScenario.Text,
                         Profile = GetProfilePath() + profile,
                         StatMods = statModList,
+                        Step=1,
                         Parent = simTask
                     });
                 }
@@ -267,40 +267,46 @@ public partial class StatCheck : Form
         {
             PB1.Value = 0;
         });
-
+        int valMax = myTaskList.Count * threadJob.Iterations;
         PB1.Invoke((MethodInvoker)delegate
         {
-            PB1.Maximum = myTaskList.Count *threadJob.Iterations;
+            PB1.Maximum = valMax;
         });
 
         this.aggThread.Start();
-   
 
-        while (this.aggThread.IsAlive)
+
+        do
         {
 
+            var stDate = DateTime.Now;
             if (interruptFlag)
                 this.aggThread.Interrupt();
 
+            int progressBefore = aggThread.Progress();
+
+            Thread.Sleep(1000);
+
+            int progress = aggThread.Progress();
             PB1.Invoke((MethodInvoker)delegate
             {
-                PB1.Value = aggThread.Progress();
+                PB1.Value = progress;
             });
+            var crDate = DateTime.Now;
+            var diffInSeconds = (crDate - stDate).TotalSeconds;
+            double performance = diffInSeconds > 0 ? ((progress - progressBefore) / diffInSeconds) : 0; //sims per sec
+            int eta = performance>0? (int)((valMax - progress) / performance):0; //sec estimate 
+            int etaM = (int)Math.Floor( (double)eta /60);
+
+
+            string etaFormated = $"{etaM}m {eta-etaM*60}s";
             lblProgressCnt.Invoke((MethodInvoker)delegate
             {
-                lblProgressCnt.Text = $"{PB1.Value}\\{PB1.Maximum}";
+                lblProgressCnt.Text = $"{PB1.Value}\\{PB1.Maximum}  {performance:f}\\sec    ETA:{etaFormated}";
             });
             //Refresh();
-            Thread.Sleep(100);
-        }
-        PB1.Invoke((MethodInvoker)delegate
-        {
-            PB1.Value = aggThread.Progress();
-        });
-        lblProgressCnt.Invoke((MethodInvoker)delegate
-        {
-            lblProgressCnt.Text = $"{PB1.Value}\\{PB1.Maximum}";
-        });
+        } while (this.aggThread.IsAlive);
+      
         //clear old
         var ctr = pnlCharts.Controls.Find("Chart", false).FirstOrDefault();
         while (ctr != null)

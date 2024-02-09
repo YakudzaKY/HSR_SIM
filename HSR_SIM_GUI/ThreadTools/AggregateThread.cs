@@ -52,6 +52,7 @@ namespace HSR_SIM_GUI.ThreadTools
             foreach (SimThread thread in threads)
             {
                 thread.Interrupt();
+                
             }
 
             threads.Clear();
@@ -80,7 +81,7 @@ namespace HSR_SIM_GUI.ThreadTools
                 if (haveTaskToRun)
                 {
                     //have slots to insert queue
-                    int freeQSlots = (childThdCount * 10) - cq.Count; //can have 10 recs per thread
+                    int freeQSlots = (childThdCount * 100) - cq.Count;
                     while (freeQSlots > 0)
                     {
                         //get first uncompleted task

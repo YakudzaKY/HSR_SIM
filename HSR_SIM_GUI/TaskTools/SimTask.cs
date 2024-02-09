@@ -15,6 +15,7 @@ namespace HSR_SIM_GUI.TaskTools
         public string Profile { get; init; }
         public string Scenario { get; init; }
         public bool DevMode { get; init; } = false;
+        public int Step { get; set; } = 0;
         
         // Parent need for group results
         public SimTask Parent { get; init; }

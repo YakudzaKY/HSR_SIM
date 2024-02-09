@@ -452,7 +452,7 @@ namespace HSR_SIM_GUI
             // 
             // btnCancel
             // 
-            btnCancel.Location = new System.Drawing.Point(134, 168);
+            btnCancel.Location = new System.Drawing.Point(134, 137);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new System.Drawing.Size(116, 23);
             btnCancel.TabIndex = 28;

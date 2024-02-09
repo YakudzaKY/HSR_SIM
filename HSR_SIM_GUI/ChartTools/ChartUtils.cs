@@ -127,15 +127,16 @@ internal static class ChartUtils
                 newChart.Series[stat].Legend = statsChartArea.Name;
                 newChart.Series[stat].BorderWidth = 3;
                 newChart.Series[stat].Points.AddXY(0, 0);
-                statsChartArea.AxisX.Minimum = 0;
-                statsChartArea.AxisX.Title = "Upgrade steps";
-                statsChartArea.AxisY.Title = "Party DPAV increase(vs normal)";
-            }
 
-            foreach (var subtask in childs)
+            }
+            statsChartArea.AxisX.Minimum = 0;
+            statsChartArea.AxisX.Title = "Upgrade steps";
+            statsChartArea.AxisY.Title = "Party DPAV increase(vs normal)";
+
+            foreach (var subtask in childs.OrderBy(x=>x.Key.Step))
             {
                 var statMod = subtask.Key.StatMods.First();
-                newChart.Series[statMod.Stat].Points.AddXY(statMod.Step, subtask.Value.avgDPAV - task.Value.avgDPAV);
+                newChart.Series[statMod.Stat].Points.AddXY(subtask.Key.Step, subtask.Value.avgDPAV - task.Value.avgDPAV);
                 newChart.Series[statMod.Stat].Points.Last().Label = $"wr:{subtask.Value.WinRate:f}%";
                 //newChart.Series[statMod.Stat].Points.Last().Label = $"wr:{subtask.Data.WinRate:f}% wcl:{subtask.Data.Cycles:f} dcl:{subtask.Data.DefeatCycles:f}";// extended stats
             }
