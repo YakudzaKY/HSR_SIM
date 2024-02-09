@@ -45,7 +45,7 @@ public class SimCls : ICloneable
 
     public Worker Parent { get; set; }
 
-    public List<Team> Teams { get; } = new();
+    public List<Team> Teams { get; set; } = new();
 
 
     public IEnumerable<Unit> AllUnits
@@ -63,7 +63,7 @@ public class SimCls : ICloneable
 
 
     public Step CurrentStep { get; set; }
-    internal Scenario CurrentScenario { get; set; }
+    public Scenario CurrentScenario { get; set; }
 
     public List<Step> Steps
     {
@@ -112,7 +112,34 @@ public class SimCls : ICloneable
 
     public object Clone()
     {
-        return MemberwiseClone();
+        SimCls newClone = (SimCls)MemberwiseClone();
+        //clone teams
+        var oldTeams = newClone.Teams;
+        if (oldTeams != null)
+        {
+          
+
+            newClone.Teams = new List<Team>();
+            foreach (var team in oldTeams)
+            {
+                throw new NotImplementedException();
+                newClone.Teams.Add((Team)team.Clone());
+            }
+
+        }
+        if (newClone.Steps != null)
+            newClone.Steps = new();
+        if (newClone.BeforeStartQueue != null)
+            newClone.BeforeStartQueue = new();
+        newClone.CurrentScenario = (Scenario)newClone.CurrentScenario.Clone();
+        //rewrite handlers
+        newClone.EventHandlerProc -= this.HandleEvent;
+        newClone.StepHandlerProc -= this.HandleStep;
+        newClone.EventHandlerProc += newClone.HandleEvent;
+        newClone.StepHandlerProc += newClone.HandleStep;
+
+        return newClone;
+
     }
 
     public void HandleZeroHp(Event ent)
@@ -405,7 +432,7 @@ public class SimCls : ICloneable
         {
             //try follow up actions before target do something.
             //follow up actions disabled at NPC turn end
-            if (CurrentFight.Turn.Actor.Fighter .IsNpcUnit || !newStep.FollowUpActions())
+            if (CurrentFight.Turn.Actor.Fighter.IsNpcUnit || !newStep.FollowUpActions())
             {
                 newStep.StepType = StepTypeEnm.UnitTurnEnded;
                 newStep.Actor = CurrentFight.Turn.Actor;

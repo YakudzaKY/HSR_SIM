@@ -26,7 +26,7 @@ internal static class ChartUtils
         var newChart = new Chart();
         newChart.Size = new Size(380, 380);
         newChart.Palette = ChartColorPalette.Chocolate;
-        newChart.Titles.Add(new Title($"{task.Key.Profile} wr:{task.Value.WinRate:f}%"));
+        newChart.Titles.Add(new Title($"{task.Key.SimScenario.CurrentScenario.Name} wr:{task.Value.WinRate:f}%"));
         newChart.Titles.Add(new Title($"Win stats: cycles:{task.Value.Cycles:f}     totalAV:{task.Value.TotalAV:f}"));
         if (task.Value.WinRate < 100)
             newChart.Titles.Add(new Title($"Defeat stats: cycles:{task.Value.DefeatCycles:f}"));
@@ -130,8 +130,8 @@ internal static class ChartUtils
 
             }
             statsChartArea.AxisX.Minimum = 0;
-            statsChartArea.AxisX.Title = "Upgrade steps";
-            statsChartArea.AxisY.Title = "Party DPAV increase(vs normal)";
+            statsChartArea.AxisX.Title = "Step";
+            statsChartArea.AxisY.Title = "Party DPAV increase(vs normal run)";
 
             foreach (var subtask in childs.OrderBy(x=>x.Key.Step))
             {

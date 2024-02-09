@@ -143,5 +143,24 @@ public class Buff(Unit caster, Buff reference = null) : CloneClass
             $">> {Type.ToString():s} for {modsStr:s} duration={BaseDuration.ToString():D} dispellable={Dispellable.ToString():s}";
     }
 
+    public override object Clone()
+    {
+        Buff newClone =(Buff)MemberwiseClone();
+        var oldEff=newClone.Effects;
+        newClone.Effects = new List<Effect>();
+        //clone calced effects
+        foreach (Effect eff in oldEff)
+        {
+            if (eff.DynamicValue)
+                newClone.Effects.Add((Effect)eff.Clone());
+            else
+            {
+                newClone.Effects.Add(eff);
+            }
+        }
+
+
+        return newClone;
+    }
  
 }

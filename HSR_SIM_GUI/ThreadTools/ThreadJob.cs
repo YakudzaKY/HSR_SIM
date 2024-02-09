@@ -13,7 +13,12 @@ using HSR_SIM_LIB.TurnBasedClasses.Events;
 
 namespace HSR_SIM_GUI.ThreadTools
 {
-    internal class ThreadJob
+    /// <summary>
+    /// The job sended into main sim thread also contains fields for results
+    /// </summary>
+    /// <param name="pTaskList"></param>
+    /// <param name="pIterations"></param>
+    internal class ThreadJob(List<SimTask> pTaskList, int pIterations)
     {
         
         public record PartyUnit
@@ -48,20 +53,14 @@ namespace HSR_SIM_GUI.ThreadTools
         /// <summary>
         /// List of task for sim
         /// </summary>
-        public List<SimTask> TaskList { get; }
+        public List<SimTask> TaskList { get; } = pTaskList;
 
         public Dictionary<SimTask, RAggregatedData> CombatData { get; } = new Dictionary<SimTask, RAggregatedData>();
 
         /// <summary>
         /// Iterations should execute for every task
         /// </summary>
-        public int Iterations { get; }
-
-        public ThreadJob(List<SimTask> pTaskList, int pIterations)
-        {
-            TaskList = pTaskList;
-            Iterations = pIterations;
-        }
+        public int Iterations { get; } = pIterations;
 
         private Type[] typeArray =
         {

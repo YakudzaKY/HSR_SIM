@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,6 +39,10 @@ namespace HSR_SIM_LIB.Fighters
             return devLogVal == 0 ? true : false;
 
 
+        }
+        public static string GetDevLogPath(string scenarioPath, string profilePath)
+        {
+            return $"{Path.GetDirectoryName(scenarioPath)}\\{Path.GetFileName(scenarioPath)}{Path.GetFileName(profilePath)}.dev_log";
         }
 
         /// <summary>

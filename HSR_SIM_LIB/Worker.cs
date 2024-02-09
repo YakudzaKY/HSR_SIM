@@ -39,13 +39,23 @@ public class Worker
         Sim.Parent = this;
         LogText("Scenario  " + Sim.CurrentScenario.Name + " was loaded");
         if (DevMode)
-            DevModeLog = new DevModeLogger(GetDevLogPath(scenarioPath, profilePath), this);
+            DevModeLog = new DevModeLogger(DevModeUtils.GetDevLogPath(scenarioPath, profilePath), this);
     }
 
-    public static string GetDevLogPath(string scenarioPath, string profilePath)
+    
+    
+    public void LoadScenarioFromSim(SimCls sim,string devLogPath)
     {
-        return $"{Path.GetDirectoryName(scenarioPath)}\\{Path.GetFileName(scenarioPath)}{Path.GetFileName(profilePath)}.dev_log";
+        Init();
+        Sim = (SimCls)sim.Clone();
+        Sim.Parent = this;
+        LogText("Scenario  " + Sim.CurrentScenario.Name + " was loaded");
+        if (DevMode)
+            DevModeLog = new DevModeLogger(devLogPath, this);
     }
+
+
+
     public RCombatResult GetCombatResult(RCombatResult inRslt = null)
     {
         var res = inRslt ?? new RCombatResult();

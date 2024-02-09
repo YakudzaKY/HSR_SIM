@@ -6,6 +6,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using HSR_SIM_LIB;
+using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Utils;
 using static HSR_SIM_GUI.GuiUtils;
 using static HSR_SIM_LIB.Utils.CallBacks;
@@ -260,7 +261,7 @@ public partial class GUIForm : Form
     private void btnClearDevMode_Click(object sender, EventArgs e)
     {
         //delete dev log
-        File.Delete(Worker.GetDevLogPath(cbScenario.Text, cbProfile.Text));
+        File.Delete(DevModeUtils.GetDevLogPath(cbScenario.Text, cbProfile.Text));
     }
 
     private void button4_Click_1(object sender, EventArgs e)

@@ -107,6 +107,50 @@ public class Unit : CloneClass
     public TypeEnm UnitType { get; set; }
     public List<Skill> Skills { get; set; } = new();
 
+    public override object Clone()
+    {
+        Unit newClone =(Unit)MemberwiseClone();
+        //clear fighter
+        newClone.fighter = null;
+        //clone resources
+        var oldRes=newClone.Resources;
+        newClone.Resources = new ();
+        foreach (var res  in oldRes)
+        {
+            newClone.Resources .Add((Resource)res.Clone()); 
+        }
+        //clone Buffs
+        var oldBuffs=newClone.Buffs;
+        newClone.Buffs = new ();
+        foreach (var res  in oldBuffs)
+        {
+            newClone.Buffs.Add((Buff)res.Clone()); 
+        }
+
+        //clone Skills
+        var oldSkills=newClone.Skills;
+        newClone.Skills = new ();
+        foreach (var res  in oldSkills)
+        {
+            newClone.Skills.Add((Skill)res.Clone()); 
+        }
+
+        //clone BaseDamageBoost
+        var oldBaseDmgBoost=newClone.BaseDamageBoost;
+        newClone.BaseDamageBoost = new ();
+        foreach (var res  in oldBaseDmgBoost)
+        {
+            newClone.BaseDamageBoost.Add(res with { });
+        }
+
+        //clone Stats
+        var oldStats=newClone.Stats;
+        newClone.Stats =(UnitStats)newClone.Stats.Clone();
+        
+
+        return newClone;
+    }
+
     public Team EnemyTeam
     {
         get
@@ -461,17 +505,6 @@ public class Unit : CloneClass
             {
                 //copy buff
                 srchBuff = (Buff)buff.Clone();
-                srchBuff.Effects = new List<Effect>();
-                //clone calced effects
-                foreach (Effect eff in buff.Effects)
-                {
-                    if (eff.DynamicValue)
-                        srchBuff.Effects.Add((Effect)eff.Clone());
-                    else
-                    {
-                        srchBuff.Effects.Add(eff);
-                    }
-                }
             }
 
             else
@@ -733,5 +766,6 @@ public class Unit : CloneClass
     {
         public ElementEnm ElemType;
         public double Value;
+      
     }
 }

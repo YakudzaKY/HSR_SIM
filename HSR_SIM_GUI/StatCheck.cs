@@ -184,8 +184,7 @@ public partial class StatCheck : Form
                     for (var i = 1; i <= nmbSteps.Value; i++)
                         res.Add(new SimTask
                         {
-                            Scenario = GetScenarioPath() + cbScenario.Text,
-                            Profile =  GetProfilePath()+ profile,
+                            SimScenario = XMLLoader.LoadCombatFromXml( GetScenarioPath() + cbScenario.Text,  GetProfilePath()+ profile),
                             Parent = simTask,
                             Step=i * (int)nmbUpgradesPerStep.Value,
                             StatMods = GetStatMods(cbCharacter.Text, (string)item,
@@ -223,8 +222,7 @@ public partial class StatCheck : Form
                     statModList.Insert(0, new RStatMod { Stat = "NEW GEAR"});
                     res.Add(new SimTask
                     {
-                        Scenario = GetScenarioPath() + cbScenario.Text,
-                        Profile = GetProfilePath() + profile,
+                        SimScenario = XMLLoader.LoadCombatFromXml( GetScenarioPath() + cbScenario.Text,  GetProfilePath()+ profile),
                         StatMods = statModList,
                         Step=1,
                         Parent = simTask
@@ -362,8 +360,7 @@ public partial class StatCheck : Form
             // first parent task
             SimTask prnt = new SimTask()
             {
-                Scenario = GetScenarioPath() + cbScenario.Text,
-                Profile = GetProfilePath() + (string)item
+                SimScenario = XMLLoader.LoadCombatFromXml(  GetScenarioPath() + cbScenario.Text,  GetProfilePath() + (string)item),
             };
             myTaskList.Add(prnt);
             //childs

@@ -1,11 +1,12 @@
-﻿using HSR_SIM_LIB.Fighters;
+﻿using System;
+using HSR_SIM_LIB.Fighters;
 
 namespace HSR_SIM_LIB.UnitStuff;
 
 /// <summary>
 ///     Class for unit stats
 /// </summary>
-public class UnitStats
+public class UnitStats:ICloneable
 {
     private double? baseDef;
 
@@ -112,5 +113,10 @@ public class UnitStats
     public void ResetAV()
     {
         PerformedActionValue = 0;
+    }
+
+    public object Clone()
+    {
+        return MemberwiseClone();
     }
 }

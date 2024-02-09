@@ -4,11 +4,9 @@ using System.IO;
 using System.IO.Pipes;
 using System.Xml;
 using System.Xml.Linq;
-using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.UnitStuff;
-using static HSR_SIM_LIB.Fighters.FighterUtils;
 using static HSR_SIM_LIB.TurnBasedClasses.PreLaunchOption;
 using static HSR_SIM_LIB.UnitStuff.Unit;
 

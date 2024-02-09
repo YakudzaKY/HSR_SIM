@@ -39,7 +39,7 @@ namespace HSR_SIM_GUI.ThreadTools
                     wrk.DevMode = task.DevMode;
                     if (wrk.DevMode)
                         wrk.CbGetDecision += GetDecision;
-                    wrk.LoadScenarioFromXml(task.Scenario, task.Profile);
+                    wrk.LoadScenarioFromSim(task.SimScenario,task.DevLogPath);
                     wrk.ApplyModes(task.StatMods);
                     Worker.RCombatResult combatRes=new Worker.RCombatResult();
                     wrk.GetCombatResult(combatRes);

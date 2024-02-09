@@ -26,7 +26,21 @@ public class Team : CloneClass
         ParentSim = parent;
 
     }
-
+    public override object Clone()
+    {
+        Team newClone =(Team)MemberwiseClone();
+        //clone teams
+        var oldUnits=newClone.Units;
+        newClone.Units = new ();
+        foreach (var unit  in oldUnits)
+        {
+            Unit newUnit = (Unit)unit.Clone();
+            if (newUnit.ParentTeam != null)
+                newUnit.ParentTeam = newClone;
+            newClone.Units.Add(newUnit); 
+        }
+        return newClone;
+    }
     public void ResetRoles()
     {
         foreach (Unit unit in this.Units)
@@ -38,7 +52,7 @@ public class Team : CloneClass
     public TeamTypeEnm TeamType { get; set; }
 
 
-    public List<Unit> Units { get; }=new();
+    public List<Unit> Units { get; set; }=new();
 
     public double TeamAggro
     {

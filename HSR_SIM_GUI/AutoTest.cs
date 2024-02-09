@@ -13,6 +13,8 @@ using System.Windows.Forms;
 using HSR_SIM_GUI.ChartTools;
 using HSR_SIM_GUI.TaskTools;
 using HSR_SIM_GUI.ThreadTools;
+using HSR_SIM_LIB.Fighters;
+using HSR_SIM_LIB.Utils;
 using Newtonsoft.Json;
 using static HSR_SIM_GUI.GuiUtils;
 
@@ -65,12 +67,13 @@ namespace HSR_SIM_GUI
             {
                 myTaskList.Add(new SimTask
                 {
-                    Scenario = testFolder + dgTest.Rows[i].Cells[0].Value,
+                    SimScenario =  XMLLoader.LoadCombatFromXml(testFolder + dgTest.Rows[i].Cells[0].Value,null),
+                    DevLogPath = DevModeUtils.GetDevLogPath(testFolder + dgTest.Rows[i].Cells[0].Value,null),
                     DevMode=true
 
                 });
             }
-            ThreadJob thdJob = new ThreadJob(myTaskList, 1);
+            ThreadJob thdJob = new ThreadJob(myTaskList, 10);//all iterations should be same
             AggregateThread mainThread = new AggregateThread(thdJob,8);
             //start
             mainThread.Start();
