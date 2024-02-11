@@ -37,8 +37,10 @@ public class SilverWolf : DefaultFighter
 
     public SilverWolf(Unit parent) : base(parent)
     {
+        //on this event we will place debuff
         trgEnt = new TriggerEvent(null, null, Parent);
         Parent.Stats.BaseMaxEnergy = 110;
+
         alwChgChnc =
             FighterUtils.GetAbilityScaling(0.75, 0.85, Parent.Skills.First(x => x.Name == "Allow Changes?").Level);
         alwChgAtk = FighterUtils.GetAbilityScaling(0.98, 1.96,
@@ -54,6 +56,7 @@ public class SilverWolf : DefaultFighter
         talentLvl = Parent.Skills.First(x => x.Name == "Awaiting System Response...").Level;
         talentDebuffChance = FighterUtils.GetAbilityScaling(0.60, 0.72, talentLvl);
 
+        //weakness duration depend on A4 traits
         weaknessDuration = Atraces.HasFlag(ATracesEnm.A4) ? 3 : 2;
 
         allowChangesDebuff = new Buff(Parent)

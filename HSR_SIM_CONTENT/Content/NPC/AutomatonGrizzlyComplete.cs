@@ -24,6 +24,7 @@ internal class AutomatonGrizzlyComplete : DefaultNPCBossFIghter
         DebuffResists.Add(new DebuffResist { Debuff = typeof(EffImprisonment), ResistVal = 0.5 });
         DebuffResists.Add(new DebuffResist { Debuff = typeof(EffEntanglement), ResistVal = 0.5 });
 
+        //TODO: need implement boss abilities
         Ability myAttackAbility;
         //Deals minor Physical DMG (250% ATK) to a single target.
         myAttackAbility = new Ability(this)

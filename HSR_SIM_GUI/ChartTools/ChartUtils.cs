@@ -3,24 +3,22 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
-using HSR_SIM_GUI.DamageTools;
 using HSR_SIM_GUI.TaskTools;
 using HSR_SIM_GUI.ThreadTools;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
-using Newtonsoft.Json.Linq;
 
 namespace HSR_SIM_GUI.ChartTools;
 
 internal static class ChartUtils
 {
     /// <summary>
-    ///     generate Chart control by results
+    /// Generate Chart for one completed sim job 
     /// </summary>
-    /// <param name="task"></param>
-    /// <param name="childs">Child runs</param>
+    /// <param name="task">KeyPair SimTask-Results</param>
+    /// <param name="childTasks">array of child results</param>
     /// <returns></returns>
-    public static Chart getChart(KeyValuePair<SimTask, ThreadJob.RAggregatedData> task,
-        IEnumerable<KeyValuePair<SimTask, ThreadJob.RAggregatedData>> childs)
+    public static Chart GetChart(KeyValuePair<SimTask, ThreadJob.RAggregatedData> task,
+        IEnumerable<KeyValuePair<SimTask, ThreadJob.RAggregatedData>> childTasks)
     {
         var i = 0;
         var newChart = new Chart();
@@ -100,7 +98,8 @@ internal static class ChartUtils
         newChart.Legends.Add(partyDpsLegend);
         newChart.Dock = DockStyle.Top;
 
-        if (childs.Any())
+        var childTasksArr = childTasks as KeyValuePair<SimTask, ThreadJob.RAggregatedData>[] ?? childTasks.ToArray();
+        if (childTasksArr.Any())
         {
             //extend size 
             newChart.Size = new Size(newChart.Size.Width, newChart.Size.Height * 2);
@@ -110,13 +109,11 @@ internal static class ChartUtils
             newChart.Legends.Add(new Legend(statsChartArea.Name));
             newChart.Legends[statsChartArea.Name].DockedToChartArea = statsChartArea.Name;
             newChart.Legends[statsChartArea.Name].IsDockedInsideChartArea = false;
-            // newChart.Legends[statsChartArea.Name].Position = new ElementPosition(70, 58, 10, 30);
 
             //create series 
-
-            var mainQuery = (from p in childs
-                    // from c in p.StatMods                               
-                    select p.Key.StatMods.First().Stat)
+            var mainQuery = (from p in childTasksArr
+                                 // from c in p.StatMods                               
+                             select p.Key.StatMods.First().Stat)
                 .Distinct();
 
             foreach (var stat in mainQuery)
@@ -133,7 +130,7 @@ internal static class ChartUtils
             statsChartArea.AxisX.Title = "Upgrade";
             statsChartArea.AxisY.Title = "Party DPAV increase(vs normal run)";
 
-            foreach (var subtask in childs.OrderBy(x=>x.Key.Step))
+            foreach (var subtask in childTasksArr.OrderBy(x => x.Key.Step))
             {
                 var statMod = subtask.Key.StatMods.First();
                 newChart.Series[statMod.Stat].Points.AddXY(subtask.Key.Step, subtask.Value.avgDPAV - task.Value.avgDPAV);

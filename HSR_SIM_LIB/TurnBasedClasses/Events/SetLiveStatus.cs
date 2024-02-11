@@ -25,6 +25,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             else
                 TargetUnit.LivingStatus=fromState;
             TargetUnit.ParentTeam.ResetRoles();     
+            //need reset enemy team roles(if 1 enemy is alive then Hunt>Destruction)
+            TargetUnit.EnemyTeam.ResetRoles();
             
             base.ProcEvent(revert);
         }

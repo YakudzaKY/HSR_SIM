@@ -1,4 +1,4 @@
-<Scenario name="Default test scenario">
+<Scenario name="Solo target test">
 	<Prelaunch>
 		<!--Set enegry at sim loaded-->
 		<Option type="SetEnergy" value="0.5" />

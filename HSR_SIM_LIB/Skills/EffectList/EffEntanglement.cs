@@ -8,7 +8,7 @@ public class EffEntanglement : EffDotTemplate
 {
     public override void OnNaturalExpire(Event ent, Buff buff)
     {
-        if (buff.Reference == buff.Caster.Fighter.ShieldBreakDebuff)
+        if (buff.Reference == buff.Caster.Fighter.WeaknessBreakDebuff)
         {
             var dotProcEvent = new ToughnessBreakDoTDamage(ent.ParentStep, buff.Caster, buff.Caster,Element)
             {

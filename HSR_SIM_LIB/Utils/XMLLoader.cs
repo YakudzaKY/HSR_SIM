@@ -31,7 +31,7 @@ public static class XMLLoader
         var xRoot = xDoc.DocumentElement;
         if (xRoot != null)
         {
-            Combat.CurrentScenario.Name = xRoot.Attributes.GetNamedItem("name").Value;
+            Combat.CurrentScenario.Name = $"{xRoot.Attributes.GetNamedItem("name").Value} ({Path.GetFileNameWithoutExtension(scenarioPath)})" ;
 
             //parse all items
             foreach (XmlElement xnode in xRoot)

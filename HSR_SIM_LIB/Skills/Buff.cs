@@ -93,7 +93,7 @@ public class Buff(Unit caster, Buff reference = null) : CloneClass
         //do some shit
         if (Type == BuffType.Dot)
             foreach (EffDotTemplate effect in Effects.Where(x=>x is EffDotTemplate))
-                if (Reference == Caster.Fighter.ShieldBreakDebuff)
+                if (Reference == Caster.Fighter.WeaknessBreakDebuff)
                 {
                     var dotProcEvent = new ToughnessBreakDoTDamage(step, Caster, Caster,effect.Element)
                     {

@@ -13,12 +13,12 @@ using HSR_SIM_LIB.UnitStuff;
 namespace HSR_SIM_CONTENT.Content.Relics
 {
     /// <summary>
-    /// new set with  debuff dmg increase test
+    /// new set with  debuff dmg increase PioneerDiverofDeadWaters
     /// </summary>
-    internal class test : DefaultRelicSet
+    internal class PioneerDiverofDeadWaters : DefaultRelicSet
     {
         private Buff onDebuffHitBuff;
-        public test(IFighter parent, int num) : base(parent, num)
+        public PioneerDiverofDeadWaters(IFighter parent, int num) : base(parent, num)
         {
             onDebuffHitBuff = new Buff(Parent.Parent, null) { BaseDuration = 1, Dispellable = false, CustomIconName = "Sword" };
             if (num >= 2)

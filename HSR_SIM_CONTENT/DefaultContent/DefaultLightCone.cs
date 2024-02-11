@@ -34,7 +34,7 @@ public abstract class DefaultLightCone : ILightCone
 
     public object Clone()
     {
-        return MemberwiseClone();
+        throw new NotImplementedException();
     }
 
     public virtual void DefaultLightCone_HandleEvent(Event ent)

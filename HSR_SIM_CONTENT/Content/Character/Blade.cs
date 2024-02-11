@@ -23,6 +23,7 @@ public class Blade : DefaultFighter
 
     private readonly double shuHuMaxCnt; // passive max counter
 
+    //some modifiers
     private readonly double dsAdjAtk;
     private readonly double dsAdjHp;
     private readonly double dsMainAtk;
@@ -42,11 +43,13 @@ public class Blade : DefaultFighter
     {
         Parent.Stats.BaseMaxEnergy = 130;
 
+        //load lvl
         dsSkillLvl = Parent.Skills.First(x => x.Name == "Death Sentence").Level;
         fsSkillLvl = Parent.Skills.First(x => x.Name == "Forest of Swords").Level;
         sgSkillLvl = Parent.Skills.First(x => x.Name == "Shuhu's Gift").Level;
         ssSkillLvl = Parent.Skills.First(x => x.Name == "Shard Sword").Level;
 
+        //get modifier by level
         dsMainAtk = FighterUtils.GetAbilityScaling(0.24, 0.4, dsSkillLvl);
         dsMainHp = FighterUtils.GetAbilityScaling(0.60, 1, dsSkillLvl);
 
@@ -348,12 +351,7 @@ public class Blade : DefaultFighter
         return (Parent.Buffs.FirstOrDefault(x => x.Reference == hellscapeBuff)?.DurationLeft ?? 0) > 2 ? 0 : 1;
     }
 
-    public override Ability ChoseAbilityToCast(Step step)
-    {
-        Ability watAbility = null;
 
-        return watAbility ?? base.ChoseAbilityToCast(step);
-    }
 
     public override void DefaultFighter_HandleEvent(Event ent)
     {

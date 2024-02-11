@@ -14,7 +14,8 @@ using HSR_SIM_LIB.Content;
 namespace HSR_SIM_LIB.Fighters;
 
 /// <summary>
-///     default fighter logics
+///     abstract class for Playable characters
+/// 
 /// </summary>
 public abstract class DefaultFighter : IFighter
 {
@@ -26,8 +27,8 @@ public abstract class DefaultFighter : IFighter
         A6 = 4
     }
 
-    private ILightCone lightCone;
-    public MechDictionary Mechanics { get; set; }
+    private ILightCone? lightCone;
+    public MechDictionary Mechanics { get; set; }// dictionary for save mechanics value in combat
     public bool IsEliteUnit => false;
     public bool IsNpcUnit => false;
 
@@ -46,7 +47,7 @@ public abstract class DefaultFighter : IFighter
         Atraces = ATracesEnm.A2 | ATracesEnm.A4 | ATracesEnm.A6;
 
         Ability defOpener;
-        //Default Opener
+        //Typical left click opener
         defOpener = new Ability(this)
         {
             AbilityType = Ability.AbilityTypeEnm.Technique,
@@ -56,20 +57,21 @@ public abstract class DefaultFighter : IFighter
         };
         defOpener.Events.Add(new ToughnessShred(null, this, Parent)
         { OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue, Val = 30 });
-
         Abilities.Add(defOpener);
+
+
     }
 
     public ATracesEnm Atraces { get; set; }
 
-    public ILightCone LightCone
+    public ILightCone? LightCone
     {
         get
         {
             if (!string.IsNullOrEmpty(Parent.LightConeStringPath))
                 lightCone ??=
                     (ILightCone)Activator.CreateInstance(Type.GetType(Parent.LightConeStringPath)!, this,
-                        Parent.LightConeInitRank);
+                        Parent.LightConeInitRank)!;
             return lightCone;
         }
 
@@ -93,19 +95,24 @@ public abstract class DefaultFighter : IFighter
 
             return relics;
         }
-        set { }
     }
 
-    public Buff ShieldBreakDebuff { get; set; } = new(null);
+    //we need this debuff to track and correctly apply debuff stacks
+    public Buff WeaknessBreakDebuff { get; set; } = new(null);
+    //buffs works only on some conditions
     public List<ConditionBuff> ConditionBuffs { get; set; } = new();
+    //always active buffs
     public List<PassiveBuff> PassiveBuffs { get; set; } = new();
     public abstract PathType? Path { get; }
     public abstract Unit.ElementEnm Element { get; }
+
     public List<Unit.ElementEnm> NativeWeaknesses { get; set; } = new();
     public List<DebuffResist> DebuffResists { get; set; } = new();
     public List<Resist> Resists { get; set; } = new();
     public Unit Parent { get; set; }
-
+    /// <summary>
+    /// return Unit cost to determine unit role on the battlefield
+    /// </summary>
     public double Cost
     {
         get
@@ -175,7 +182,7 @@ public abstract class DefaultFighter : IFighter
             if (step.Parent.Parent.DevMode)
                 return DevModeUtils.ChooseAbilityToCast(this, abilities, true);
 
-            //sort by combat then cost. avalable for casting by cost
+            //sort by combat then cost. available for casting by cost
             foreach (var ability in abilities)
                 //enter combat skills
                 if (ability.Attack)
@@ -336,7 +343,7 @@ public abstract class DefaultFighter : IFighter
 
     public object Clone()
     {
-        return MemberwiseClone();
+        throw new NotImplementedException();
     }
 
 

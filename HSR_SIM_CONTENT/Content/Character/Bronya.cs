@@ -164,6 +164,7 @@ public class Bronya : DefaultFighter
                GetAbilityScaling(0.12, 0.20, ultimateSkillLvl);
     }
 
+    //windrider bullet advance calc
     private double? CalcTalentAV(Event ent)
     {
         return Parent.GetActionValue(ent) * GetAbilityScaling(0.15, 0.30, talentSkillLvl);
@@ -195,11 +196,9 @@ public class Bronya : DefaultFighter
         base.DefaultFighter_HandleEvent(ent);
     }
 
-    //windriderBullet.Events.Add(new ModActionValue(null, this, Parent){CalculateValue = CalcTalentAV });
 
     /*
-     * if 2+ turns left we dont need SP.
-     * duration 2= turn+ next from bronya turn or double turn between support turn
+        If wanna cast E then return sp cost+ maindps sp cost 
      */
     public override double WillSpend()
     {
@@ -218,7 +217,7 @@ public class Bronya : DefaultFighter
     }
 
 
-    //50-110
+    //50-110%
     private double? CalculateBasicDmg(Event ent)
     {
         return CalculateDmgByBasicVal(

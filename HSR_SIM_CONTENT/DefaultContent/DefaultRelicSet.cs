@@ -29,7 +29,7 @@ public class DefaultRelicSet : IRelicSet
 
     public object Clone()
     {
-        return MemberwiseClone();
+        throw new NotImplementedException();
     }
 
     public virtual void DefaultRelicSet_HandleEvent(Event ent)

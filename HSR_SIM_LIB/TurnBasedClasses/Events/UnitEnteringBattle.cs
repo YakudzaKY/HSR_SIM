@@ -19,6 +19,8 @@ public class UnitEnteringBattle : Event
     {
         TargetUnit.OnEnteringBattle();
         TargetUnit.ParentTeam.ResetRoles();
+        //need reset enemy team roles coz some roles eff depend on enemy count
+        TargetUnit.EnemyTeam.ResetRoles();
         base.ProcEvent(revert);
     }
 }

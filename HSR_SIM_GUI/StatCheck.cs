@@ -320,7 +320,7 @@ public partial class StatCheck : Form
         
         foreach (var task in threadJob.CombatData.Where(x=>x.Key.Parent is null))
         {
-            var newChart = ChartUtils.getChart(task,threadJob.CombatData.Where(x=>x.Key.Parent ==task.Key));
+            var newChart = ChartUtils.GetChart(task,threadJob.CombatData.Where(x=>x.Key.Parent ==task.Key));
             newChart.Name = "Chart";
             pnlCharts.Invoke((MethodInvoker)delegate
             {
