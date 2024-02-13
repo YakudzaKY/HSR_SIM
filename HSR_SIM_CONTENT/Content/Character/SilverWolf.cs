@@ -16,7 +16,7 @@ public class SilverWolf : DefaultFighter
     private readonly double allowChangesDebuffAllDmgVal;
     private readonly double alwChgAtk;
 
-
+    private readonly Ability userBanned;
     private readonly double alwChgChnc;
     private readonly Buff[] bugArray;
     private readonly int bugDuration;
@@ -37,6 +37,7 @@ public class SilverWolf : DefaultFighter
 
     public SilverWolf(Unit parent) : base(parent)
     {
+
         //on this event we will place debuff
         trgEnt = new TriggerEvent(null, null, Parent);
         Parent.Stats.BaseMaxEnergy = 110;
@@ -61,38 +62,46 @@ public class SilverWolf : DefaultFighter
 
         allowChangesDebuff = new Buff(Parent)
         {
-            Type = Buff.BuffType.Debuff, BaseDuration = weaknessDuration, CustomIconName = "Allow_Changes",
-            Effects = new List<Effect>(), EffectStackingType = Buff.EffectStackingTypeEnm.FullReplace
+            Type = Buff.BuffType.Debuff,
+            BaseDuration = weaknessDuration,
+            CustomIconName = "Allow_Changes",
+            Effects = new List<Effect>(),
+            EffectStackingType = Buff.EffectStackingTypeEnm.FullReplace
         };
 
         allowChangesDebuffAllDmgRes = new Buff(Parent)
         {
-            Type = Buff.BuffType.Debuff, BaseDuration = 2,
+            Type = Buff.BuffType.Debuff,
+            BaseDuration = 2,
             Effects = new List<Effect> { new EffAllDamageResist { CalculateValue = calcSkillAllDmgRes } }
         };
 
         ultDefDebuff = new Buff(Parent)
         {
-            Type = Buff.BuffType.Debuff, BaseDuration = 3,
+            Type = Buff.BuffType.Debuff,
+            BaseDuration = 3,
             Effects = new List<Effect> { new EffDefPrc { Value = -ultDef } }
         };
 
         bugDuration = Atraces.HasFlag(ATracesEnm.A2) ? 4 : 3;
         talentAtkDebuff = new Buff(Parent)
         {
-            Type = Buff.BuffType.Debuff, BaseDuration = bugDuration,
+            Type = Buff.BuffType.Debuff,
+            BaseDuration = bugDuration,
             Effects = new List<Effect>
                 { new EffAtkPrc { Value = -FighterUtils.GetAbilityScaling(0.05, 0.1, talentLvl) } }
         };
         talentDefDebuff = new Buff(Parent)
         {
-            Type = Buff.BuffType.Debuff, BaseDuration = bugDuration,
+            Type = Buff.BuffType.Debuff,
+            BaseDuration = bugDuration,
             Effects = new List<Effect>
                 { new EffDefPrc { Value = -FighterUtils.GetAbilityScaling(0.04, 0.08, talentLvl) } }
         };
         talentSpdDebuff = new Buff(Parent)
         {
-            Type = Buff.BuffType.Debuff, BaseDuration = bugDuration,
+            Type = Buff.BuffType.Debuff,
+            BaseDuration = bugDuration,
             Effects = new List<Effect>
                 { new EffSpeedPrc { Value = -FighterUtils.GetAbilityScaling(0.03, 0.06, talentLvl) } }
         };
@@ -144,12 +153,12 @@ public class SilverWolf : DefaultFighter
         foreach (var proportion in new[] { 0.25, 0.25, 0.5 })
         {
             SystemWarning.Events.Add(new DirectDamage(null, this, Parent)
-                { CalculateValue = CalculateBasicDmg, CalculateProportion = proportion });
+            { CalculateValue = CalculateBasicDmg, CalculateProportion = proportion });
 
             SystemWarning.Events.Add(new ToughnessShred(null, this, Parent)
-                { Val = 30, CalculateProportion = proportion });
+            { Val = 30, CalculateProportion = proportion });
             SystemWarning.Events.Add(new EnergyGain(null, this, Parent)
-                { Val = 20, TargetUnit = Parent, CalculateProportion = proportion });
+            { Val = 20, TargetUnit = Parent, CalculateProportion = proportion });
         }
 
         SystemWarning.Events.Add(trgEnt);
@@ -166,21 +175,21 @@ public class SilverWolf : DefaultFighter
             Cost = 1
         };
         AllowChanges.Events.Add(new AttemptEffect(null, this, Parent)
-            { BaseChance = alwChgChnc, BuffToApply = allowChangesDebuff });
+        { BaseChance = alwChgChnc, BuffToApply = allowChangesDebuff });
         AllowChanges.Events.Add(new AttemptEffect(null, this, Parent)
-            { BaseChance = 1, BuffToApply = allowChangesDebuffAllDmgRes });
+        { BaseChance = 1, BuffToApply = allowChangesDebuffAllDmgRes });
         //dmg events
         AllowChanges.Events.Add(new DirectDamage(null, this, Parent)
-            { CalculateValue = CalculateAbilityDmg });
+        { CalculateValue = CalculateAbilityDmg });
         AllowChanges.Events.Add(new ToughnessShred(null, this, Parent) { Val = 60 });
         AllowChanges.Events.Add(trgEnt);
         AllowChanges.Events.Add(new EnergyGain(null, this, Parent)
-            { Val = 30, TargetUnit = Parent });
+        { Val = 30, TargetUnit = Parent });
         Abilities.Add(AllowChanges);
 
         //User Banned
-        Ability UserBanned;
-        UserBanned = new Ability(this)
+
+        userBanned = new Ability(this)
         {
             AbilityType = AbilityTypeEnm.Ultimate,
             Name = "User Banned",
@@ -188,18 +197,19 @@ public class SilverWolf : DefaultFighter
             CostType = Resource.ResourceType.Energy,
             Cost = Parent.Stats.BaseMaxEnergy
         };
-        UserBanned.Events.Add(new AttemptEffect(null, this, Parent)
-            { BaseChance = ultChance, BuffToApply = ultDefDebuff });
+        userBanned.Events.Add(new AttemptEffect(null, this, Parent)
+        { BaseChance = ultChance, BuffToApply = ultDefDebuff });
         //dmg events
-        UserBanned.Events.Add(new DirectDamage(null, this, Parent)
-            { CalculateValue = CalculateUltimateDmg });
-        UserBanned.Events.Add(new ToughnessShred(null, this, Parent) { Val = 90 });
-        UserBanned.Events.Add(trgEnt);
+        userBanned.Events.Add(new DirectDamage(null, this, Parent)
+        { CalculateValue = CalculateUltimateDmg });
+        userBanned.Events.Add(new ToughnessShred(null, this, Parent) { Val = 90 });
+        userBanned.Events.Add(trgEnt);
         ultimateHitLastEvent = new EnergyGain(null, this, Parent)
-            { Val = 5, TargetUnit = Parent };
-        UserBanned.Events.Add(ultimateHitLastEvent);
-
-        Abilities.Add(UserBanned);
+        { Val = 5, TargetUnit = Parent };
+        userBanned.Events.Add(ultimateHitLastEvent);
+        //for E4
+        Mechanics.AddVal(userBanned);
+        Abilities.Add(userBanned);
 
         if (Parent.Rank >= 6)
             PassiveBuffs.Add(new PassiveBuff(Parent)
@@ -233,7 +243,7 @@ public class SilverWolf : DefaultFighter
 
     private double? CalculateE4Dmg(Event ent)
     {
-        var attackPart =  Parent.GetAttack(ent) * 0.2;
+        var attackPart = Parent.GetAttack(ent) * 0.2;
         return FighterUtils.CalculateDmgByBasicVal(attackPart, ent);
     }
 
@@ -293,18 +303,27 @@ public class SilverWolf : DefaultFighter
                 var elm = (Unit.ElementEnm)Utl.GetRandomObject(elemListToApply, Parent.ParentTeam.ParentSim.Parent);
                 ent.ChildEvents.Add(new ApplyBuffEffect(ent.ParentStep, this, Parent)
                 {
-                    TargetUnit = ent.TargetUnit, BuffToApply = allowChangesDebuff,
+                    TargetUnit = ent.TargetUnit,
+                    BuffToApply = allowChangesDebuff,
                     Eff = new EffWeaknessImpair { Element = elm }
                 });
                 if (reduceResists)
                     ent.ChildEvents.Add(new ApplyBuffEffect(ent.ParentStep, this, Parent)
                     {
-                        TargetUnit = ent.TargetUnit, BuffToApply = allowChangesDebuff,
+                        TargetUnit = ent.TargetUnit,
+                        BuffToApply = allowChangesDebuff,
                         Eff = new EffElementalResist { Element = elm, Value = -0.2 }
                     });
             }
         }
-        //E2-4
+        //E4 release
+        else if (ent is MechanicValChg mvc && mvc.AbilityValue == userBanned&&mvc.TargetUnit.IsAlive)
+        {
+            for (var i = 0; i < mvc.Val; i++)
+                ent.ChildEvents.Add(new DirectDamage(ent.ParentStep, this, Parent)
+                { TargetUnit = mvc.TargetUnit, CalculateValue = CalculateE4Dmg });
+        }
+        //E1-4
         else if (Parent.Rank >= 1 && ent.Reference == ultimateHitLastEvent) //EnergyGain event
         {
             double debuffs;
@@ -314,13 +333,13 @@ public class SilverWolf : DefaultFighter
             if (Parent.Rank >= 1)
                 for (var i = 0; i < debuffs; i++)
                     ent.ChildEvents.Add(new EnergyGain(ent.ParentStep, this, Parent)
-                        { TargetUnit = Parent, Val = 7});
+                    { TargetUnit = Parent, Val = 7 });
             if (Parent.Rank >= 4)
-                for (var i = 0; i < debuffs; i++)
-                    ent.ChildEvents.Add(new DirectDamage(ent.ParentStep, this, Parent)
-                        { TargetUnit = tarUnit, CalculateValue = CalculateE4Dmg });
+                ent.ChildEvents.Add(new MechanicValChg(ent.ParentStep, this, Parent)
+                { AbilityValue = userBanned, TargetUnit = tarUnit, Val = debuffs });
+            //e1
             ent.ChildEvents.Add(new EnergyGain(ent.ParentStep, this, Parent)
-                { TargetUnit = Parent, Val = 7 * debuffs });
+            { TargetUnit = Parent, Val = 7 * debuffs });
         }
 
         else if (ent.Reference == trgEnt && ent.SourceUnit == Parent)
@@ -352,7 +371,7 @@ public class SilverWolf : DefaultFighter
             {
                 var randomBug = (Buff)Utl.GetRandomObject(notExistsBugs, Parent.ParentTeam.ParentSim.Parent);
                 ent.ChildEvents.Add(new AttemptEffect(ent.ParentStep, this, ent.SourceUnit)
-                    { BuffToApply = randomBug, BaseChance = chance, TargetUnit = target });
+                { BuffToApply = randomBug, BaseChance = chance, TargetUnit = target });
                 break;
             }
 
@@ -361,7 +380,7 @@ public class SilverWolf : DefaultFighter
             {
                 var randomBug = (Buff)Utl.GetRandomObject(bugArray, Parent.ParentTeam.ParentSim.Parent);
                 ent.ChildEvents.Add(new AttemptEffect(ent.ParentStep, this, ent.SourceUnit)
-                    { BuffToApply = randomBug, BaseChance = chance, TargetUnit = target });
+                { BuffToApply = randomBug, BaseChance = chance, TargetUnit = target });
             }
         }
     }

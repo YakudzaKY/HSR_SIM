@@ -107,7 +107,7 @@ public class Blade : DefaultFighter
         shuhuGift.Events.Add(new Healing(null, this, Parent)
             { TargetUnit = Parent, CalculateValue = CalculateSgHeal });
         shuhuGift.Events.Add(new MechanicValChg(null, this, Parent)
-            { TargetUnit = Parent, AbilityValue = shuhuGift, Val = -shuHuMaxCnt });
+            { AbilityValue = shuhuGift, Val = -shuHuMaxCnt });
         Abilities.Add(shuhuGift);
         //Passive counter
         Mechanics.AddVal(shuhuGift);
@@ -229,7 +229,7 @@ public class Blade : DefaultFighter
         deathSentence.Events.Add(new ToughnessShred(null, this, Parent)
             { Val = 60, CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
         deathSentence.Events.Add(new MechanicValChg(null, this, Parent)
-            { TargetUnit = Parent, AbilityValue = deathSentence, CalculateValue = CalcResetDsCharge });
+            { AbilityValue = deathSentence, CalculateValue = CalcResetDsCharge });
 
         Abilities.Add(deathSentence);
         Mechanics.AddVal(deathSentence);
@@ -368,7 +368,7 @@ public class Blade : DefaultFighter
                 lastDamageStep = ent.ParentStep;
             if (Mechanics.Values[shuhuGift] < shuHuMaxCnt)
                 ent.ChildEvents.Add(new MechanicValChg(ent.ParentStep, this, Parent)
-                    { TargetUnit = Parent, Val = 1, AbilityValue = shuhuGift });
+                    {  Val = 1, AbilityValue = shuhuGift });
 
             var bladeHalfHp = Parent.GetMaxHp(ent) * 0.5;
             //if hp<=50% but was 50%+ then apply hp buff
@@ -390,7 +390,7 @@ public class Blade : DefaultFighter
             ))
         {
             var dsValCharge = new MechanicValChg(ent.ParentStep, this, Parent)
-                { TargetUnit = Parent, Val = ent.RealVal, AbilityValue = deathSentence };
+                { Val = ent.RealVal, AbilityValue = deathSentence };
             ent.ChildEvents.Add(dsValCharge);
         }
 

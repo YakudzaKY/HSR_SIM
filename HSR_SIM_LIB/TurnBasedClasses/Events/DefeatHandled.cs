@@ -10,7 +10,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
 {
     internal class DefeatHandled : Event
     {
-        public List<Buff> RemovedMods { get; set; } = new();
+
         public DefeatHandled(Step parentStep, ICloneable source, Unit sourceUnit) : base(parentStep, source, sourceUnit)
         {
         }
@@ -25,27 +25,13 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
 
             if (!TriggersHandled)
             {
-
-                RemovedMods.AddRange(TargetUnit.Buffs.Where(x => x.Dispellable));
+              
                 ChildEvents.Add(new SetLiveStatus(ParentStep, SourceUnit, SourceUnit)
                 { ToState = Unit.LivingStatusEnm.WaitingForFollowUp, TargetUnit = TargetUnit });
 
             }
 
-            if (!revert)
-            {
 
-                foreach (var mod in RemovedMods)
-                    TargetUnit.RemoveBuff(this, mod);
-            }
-            else
-            {
-                List<Buff> rmods = new();
-                rmods.AddRange(RemovedMods);
-                rmods.Reverse();
-                foreach (var mod in rmods)
-                    TargetUnit.RestoreBuff(this, mod);
-            }
 
 
             base.ProcEvent(revert);

@@ -70,7 +70,7 @@ public class Bronya : DefaultFighter
         };
         //dmg events
         windriderBullet.Events.Add(new MechanicValChg(null, this, Parent)
-            { TargetUnit = Parent, AbilityValue = windriderBullet, Val = 1 });
+            { AbilityValue = windriderBullet, Val = 1 });
         windriderBullet.Events.Add(new DirectDamage(null, this, Parent)
             { CalculateValue = CalculateBasicDmg });
         windriderBullet.Events.Add(new ToughnessShred(null, this, Parent) { Val = 30 });
@@ -179,7 +179,7 @@ public class Bronya : DefaultFighter
             step.Events.Add(new ModActionValue(step, this, Parent)
                 { CalculateValue = CalcTalentAV, TargetUnit = Parent });
             step.Events.Add(new MechanicValChg(step, this, Parent)
-                { TargetUnit = Parent, AbilityValue = windriderBullet, Val = -Mechanics.Values[windriderBullet] });
+                {  AbilityValue = windriderBullet, Val = -Mechanics.Values[windriderBullet] });
         }
 
         base.DefaultFighter_HandleStep(step);

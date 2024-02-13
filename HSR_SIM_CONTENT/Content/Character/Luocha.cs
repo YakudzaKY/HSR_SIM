@@ -77,10 +77,9 @@ public class Luocha : DefaultFighter
             Available = ColAvailable,
             FollowUpPriority = PriorityEnm.Medium,
             TargetType = TargetTypeEnm.Self,
-            AdjacentTargets = AdjacentTargetsEnm.All
         };
         cycleOfLife.Events.Add(new MechanicValChg(null, this, Parent)
-            { TargetUnit = Parent, AbilityValue = cycleOfLife, Val = -cycleOfLifeMaxCnt });
+            {  AbilityValue = cycleOfLife, Val = -cycleOfLifeMaxCnt });
         cycleOfLife.Events.Add(new ApplyBuff(null, this, Parent)
         {
             TargetUnit = Parent,
@@ -211,7 +210,6 @@ public class Luocha : DefaultFighter
         ability.Events.Add(new MechanicValChg(null, this, Parent)
         {
             OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
-            TargetUnit = Parent,
             Val = cycleOfLifeMaxCnt,
             AbilityValue = cycleOfLife
         }); //AbilityValue for Cycle of life
@@ -276,6 +274,7 @@ public class Luocha : DefaultFighter
     //default all abilities we wanna cast
     public bool IWannaUseDW()
     {
+        return false;
         //if we have no CoL or enemy have buff
         return ultimateAbility.DefaultAbilityWannaUse() && (!ColBuffAvailable() ||
                                                             GetAliveEnemies().Count(x =>
@@ -402,7 +401,7 @@ public class Luocha : DefaultFighter
                                                                  step.ActorAbility == prayerOfAbyssFlowerAuto ||
                                                                  step.ActorAbility == prayerOfAbyssFlower))
                 step.Events.Add(new MechanicValChg(step, this, Parent)
-                    { TargetUnit = Parent, Val = 1, AbilityValue = cycleOfLife });
+                    { Val = 1, AbilityValue = cycleOfLife });
         }
 
 
