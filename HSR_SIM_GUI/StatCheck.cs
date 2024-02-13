@@ -186,7 +186,7 @@ public partial class StatCheck : Form
                         {
                             SimScenario = XMLLoader.LoadCombatFromXml( GetScenarioPath() + cbScenario.Text,  GetProfilePath()+ profile),
                             Parent = simTask,
-                            Step=i * (int)nmbUpgradesPerStep.Value,
+                            UpgradesCount=i * (int)nmbUpgradesPerStep.Value,
                             StatMods = GetStatMods(cbCharacter.Text, (string)item,
                                 i * (int)nmbUpgradesPerStep.Value,  cbStatToReplace.Text)
                         });
@@ -224,7 +224,7 @@ public partial class StatCheck : Form
                     {
                         SimScenario = XMLLoader.LoadCombatFromXml( GetScenarioPath() + cbScenario.Text,  GetProfilePath()+ profile),
                         StatMods = statModList,
-                        Step=1,
+                        UpgradesCount=1,
                         Parent = simTask
                     });
                 }

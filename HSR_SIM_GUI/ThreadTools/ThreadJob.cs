@@ -2,10 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using HSR_SIM_GUI.DamageTools;
 using HSR_SIM_GUI.TaskTools;
 using HSR_SIM_LIB;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -15,6 +11,7 @@ namespace HSR_SIM_GUI.ThreadTools
 {
     /// <summary>
     /// The job sended into main sim thread also contains fields for results
+    /// 
     /// </summary>
     /// <param name="pTaskList"></param>
     /// <param name="pIterations"></param>
@@ -68,7 +65,11 @@ namespace HSR_SIM_GUI.ThreadTools
             typeof(ToughnessBreak)
         };
 
-
+        /// <summary>
+        /// calculate average values. Also recal values by new result
+        /// </summary>
+        /// <param name="taskProgress"></param>
+        /// <param name="rCombatResult"></param>
         public void Aggregate(AggregateThread.rTaskProgress taskProgress,Worker.RCombatResult rCombatResult)
         {
             RAggregatedData Data;

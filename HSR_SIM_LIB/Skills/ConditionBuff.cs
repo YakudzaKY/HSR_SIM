@@ -16,7 +16,11 @@ public class ConditionBuff(Unit parentUnit) : PassiveBuff(parentUnit)
         Exists
     }
 
-
+    /// <summary>
+    /// options that we can check in condition buffs
+    /// !!!! if you add some rows here do not forget add reset trigger to buff effect!!!!
+    /// For example check EffCritPrc-> OnApply and Remove triggers
+    /// </summary>
     public enum ConditionCheckParam
     {
         SPD,

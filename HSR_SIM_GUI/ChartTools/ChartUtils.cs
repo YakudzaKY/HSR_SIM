@@ -98,6 +98,7 @@ internal static class ChartUtils
         newChart.Legends.Add(partyDpsLegend);
         newChart.Dock = DockStyle.Top;
 
+        //If we have child task-> do additional chart compare with parent results
         var childTasksArr = childTasks as KeyValuePair<SimTask, ThreadJob.RAggregatedData>[] ?? childTasks.ToArray();
         if (childTasksArr.Any())
         {
@@ -130,11 +131,11 @@ internal static class ChartUtils
             statsChartArea.AxisX.Title = "Upgrade";
             statsChartArea.AxisY.Title = "Party DPAV increase(vs normal run)";
 
-            foreach (var subtask in childTasksArr.OrderBy(x => x.Key.Step))
+            foreach (var subTask in childTasksArr.OrderBy(x => x.Key.UpgradesCount))
             {
-                var statMod = subtask.Key.StatMods.First();
-                newChart.Series[statMod.Stat].Points.AddXY(subtask.Key.Step, subtask.Value.avgDPAV - task.Value.avgDPAV);
-                newChart.Series[statMod.Stat].Points.Last().Label = $"wr:{subtask.Value.WinRate:f}%";
+                var statMod = subTask.Key.StatMods.First();
+                newChart.Series[statMod.Stat].Points.AddXY(subTask.Key.UpgradesCount, subTask.Value.avgDPAV - task.Value.avgDPAV);
+                newChart.Series[statMod.Stat].Points.Last().Label = $"wr:{subTask.Value.WinRate:f}%";
                 //newChart.Series[statMod.Stat].Points.Last().Label = $"wr:{subtask.Data.WinRate:f}% wcl:{subtask.Data.Cycles:f} dcl:{subtask.Data.DefeatCycles:f}";// extended stats
             }
         }

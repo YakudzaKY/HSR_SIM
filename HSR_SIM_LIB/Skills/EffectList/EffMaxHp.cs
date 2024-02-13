@@ -3,6 +3,9 @@ using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Skills.EffectList;
 
+/// <summary>
+/// Max HP fixed value buff
+/// </summary>
 public class EffMaxHp : Effect
 {
     public double GetCorrectedHP(Event ent, Buff buff)

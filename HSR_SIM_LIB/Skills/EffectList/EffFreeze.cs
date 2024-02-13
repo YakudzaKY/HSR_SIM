@@ -3,6 +3,9 @@ using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Skills.EffectList;
 
+/// <summary>
+/// freeze debuff.
+/// </summary>
 public class EffFreeze : EffDotTemplate
 {
     public override void OnNaturalExpire(Event ent, Buff buff)

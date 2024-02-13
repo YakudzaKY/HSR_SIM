@@ -11,12 +11,17 @@ using Ini;
 
 namespace HSR_SIM_GUI;
 
+/// <summary>
+/// Class with utils for graphical interface and forms
+/// </summary>
 internal static class GuiUtils
 {
+
     private const int CURSOR_SHOWING = 0x00000001;
     public static IniFile IniF = new(AppDomain.CurrentDomain.BaseDirectory + "config.ini");
 
     /// <summary>
+    /// Add line to textbox with cleaning old lines
     /// </summary>
     /// <param name="box"></param>
     /// <param name="text"></param>
@@ -39,6 +44,10 @@ internal static class GuiUtils
         box.AppendText(line);
     }
 
+    /// <summary>
+    /// apply dark theme to chart
+    /// </summary>
+    /// <param name="chart"></param>
     public static void ApplyDarkLightTheme(Chart chart)
     {
         [DllImport("UXTheme.dll", SetLastError = true, EntryPoint = "#138")]

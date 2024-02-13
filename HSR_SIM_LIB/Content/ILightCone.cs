@@ -8,7 +8,7 @@ using static HSR_SIM_LIB.Fighters.FighterUtils;
 namespace HSR_SIM_LIB.Content;
 
 /// <summary>
-///     Light cone/relics interface
+///     Light cone interface. Same as IFighter but simple
 /// </summary>
 public interface ILightCone : ICloneable
 {

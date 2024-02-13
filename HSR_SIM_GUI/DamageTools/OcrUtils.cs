@@ -13,6 +13,9 @@ namespace HSR_SIM_GUI.DamageTools;
 
 internal class OcrUtils
 {
+    /// <summary>
+    /// Utilities for text recognition
+    /// </summary>
     public enum RectModeEnm
     {
         Minus,
@@ -99,7 +102,7 @@ internal class OcrUtils
         engine.DefaultPageSegMode = PageSegMode.SingleBlock;
         engineNumbers.DefaultPageSegMode = PageSegMode.SingleBlock;
 
-
+        //need 2 picture rectangles. One is unequipped item, second is equipped item
         foreach (var itemRectMode in (RectModeEnm[])Enum.GetValues(typeof(RectModeEnm)))
         {
             rectMode = itemRectMode;
@@ -133,10 +136,12 @@ internal class OcrUtils
 
                 using (var img = PixConverter.ToPix(miniHsrScreen))
                 {
+                    
                     var page = engine.Process(img);
                     var pageNumbers = engineNumbers.Process(img);
                     var text = page.GetText();
                     var textNumbers = pageNumbers.GetText();
+
                     text = text.Replace("\n\n", "\n");
                     textNumbers = textNumbers.Replace("\n\n", "\n");
                     if (text.EndsWith("\n"))

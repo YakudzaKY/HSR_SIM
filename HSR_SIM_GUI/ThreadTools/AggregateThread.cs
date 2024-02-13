@@ -13,15 +13,15 @@ namespace HSR_SIM_GUI.ThreadTools
 {
     /// <summary>
     /// Main thread class for sim job
-    /// Its Thread wrapper
+    /// It is System.Threading wrapper
     /// </summary>
     internal class AggregateThread
     {
-        private Thread mainThread;
-        private ThreadJob job;
-        private int childThdCount;
-        private ConcurrentQueue<SimTask> cq = new ConcurrentQueue<SimTask>();
-        private ConcurrentQueue<KeyValuePair<SimTask, Worker.RCombatResult>> cResq = new();
+        private Thread mainThread;//ref to thread
+        private ThreadJob job;// ref to job( job= SimTask+ Results
+        private int childThdCount;//child thread count
+        private ConcurrentQueue<SimTask> cq = new ConcurrentQueue<SimTask>();//Task queue. Child threads will grab task from here
+        private ConcurrentQueue<KeyValuePair<SimTask, Worker.RCombatResult>> cResq = new();//Child thread will insert results into this queue. Main thread will consume it
 
         public record rTaskProgress
         {
@@ -30,14 +30,11 @@ namespace HSR_SIM_GUI.ThreadTools
             public int EndCount { get; set; } = 0;
 
         }
-        private List<rTaskProgress> taskProgress = new();
+        private List<rTaskProgress> taskProgress = new();//task progression tracker
 
         List<SimThread> threads = new List<SimThread>();
 
-        public bool IsAlive
-        {
-            get => mainThread.IsAlive;
-        }
+        public bool IsAlive => mainThread.IsAlive;
 
         private bool HaveTaskToWait()
         {
@@ -45,9 +42,9 @@ namespace HSR_SIM_GUI.ThreadTools
         }
 
         /// <summary>
-        /// Interrupt all childs
+        /// Interrupt all child threads
         /// </summary>
-        private void StopChilds()
+        private void StopChild()
         {
             foreach (SimThread thread in threads)
             {
@@ -57,24 +54,25 @@ namespace HSR_SIM_GUI.ThreadTools
 
             threads.Clear();
         }
+
         private void DoWork(object taskList)
         {
             bool haveTaskToRun = true;//flag that we have some task to queue
-            bool haveTaskToWait = true;//flag that we have uncompleted sims
-            bool haveTaskToAggregate = true;//flag that we have some task to aggregate data
             ThreadJob thd = taskList as ThreadJob;
+            //fill progress tracker
             foreach (var task in thd.TaskList)
             {
                 taskProgress.Add(new rTaskProgress() { STask = task });
             }
 
+            //create child threads
             for (var i = 0; i < childThdCount; i++)
             {
                 SimThread sim = new SimThread(cq, cResq);
                 threads.Add(sim);
             }
 
-
+            //while we have tasks that are not running, or tasks that we are waiting for completion
             while (haveTaskToRun || HaveTaskToWait() )
             {
                 //start child jobs
@@ -119,18 +117,13 @@ namespace HSR_SIM_GUI.ThreadTools
                 }
                 catch (ThreadInterruptedException e)
                 {
-                    StopChilds();
+                    StopChild();
                     Console.WriteLine("thread interrupted");
                     break;
 
                 }
             }
-
-
-
-            StopChilds();
-
-
+            StopChild();
         }
 
 
@@ -151,7 +144,7 @@ namespace HSR_SIM_GUI.ThreadTools
             mainThread.Interrupt();
         }
 
-        //return number of completed sims
+        //return number of completed sims. Can use it for progress bar or other visual control
         public int Progress()
         {
             return taskProgress.Sum(x => x.EndCount);

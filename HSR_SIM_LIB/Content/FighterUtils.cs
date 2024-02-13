@@ -11,7 +11,7 @@ using static HSR_SIM_LIB.UnitStuff.Unit;
 namespace HSR_SIM_LIB.Fighters;
 
 /// <summary>
-///     ultils
+///   Combat utilities
 /// </summary>
 public static class FighterUtils
 {
@@ -39,6 +39,8 @@ public static class FighterUtils
 
     /// <summary>
     ///     get from table in https://honkai-star-rail.fandom.com/wiki/Toughness#Weakness_Break
+    ///     if someone know formula plz rewrite
+    /// 
     /// </summary>
     static FighterUtils()
     {
@@ -305,7 +307,7 @@ public static class FighterUtils
     /// <returns></returns>
     public static double GetAbilityScaling(double modAt1, double modAt10, int level)
     {
-        int maxLvl = 10;//without E
+        int maxLvl = 10;//without Eidolons
         int firstModLvl = 6;
         if (level <= firstModLvl)
         {
@@ -329,7 +331,7 @@ public static class FighterUtils
     /// <returns></returns>
     public static double GetBasicScaling(double modAt1, double modAt6, int level)
     {
-        int maxLvl = 6;//without E
+        int maxLvl = 6;//without Eidolons
        
         return modAt1+(level-1)/(maxLvl-1)*(modAt6-modAt6);
     }

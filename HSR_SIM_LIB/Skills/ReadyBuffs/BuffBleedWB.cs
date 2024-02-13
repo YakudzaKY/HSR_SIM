@@ -4,7 +4,9 @@ using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Skills.ReadyBuffs;
-
+/// <summary>
+/// Bleed DoT on weakness break
+/// </summary>
 public class BuffBleedWB : Buff
 {
     public BuffBleedWB(Unit caster, Buff reference = null) : base(caster, reference)

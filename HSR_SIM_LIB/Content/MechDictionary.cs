@@ -6,7 +6,7 @@ using HSR_SIM_LIB.Skills;
 namespace HSR_SIM_LIB.Fighters;
 
 /// <summary>
-///     dictionary with mechancis
+///     dictionary with mechanics
 /// </summary>
 public class MechDictionary
 {

@@ -12,7 +12,9 @@ using Newtonsoft.Json;
 using static HSR_SIM_GUI.GuiUtils;
 
 namespace HSR_SIM_GUI;
-
+/// <summary>
+/// Character import from hoyo api.
+/// </summary>
 public partial class CharImport : Form
 {
     private Character mainCharacter;
@@ -367,6 +369,11 @@ public partial class CharImport : Form
         if (saveFileDialog1.ShowDialog() == DialogResult.OK) XmlSave(mainCharacter, saveFileDialog1.FileName);
     }
 
+    /// <summary>
+    /// save character gear and stats into XML
+    /// </summary>
+    /// <param name="character"></param>
+    /// <param name="savePath"></param>
     private static void XmlSave(Character character, string savePath)
     {
         XElement unit = new("Unit");
@@ -428,6 +435,11 @@ public partial class CharImport : Form
         }
     }
 
+    /// <summary>
+    /// load character from xml
+    /// </summary>
+    /// <param name="openFileFileName"></param>
+    /// <returns></returns>
     private static Character XmlLoad(string openFileFileName)
     {
         Character character
@@ -493,6 +505,11 @@ public partial class CharImport : Form
         return character;
     }
 
+    /// <summary>
+    /// update character skill values after grid end edit
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void DgSkills_CellEndEdit(object sender, DataGridViewCellEventArgs e)
     {
         var rw = e.RowIndex;

@@ -3,7 +3,9 @@ using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Skills.EffectList;
-
+/// <summary>
+/// Entanglement debuff
+/// </summary>
 public class EffEntanglement : EffDotTemplate
 {
     public override void OnNaturalExpire(Event ent, Buff buff)

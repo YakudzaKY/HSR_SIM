@@ -5,7 +5,9 @@ using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Skills.ReadyBuffs;
-
+/// <summary>
+/// freeze on weakness break
+/// </summary>
 public class BuffFreezeWB : Buff
 {
     public BuffFreezeWB(Unit caster, Buff reference = null) : base(caster, reference)

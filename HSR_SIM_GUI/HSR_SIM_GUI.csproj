@@ -133,10 +133,6 @@
     <None Remove="Data\WarGear\NPC\MaraStruckSoldier.xml" />
     <None Remove="Data\WarGear\NPC\Vagrant.xml" />
     <None Remove="Data\WarGear\Special\Forgotten Hall.xml" />
-    <None Remove="Data\WarGear\UID_712767509.xml" />
-    <None Remove="Data\WarGear\UID_SWE0.xml" />
-    <None Remove="Data\WarGear\UID_SWE5.xml" />
-    <None Remove="Data\WarGear\UID_SWE6.xml" />
     <None Remove="tessdata\rus.traineddata" />
     <None Remove="tessdata\rus.xml" />
   </ItemGroup>
@@ -485,18 +481,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\WarGear\Special\Forgotten Hall.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Data\WarGear\UID_712767509.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Data\WarGear\UID_SWE0.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Data\WarGear\UID_SWE5.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Data\WarGear\UID_SWE6.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="tessdata\rus.traineddata">

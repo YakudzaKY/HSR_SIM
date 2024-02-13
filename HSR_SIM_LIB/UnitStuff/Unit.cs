@@ -61,7 +61,7 @@ public class Unit : CloneClass
     public IFighter Fighter
     {
         get =>
-            fighter ??= (IFighter)Activator.CreateInstance(Type.GetType(FighterClassName,true)!, this);
+            fighter ??= (IFighter)Activator.CreateInstance(Type.GetType(FighterClassName, true)!, this);
         set => fighter = value;
     }
 
@@ -109,44 +109,44 @@ public class Unit : CloneClass
 
     public override object Clone()
     {
-        Unit newClone =(Unit)MemberwiseClone();
+        Unit newClone = (Unit)MemberwiseClone();
         //clear fighter
         newClone.fighter = null;
         //clone resources
-        var oldRes=newClone.Resources;
-        newClone.Resources = new ();
-        foreach (var res  in oldRes)
+        var oldRes = newClone.Resources;
+        newClone.Resources = new();
+        foreach (var res in oldRes)
         {
-            newClone.Resources .Add((Resource)res.Clone()); 
+            newClone.Resources.Add((Resource)res.Clone());
         }
         //clone Buffs
-        var oldBuffs=newClone.Buffs;
-        newClone.Buffs = new ();
-        foreach (var res  in oldBuffs)
+        var oldBuffs = newClone.Buffs;
+        newClone.Buffs = new();
+        foreach (var res in oldBuffs)
         {
-            newClone.Buffs.Add((Buff)res.Clone()); 
+            newClone.Buffs.Add((Buff)res.Clone());
         }
 
         //clone Skills
-        var oldSkills=newClone.Skills;
-        newClone.Skills = new ();
-        foreach (var res  in oldSkills)
+        var oldSkills = newClone.Skills;
+        newClone.Skills = new();
+        foreach (var res in oldSkills)
         {
-            newClone.Skills.Add((Skill)res.Clone()); 
+            newClone.Skills.Add((Skill)res.Clone());
         }
 
         //clone BaseDamageBoost
-        var oldBaseDmgBoost=newClone.BaseDamageBoost;
-        newClone.BaseDamageBoost = new ();
-        foreach (var res  in oldBaseDmgBoost)
+        var oldBaseDmgBoost = newClone.BaseDamageBoost;
+        newClone.BaseDamageBoost = new();
+        foreach (var res in oldBaseDmgBoost)
         {
             newClone.BaseDamageBoost.Add(res with { });
         }
 
         //clone Stats
-        var oldStats=newClone.Stats;
-        newClone.Stats =(UnitStats)newClone.Stats.Clone();
-        
+        var oldStats = newClone.Stats;
+        newClone.Stats = (UnitStats)newClone.Stats.Clone();
+
 
         return newClone;
     }
@@ -448,7 +448,8 @@ public class Unit : CloneClass
         int res = 0;
         foreach (var effect in buff.Effects) effect.BeforeApply(ent, buff);
         Buffs.Add(buff);
-        this.ResetCondition(ConditionBuff.ConditionCheckParam.Buff);
+        ResetCondition(ConditionBuff.ConditionCheckParam.Buff);
+        if (buff.Type != Buff.BuffType.Buff) ResetCondition(ConditionBuff.ConditionCheckParam.AnyDebuff);
         foreach (var effect in buff.Effects) effect.OnApply(ent, buff);
     }
 
@@ -515,7 +516,8 @@ public class Unit : CloneClass
             srchBuff.Owner = this;
             Buffs.Add(srchBuff);
         }
-        this.ResetCondition(ConditionBuff.ConditionCheckParam.Buff);
+        ResetCondition(ConditionBuff.ConditionCheckParam.Buff);
+        if (buff.Type != Buff.BuffType.Buff) ResetCondition(ConditionBuff.ConditionCheckParam.AnyDebuff);
         foreach (var effect in srchBuff.Effects) effect.OnApply(ent, srchBuff);
         //reset duration
         srchBuff.IsOld = false; //renew the flag
@@ -538,7 +540,9 @@ public class Unit : CloneClass
             foreach (var effect in foundBuff.Effects) effect.OnRemove(ent, foundBuff);
             res = true;
         }
-        this.ResetCondition(ConditionBuff.ConditionCheckParam.Buff);
+        ResetCondition(ConditionBuff.ConditionCheckParam.Buff);
+        if (buff.Type != Buff.BuffType.Buff) ResetCondition(ConditionBuff.ConditionCheckParam.AnyDebuff);
+
         return res;
     }
 
@@ -634,9 +638,9 @@ public class Unit : CloneClass
     /// <returns></returns>
     public double GetAbilityTypeMultiplier(Event ent, Ability ability)
     {
-        return GetBuffSumByType(typeof(EffAbilityTypeBoost), ent: ent,abilityType:ability.AbilityType)
+        return GetBuffSumByType(typeof(EffAbilityTypeBoost), ent: ent, abilityType: ability.AbilityType)
                // plus follow up bonus for non follow up attacks in follow up step
-               + (ability.AbilityType != AbilityTypeEnm.FollowUpAction && ent.ParentStep.StepType == Step.StepTypeEnm.UnitFollowUpAction ? GetBuffSumByType(typeof(EffAbilityTypeBoost), ent: ent,abilityType:AbilityTypeEnm.FollowUpAction) : 0);
+               + (ability.AbilityType != AbilityTypeEnm.FollowUpAction && ent.ParentStep.StepType == Step.StepTypeEnm.UnitFollowUpAction ? GetBuffSumByType(typeof(EffAbilityTypeBoost), ent: ent, abilityType: AbilityTypeEnm.FollowUpAction) : 0);
     }
 
     public double GetOutgoingHealMultiplier(Event ent)
@@ -766,6 +770,6 @@ public class Unit : CloneClass
     {
         public ElementEnm ElemType;
         public double Value;
-      
+
     }
 }

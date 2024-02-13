@@ -4,7 +4,9 @@ using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Skills.ReadyBuffs;
-
+/// <summary>
+/// Wind DoT on weakness break
+/// </summary>
 public class BuffWindShearWB : Buff
 {
     public BuffWindShearWB(Unit caster, Buff reference = null) : base(caster, reference)

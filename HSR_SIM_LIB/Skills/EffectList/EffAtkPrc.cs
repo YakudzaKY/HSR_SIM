@@ -2,18 +2,9 @@
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Skills.EffectList;
-
+/// <summary>
+/// buff to attack by percent value. ( multiply base ATK by x%)
+/// </summary>
 public class EffAtkPrc : Effect
 {
-    public override void OnApply(Event ent, Buff buff, Unit target = null)
-    {
-        (target??buff.Owner).ResetCondition(ConditionBuff.ConditionCheckParam.SPD);
-        base.OnApply(ent, buff,target);
-    }
-
-    public override void OnRemove(Event ent, Buff buff, Unit target = null)
-    {
-        (target??buff.Owner).ResetCondition(ConditionBuff.ConditionCheckParam.SPD);
-        base.OnRemove(ent, buff,target);
-    }
 }

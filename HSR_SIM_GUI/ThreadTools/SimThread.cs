@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using HSR_SIM_GUI.TaskTools;
 using HSR_SIM_LIB;
 
@@ -12,9 +9,13 @@ namespace HSR_SIM_GUI.ThreadTools
 {
     internal class SimThread
     {
-        private ConcurrentQueue<SimTask> qRef;
-        private  ConcurrentQueue<KeyValuePair<SimTask, Worker.RCombatResult>> rRef;
-        private Thread thread;
+        /// <summary>
+        /// wrapper for System.Threading.
+        /// Child thread for Sim run by task and return results 
+        /// </summary>
+        private readonly ConcurrentQueue<SimTask> qRef;//ref to task queue
+        private readonly ConcurrentQueue<KeyValuePair<SimTask, Worker.RCombatResult>> rRef;//ref to results queue
+        private readonly Thread thread;
         public SimThread(ConcurrentQueue<SimTask> cq,
             ConcurrentQueue<KeyValuePair<SimTask, Worker.RCombatResult>> keyValuePairs)
         {
@@ -23,6 +24,7 @@ namespace HSR_SIM_GUI.ThreadTools
             thread=new Thread(DoWork);
             thread.Start();
         }
+        //handler for DevMode
         public static int GetDecision(string[] items, string description)
         {
             throw new NotImplementedException();
@@ -31,7 +33,7 @@ namespace HSR_SIM_GUI.ThreadTools
         {
             while (true)
             {
-
+                //get some thing from queue and start sim/
                 if (qRef.TryDequeue(out var task))
                 {
                     

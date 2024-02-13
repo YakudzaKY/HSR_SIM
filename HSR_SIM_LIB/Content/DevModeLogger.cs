@@ -1,9 +1,7 @@
-﻿using HSR_SIM_LIB.UnitStuff;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace HSR_SIM_LIB.Fighters
 {
@@ -36,7 +34,13 @@ namespace HSR_SIM_LIB.Fighters
             this.parentWorker = parentWorker;
         }
 
-
+        /// <summary>
+        /// read next value from log or ask user if no record exists
+        /// </summary>
+        /// <param name="arrayStrings">items to select</param>
+        /// <param name="description">description show to user</param>
+        /// <returns>index selected</returns>
+        /// <exception cref="Exception"></exception>
         public int ReadNext(string[] arrayStrings, string description)
         {
             

@@ -3,6 +3,9 @@ using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Skills.EffectList;
 
+/// <summary>
+/// increase max hp by x%(from base stats ofc)
+/// </summary>
 public class EffMaxHpPrc : Effect
 {
     public double GetCorrectedHP(Event ent, Buff buff)

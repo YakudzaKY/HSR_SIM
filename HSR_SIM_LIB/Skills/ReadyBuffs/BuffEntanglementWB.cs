@@ -6,7 +6,9 @@ using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Skills.ReadyBuffs;
-
+/// <summary>
+/// Entanglement on weakness break
+/// </summary>
 public class BuffEntanglementWB : Buff
 {
     public BuffEntanglementWB(Unit caster, Buff reference = null, Event ent=null) : base(caster, reference)

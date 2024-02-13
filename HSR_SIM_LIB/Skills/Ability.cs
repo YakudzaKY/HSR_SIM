@@ -21,6 +21,9 @@ public class Ability : CloneClass
         AbilityMain
     }
 
+    /// <summary>
+    /// Ability type. todo:rewrite into Flags
+    /// </summary>
     public enum AbilityTypeEnm
     {
         None = 0,
