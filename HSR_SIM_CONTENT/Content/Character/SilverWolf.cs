@@ -233,8 +233,7 @@ public class SilverWolf : DefaultFighter
 
     private double? CalculateE4Dmg(Event ent)
     {
-        var attackPart = Parent.GetAttack(ent) * 0.2;
-
+        var attackPart =  Parent.GetAttack(ent) * 0.2;
         return FighterUtils.CalculateDmgByBasicVal(attackPart, ent);
     }
 
@@ -306,12 +305,16 @@ public class SilverWolf : DefaultFighter
             }
         }
         //E2-4
-        else if (Parent.Rank >= 2 && ent.Reference == ultimateHitLastEvent) //EnergyGain event
+        else if (Parent.Rank >= 1 && ent.Reference == ultimateHitLastEvent) //EnergyGain event
         {
             double debuffs;
             var tarUnit = ent.ParentStep.Target;
             debuffs = tarUnit.Buffs.Count(x => x.Type == Buff.BuffType.Debuff || x.Type == Buff.BuffType.Dot);
             debuffs = Math.Min(debuffs, 5);
+            if (Parent.Rank >= 1)
+                for (var i = 0; i < debuffs; i++)
+                    ent.ChildEvents.Add(new EnergyGain(ent.ParentStep, this, Parent)
+                        { TargetUnit = Parent, Val = 7});
             if (Parent.Rank >= 4)
                 for (var i = 0; i < debuffs; i++)
                     ent.ChildEvents.Add(new DirectDamage(ent.ParentStep, this, Parent)

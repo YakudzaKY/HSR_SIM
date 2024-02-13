@@ -13,9 +13,6 @@ public class Defeat : Event
     {
 
     }
-    public List<Buff> RemovedMods { get; set; } = new();
-
-
 
     public override string GetDescription()
     {
@@ -29,30 +26,12 @@ public class Defeat : Event
         {
 
             //attacker got 10 energy
-            RemovedMods.AddRange(TargetUnit.Buffs);
             ChildEvents.Add(new EnergyGain(ParentStep, TargetUnit, SourceUnit)
             { Val = 10, TargetUnit = SourceUnit });
             ChildEvents.Add(new SetLiveStatus(ParentStep, SourceUnit, SourceUnit)
             { ToState = Unit.LivingStatusEnm.Defeated, TargetUnit = TargetUnit });
 
         }
-
-
-        if (!revert)
-        {
-
-            foreach (var mod in RemovedMods)
-                TargetUnit.RemoveBuff(this, mod);
-        }
-        else
-        {
-            List<Buff> rmods = new();
-            rmods.AddRange(RemovedMods);
-            rmods.Reverse();
-            foreach (var mod in rmods)
-                TargetUnit.RestoreBuff(this, mod);
-        }
-
 
         base.ProcEvent(revert);
     }

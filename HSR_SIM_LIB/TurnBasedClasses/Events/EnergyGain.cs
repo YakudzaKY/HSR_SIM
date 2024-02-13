@@ -9,6 +9,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 /// </summary>
 public class EnergyGain : Event
 {
+    //scale energy gain by energy regen rate
+    private bool IsRawEnergy { get; set; } = false;
     public EnergyGain(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
     {
     }
@@ -23,7 +25,7 @@ public class EnergyGain : Event
     {
         if (RealVal == null)
         {
-            RealVal = Val * TargetUnit.EnergyRegenPrc(this);
+            RealVal = Val *(IsRawEnergy?1: TargetUnit.EnergyRegenPrc(this));
             RealVal = Math.Min((double)RealVal, TargetUnit.Stats.BaseMaxEnergy - TargetUnit.CurrentEnergy);
         }
 
