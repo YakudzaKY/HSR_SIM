@@ -23,8 +23,10 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
             if (!TriggersHandled)
             {
                 fromState = this.TargetUnit.LivingStatus;
-                if (ToState == Unit.LivingStatusEnm.WaitingForFollowUp)
-                    RemovedMods.AddRange(TargetUnit.Buffs.Where(x => x.Dispellable));
+               /* if (ToState == Unit.LivingStatusEnm.WaitingForFollowUp)
+                    RemovedMods.AddRange(TargetUnit.Buffs.Where(x => x.Dispellable));*/
+                if (ToState==Unit.LivingStatusEnm.Defeated)
+                    RemovedMods.AddRange(TargetUnit.Buffs);
             }
 
             if (!revert)

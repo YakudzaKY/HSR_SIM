@@ -20,10 +20,8 @@ public class DefaultNPCFighter : IFighter
     {
         Parent = parent;
 
-        EventHandlerProcAfter += DefaultFighter_HandleEventAfter;
-        StepHandlerProcAfter += DefaultFighter_HandleStepAfter;
-        EventHandlerProcBefore += DefaultFighter_HandleEventBefore;
-        StepHandlerProcBefore += DefaultFighter_HandleStepBefore;
+        EventHandlerProc += DefaultFighter_HandleEvent;
+        StepHandlerProc += DefaultFighter_HandleStep;
     }
     public virtual bool IsEliteUnit => false;
     public bool IsNpcUnit => true;
@@ -135,10 +133,8 @@ public class DefaultNPCFighter : IFighter
     public MechDictionary Mechanics { get; set; }
 
 
-    public IFighter.EventHandler EventHandlerProcAfter { get; set; }
-    public IFighter.StepHandler StepHandlerProcAfter { get; set; }
-    public IFighter.EventHandler EventHandlerProcBefore { get; set; }
-    public IFighter.StepHandler StepHandlerProcBefore { get; set; }
+    public IFighter.EventHandler EventHandlerProc { get; set; }
+    public IFighter.StepHandler StepHandlerProc { get; set; }
     public List<Ability> Abilities { get; set; } = new();
 
     public object Clone()
@@ -156,21 +152,12 @@ public class DefaultNPCFighter : IFighter
         return Parent.Friends.Where(x => x.IsAlive);
     }
 
-    public virtual void DefaultFighter_HandleEventAfter(Event ent)
+    public virtual void DefaultFighter_HandleEvent(Event ent)
     {
 
     }
 
-    public virtual void DefaultFighter_HandleStepAfter(Step step)
-    {
-    }
-
-    public virtual void DefaultFighter_HandleEventBefore(Event ent)
-    {
-
-    }
-
-    public virtual void DefaultFighter_HandleStepBefore(Step step)
+    public virtual void DefaultFighter_HandleStep(Step step)
     {
     }
 }

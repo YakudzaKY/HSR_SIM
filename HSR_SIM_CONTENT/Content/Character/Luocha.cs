@@ -274,7 +274,7 @@ public class Luocha : DefaultFighter
     //default all abilities we wanna cast
     public bool IWannaUseDW()
     {
-        return true;
+        return false;
         //if we have no CoL or enemy have buff
         return ultimateAbility.DefaultAbilityWannaUse() && (!ColBuffAvailable() ||
                                                             GetAliveEnemies().Count(x =>
@@ -315,7 +315,7 @@ public class Luocha : DefaultFighter
     }
 
 
-    public override void DefaultFighter_HandleEventAfter(Event ent)
+    public override void DefaultFighter_HandleEvent(Event ent)
     {
         //if unit consume hp or got attack then apply buff
 
@@ -359,7 +359,7 @@ public class Luocha : DefaultFighter
                     { TargetUnit = ent.TargetUnit, BuffToApply = e2ShieldBuff });
 
 
-        base.DefaultFighter_HandleEventAfter(ent);
+        base.DefaultFighter_HandleEvent(ent);
     }
 
 
@@ -388,7 +388,7 @@ public class Luocha : DefaultFighter
     }
 
 
-    public override void DefaultFighter_HandleStepBefore(Step step)
+    public override void DefaultFighter_HandleStep(Step step)
     {
         //check if friendly unit do action
         if (step.StepType is Step.StepTypeEnm.ExecuteAbilityFromQueue or Step.StepTypeEnm.UnitFollowUpAction
@@ -405,7 +405,7 @@ public class Luocha : DefaultFighter
         }
 
 
-        base.DefaultFighter_HandleStepBefore(step);
+        base.DefaultFighter_HandleStep(step);
     }
 
 

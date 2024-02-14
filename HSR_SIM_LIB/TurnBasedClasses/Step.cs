@@ -135,8 +135,6 @@ public class Step
         //while because new events can occur by procs
         while (ent != null)
         {
-            if (!ent.TriggersHandled&&Parent.CurrentFight != null)
-                Parent.EventHandlerProcBefore?.Invoke(ent);
             ent.ProcEvent(revert);
             ent = GetNextEvent(revert);
         }

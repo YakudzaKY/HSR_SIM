@@ -55,7 +55,7 @@ namespace HSR_SIM_CONTENT.Content.LightCones
 
         public override FighterUtils.PathType Path { get; } = FighterUtils.PathType.Nihility;
 
-        public override void DefaultLightCone_HandleEventAfter(Event ent)
+        public override void DefaultLightCone_HandleEvent(Event ent)
         {
 
             if (ent is ExecuteAbilityFinish && ent.SourceUnit == Parent.Parent && ent.ParentStep.ActorAbility.Attack && ent.ParentStep.ActorAbility.AbilityType != Ability.AbilityTypeEnm.Technique)
@@ -73,7 +73,7 @@ namespace HSR_SIM_CONTENT.Content.LightCones
 
 
             }
-            base.DefaultLightCone_HandleEventAfter(ent);
+            base.DefaultLightCone_HandleEvent(ent);
         }
 
     }

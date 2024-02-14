@@ -20,10 +20,8 @@ public interface ILightCone : ICloneable
     public int Rank { get; set; }
     public PathType Path { get; }
 
-    public EventHandler EventHandlerProcAfter { get; set; }
-    public StepHandler StepHandlerProcAfter { get; set; }
-    public EventHandler EventHandlerProcBefore { get; set; }
-    public StepHandler StepHandlerProcBefore { get; set; }
+    public EventHandler EventHandlerProc { get; set; }
+    public StepHandler StepHandlerProc { get; set; }
     public List<Ability> Abilities { get; set; }
     public void Reset();
 }

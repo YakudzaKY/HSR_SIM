@@ -25,7 +25,7 @@ internal class LongevousDisciple : DefaultRelicSet
     }
 
     private Step lastDamageStep = null;
-    public override void DefaultRelicSet_HandleEventAfter(Event ent)
+    public override void DefaultRelicSet_HandleEvent(Event ent)
     {
         //if friend unit consume our hp or got attack then apply buff
         if (Num >= 4)
@@ -47,7 +47,7 @@ internal class LongevousDisciple : DefaultRelicSet
             }
 
 
-        base.DefaultRelicSet_HandleEventAfter(ent);
+        base.DefaultRelicSet_HandleEvent(ent);
     }
 
 }

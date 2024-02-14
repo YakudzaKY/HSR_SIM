@@ -353,7 +353,7 @@ public class Blade : DefaultFighter
 
 
 
-    public override void DefaultFighter_HandleEventAfter(Event ent)
+    public override void DefaultFighter_HandleEvent(Event ent)
     {
         //if unit consume hp or got attack 
         if (ent.TargetUnit == Parent
@@ -394,7 +394,7 @@ public class Blade : DefaultFighter
             ent.ChildEvents.Add(dsValCharge);
         }
 
-        base.DefaultFighter_HandleEventAfter(ent);
+        base.DefaultFighter_HandleEvent(ent);
     }
 
 

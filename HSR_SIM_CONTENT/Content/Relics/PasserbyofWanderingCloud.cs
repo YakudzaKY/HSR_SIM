@@ -12,7 +12,7 @@ public class PasserbyofWanderingCloud : DefaultRelicSet
     {
     }
 
-    public override void DefaultRelicSet_HandleStepBefore(Step step)
+    public override void DefaultRelicSet_HandleStep(Step step)
     {
         if (Num >= 4)
             if (step.StepType == Step.StepTypeEnm.StartCombat)
@@ -28,6 +28,6 @@ public class PasserbyofWanderingCloud : DefaultRelicSet
             }
 
 
-        base.DefaultRelicSet_HandleStepBefore(step);
+        base.DefaultRelicSet_HandleStep(step);
     }
 }

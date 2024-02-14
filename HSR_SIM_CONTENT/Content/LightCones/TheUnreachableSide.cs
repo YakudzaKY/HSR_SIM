@@ -30,7 +30,7 @@ internal class TheUnreachableSide : DefaultLightCone
     public sealed override FighterUtils.PathType Path { get; } = FighterUtils.PathType.Destruction;
 
     //add buff when attacked or loose hp
-    public override void DefaultLightCone_HandleEventAfter(Event ent)
+    public override void DefaultLightCone_HandleEvent(Event ent)
     {
         //if unit consume hp or got attack then apply buff
         if ((ent.ParentStep.ActorAbility?.Parent == Parent && ent.TargetUnit == Parent.Parent && ent is ResourceDrain &&
@@ -56,6 +56,6 @@ internal class TheUnreachableSide : DefaultLightCone
             ent.ChildEvents.Add(newEvent);
         }
 
-        base.DefaultLightCone_HandleEventAfter(ent);
+        base.DefaultLightCone_HandleEvent(ent);
     }
 }

@@ -14,9 +14,7 @@ public interface IRelicSet : ICloneable
 
     public int Num { get; set; }
 
-    public EventHandler EventHandlerProcAfter { get; set; }
-    public StepHandler StepHandlerProcAfter { get; set; }
-    public EventHandler EventHandlerProcBefore { get; set; }
-    public StepHandler StepHandlerProcBefore { get; set; }
+    public EventHandler EventHandlerProc { get; set; }
+    public StepHandler StepHandlerProc { get; set; }
     public void Reset();
 }

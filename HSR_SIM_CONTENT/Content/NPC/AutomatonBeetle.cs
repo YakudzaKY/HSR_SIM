@@ -13,7 +13,7 @@ public class AutomatonBeetle : DefaultNPCFighter
     public AutomatonBeetle(Unit parent) : base(parent)
     {
         barierBuff = new Buff(Parent)
-            { EventHandlerProcAfter = MyBarrierEventHandler, Effects = new List<Effect> { new EffBarrier() } };
+            { EventHandlerProc = MyBarrierEventHandler, Effects = new List<Effect> { new EffBarrier() } };
         //Elemenet
         Element = Unit.ElementEnm.Physical;
 

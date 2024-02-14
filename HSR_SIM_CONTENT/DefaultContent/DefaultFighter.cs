@@ -41,11 +41,8 @@ public abstract class DefaultFighter : IFighter
         Mechanics = new MechDictionary();
         Mechanics.Reset();
         Parent = parent;
-        EventHandlerProcAfter += DefaultFighter_HandleEventAfter;
-        StepHandlerProcAfter += DefaultFighter_HandleStepAfter;
-        EventHandlerProcBefore += DefaultFighter_HandleEventBefore;
-        StepHandlerProcBefore += DefaultFighter_HandleStepBefore;
-
+        EventHandlerProc += DefaultFighter_HandleEvent;
+        StepHandlerProc += DefaultFighter_HandleStep;
         //no way to get ascend traces from api :/
         Atraces = ATracesEnm.A2 | ATracesEnm.A4 | ATracesEnm.A6;
 
@@ -256,10 +253,8 @@ public abstract class DefaultFighter : IFighter
     }
 
 
-    public IFighter.EventHandler EventHandlerProcAfter { get; set; }
-    public StepHandler StepHandlerProcAfter { get; set; }
-    public IFighter.EventHandler EventHandlerProcBefore { get; set; }
-    public StepHandler StepHandlerProcBefore { get; set; }
+    public IFighter.EventHandler EventHandlerProc { get; set; }
+    public StepHandler StepHandlerProc { get; set; }
     public List<Ability> Abilities { get; set; } = new();
 
     public virtual void Reset()
@@ -470,27 +465,15 @@ public abstract class DefaultFighter : IFighter
         return 0;
     }
 
-    public virtual void DefaultFighter_HandleEventAfter(Event ent)
+    public virtual void DefaultFighter_HandleEvent(Event ent)
     {
-        LightCone?.EventHandlerProcAfter?.Invoke(ent);
-        foreach (var relic in Relics) relic.EventHandlerProcAfter?.Invoke(ent);
+        LightCone?.EventHandlerProc?.Invoke(ent);
+        foreach (var relic in Relics) relic.EventHandlerProc?.Invoke(ent);
     }
 
-    public virtual void DefaultFighter_HandleStepAfter(Step step)
+    public virtual void DefaultFighter_HandleStep(Step step)
     {
-        LightCone?.StepHandlerProcAfter?.Invoke(step);
-        foreach (var relic in Relics) relic.StepHandlerProcAfter?.Invoke(step);
-    }
-
-    public virtual void DefaultFighter_HandleEventBefore(Event ent)
-    {
-        LightCone?.EventHandlerProcBefore?.Invoke(ent);
-        foreach (var relic in Relics) relic.EventHandlerProcBefore?.Invoke(ent);
-    }
-
-    public virtual void DefaultFighter_HandleStepBefore(Step step)
-    {
-        LightCone?.StepHandlerProcBefore?.Invoke(step);
-        foreach (var relic in Relics) relic.StepHandlerProcBefore?.Invoke(step);
+        LightCone?.StepHandlerProc?.Invoke(step);
+        foreach (var relic in Relics) relic.StepHandlerProc?.Invoke(step);
     }
 }

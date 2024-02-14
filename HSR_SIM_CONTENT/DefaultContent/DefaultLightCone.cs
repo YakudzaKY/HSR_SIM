@@ -14,10 +14,8 @@ public abstract class DefaultLightCone : ILightCone
         Rank = rank;
         if (Path != Parent.Path) //prevent from wrong Path lc
             return;
-        EventHandlerProcAfter += DefaultLightCone_HandleEventAfter;
-        StepHandlerProcAfter += DefaultLightCone_HandleStepAfter;
-        EventHandlerProcBefore += DefaultLightCone_HandleEventBefore;
-        StepHandlerProcBefore += DefaultLightCone_HandleStepBefore;
+        EventHandlerProc += DefaultLightCone_HandleEvent;
+        StepHandlerProc += DefaultLightCone_HandleStep;
     }
 
 
@@ -26,10 +24,8 @@ public abstract class DefaultLightCone : ILightCone
     public List<PassiveBuff> PassiveMods { get; set; } = new();
     public int Rank { get; set; }
     public abstract FighterUtils.PathType Path { get; }
-    public ILightCone.EventHandler EventHandlerProcAfter { get; set; }
-    public ILightCone.StepHandler StepHandlerProcAfter { get; set; }
-    public ILightCone.EventHandler EventHandlerProcBefore { get; set; }
-    public ILightCone.StepHandler StepHandlerProcBefore { get; set; }
+    public ILightCone.EventHandler EventHandlerProc { get; set; }
+    public ILightCone.StepHandler StepHandlerProc { get; set; }
     public List<Ability> Abilities { get; set; }
 
     public void Reset()
@@ -41,19 +37,11 @@ public abstract class DefaultLightCone : ILightCone
         throw new NotImplementedException();
     }
 
-    public virtual void DefaultLightCone_HandleEventAfter(Event ent)
+    public virtual void DefaultLightCone_HandleEvent(Event ent)
     {
     }
 
-    public virtual void DefaultLightCone_HandleStepAfter(Step step)
-    {
-    }
-
-    public virtual void DefaultLightCone_HandleEventBefore(Event ent)
-    {
-    }
-
-    public virtual void DefaultLightCone_HandleStepBefore(Step step)
+    public virtual void DefaultLightCone_HandleStep(Step step)
     {
     }
 }
