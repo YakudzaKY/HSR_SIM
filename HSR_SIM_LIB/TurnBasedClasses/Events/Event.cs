@@ -147,11 +147,16 @@ public abstract class Event : CloneClass
             TriggersHandled = true;
             //proc events only in battle
             if (ParentStep.Parent.CurrentFight != null)
-                ParentStep.Parent.EventHandlerProc?.Invoke(this);
+                ParentStep.Parent.EventHandlerProcAfter?.Invoke(this);
         }
 
         //Child events
-        foreach (var e in ChildEvents) e.ProcEvent(revert);
+        foreach (var e in ChildEvents)
+        {
+            if (!TriggersHandled&&ParentStep.Parent.CurrentFight != null)
+                ParentStep.Parent.EventHandlerProcBefore?.Invoke(this);
+            e.ProcEvent(revert);
+        }
         ChildEvents.Clear();
     }
 

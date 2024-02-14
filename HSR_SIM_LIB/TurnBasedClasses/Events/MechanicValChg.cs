@@ -15,7 +15,7 @@ public class MechanicValChg : Event
 
     public override string GetDescription()
     {
-        return $"{TargetUnit?.Name:s} mechanic counter change on  {Val:f}";
+        return $"{SourceUnit?.Name:s} mechanic counter change on  {Val:f}";
     }
 
     public override void ProcEvent(bool revert)

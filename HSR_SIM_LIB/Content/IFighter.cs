@@ -44,9 +44,12 @@ public interface IFighter : ICloneable
     /// native debuff resists defined by profile
     /// </summary>
     public List<DebuffResist> DebuffResists { get; set; }
-    public EventHandler EventHandlerProc { get; set; }
+    public EventHandler EventHandlerProcAfter { get; set; }
 
-    public StepHandler StepHandlerProc { get; set; }
+    public StepHandler StepHandlerProcAfter { get; set; }
+    public EventHandler EventHandlerProcBefore{ get; set; }
+
+    public StepHandler StepHandlerProcBefore { get; set; }
 
     /// <summary>
     /// ability list

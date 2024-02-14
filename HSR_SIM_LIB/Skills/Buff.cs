@@ -59,8 +59,10 @@ public class Buff(Unit caster, Buff reference = null) : CloneClass
     public Unit Owner { get; set; }
 
 
-    public IFighter.EventHandler EventHandlerProc { get; set; }
-    public IFighter.StepHandler StepHandlerProc { get; set; }
+    public EventHandler EventHandlerProcAfter { get; set; }
+    public StepHandler StepHandlerProcAfter { get; set; }
+    public EventHandler EventHandlerProcBefore { get; set; }
+    public StepHandler StepHandlerProcBefore { get; set; }
     public int Stack { get; set; } = 1;
 
     public int MaxStack { get; set; } = 1;

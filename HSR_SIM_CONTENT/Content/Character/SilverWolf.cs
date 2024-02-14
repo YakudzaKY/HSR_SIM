@@ -208,7 +208,6 @@ public class SilverWolf : DefaultFighter
         { Val = 5, TargetUnit = Parent };
         userBanned.Events.Add(ultimateHitLastEvent);
         //for E4
-        Mechanics.AddVal(userBanned);
         Abilities.Add(userBanned);
 
         if (Parent.Rank >= 6)
@@ -261,7 +260,7 @@ public class SilverWolf : DefaultFighter
         return -res;
     }
 
-    public override void DefaultFighter_HandleEvent(Event ent)
+    public override void DefaultFighter_HandleEventAfter(Event ent)
     {
         //if unit consume hp or got attack then apply buff
         if (Parent.Rank >= 2 && Parent.IsAlive && ent is UnitEnteringBattle)
@@ -316,32 +315,6 @@ public class SilverWolf : DefaultFighter
                     });
             }
         }
-        //E4 release
-        else if (ent is MechanicValChg mvc && mvc.AbilityValue == userBanned&&mvc.TargetUnit.IsAlive)
-        {
-            for (var i = 0; i < mvc.Val; i++)
-                ent.ChildEvents.Add(new DirectDamage(ent.ParentStep, this, Parent)
-                { TargetUnit = mvc.TargetUnit, CalculateValue = CalculateE4Dmg });
-        }
-        //E1-4
-        else if (Parent.Rank >= 1 && ent.Reference == ultimateHitLastEvent) //EnergyGain event
-        {
-            double debuffs;
-            var tarUnit = ent.ParentStep.Target;
-            debuffs = tarUnit.Buffs.Count(x => x.Type == Buff.BuffType.Debuff || x.Type == Buff.BuffType.Dot);
-            debuffs = Math.Min(debuffs, 5);
-            if (Parent.Rank >= 1)
-                for (var i = 0; i < debuffs; i++)
-                    ent.ChildEvents.Add(new EnergyGain(ent.ParentStep, this, Parent)
-                    { TargetUnit = Parent, Val = 7 });
-            if (Parent.Rank >= 4)
-                ent.ChildEvents.Add(new MechanicValChg(ent.ParentStep, this, Parent)
-                { AbilityValue = userBanned, TargetUnit = tarUnit, Val = debuffs });
-            //e1
-            ent.ChildEvents.Add(new EnergyGain(ent.ParentStep, this, Parent)
-            { TargetUnit = Parent, Val = 7 * debuffs });
-        }
-
         else if (ent.Reference == trgEnt && ent.SourceUnit == Parent)
         {
             ImplantBug(ent.TargetUnit, ent, talentDebuffChance);
@@ -353,7 +326,35 @@ public class SilverWolf : DefaultFighter
             ImplantBug(ent.TargetUnit, ent, 0.65); //fixed chance
         }
 
-        base.DefaultFighter_HandleEvent(ent);
+        base.DefaultFighter_HandleEventAfter(ent);
+    }
+
+
+    public override void DefaultFighter_HandleEventBefore(Event ent)
+    {
+       
+        //E1-4
+        if (Parent.Rank >= 1 && ent.Reference == ultimateHitLastEvent) //EnergyGain event
+        {
+            double debuffs;
+            var tarUnit = ent.ParentStep.Target;
+            debuffs = tarUnit.Buffs.Count(x => x.Type == Buff.BuffType.Debuff || x.Type == Buff.BuffType.Dot);
+            debuffs = Math.Min(debuffs, 5);
+            if (Parent.Rank >= 1)
+                for (var i = 0; i < debuffs; i++)
+                    ent.ChildEvents.Add(new EnergyGain(ent.ParentStep, this, Parent)
+                    { TargetUnit = Parent, Val = 7 });
+            if (Parent.Rank >= 4)
+                for (var i = 0; i < debuffs; i++)
+                    ent.ChildEvents.Add(new DirectDamage(ent.ParentStep, this, Parent)
+                        { TargetUnit = ent.ParentStep.Target, CalculateValue = CalculateE4Dmg });
+            //e1
+            ent.ChildEvents.Add(new EnergyGain(ent.ParentStep, this, Parent)
+            { TargetUnit = Parent, Val = 7 * debuffs });
+        }
+
+
+        base.DefaultFighter_HandleEventBefore(ent);
     }
 
     //apply talent Debuff

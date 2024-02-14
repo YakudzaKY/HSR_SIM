@@ -14,7 +14,7 @@ internal class MessengerTraversingHackerspace : DefaultRelicSet
     {
     }
 
-    public override void DefaultRelicSet_HandleStep(Step step)
+    public override void DefaultRelicSet_HandleStepBefore(Step step)
     {
         if (Num >= 4)
             if (step.StepType == Step.StepTypeEnm.UnitUltimate && step.Actor == Parent.Parent)
@@ -39,6 +39,6 @@ internal class MessengerTraversingHackerspace : DefaultRelicSet
                         step.Events.Add(eventBuff);
                     }
 
-        base.DefaultRelicSet_HandleStep(step);
+        base.DefaultRelicSet_HandleStepBefore(step);
     }
 }

@@ -12,15 +12,19 @@ public class DefaultRelicSet : IRelicSet
     {
         Num = num;
         Parent = parent;
-        EventHandlerProc += DefaultRelicSet_HandleEvent;
-        StepHandlerProc += DefaultRelicSet_HandleStep;
+        EventHandlerProcAfter += DefaultRelicSet_HandleEventAfter;
+        StepHandlerProcAfter += DefaultRelicSet_HandleStepAfter;
+        EventHandlerProcBefore+= DefaultRelicSet_HandleEventBefore;
+        StepHandlerProcBefore += DefaultRelicSet_HandleStepBefore;
     }
 
     public IFighter Parent { get; set; }
 
     public int Num { get; set; }
-    public IRelicSet.EventHandler EventHandlerProc { get; set; }
-    public IRelicSet.StepHandler StepHandlerProc { get; set; }
+    public IRelicSet.EventHandler EventHandlerProcAfter { get; set; }
+    public IRelicSet.StepHandler StepHandlerProcAfter { get; set; }
+    public IRelicSet.EventHandler EventHandlerProcBefore { get; set; }
+    public IRelicSet.StepHandler StepHandlerProcBefore { get; set; }
     public List<Ability> Abilities { get; set; }
 
     public void Reset()
@@ -32,11 +36,19 @@ public class DefaultRelicSet : IRelicSet
         throw new NotImplementedException();
     }
 
-    public virtual void DefaultRelicSet_HandleEvent(Event ent)
+    public virtual void DefaultRelicSet_HandleEventAfter(Event ent)
     {
     }
 
-    public virtual void DefaultRelicSet_HandleStep(Step step)
+    public virtual void DefaultRelicSet_HandleStepAfter(Step step)
+    {
+    }
+
+    public virtual void DefaultRelicSet_HandleEventBefore(Event ent)
+    {
+    }
+
+    public virtual void DefaultRelicSet_HandleStepBefore(Step step)
     {
     }
 }

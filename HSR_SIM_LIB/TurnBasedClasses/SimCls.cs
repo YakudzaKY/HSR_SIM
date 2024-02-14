@@ -36,12 +36,18 @@ public class SimCls : ICloneable
     /// </summary>
     public SimCls()
     {
-        EventHandlerProc += HandleEvent;
-        StepHandlerProc += HandleStep;
+        EventHandlerProcAfter += HandleEventAfter;
+        StepHandlerProcAfter += HandleStepAfter;
+        EventHandlerProcBefore += HandleEventBefore;
+        StepHandlerProcBefore += HandleStepBefore;
     }
 
-    public IFighter.EventHandler EventHandlerProc { get; set; }
-    public IFighter.StepHandler StepHandlerProc { get; set; }
+    public EventHandler EventHandlerProcAfter { get; set; }
+    public StepHandler StepHandlerProcAfter { get; set; }
+
+    public EventHandler EventHandlerProcBefore { get; set; }
+    public StepHandler StepHandlerProcBefore { get; set; }
+
 
     public Worker Parent { get; set; }
 
@@ -117,7 +123,7 @@ public class SimCls : ICloneable
         var oldTeams = newClone.Teams;
         if (oldTeams != null)
         {
-          
+
 
             newClone.Teams = new List<Team>();
             foreach (var team in oldTeams)
@@ -133,10 +139,15 @@ public class SimCls : ICloneable
             newClone.BeforeStartQueue = new();
         newClone.CurrentScenario = (Scenario)newClone.CurrentScenario.Clone();
         //rewrite handlers
-        newClone.EventHandlerProc -= this.HandleEvent;
-        newClone.StepHandlerProc -= this.HandleStep;
-        newClone.EventHandlerProc += newClone.HandleEvent;
-        newClone.StepHandlerProc += newClone.HandleStep;
+        newClone.EventHandlerProcAfter -= this.HandleEventAfter;
+        newClone.StepHandlerProcAfter -= this.HandleStepAfter;
+        newClone.EventHandlerProcAfter += newClone.HandleEventAfter;
+        newClone.StepHandlerProcAfter += newClone.HandleStepAfter;
+
+        newClone.EventHandlerProcBefore -= this.HandleEventBefore;
+        newClone.StepHandlerProcBefore -= this.HandleStepBefore;
+        newClone.EventHandlerProcBefore += newClone.HandleEventBefore;
+        newClone.StepHandlerProcBefore += newClone.HandleStepBefore;
 
         return newClone;
 
@@ -178,7 +189,7 @@ public class SimCls : ICloneable
         return battleRes != null;
     }
 
-    public void HandleEvent(Event ent)
+    public void HandleEventAfter(Event ent)
     {
         if (ent is StartWave)
             foreach (var unit in AllUnits)
@@ -221,19 +232,41 @@ public class SimCls : ICloneable
         //next handlers 
         foreach (var unit in AllUnits)
         {
-            unit.Fighter.EventHandlerProc.Invoke(ent);
-            foreach (var mod in unit.Buffs.Where(x => x.EventHandlerProc != null)) mod.EventHandlerProc?.Invoke(ent);
+            unit.Fighter.EventHandlerProcAfter.Invoke(ent);
+            foreach (var mod in unit.Buffs.Where(x => x.EventHandlerProcAfter != null)) mod.EventHandlerProcAfter?.Invoke(ent);
         }
     }
 
-    public virtual void HandleStep(Step step)
+    public void HandleEventBefore(Event ent)
+    {
+        //next handlers 
+        foreach (var unit in AllUnits)
+        {
+            unit.Fighter.EventHandlerProcBefore.Invoke(ent);
+            foreach (var mod in unit.Buffs.Where(x => x.EventHandlerProcBefore != null)) mod.EventHandlerProcBefore?.Invoke(ent);
+        }
+    }
+
+    public virtual void HandleStepAfter(Step step)
     {
         foreach (var unit in AllUnits)
         {
-            unit.Fighter.StepHandlerProc.Invoke(CurrentStep);
-            foreach (var mod in unit.Buffs.Where(x => x.StepHandlerProc != null)) mod.StepHandlerProc?.Invoke(step);
+            unit.Fighter.StepHandlerProcAfter.Invoke(CurrentStep);
+            foreach (var mod in unit.Buffs.Where(x => x.StepHandlerProcAfter != null))
+                mod.StepHandlerProcAfter?.Invoke(step);
         }
     }
+
+    public virtual void HandleStepBefore(Step step)
+    {
+        foreach (var unit in AllUnits)
+        {
+            unit.Fighter.StepHandlerProcBefore.Invoke(CurrentStep);
+            foreach (var mod in unit.Buffs.Where(x => x.StepHandlerProcBefore != null))
+                mod.StepHandlerProcBefore?.Invoke(step);
+        }
+    }
+
 
 
     /// <summary>
@@ -452,19 +485,24 @@ public class SimCls : ICloneable
         }
 
 
-        //if we doing somethings then need proced the events
+        //if we doing somethings then need proceed the events
         CurrentStep = newStep;
         Steps.Add(CurrentStep);
 
 
         if (!CurrentStep.TriggersHandled)
         {
-            CurrentStep.TriggersHandled = true;
-            StepHandlerProc?.Invoke(CurrentStep);
+
+            StepHandlerProcBefore?.Invoke(CurrentStep);
         }
 
         CurrentStep.ProcEvents();
 
+        if (!CurrentStep.TriggersHandled)
+        {
+            CurrentStep.TriggersHandled = true;
+            StepHandlerProcAfter?.Invoke(CurrentStep);
+        }
 
         return CurrentStep;
     }

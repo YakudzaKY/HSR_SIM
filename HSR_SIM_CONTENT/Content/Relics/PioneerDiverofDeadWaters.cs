@@ -48,7 +48,7 @@ namespace HSR_SIM_CONTENT.Content.Relics
                 });
         }
 
-        public override void DefaultRelicSet_HandleEvent(Event ent)
+        public override void DefaultRelicSet_HandleEventAfter(Event ent)
         {
             if (Num >= 4)
                 if (ent is ApplyBuff ab
@@ -68,7 +68,7 @@ namespace HSR_SIM_CONTENT.Content.Relics
                 }
 
 
-            base.DefaultRelicSet_HandleEvent(ent);
+            base.DefaultRelicSet_HandleEventAfter(ent);
         }
 
         private double? Calc4Pieces(Event ent)

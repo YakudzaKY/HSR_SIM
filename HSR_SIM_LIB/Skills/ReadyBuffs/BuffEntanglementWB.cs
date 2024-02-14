@@ -27,7 +27,7 @@ public class BuffEntanglementWB : Buff
                 StackAffectValue = false
             }
         };
-        EventHandlerProc += EntanglementEventHandler;
+        EventHandlerProcAfter += EntanglementEventHandler;
     }
 
     private bool UnitGotHitByAbility(List<Event> events)

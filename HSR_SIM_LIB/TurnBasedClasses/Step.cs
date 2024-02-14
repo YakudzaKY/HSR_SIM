@@ -135,6 +135,8 @@ public class Step
         //while because new events can occur by procs
         while (ent != null)
         {
+            if (!ent.TriggersHandled&&Parent.CurrentFight != null)
+                Parent.EventHandlerProcBefore?.Invoke(ent);
             ent.ProcEvent(revert);
             ent = GetNextEvent(revert);
         }
@@ -324,15 +326,21 @@ public class Step
         //all alive and NO-cced units
         foreach (var prio in Enum.GetValues(typeof(PriorityEnm)).Cast<PriorityEnm>())
             foreach (var unit in Parent.AllUnits.Where(x => !x.Controlled && x.LivingStatus != Unit.LivingStatusEnm.Defeated).OrderByDescending(x => x.Fighter.Role))//supports cast ultimate first
-                foreach (var ability in unit.Fighter.Abilities.Where(x => (x.FollowUpPriority == prio || (prio == PriorityEnm.UltimateShouldBeHere && x.AbilityType == AbilityTypeEnm.Ultimate)) &&
-                                                                          //follow up abilities only with target  or All adjacent or self ability
-                                                                          ((x.AbilityType == AbilityTypeEnm.FollowUpAction && (unit.LivingStatus == Unit.LivingStatusEnm.WaitingForFollowUp||prio!=PriorityEnm.DefeatHandler)
+                foreach (var ability in unit.Fighter.Abilities.Where(x =>
+                                            (
+                                                //Is ultimate
+                                                (prio == PriorityEnm.UltimateShouldBeHere && x.AbilityType == AbilityTypeEnm.Ultimate && x.IWannaUseIt())
+                                                ||
+                                                //Or follow up
+                                               (x.FollowUpPriority == prio && x.AbilityType == AbilityTypeEnm.FollowUpAction
+
+                                               && (unit.LivingStatus == Unit.LivingStatusEnm.WaitingForFollowUp || prio != PriorityEnm.DefeatHandler)
                                                                                                                            && (x.FollowUpTargets.Any(x => x.Key.IsAlive)
                                                                                                                                 || x.AdjacentTargets == AdjacentTargetsEnm.All
                                                                                                                                 || x.TargetType == TargetTypeEnm.Self
                                                                                                                                 )
-                                                                               ) ||
-                                                                           (x.AbilityType == AbilityTypeEnm.Ultimate && x.IWannaUseIt())) &&
+                                                                               )
+                                                ) &&
                                                                           x.Available()))
                 {
                     if (ability.AbilityType == AbilityTypeEnm.Ultimate && prio == PriorityEnm.UltimateShouldBeHere)

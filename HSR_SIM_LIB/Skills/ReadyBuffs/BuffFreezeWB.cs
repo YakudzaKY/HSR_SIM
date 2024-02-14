@@ -16,7 +16,7 @@ public class BuffFreezeWB : Buff
         Type = BuffType.Debuff;
         BaseDuration = 1;
         Effects = new List<Effect> { new EffFreeze { DoTCalculateValue = FighterUtils.CalculateShieldBrokeDmg } };
-        EventHandlerProc += FreezeEventHandler;
+        EventHandlerProcAfter += FreezeEventHandler;
     }
 
     public void FreezeEventHandler(Event ent)

@@ -170,7 +170,7 @@ public class Bronya : DefaultFighter
         return Parent.GetActionValue(ent) * GetAbilityScaling(0.15, 0.30, talentSkillLvl);
     }
 
-    public override void DefaultFighter_HandleStep(Step step)
+    public override void DefaultFighter_HandleStepBefore(Step step)
     {
         if (((step.StepType is Step.StepTypeEnm.UnitFollowUpAction && step.ActorAbility == ability) ||
              step.StepType is Step.StepTypeEnm.UnitTurnEnded) && step.Actor == Parent &&
@@ -182,10 +182,10 @@ public class Bronya : DefaultFighter
                 {  AbilityValue = windriderBullet, Val = -Mechanics.Values[windriderBullet] });
         }
 
-        base.DefaultFighter_HandleStep(step);
+        base.DefaultFighter_HandleStepBefore(step);
     }
 
-    public override void DefaultFighter_HandleEvent(Event ent)
+    public override void DefaultFighter_HandleEventAfter(Event ent)
     {
         //if E castet not on self
         if (ent.SourceUnit == Parent && ent.TargetUnit != Parent && ent is ExecuteAbilityFinish af &&
@@ -193,7 +193,7 @@ public class Bronya : DefaultFighter
             ent.ChildEvents.Add(new AdvanceAV(ent.ParentStep, this, Parent) { TargetUnit = ent.TargetUnit });
 
 
-        base.DefaultFighter_HandleEvent(ent);
+        base.DefaultFighter_HandleEventAfter(ent);
     }
 
 
