@@ -1,0 +1,43 @@
+﻿<Window x:Class="HSR_SIM_CLIENT.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HSR_SIM_CLIENT"
+        xmlns:drawing="clr-namespace:System.Drawing;assembly=System.Drawing.Common"
+        mc:Ignorable="d"
+        Title="Main menu" Height="450" Width="800">
+  
+    <Grid ShowGridLines="True">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <!--Loader-->
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <Label  FontWeight="Black" Grid.Row="0">Run single sim
+            </Label>
+            <Label Grid.Row="1" Grid.Column="0">Scenario:</Label>
+            <ComboBox Grid.Row="1" Grid.Column="1" Name="CbScenario"></ComboBox>
+            <Label Grid.Row="1" Grid.Column="2">Profile:</Label>
+            <ComboBox Grid.Row="1" Grid.Column="3" Name="CbProfile"></ComboBox>
+
+            <Button Grid.Row="3" Grid.Column="0" Name="BtnLoad" Click="BtnLoad_OnClick">Load into separate window</Button>
+            <Button Grid.Row="3" Grid.Column="1" Name="BtnRefresh" Click="BtnRefresh_OnClick">Refresh files</Button>
+
+        </Grid>
+    </Grid>
+</Window>

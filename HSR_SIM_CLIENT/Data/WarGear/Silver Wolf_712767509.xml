@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Unit name="Silver Wolf" level="80" rank="6">
+  <Stats hp="2106.2160000000003" atk="1222.4519999999998" def="923.895" spd="107" crit_rate="0.05" crit_dmg="0.5" atk_prc="0.8449600265" effect_hit_prc="0.7744000115" quantum_dmg_prc="0.568803015" hp_fix="705.5999999999999" atk_fix="484.04639499999996" crit_dmg_prc="0.6480000048" effect_res_prc="0.1209600072" def_fix="114.311376" crit_rate_prc="0.4114800006" spd_fix="25.032" def_prc="0.09720000000000001" hp_prc="0.0388800023" sp_rate_prc="0.19439401499999998" />
+  <LightCone rank="5" level="80" name="Incessant Rain" />
+  <Skill name="System Warning" level="7" max_level="9" />
+  <Skill name="Allow Changes?" level="12" max_level="15" />
+  <Skill name="User Banned" level="12" max_level="15" />
+  <Skill name="Awaiting System Response..." level="12" max_level="15" />
+  <Skill name="100606" level="0" max_level="1" />
+  <Skill name="Force Quit Program" level="1" max_level="1" />
+  <RelicSet name="Genius of Brilliant Stars" num="4" />
+  <RelicSet name="Space Sealing Station" num="2" />
+</Unit>
