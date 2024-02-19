@@ -32,6 +32,8 @@
 /packages/Magick.NET-Q16-AnyCPU.13.3.0/runtimes/linux-x64/native/Magick.Native-Q16-x64.dll.so
 /HSR_SIM_GUI/bin/
 /HSR_SIM_GUI/obj/
+/HSR_SIM_CLIENT/bin/
+/HSR_SIM_CLIENT/obj/
 /HSR_SIM_LIB/bin/
 /HSR_SIM_LIB/obj/
 /HSR_SIM.sln.DotSettings
