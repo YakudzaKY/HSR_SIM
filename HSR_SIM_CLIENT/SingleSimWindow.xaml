@@ -5,10 +5,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:HSR_SIM_CLIENT"
         mc:Ignorable="d"
-        Title="SingleSimWindow" Height="Auto" Width="1200">
-    <Grid>
+        Title="SingleSimWindow" Height="Auto" Width="1200"
+        WindowStartupLocation="CenterScreen"
+        SizeToContent="Height"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}">
+    
+    <Grid >
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
 
@@ -18,27 +23,34 @@
             <ColumnDefinition Width="2*"></ColumnDefinition>
             <ColumnDefinition Width="2*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Image Grid.ColumnSpan="3" Grid.Row="0" Width="1200" Height="600" Stretch="UniformToFill" Name="CombatImg"></Image>
-        <ScrollViewer Grid.Row="1" Grid.Column="1" >
-            <TextBlock Height="60" Width="Auto" Name="LogTextBlock"
-                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                       ScrollViewer.VerticalScrollBarVisibility="Auto">
-            </TextBlock>
-        </ScrollViewer>
-        <ScrollViewer Grid.Row="1" Grid.Column="2">
-            <TextBlock  Height="60" Width="Auto" Name="DebugTextBlock"
-                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                       ScrollViewer.VerticalScrollBarVisibility="Auto">
-            </TextBlock>
-        </ScrollViewer>
-        <Grid Grid.Row="2" Grid.Column="0">
+        <Image Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="0"  Height="600" Stretch="Fill" Name="CombatImg"></Image>
+
+        <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Height="120"  Name="LogTextBlock" MaxLines="400"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+        </TextBox>
+
+
+        <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Height="120"   Name="DebugTextBlock" MaxLines="400"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+        </TextBox>
+
+        <Grid Grid.Row="1" Grid.RowSpan="2" Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="4*"></ColumnDefinition>
                 <ColumnDefinition Width="1*"></ColumnDefinition>
                 <ColumnDefinition Width="4*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Name="BtnNext" Click="BtnNext_OnClick">Next step</Button>
-            <Button Grid.Column="2">Prev step</Button>
+            <Button Grid.Row="0" Grid.Column="2" Name="BtnNext" Click="BtnNext_OnClick">Next step</Button>
+            <Button Grid.Row="0" Grid.Column="0">Prev step</Button>
+            <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding Path=DbgMode, Mode=TwoWay}">Debug output</CheckBox>
         </Grid>
     </Grid>
 </Window>

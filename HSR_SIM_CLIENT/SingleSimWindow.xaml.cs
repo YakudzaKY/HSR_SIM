@@ -12,6 +12,7 @@ public partial class SingleSimWindow : Window
 {
     private Worker wrk;
     private bool busy = false;
+    public bool DbgMode { get; set; } = false;
 
     public SingleSimWindow()
     {
@@ -26,12 +27,19 @@ public partial class SingleSimWindow : Window
     {
         if (string.Equals(kv.Key, Constant.MsgLog))
         {
-            LogTextBlock.Text += kv.Value;
-            
+            LogTextBlock.AppendText(kv.Value);
+            if (!busy)
+                LogTextBlock.ScrollToEnd();
         }
         else if (string.Equals(kv.Key, Constant.MsgDebug))
         {
-            DebugTextBlock.Text+=kv.Value;
+            if (DbgMode)
+            {
+                DebugTextBlock.AppendText(kv.Value);
+                DebugTextBlock.AppendText(Environment.NewLine);
+                if (!busy)
+                    DebugTextBlock.ScrollToEnd();
+            }
         }
     }
 
@@ -77,6 +85,7 @@ public partial class SingleSimWindow : Window
             return bitmapimage;
         }
     }
+
     /// <summary>
     ///     For imagesCallback
     /// </summary>

@@ -6,7 +6,10 @@
         xmlns:local="clr-namespace:HSR_SIM_CLIENT"
         xmlns:drawing="clr-namespace:System.Drawing;assembly=System.Drawing.Common"
         mc:Ignorable="d"
-        Title="Main menu" Height="450" Width="800">
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        Title="Main menu" Height="450" Width="800"
+        WindowStartupLocation="CenterScreen"
+        Closing="MainWindow_OnClosing">
   
     <Grid ShowGridLines="True">
         <Grid.RowDefinitions>
@@ -31,12 +34,13 @@
             <Label  FontWeight="Black" Grid.Row="0">Run single sim
             </Label>
             <Label Grid.Row="1" Grid.Column="0">Scenario:</Label>
-            <ComboBox Grid.Row="1" Grid.Column="1" Name="CbScenario"></ComboBox>
+            <ComboBox Grid.Row="1" Grid.Column="1" Name="CbScenario" ItemsSource="{Binding Path=Scenarios, Mode=OneWay}"></ComboBox>
             <Label Grid.Row="1" Grid.Column="2">Profile:</Label>
-            <ComboBox Grid.Row="1" Grid.Column="3" Name="CbProfile"></ComboBox>
+            <ComboBox Grid.Row="1" Grid.Column="3" Name="CbProfile"  ItemsSource="{Binding Path=Profiles, Mode=OneWay}"></ComboBox>
 
             <Button Grid.Row="3" Grid.Column="0" Name="BtnLoad" Click="BtnLoad_OnClick">Load into separate window</Button>
-            <Button Grid.Row="3" Grid.Column="1" Name="BtnRefresh" Click="BtnRefresh_OnClick">Refresh files</Button>
+            <Button Grid.Row="3" Grid.Column="1" Name="BtnRefresh"  Click="BtnRefresh_OnClick">Refresh files</Button>
+            <CheckBox Grid.Row="3" Grid.Column="2" IsChecked="{Binding Path=DevMode, Mode=TwoWay}">Dev mode</CheckBox>
 
         </Grid>
     </Grid>

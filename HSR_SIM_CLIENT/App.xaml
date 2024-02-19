@@ -4,6 +4,6 @@
              xmlns:local="clr-namespace:HSR_SIM_CLIENT"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+    
     </Application.Resources>
 </Application>
