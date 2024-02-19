@@ -57,8 +57,11 @@ public partial class MainWindow : Window
     }
     private void BtnLoad_OnClick(object sender, RoutedEventArgs e)
     {
-        SimCls SimScenario = XMLLoader.LoadCombatFromXml(GetScenarioPath() + CbScenario.Text, GetProfilePath() + (string)CbProfile.Text);
-        
+  
+        SingleSimWindow singleSimWindow = new SingleSimWindow();
+        singleSimWindow.SetSim(XMLLoader.LoadCombatFromXml(GetScenarioPath() + CbScenario.Text, GetProfilePath() + (string)CbProfile.Text));
+        singleSimWindow.Show();
+
     }
 
     private void BtnRefresh_OnClick(object sender, RoutedEventArgs e)

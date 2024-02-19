@@ -1,0 +1,44 @@
+﻿<Window x:Class="HSR_SIM_CLIENT.SingleSimWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:HSR_SIM_CLIENT"
+        mc:Ignorable="d"
+        Title="SingleSimWindow" Height="Auto" Width="1200">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"></ColumnDefinition>
+            <ColumnDefinition Width="2*"></ColumnDefinition>
+            <ColumnDefinition Width="2*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Image Grid.ColumnSpan="3" Grid.Row="0" Width="1200" Height="600" Stretch="UniformToFill" Name="CombatImg"></Image>
+        <ScrollViewer Grid.Row="1" Grid.Column="1" >
+            <TextBlock Height="60" Width="Auto" Name="LogTextBlock"
+                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                       ScrollViewer.VerticalScrollBarVisibility="Auto">
+            </TextBlock>
+        </ScrollViewer>
+        <ScrollViewer Grid.Row="1" Grid.Column="2">
+            <TextBlock  Height="60" Width="Auto" Name="DebugTextBlock"
+                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                       ScrollViewer.VerticalScrollBarVisibility="Auto">
+            </TextBlock>
+        </ScrollViewer>
+        <Grid Grid.Row="2" Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="4*"></ColumnDefinition>
+                <ColumnDefinition Width="1*"></ColumnDefinition>
+                <ColumnDefinition Width="4*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Name="BtnNext" Click="BtnNext_OnClick">Next step</Button>
+            <Button Grid.Column="2">Prev step</Button>
+        </Grid>
+    </Grid>
+</Window>
