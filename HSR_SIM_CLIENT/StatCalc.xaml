@@ -1,0 +1,47 @@
+﻿<Window x:Class="HSR_SIM_CLIENT.StatCalc"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:local="clr-namespace:HSR_SIM_CLIENT"
+        mc:Ignorable="d"
+        Title="Stat Calc" Height="1000" Width="800"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="1*"></RowDefinition>
+            <RowDefinition Height="20*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <Label Grid.Row="0" Content="Scenario:" />
+                <ComboBox Grid.Row="1"
+                          ItemsSource="{Binding Path=Scenarios, Mode=OneWay}" />
+                <Label Grid.Row="2" Content="Profile:" />
+                <ComboBox Grid.Row="3" 
+                          ItemsSource="{Binding Path=Profiles, Mode=OneWay}" />
+                <Label Grid.Row="4" Content="Threads:" />
+                <TextBox Grid.Row="5"  PreviewTextInput="NumberValidationTextBox"></TextBox>
+            </Grid>
+
+        </Grid>
+        <ProgressBar Grid.Row="1"></ProgressBar>
+    </Grid>
+</Window>

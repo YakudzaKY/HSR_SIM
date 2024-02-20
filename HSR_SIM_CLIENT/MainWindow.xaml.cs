@@ -126,4 +126,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         SaveIni();
     }
+
+    private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+    {
+        //open stat calc
+        new StatCalc().Show();
+    }
 }
