@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:HSR_SIM_CLIENT"
         mc:Ignorable="d"
         Title="Get Decision" Height="300" Width="400"
-        DataContext="{Binding RelativeSource={RelativeSource Self}}">
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="5*"></RowDefinition>
@@ -14,11 +15,11 @@
             <RowDefinition Height="1*"></RowDefinition>
             <RowDefinition Height="1*"></RowDefinition>
         </Grid.RowDefinitions>
-        <Label Grid.Row="0"></Label>
+        <Label Grid.Row="0" Content="{Binding Path=Description, Mode=OneWay}"></Label>
         <Label Grid.Row="1">Chose item:</Label>
         <ComboBox Grid.Row="2" ItemsSource="{Binding Items, Mode=OneWay}"
-                  SelectedIndex="{Binding ItemIndex, Mode=OneWayToSource}">
+                  SelectedIndex="{Binding ItemIndex, Mode=TwoWay}">
         </ComboBox>
-        <Button Grid.Row="3">OK</Button>
+        <Button Grid.Row="3" Click="ButtonBase_OnClick">OK</Button>
     </Grid>
 </Window>

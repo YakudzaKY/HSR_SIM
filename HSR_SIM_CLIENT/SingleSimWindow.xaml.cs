@@ -51,7 +51,9 @@ public partial class SingleSimWindow : Window
     /// <returns></returns>
     public int WorkerCallBackGetDecision(string[] items, string description)
     {
-        throw new NotImplementedException();
+        GetDecision getDecision = new GetDecision(items,description);
+        getDecision.ShowDialog();
+        return getDecision.ItemIndex;
     }
 
     /// <summary>
