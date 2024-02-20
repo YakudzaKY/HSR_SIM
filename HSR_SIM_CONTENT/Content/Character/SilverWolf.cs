@@ -297,9 +297,7 @@ public class SilverWolf : DefaultFighter
                 for (var i = 0; i < debuffs; i++)
                     ent.ChildEvents.Add(new DirectDamage(ent.ParentStep, this, Parent)
                         { TargetUnit = ent.ParentStep.Target, CalculateValue = CalculateE4Dmg });
-            //e1
-            ent.ChildEvents.Add(new EnergyGain(ent.ParentStep, this, Parent)
-                { TargetUnit = Parent, Val = 7 * debuffs });
+
         }
 
         else if (ent is ApplyBuff ab && ent.SourceUnit == Parent)

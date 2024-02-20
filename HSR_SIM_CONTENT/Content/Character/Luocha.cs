@@ -274,7 +274,6 @@ public class Luocha : DefaultFighter
     //default all abilities we wanna cast
     public bool IWannaUseDW()
     {
-        return false;
         //if we have no CoL or enemy have buff
         return ultimateAbility.DefaultAbilityWannaUse() && (!ColBuffAvailable() ||
                                                             GetAliveEnemies().Count(x =>

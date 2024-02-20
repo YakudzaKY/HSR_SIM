@@ -11,13 +11,10 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events
     /// <summary>
     /// check target condition then proceed with defeat event 
     /// </summary>
-    internal class CheckForDefeat:Event
+    internal class CheckForDefeat(Step parentStep, ICloneable source, Unit sourceUnit)
+        : Event(parentStep, source, sourceUnit)
     {
         public KeyValuePair<Unit, Unit> TargetSourcePair { get; init; }
-        public CheckForDefeat(Step parentStep, ICloneable source, Unit sourceUnit) : base(parentStep, source, sourceUnit)
-        {
-           
-        }
 
         public override void ProcEvent(bool revert)
         {

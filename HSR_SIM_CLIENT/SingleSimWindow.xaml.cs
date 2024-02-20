@@ -28,6 +28,7 @@ public partial class SingleSimWindow : Window
         if (string.Equals(kv.Key, Constant.MsgLog))
         {
             LogTextBlock.AppendText(kv.Value);
+            LogTextBlock.AppendText(Environment.NewLine);
             if (!busy)
                 LogTextBlock.ScrollToEnd();
         }
@@ -103,5 +104,10 @@ public partial class SingleSimWindow : Window
     private void BtnNext_OnClick(object sender, RoutedEventArgs e)
     {
         wrk?.MoveStep();
+    }
+
+    private void BtnPrev_OnClick(object sender, RoutedEventArgs e)
+    {
+        wrk?.MoveStep(true);
     }
 }

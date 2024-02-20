@@ -5,7 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:HSR_SIM_CLIENT"
         mc:Ignorable="d"
-        Title="SingleSimWindow" Height="Auto" Width="1200"
+        Title="SingleSimWindow" Height="Auto" Width="1250"
         WindowStartupLocation="CenterScreen"
         SizeToContent="Height"
         DataContext="{Binding RelativeSource={RelativeSource Self}}">
@@ -23,7 +23,7 @@
             <ColumnDefinition Width="2*"></ColumnDefinition>
             <ColumnDefinition Width="2*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Image Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="0"  Height="600" Stretch="Fill" Name="CombatImg"></Image>
+        <Image Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="0"  Height="600"  Name="CombatImg"></Image>
 
         <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Height="120"  Name="LogTextBlock" MaxLines="400"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -49,7 +49,7 @@
                 <ColumnDefinition Width="4*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <Button Grid.Row="0" Grid.Column="2" Name="BtnNext" Click="BtnNext_OnClick">Next step</Button>
-            <Button Grid.Row="0" Grid.Column="0">Prev step</Button>
+            <Button Grid.Row="0" Grid.Column="0" Name="BtnPrev" Click="BtnPrev_OnClick">Prev step</Button>
             <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding Path=DbgMode, Mode=TwoWay}">Debug output</CheckBox>
         </Grid>
     </Grid>

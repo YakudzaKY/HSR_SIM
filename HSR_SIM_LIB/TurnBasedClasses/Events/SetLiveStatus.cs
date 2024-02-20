@@ -8,23 +8,20 @@ using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events
 {
-    public class SetLiveStatus : Event
+    public class SetLiveStatus(Step parentStep, ICloneable source, Unit sourceUnit)
+        : Event(parentStep, source, sourceUnit)
     {
         public Unit.LivingStatusEnm ToState { get; set; }
         private Unit.LivingStatusEnm fromState;
         public List<Buff> RemovedMods { get; set; } = new();
-        public SetLiveStatus(Step parentStep, ICloneable source, Unit sourceUnit) : base(parentStep, source, sourceUnit)
-        {
-
-        }
 
         public override void ProcEvent(bool revert)
         {
             if (!TriggersHandled)
             {
                 fromState = this.TargetUnit.LivingStatus;
-               /* if (ToState == Unit.LivingStatusEnm.WaitingForFollowUp)
-                    RemovedMods.AddRange(TargetUnit.Buffs.Where(x => x.Dispellable));*/
+                if (ToState == Unit.LivingStatusEnm.WaitingForFollowUp)
+                    RemovedMods.AddRange(TargetUnit.Buffs.Where(x => x.Dispellable));
                 if (ToState==Unit.LivingStatusEnm.Defeated)
                     RemovedMods.AddRange(TargetUnit.Buffs);
             }

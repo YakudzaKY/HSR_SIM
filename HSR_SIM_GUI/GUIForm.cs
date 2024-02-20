@@ -116,7 +116,7 @@ public partial class GUIForm : Form
     /// <summary>
     ///     For imagesCallback
     /// </summary>
-    /// <param name="kv"></param>
+    /// <param name="combatImg"> Rendered image</param>
     public void WorkerCallBackImages(Bitmap combatImg)
     {
         if (combatImg != null)

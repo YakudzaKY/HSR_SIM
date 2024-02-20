@@ -7,13 +7,8 @@ using HSR_SIM_LIB.UnitStuff;
 namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 
 // unit got defeated
-public class Defeat : Event
+public class Defeat(Step parent, ICloneable source, Unit sourceUnit) : Event(parent, source, sourceUnit)
 {
-    public Defeat(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
-    {
-
-    }
-
     public override string GetDescription()
     {
         return $"{TargetUnit.Name} got defeated";

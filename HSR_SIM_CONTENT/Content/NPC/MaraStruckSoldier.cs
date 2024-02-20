@@ -117,7 +117,7 @@ public class MaraStruckSoldier : DefaultNPCFighter
 
     private bool RejuvenateAvailable()
     {
-        return  Parent.Buffs.Any(x => x.Reference == uniqueBuff);
+        return  Parent.Buffs.Any(x => x.Reference == uniqueBuff)||Parent.LivingStatus==Unit.LivingStatusEnm.WaitingForFollowUp;
     }
 
     public double? CalcMyAttack(Event ent)
