@@ -1,13 +1,14 @@
-﻿<Window x:Class="HSR_SIM_CLIENT.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d"
-        DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="Main menu" Height="450" Width="800"
-        WindowStartupLocation="CenterScreen"
-        Closing="MainWindow_OnClosing">
+﻿<mah:MetroWindow x:Class="HSR_SIM_CLIENT.MainWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                 mc:Ignorable="d"
+                 DataContext="{Binding RelativeSource={RelativeSource Self}}"
+                 Title="Main menu" Height="450" Width="800"
+                 WindowStartupLocation="CenterScreen"   
+                 Closing="MainWindow_OnClosing">
 
     <Grid ShowGridLines="True" >
         <Grid.RowDefinitions>
@@ -53,4 +54,4 @@
             </Button>
         </Grid>
     </Grid>
-</Window>
+</mah:MetroWindow>

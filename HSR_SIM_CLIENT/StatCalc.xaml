@@ -1,14 +1,15 @@
-﻿<Window x:Class="HSR_SIM_CLIENT.StatCalc"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-        xmlns:local="clr-namespace:HSR_SIM_CLIENT"
-        mc:Ignorable="d"
-        Title="Stat Calc" Height="1000" Width="800"
-        DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        WindowStartupLocation="CenterScreen">
+﻿<mah:MetroWindow x:Class="HSR_SIM_CLIENT.StatCalc"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                 xmlns:local="clr-namespace:HSR_SIM_CLIENT"
+                 xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                 mc:Ignorable="d"
+                 Title="Stat Calc" Height="1000" Width="800"
+                 DataContext="{Binding RelativeSource={RelativeSource Self}}"
+                 WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -44,4 +45,4 @@
         </Grid>
         <ProgressBar Grid.Row="1"></ProgressBar>
     </Grid>
-</Window>
+</mah:MetroWindow>

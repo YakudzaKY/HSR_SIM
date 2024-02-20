@@ -4,7 +4,7 @@ using System.Windows.Input;
 
 namespace HSR_SIM_CLIENT;
 
-public partial class StatCalc : Window
+public partial class StatCalc 
 {
     public StatCalc()
     {

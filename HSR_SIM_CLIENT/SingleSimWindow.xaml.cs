@@ -8,7 +8,7 @@ using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_CLIENT;
 
-public partial class SingleSimWindow : Window
+public partial class SingleSimWindow 
 {
     private Worker wrk;
     private bool busy = false;
