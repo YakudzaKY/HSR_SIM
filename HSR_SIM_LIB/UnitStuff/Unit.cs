@@ -453,7 +453,7 @@ public class Unit : CloneClass
         foreach (var effect in buff.Effects) effect.OnApply(ent, buff);
     }
 
-    public int ApplyBuff(Event ent, Buff buff)
+    public int ApplyBuff(Event ent, Buff buff, out Buff appliedBuff)
     {
         int res = 0;
         var srchBuff = Buffs.FirstOrDefault(x =>
@@ -506,6 +506,8 @@ public class Unit : CloneClass
             {
                 //copy buff
                 srchBuff = (Buff)buff.Clone();
+                //and mark as Do not clone to avoid cloning in undo->redo steps
+                srchBuff.DoNotClone = true;
             }
 
             else
@@ -522,6 +524,7 @@ public class Unit : CloneClass
         //reset duration
         srchBuff.IsOld = false; //renew the flag
         srchBuff.DurationLeft = srchBuff.BaseDuration;
+        appliedBuff = srchBuff;
         return res;
     }
 
@@ -529,16 +532,16 @@ public class Unit : CloneClass
     ///     remove buff by ref. Return buff was found or not
     /// </summary>
     /// <param name="buff"></param>
-    public bool RemoveBuff(Event ent, Buff buff)
+    public  Buff  RemoveBuff(Event ent, Buff buff)
     {
-        bool res = false;
+        Buff res = null;
         if (Buffs.Any(x => x.Reference == (buff.Reference ?? buff)))
         {
             var foundBuff = Buffs.First(x => x.Reference == (buff.Reference ?? buff));
             foreach (var effect in foundBuff.Effects) effect.BeforeRemove(ent, foundBuff);
             Buffs.Remove(foundBuff);
             foreach (var effect in foundBuff.Effects) effect.OnRemove(ent, foundBuff);
-            res = true;
+            res = foundBuff;
         }
         ResetCondition(ConditionBuff.ConditionCheckParam.Buff);
         if (buff.Type != Buff.BuffType.Buff) ResetCondition(ConditionBuff.ConditionCheckParam.AnyDebuff);

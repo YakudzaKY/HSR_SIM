@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -18,6 +19,7 @@ public class ApplyBuff : BuffEventTemplate
     {
     }
 
+    private Buff appliedBuff;
 
     public override string GetDescription()
     {
@@ -36,7 +38,8 @@ public class ApplyBuff : BuffEventTemplate
 
             if (!revert)
             {
-                stacksApplied = TargetUnit.ApplyBuff(this, BuffToApply);
+                
+                stacksApplied = TargetUnit.ApplyBuff(this, appliedBuff??BuffToApply, out appliedBuff);
 
             }
             else
