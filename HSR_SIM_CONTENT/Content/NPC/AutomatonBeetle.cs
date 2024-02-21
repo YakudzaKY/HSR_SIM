@@ -40,6 +40,8 @@ public class AutomatonBeetle : DefaultNPCFighter
         myAttackAbility.Events.Add(new EnergyGain(null, this, Parent) { Val = 15 });
         myAttackAbility.Events.Add(new ApplyBuff(null, this, Parent)
             { TargetUnit = Parent, BuffToApply = barierBuff });
+        myAttackAbility.Events.Add(new ApplyBuff(null, this, Parent)
+            { TargetUnit = Parent, BuffToApply = barierBuff });
         Abilities.Add(myAttackAbility);
     }
 

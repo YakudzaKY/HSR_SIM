@@ -23,10 +23,11 @@ public class RemoveBuff(Step parent, ICloneable source, Unit sourceUnit) : BuffE
         if (!revert)
         {
             buffRemoved = TargetUnit.RemoveBuff(this, BuffToApply);
-            if (buffRemoved == null)
+            //err if buff not found on alive target
+            if (buffRemoved == null && TargetUnit.LivingStatus != Unit.LivingStatusEnm.Defeated)
                 throw new Exception("Cant find buff to remove:(");
         }
-        else
+        else if (buffRemoved != null)
             TargetUnit.RestoreBuff(this, buffRemoved);
 
         base.ProcEvent(revert);

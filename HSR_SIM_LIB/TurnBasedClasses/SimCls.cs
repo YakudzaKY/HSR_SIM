@@ -27,9 +27,8 @@ public class SimCls : ICloneable
 
     public List<PreLaunchOption> PreLaunch;
 
-    //ForgottenHall Cycles
+    private List<Step> steps = new();
 
-    public List<Step> steps = new();
 
     /// <summary>
     ///     constructor

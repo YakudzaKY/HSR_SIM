@@ -120,14 +120,14 @@ public class Worker
     /// </summary>
     public void MoveStep(bool goBack = false, int stepcount = 1, bool forceNewSteps = false)
     {
-        var stepndx = Sim?.steps?.IndexOf(Sim.CurrentStep) ?? 0;
+        var stepndx = Sim?.Steps?.IndexOf(Sim.CurrentStep) ?? 0;
         var oldStep = Sim?.CurrentStep;
         //delete future steps
-        if (forceNewSteps && Sim != null && Sim.steps?.Count() > 1)
-            for (var i = Sim?.steps.Count() ?? 0; i > stepndx + 1; i--)
+        if (forceNewSteps && Sim != null && Sim.Steps?.Count() > 1)
+            for (var i = Sim?.Steps.Count() ?? 0; i > stepndx + 1; i--)
             {
-                Sim.steps[i - 1] = null;
-                Sim.steps.Remove(Sim.steps[i - 1]);
+                Sim.Steps[i - 1] = null;
+                Sim.Steps.Remove(Sim.Steps[i - 1]);
             }
 
         if (goBack)
@@ -139,18 +139,18 @@ public class Worker
                 LogStepDescription(Sim.CurrentStep, true);
                 Sim.CurrentStep.ProcEvents(true, true);
                 stepndx -= 1;
-                Sim.CurrentStep = Sim.steps[stepndx];
+                Sim.CurrentStep = Sim.Steps[stepndx];
             }
         else //go forward
             for (var i = 0; i < stepcount || stepcount == -1; i++)
             {
                 stepndx += 1;
-                if (Sim?.steps.Count >= stepndx + 1)
+                if (Sim?.Steps.Count >= stepndx + 1)
                 {
                     replay = true;
-                    Sim.CurrentStep = Sim.steps[stepndx];
-                    Sim.steps[stepndx].ProcEvents(false, true);
-                    LogStepDescription(Sim.steps[stepndx]);
+                    Sim.CurrentStep = Sim.Steps[stepndx];
+                    Sim.Steps[stepndx].ProcEvents(false, true);
+                    LogStepDescription(Sim.Steps[stepndx]);
                 }
                 else
                 {
@@ -178,7 +178,7 @@ public class Worker
 
 
                         //if no changes at step then scenario completed
-                        if (stepndx > 0 && Sim?.CurrentStep == Sim?.steps[stepndx - 1]) break;
+                        if (stepndx > 0 && Sim?.CurrentStep == Sim?.Steps[stepndx - 1]) break;
                     }
                     else
                     {
