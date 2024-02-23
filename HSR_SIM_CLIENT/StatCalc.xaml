@@ -7,21 +7,27 @@
                  xmlns:local="clr-namespace:HSR_SIM_CLIENT"
                  xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                  mc:Ignorable="d"
-                 Title="Stat Calc" Height="1000" Width="800"
+                 Title="Stat Calc" Height="1000" Width="Auto"
                  DataContext="{Binding RelativeSource={RelativeSource Self}}"
-                 WindowStartupLocation="CenterScreen">
+                 WindowStartupLocation="CenterScreen" Closing="StatCalc_OnClosing">
+    <mah:MetroWindow.Resources>
+        <Style TargetType="mah:MetroTabItem">
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+    </mah:MetroWindow.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="1*"></RowDefinition>
-            <RowDefinition Height="20*"></RowDefinition>
+            <RowDefinition Height="15"></RowDefinition>
+            <RowDefinition Height="25*"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="10"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"> </ColumnDefinition>
+
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
@@ -31,16 +37,105 @@
                     <RowDefinition></RowDefinition>
                     <RowDefinition></RowDefinition>
                     <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
                 </Grid.RowDefinitions>
                 <Label Grid.Row="0" Content="Scenario:" />
                 <ComboBox Grid.Row="1"
+                          Name="CbScenario"
                           ItemsSource="{Binding Path=Scenarios, Mode=OneWay}" />
-                <Label Grid.Row="2" Content="Profile:" />
-                <ComboBox Grid.Row="3" 
-                          ItemsSource="{Binding Path=Profiles, Mode=OneWay}" />
+                <Label Grid.Row="2" Content="Iterations:" />
+                <TextBox Grid.Row="3" PreviewTextInput="NumberValidationTextBox"
+                         Text="{Binding IterationsCnt ,Mode=TwoWay}">
+                </TextBox>
                 <Label Grid.Row="4" Content="Threads:" />
-                <TextBox Grid.Row="5"  PreviewTextInput="NumberValidationTextBox"></TextBox>
+                <TextBox Grid.Row="5" PreviewTextInput="NumberValidationTextBox" Text="{Binding ThrCnt ,Mode=TwoWay}"></TextBox>
+                <Grid Grid.Row="6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Click="ButtonBase_OnClick"
+                            IsEnabled="{Binding Path=!WorkInProgress,Mode=OneWay}">
+                        Go
+                    </Button>
+                    <Button Grid.Column="1" IsEnabled="{Binding Path=WorkInProgress,Mode=OneWay}">Cancel</Button>
+
+                </Grid>
             </Grid>
+            <ListBox Grid.Column="1" ItemsSource="{Binding Profiles}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox Content="{Binding Name}"
+                                  IsChecked="{Binding IsSelected}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <GridSplitter Grid.Column="2"></GridSplitter>
+            <mah:MetroTabControl Grid.Column="3" Name="tbCalcType">
+                <mah:MetroTabItem x:Name="tbiStatImpact" Header="Stat impact calc">
+
+
+                    <mah:MetroTabItem.Content>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <Label Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="0">Character:</Label>
+                                <ComboBox Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="0"></ComboBox>
+                                <Label Grid.Row="2"  Grid.Column="0">Upgrades per iteration:</Label>
+                                <TextBox Grid.Row="3" Grid.Column="0" PreviewTextInput="NumberValidationTextBox" Text="{Binding ThrCnt ,Mode=TwoWay}"></TextBox>
+                                <Label Grid.Row="2"  Grid.Column="1">Stat to replace:</Label>
+                                <ComboBox Grid.Row="3" Grid.Column="1"></ComboBox>
+                                <Label Grid.Row="4"  Grid.Column="0">Upgrades iterations:</Label>
+                                <TextBox Grid.Row="5" Grid.Column="0" PreviewTextInput="NumberValidationTextBox" Text="{Binding ThrCnt ,Mode=TwoWay}"></TextBox>
+                            </Grid>
+                            <StackPanel Grid.Column="1" Orientation="Vertical">
+                                <Label>Load stat table:</Label>
+                                <Button>sub stats</Button>
+                                <Button>main stats</Button>
+                            </StackPanel>
+                            <ListBox Grid.Column="2" ItemsSource="{Binding Profiles}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox Content="{Binding Name}"
+                                                  IsChecked="{Binding IsSelected}" />
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                            <DataGrid Grid.Column="3"></DataGrid>
+                        </Grid>
+                    </mah:MetroTabItem.Content>
+
+                </mah:MetroTabItem>
+                <mah:MetroTabItem Name="tbiGearRepalce">
+                    <mah:MetroTabItem.Header>
+                        GearReplaceCalc
+                    </mah:MetroTabItem.Header>
+                    <mah:MetroTabItem.Content>
+                        <StackPanel>
+                            <RadioButton IsChecked="True">123</RadioButton>
+                            <RadioButton>123</RadioButton>
+                            <RadioButton>123</RadioButton>
+                        </StackPanel>
+                    </mah:MetroTabItem.Content>
+                </mah:MetroTabItem>
+            </mah:MetroTabControl>
 
         </Grid>
         <ProgressBar Grid.Row="1"></ProgressBar>

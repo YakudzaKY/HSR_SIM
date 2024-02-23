@@ -94,7 +94,7 @@ internal class OcrUtils
         SetForegroundWindow(hsrWindow);
         WaitForActiveWindow(hsrWindow, 5);
         var hsrScreen = GraphicsCls.ConvertBlackAndWhite(CaptureScreen(false));
-        var loc = "rus";//todo: into settings ?
+        var loc = "rus"; //todo: into settings ?
         //init engines LSTM for text, Legacy for numbers
         var engine = new TesseractEngine(AppDomain.CurrentDomain.BaseDirectory + "tessdata", loc, EngineMode.LstmOnly);
         var engineNumbers = new TesseractEngine(AppDomain.CurrentDomain.BaseDirectory + "tessdata", loc,
@@ -136,7 +136,6 @@ internal class OcrUtils
 
                 using (var img = PixConverter.ToPix(miniHsrScreen))
                 {
-                    
                     var page = engine.Process(img);
                     var pageNumbers = engineNumbers.Process(img);
                     var text = page.GetText();
@@ -155,27 +154,27 @@ internal class OcrUtils
                     xDoc.Load($"{AppDomain.CurrentDomain.BaseDirectory}\\tessdata\\{loc}.xml");
                     var xRoot = xDoc.DocumentElement;
 
-                    Dictionary<string, string> replacers = new Dictionary<string, string>();
-                    Dictionary<string, string> valFixers = new Dictionary<string, string>();
+                    var replacers = new Dictionary<string, string>();
+                    var valFixers = new Dictionary<string, string>();
                     //parse replacers
                     foreach (XmlElement xnode in xRoot.SelectNodes("replacer"))
-                    {
-                        replacers.Add(xnode.Attributes.GetNamedItem("from").Value.Trim(), xnode.Attributes.GetNamedItem("to")?.Value.Trim());
-                    }
+                        replacers.Add(xnode.Attributes.GetNamedItem("from").Value.Trim(),
+                            xnode.Attributes.GetNamedItem("to")?.Value.Trim());
                     foreach (XmlElement xnode in xRoot.SelectNodes("valFix"))
-                    {
-                        valFixers.Add(xnode.Attributes.GetNamedItem("from").Value.Trim(), xnode.Attributes.GetNamedItem("to")?.Value.Trim());
-                    }
+                        valFixers.Add(xnode.Attributes.GetNamedItem("from").Value.Trim(),
+                            xnode.Attributes.GetNamedItem("to")?.Value.Trim());
 
                     if (xRoot != null)
                         for (var i = 0; i < strings.Count; i++)
+                        {
+                            bool replacerFound = false;
                             //parse all items
-                            foreach (KeyValuePair<string, string> replacer in replacers)
+                            foreach (var replacer in replacers)
                             {
                                 var wordFrom = replacer.Key;
                                 var wordTo = replacer.Value;
 
-                                var wordNdx = strings[i].IndexOf(wordFrom);
+                                var wordNdx = strings[i].IndexOf(wordFrom, StringComparison.Ordinal);
                                 if (wordNdx >= 0)
                                 {
                                     var rx = new Regex("[0-9]");
@@ -188,18 +187,21 @@ internal class OcrUtils
                                         val = strings[i]
                                             .Substring(rx.Matches(strings[i]).First(x => x.Index > wordNdx).Index)
                                             .Replace(" ", string.Empty);
-                                    foreach (KeyValuePair<string, string> vlFix in valFixers)
-                                    {
-                                        val = val.Replace(vlFix.Key, vlFix.Value);
-                                    }
+                                    foreach (var vlFix in valFixers) val = val.Replace(vlFix.Key, vlFix.Value);
                                     var key = wordTo + (val.EndsWith("%") ? "_prc" : "_fix");
 
-
+                                    replacerFound = true;
                                     res.Add(res.Count,
                                         new RStatWordRec { Key = key, Value = val, StatMode = itemRectMode });
+                                    //key got replaced then exit foreach
                                     break;
                                 }
                             }
+                            //if item was not found in replacers
+                            if (!replacerFound)
+                                res.Add(res.Count,
+                                    new RStatWordRec { Key = strings[i], Value = stringsNumbers[i], StatMode = itemRectMode });
+                        }
 
                     page.Dispose();
                     pageNumbers.Dispose();
@@ -212,7 +214,6 @@ internal class OcrUtils
         engineNumbers.Dispose();
         return res;
     }
-
 
 
     public record RStatWordRec

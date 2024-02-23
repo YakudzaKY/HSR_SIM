@@ -16,6 +16,10 @@ public class RemoveBuff(Step parent, ICloneable source, Unit sourceUnit) : BuffE
     }
 
     private Buff buffRemoved;
+    /// <summary>
+    /// Ignore the not found error
+    /// </summary>
+    public bool NotFoundIgnore { get; set; } = false;
 
     public override void ProcEvent(bool revert)
     {
@@ -24,7 +28,7 @@ public class RemoveBuff(Step parent, ICloneable source, Unit sourceUnit) : BuffE
         {
             buffRemoved = TargetUnit.RemoveBuff(this, BuffToApply);
             //err if buff not found on alive target
-            if (buffRemoved == null && TargetUnit.LivingStatus != Unit.LivingStatusEnm.Defeated)
+            if (buffRemoved == null && TargetUnit.LivingStatus != Unit.LivingStatusEnm.Defeated&&!NotFoundIgnore)
                 throw new Exception("Cant find buff to remove:(");
         }
         else if (buffRemoved != null)
@@ -32,4 +36,6 @@ public class RemoveBuff(Step parent, ICloneable source, Unit sourceUnit) : BuffE
 
         base.ProcEvent(revert);
     }
+
+
 }

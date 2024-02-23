@@ -58,7 +58,9 @@ public class AutomatonBeetle : DefaultNPCFighter
             RemoveBuff newEvent = new(ent.ParentStep, this, Parent)
             {
                 TargetUnit = Parent,
-                BuffToApply = barierBuff
+                BuffToApply = barierBuff,
+                NotFoundIgnore =true//Because this event at bottom of list (waiting all attack hits barrier)
+                                 //a lot of RemoveBuff events cant be generated
             };
             ent.ParentStep.Events.Add(newEvent);
         }
