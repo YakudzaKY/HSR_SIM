@@ -1,4 +1,5 @@
-﻿using HSR_SIM_LIB.Fighters;
+﻿using HSR_SIM_CONTENT.DefaultContent;
+using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
@@ -11,15 +12,15 @@ namespace HSR_SIM_CONTENT.Content.Character;
 
 public class Blade : DefaultFighter
 {
-    private readonly Ability deathSentence; //ultimate
+    private readonly Ability? deathSentence; //ultimate
 
 
     private readonly Event forestMainTrgtHit; //last hit in main target by this ability(for event handlers)
-    private readonly Ability forestOfSwords; //enchanced basic
+    private readonly Ability? forestOfSwords; //enchanced basic
     private readonly Buff hellscapeBuff; //E buff
 
 
-    private readonly Ability shuhuGift; //passive ability
+    private readonly Ability? shuhuGift; //passive ability
 
     private readonly double shuHuMaxCnt; // passive max counter
 
@@ -39,7 +40,7 @@ public class Blade : DefaultFighter
 
     private readonly int ssSkillLvl;
 
-    public Blade(Unit parent) : base(parent)
+    public Blade(Unit? parent) : base(parent)
     {
         Parent.Stats.BaseMaxEnergy = 130;
 
@@ -114,7 +115,7 @@ public class Blade : DefaultFighter
 
         //basic
 
-        Ability shardSword;
+        Ability? shardSword;
         shardSword = new Ability(this)
         {
             AbilityType = AbilityTypeEnm.Basic,
@@ -267,7 +268,7 @@ public class Blade : DefaultFighter
         Abilities.Add(karmaWind);
 
 
-        Ability Hellscape;
+        Ability? Hellscape;
         //Hellscape
         Hellscape = new Ability(this)
         {
@@ -303,7 +304,7 @@ public class Blade : DefaultFighter
         //=====================
         //Ascended Traces
         //=====================
-        if (Atraces.HasFlag(ATracesEnm.A2))
+        if (ATraces.HasFlag(ATracesEnm.A2))
             ConditionBuffs.Add(new ConditionBuff(Parent)
             {
                 AppliedBuff = new Buff(Parent)
@@ -319,7 +320,7 @@ public class Blade : DefaultFighter
                     Value = 0.5
                 }
             });
-        if (Atraces.HasFlag(ATracesEnm.A6))
+        if (ATraces.HasFlag(ATracesEnm.A6))
             PassiveBuffs.Add(new PassiveBuff(Parent)
             {
                 AppliedBuff = new Buff(Parent)
@@ -346,14 +347,13 @@ public class Blade : DefaultFighter
      * if 2+ turns left we dont need SP.
      * duration 2= turn+ next from bronya turn or double turn between support turn
      */
-    public override double WillSpend()
+    protected override double WillSpend()
     {
         return (Parent.Buffs.FirstOrDefault(x => x.Reference == hellscapeBuff)?.DurationLeft ?? 0) > 2 ? 0 : 1;
     }
 
 
-
-    public override void DefaultFighter_HandleEvent(Event ent)
+    protected override void DefaultFighter_HandleEvent(Event ent)
     {
         //if unit consume hp or got attack 
         if (ent.TargetUnit == Parent
@@ -378,7 +378,7 @@ public class Blade : DefaultFighter
                     { TargetUnit = Parent, BuffToApply = e4Buff });
         }
 
-        if (ent.Reference == forestMainTrgtHit && Atraces.HasFlag(ATracesEnm.A4) &&
+        if (ent.Reference == forestMainTrgtHit && ATraces.HasFlag(ATracesEnm.A4) &&
             ent.TargetUnit.GetRes(Resource.ResourceType.Toughness).ResVal == 0)
             ent.ChildEvents.Add(new Healing(ent.ParentStep, this, Parent)
                 { TargetUnit = Parent, CalculateValue = CalculateForestHeal });

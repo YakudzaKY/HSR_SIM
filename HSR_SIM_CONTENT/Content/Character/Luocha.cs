@@ -1,4 +1,5 @@
-﻿using HSR_SIM_LIB.Fighters;
+﻿using HSR_SIM_CONTENT.DefaultContent;
+using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
@@ -10,14 +11,14 @@ namespace HSR_SIM_CONTENT.Content.Character;
 
 public class Luocha : DefaultFighter
 {
-    private readonly Ability cycleOfLife;
+    private readonly Ability? cycleOfLife;
     private readonly double cycleOfLifeMaxCnt = 2;
     private readonly Buff e2ShieldBuff;
 
-    private readonly Ability prayerOfAbyssFlower;
-    private readonly Ability prayerOfAbyssFlowerAuto;
+    private readonly Ability? prayerOfAbyssFlower;
+    private readonly Ability? prayerOfAbyssFlowerAuto;
     private readonly Buff triggerCdBuff;
-    private readonly Ability ultimateAbility;
+    private readonly Ability? ultimateAbility;
     private readonly Buff uniqueBuff;
 
     private readonly double coLfAtk;
@@ -30,9 +31,9 @@ public class Luocha : DefaultFighter
     private readonly int poALvl;
     private readonly int totALvl;
 
-    private List<KeyValuePair<Unit, Unit>> trackedUnits = new();
+    private List<KeyValuePair<Unit, Unit?>> trackedUnits = new();
 
-    public Luocha(Unit parent) : base(parent)
+    public Luocha(Unit? parent) : base(parent)
     {
         Parent.Stats.BaseMaxEnergy = 100;
 
@@ -98,7 +99,7 @@ public class Luocha : DefaultFighter
             CostType = Resource.ResourceType.SP,
             Cost = 1
         };
-        if (Atraces.HasFlag(ATracesEnm.A2))
+        if (ATraces.HasFlag(ATracesEnm.A2))
             prayerOfAbyssFlower.Events.Add(new DispelBad(null, this, Parent));
 
         prayerOfAbyssFlower.Events.Add(new Healing(null, this, Parent)
@@ -119,7 +120,7 @@ public class Luocha : DefaultFighter
             TargetType = TargetTypeEnm.Friend,
             FollowUpTargets = trackedUnits
         };
-        if (Atraces.HasFlag(ATracesEnm.A2))
+        if (ATraces.HasFlag(ATracesEnm.A2))
             prayerOfAbyssFlowerAuto.Events.Add(new DispelBad(null, this, Parent));
         prayerOfAbyssFlowerAuto.Events.Add(new Healing(null, this, Parent)
         {
@@ -138,7 +139,7 @@ public class Luocha : DefaultFighter
             { Effects = new List<Effect> { new EffShield { CalculateValue = CalculateE2Shield } } };
 
         //basic attack
-        Ability ThornsoftheAbyss;
+        Ability? ThornsoftheAbyss;
         ThornsoftheAbyss = new Ability(this)
         {
             AbilityType = AbilityTypeEnm.Basic,
@@ -235,7 +236,7 @@ public class Luocha : DefaultFighter
 
 
         //A6
-        if (Atraces.HasFlag(ATracesEnm.A6))
+        if (ATraces.HasFlag(ATracesEnm.A6))
             DebuffResists.Add(new DebuffResist { Debuff = typeof(EffCrowControl), ResistVal = 0.7 });
         //E2
         if (Parent.Rank >= 2)
@@ -314,13 +315,13 @@ public class Luocha : DefaultFighter
     }
 
 
-    public override void DefaultFighter_HandleEvent(Event ent)
+    protected override void DefaultFighter_HandleEvent(Event ent)
     {
         //if unit consume hp or got attack then apply buff
 
         if (ent is FinishCombat)
         {
-            trackedUnits = new List<KeyValuePair<Unit, Unit>>();
+            trackedUnits = new List<KeyValuePair<Unit, Unit?>>();
         }
         else if (ent is ResourceDrain or DamageEventTemplate or Healing or ResourceGain or Defeat)
         {
@@ -337,7 +338,7 @@ public class Luocha : DefaultFighter
                         CalculateValue = CalcCoLHealing
                     });
 
-            if (Atraces.HasFlag(ATracesEnm.A4))
+            if (ATraces.HasFlag(ATracesEnm.A4))
                 //for all friends except attacker unit
                 foreach (var unit in ent.SourceUnit.Friends.Where(x => x.IsAlive && x != ent.SourceUnit))
                     ent.ChildEvents.Add(
@@ -371,7 +372,7 @@ public class Luocha : DefaultFighter
             if (trackedUnits.All(x => x.Key != entTargetUnit) && entTargetUnit.IsAlive &&
                 UnitAtLowHpForAuto(entTargetUnit, ent))
             {
-                trackedUnits.Add(new KeyValuePair<Unit, Unit>(entTargetUnit, Parent));
+                trackedUnits.Add(new KeyValuePair<Unit, Unit?>(entTargetUnit, Parent));
                 Parent.ParentTeam.ParentSim.Parent.LogDebug($"{Parent.Name} add {entTargetUnit.Name} to track list");
             }
             else if (trackedUnits.Any(x => x.Key == entTargetUnit) &&
@@ -387,7 +388,7 @@ public class Luocha : DefaultFighter
     }
 
 
-    public override void DefaultFighter_HandleStep(Step step)
+    protected override void DefaultFighter_HandleStep(Step step)
     {
         //check if friendly unit do action
         if (step.StepType is Step.StepTypeEnm.ExecuteAbilityFromQueue or Step.StepTypeEnm.UnitFollowUpAction

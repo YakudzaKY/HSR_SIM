@@ -10,28 +10,21 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 /// <summary>
 ///     Events. Situation changed when event was pro-ceded
 /// </summary>
-public abstract class Event : CloneClass
+public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit) : CloneClass
 {
     public delegate IEnumerable<Unit> CalculateTargetPrc();
 
     public delegate double? CalculateValuePrc(Event ent);
 
-    public List<Event> ChildEvents = new();
+    public readonly List<Event> ChildEvents = [];
     private double? val; //Theoretical value
-
-    public Event(Step parentStep, ICloneable source, Unit sourceUnit)
-    {
-        ParentStep = parentStep;
-        Source = source;
-        SourceUnit = sourceUnit;
-    }
 
     public CalculateValuePrc CalculateValue { get; set; }
     public CalculateTargetPrc CalculateTargets { get; init; }
 
 
-    public ICloneable Source { get; }
-    public Ability.TargetTypeEnm? TargetType { get; set; }
+    public ICloneable Source { get; } = source;
+    public Ability.TargetTypeEnm? TargetType { get; init; }
 
     public int ProcRatio
     {
@@ -71,26 +64,24 @@ public abstract class Event : CloneClass
     }
 
 
-    public ProcRatioDirectionEnm ProcRatioDirection { get; init; } = ProcRatioDirectionEnm.Descending;
+    private ProcRatioDirectionEnm ProcRatioDirection { get; init; } = ProcRatioDirectionEnm.Descending;
 
-    public enum ProcRatioDirectionEnm
+    private enum ProcRatioDirectionEnm
     {
         Descending,//proc on first use then counter
+        // ReSharper disable once UnusedMember.Local
         Ascending//counter and proc at finish
     }
 
-    public bool IsReady
-    {
-        get => (procRatioCounter == 1);
-    }//event is ready to be aplied on target
+    public bool IsReady => (procRatioCounter == 1); //event is ready to be applied on target
 
-    public Ability.AbilityCurrentTargetEnm? CurrentTargetType { get; set; }
-    public Unit SourceUnit { get; set; }
+    public Ability.AbilityCurrentTargetEnm? CurrentTargetType { get; init; }
+    public Unit SourceUnit { get; set; } = sourceUnit;
     public Unit TargetUnit { get; set; }
     public StepTypeEnm? OnStepType { get; init; }
 
     //after calc Val will be multiplied by this number
-    public double? CalculateProportion { get; set; } = null;
+    public double? CalculateProportion { get; set; } 
 
     public double? Val
     {
@@ -119,12 +110,12 @@ public abstract class Event : CloneClass
         set => val = value;
     }
 
-    public double? RealVal { get; set; }
+    public double? RealVal { get; protected set; }
 
 
 
-    public Step ParentStep { get; set; }
-    public bool TriggersHandled { get; set; }
+    public Step ParentStep { get; set; } = parentStep;
+    protected bool TriggersHandled { get; private set; }
 
     public bool IsDamageEvent => this is ToughnessBreak or DoTDamage or DirectDamage or ToughnessBreakDoTDamage;
     public Event Reference { get; set; }
@@ -135,7 +126,6 @@ public abstract class Event : CloneClass
     /// <summary>
     ///     Proc one event. Used after child
     /// </summary>
-    /// <param name="ent"></param>
     /// <param name="revert"></param>
     public virtual void ProcEvent(bool revert)
     {
@@ -157,10 +147,10 @@ public abstract class Event : CloneClass
 
 
     /// <summary>
-    ///     Remove modifictaion
+    ///     Remove modification
     /// </summary>
     /// <param name="mod">BuffToApply</param>
-    /// <param name="naturalFinish">If true - MOD exceed by duratiuon. If false - dispeleed by ability</param>
+    /// <param name="naturalFinish">If true - MOD exceed by duration. If false - dispelled by ability</param>
     /// <exception cref="NotImplementedException"></exception>
     public void DispelMod(Buff mod, bool naturalFinish)
     {
@@ -174,14 +164,12 @@ public abstract class Event : CloneClass
     /// <summary>
     ///     attempt to apply debuff
     /// </summary>
-    /// <param name="modType">What we modificate</param>
-    /// <param name="effects">effect list </param>
-    /// <param name="baseDuration">Duration of the mod</param>
-    /// <param name="baseChance">base chance of debuff</param>
-    /// <param name="maxStack">max stacks</param>
-    /// <param name="uniqueStr">Unique buff per battle</param>
-    /// <param name="uniqueUnit">Unique buff per unit</param>
-    public void TryDebuff(Buff mod, double baseChance)
+    /// <param>base chance of debuff
+    ///     <name>baseChance</name>
+    /// </param>
+    /// <param name="mod"></param>
+    /// <param name="baseChance"></param>
+    protected void TryDebuff(Buff mod, double baseChance)
     {
         //add Dots and debuffs
         ApplyBuff applyBuff = new(ParentStep, Source, SourceUnit)

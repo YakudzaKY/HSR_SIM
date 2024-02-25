@@ -1,4 +1,5 @@
-﻿using HSR_SIM_LIB.Fighters;
+﻿using HSR_SIM_CONTENT.DefaultContent;
+using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
@@ -15,10 +16,10 @@ public class Bronya : DefaultFighter
     private readonly int talentSkillLvl;
     private readonly int ultimateSkillLvl;
     private readonly int wbSkillLvl;
-    private readonly Ability ability;
-    private readonly Ability windriderBullet;
+    private readonly Ability? ability;
+    private readonly Ability? windriderBullet;
 
-    public Bronya(Unit parent) : base(parent)
+    public Bronya(Unit? parent) : base(parent)
     {
         Parent.Stats.BaseMaxEnergy = 120;
         wbSkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Windrider Bullet").Level;
@@ -145,7 +146,7 @@ public class Bronya : DefaultFighter
         //Ascended Traces
         //=====================
 
-        if (Atraces.HasFlag(ATracesEnm.A6))
+        if (ATraces.HasFlag(ATracesEnm.A6))
             PassiveBuffs.Add(new PassiveBuff(Parent)
             {
                 AppliedBuff = new Buff(Parent)
@@ -170,7 +171,7 @@ public class Bronya : DefaultFighter
         return Parent.GetActionValue(ent) * GetAbilityScaling(0.15, 0.30, talentSkillLvl);
     }
 
-    public override void DefaultFighter_HandleStep(Step step)
+    protected override void DefaultFighter_HandleStep(Step step)
     {
         if (((step.StepType is Step.StepTypeEnm.UnitFollowUpAction && step.ActorAbility == ability) ||
              step.StepType is Step.StepTypeEnm.UnitTurnEnded) && step.Actor == Parent &&
@@ -185,7 +186,7 @@ public class Bronya : DefaultFighter
         base.DefaultFighter_HandleStep(step);
     }
 
-    public override void DefaultFighter_HandleEvent(Event ent)
+    protected override void DefaultFighter_HandleEvent(Event ent)
     {
         //if E castet not on self
         if (ent.SourceUnit == Parent && ent.TargetUnit != Parent && ent is ExecuteAbilityFinish af &&
@@ -200,7 +201,7 @@ public class Bronya : DefaultFighter
     /*
         If wanna cast E then return sp cost+ maindps sp cost 
      */
-    public override double WillSpend()
+    protected override double WillSpend()
     {
         return WillCastE() ? 1 + GetFriendSpender(UnitRole.MainDPS) : 0;
     }

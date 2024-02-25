@@ -35,7 +35,7 @@ public class Worker
     public void LoadScenarioFromXml(string scenarioPath, string profilePath)
     {
         Init();
-        Sim = XMLLoader.LoadCombatFromXml(scenarioPath, profilePath);
+        Sim = XmlLoader.LoadCombatFromXml(scenarioPath, profilePath);
         Sim.Parent = this;
         LogText("Scenario  " + Sim.CurrentScenario.Name + " was loaded");
         if (DevMode)

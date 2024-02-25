@@ -184,7 +184,7 @@ public partial class StatCheck : Form
                     for (var i = 1; i <= nmbSteps.Value; i++)
                         res.Add(new SimTask
                         {
-                            SimScenario = XMLLoader.LoadCombatFromXml( GetScenarioPath() + cbScenario.Text,  GetProfilePath()+ profile),
+                            SimScenario = XmlLoader.LoadCombatFromXml( GetScenarioPath() + cbScenario.Text,  GetProfilePath()+ profile),
                             Parent = simTask,
                             UpgradesCount=i * (int)nmbUpgradesPerStep.Value,
                             StatMods = GetStatMods(cbCharacter.Text, (string)item,
@@ -222,7 +222,7 @@ public partial class StatCheck : Form
                     statModList.Insert(0, new RStatMod { Stat = "NEW GEAR"});
                     res.Add(new SimTask
                     {
-                        SimScenario = XMLLoader.LoadCombatFromXml( GetScenarioPath() + cbScenario.Text,  GetProfilePath()+ profile),
+                        SimScenario = XmlLoader.LoadCombatFromXml( GetScenarioPath() + cbScenario.Text,  GetProfilePath()+ profile),
                         StatMods = statModList,
                         UpgradesCount=1,
                         Parent = simTask
@@ -360,7 +360,7 @@ public partial class StatCheck : Form
             // first parent task
             SimTask prnt = new SimTask()
             {
-                SimScenario = XMLLoader.LoadCombatFromXml(  GetScenarioPath() + cbScenario.Text,  GetProfilePath() + (string)item),
+                SimScenario = XmlLoader.LoadCombatFromXml(  GetScenarioPath() + cbScenario.Text,  GetProfilePath() + (string)item),
             };
             myTaskList.Add(prnt);
             //childs
@@ -379,7 +379,7 @@ public partial class StatCheck : Form
         foreach (var item in chkProfiles.CheckedItems)
         {
             var units =
-                XMLLoader.ExctractPartyFromXml(GetProfilePath() + item);
+                XmlLoader.ExtractPartyFromXml(GetProfilePath() + item);
             cbCharacter.Items.AddRange(units.Where(x => !cbCharacter.Items.Contains(x.Name)).Select(x => x.Name)
                 .ToArray());
         }

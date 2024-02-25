@@ -5,7 +5,7 @@ namespace HSR_SIM_LIB.Fighters;
 //routine for Elite
 internal class DefaultNPCBossFIghter : DefaultNPCFighter
 {
-    public DefaultNPCBossFIghter(Unit parent) : base(parent)
+    public DefaultNPCBossFIghter(Unit? parent) : base(parent)
     {
     }
 

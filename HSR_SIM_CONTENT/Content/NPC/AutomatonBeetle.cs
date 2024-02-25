@@ -10,7 +10,7 @@ public class AutomatonBeetle : DefaultNPCFighter
 {
     private readonly Buff barierBuff;
 
-    public AutomatonBeetle(Unit parent) : base(parent)
+    public AutomatonBeetle(Unit? parent) : base(parent)
     {
         barierBuff = new Buff(Parent)
             { EventHandlerProc = MyBarrierEventHandler, Effects = new List<Effect> { new EffBarrier() } };
@@ -25,7 +25,7 @@ public class AutomatonBeetle : DefaultNPCFighter
         Resists.Add(new Resist { ResistType = Unit.ElementEnm.Ice, ResistVal = 0.20 });
         Resists.Add(new Resist { ResistType = Unit.ElementEnm.Quantum, ResistVal = 0.20 });
 
-        Ability myAttackAbility;
+        Ability? myAttackAbility;
         //Deals Physical DMG (300% ATK) to a single target, and grants a Barrier to self. The Barrier nullifies all DMG received except for DoT until after being attacked.
         myAttackAbility = new Ability(this)
         {

@@ -12,7 +12,7 @@ public class Vagrant : DefaultNPCFighter
     {
         BaseDuration = 2, Effects = new List<Effect> { new EffAtkPrc { Value = 0.3 } }
     };
-    public Vagrant(Unit parent) : base(parent)
+    public Vagrant(Unit? parent) : base(parent)
     {
         //Elemenet
         Element = Unit.ElementEnm.Physical;
@@ -42,7 +42,7 @@ public class Vagrant : DefaultNPCFighter
         ability.Events.Add(new AdvanceAV(null, this, Parent) );
         Abilities.Add(ability);
 
-        Ability myAttackAbility;
+        Ability? myAttackAbility;
         //Deals minor Physical DMG (250% ATK) to a single target.
         myAttackAbility = new Ability(this)
         {

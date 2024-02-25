@@ -9,9 +9,9 @@ namespace HSR_SIM_CONTENT.Content.Special;
 
 public class ForgottenHall : DefaultNPCFighter
 {
-    public ForgottenHall(Unit parent) : base(parent)
+    public ForgottenHall(Unit? parent) : base(parent)
     {
-        Ability IncreaseCycle;
+        Ability? IncreaseCycle;
         //Karma Wind
         IncreaseCycle = new Ability(this)
         {

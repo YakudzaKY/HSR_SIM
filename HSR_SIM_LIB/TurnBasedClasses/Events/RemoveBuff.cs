@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.UnitStuff;
@@ -12,14 +11,14 @@ public class RemoveBuff(Step parent, ICloneable source, Unit sourceUnit) : BuffE
     public override string GetDescription()
     {
         return
-            $"Remove modifications on {TargetUnit.Name}. Source: {Source?.GetType()?.ToString().Split(".").Last():s}";
+            $"Remove modifications on {TargetUnit.Name}. Source: {Source?.GetType().ToString().Split(".").Last()}";
     }
 
     private Buff buffRemoved;
     /// <summary>
     /// Ignore the not found error
     /// </summary>
-    public bool NotFoundIgnore { get; set; } = false;
+    public bool NotFoundIgnore { get; init; } 
 
     public override void ProcEvent(bool revert)
     {

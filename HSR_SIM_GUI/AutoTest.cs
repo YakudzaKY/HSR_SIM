@@ -67,7 +67,7 @@ namespace HSR_SIM_GUI
             {
                 myTaskList.Add(new SimTask
                 {
-                    SimScenario =  XMLLoader.LoadCombatFromXml(testFolder + dgTest.Rows[i].Cells[0].Value,null),
+                    SimScenario =  XmlLoader.LoadCombatFromXml(testFolder + dgTest.Rows[i].Cells[0].Value,null),
                     DevLogPath = DevModeUtils.GetDevLogPath(testFolder + dgTest.Rows[i].Cells[0].Value,null),
                     DevMode=true
 

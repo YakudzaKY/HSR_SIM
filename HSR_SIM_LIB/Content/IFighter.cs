@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using static HSR_SIM_LIB.Fighters.FighterUtils;
 
-namespace HSR_SIM_LIB.Fighters;
+namespace HSR_SIM_LIB.Content;
 
 /// <summary>
 ///     Fighter logic interface
@@ -53,7 +54,7 @@ public interface IFighter : ICloneable
     /// </summary>
     public List<Ability> Abilities { get; set; }
     /// <summary>
-    /// reference to Unit. i.e. Character = Unit who have Resources, Figher, buffs etc
+    /// reference to Unit. i.e. Character = Unit who have Resources, Fighter, buffs etc
     /// </summary>
     public Unit Parent { get; set; }
     /// <summary>

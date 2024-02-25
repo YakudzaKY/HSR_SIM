@@ -8,7 +8,7 @@ namespace HSR_SIM_CONTENT.Content.NPC;
 
 internal class AutomatonGrizzlyComplete : DefaultNPCBossFIghter
 {
-    public AutomatonGrizzlyComplete(Unit parent) : base(parent)
+    public AutomatonGrizzlyComplete(Unit? parent) : base(parent)
     {
         //Elemenet
         Element = Unit.ElementEnm.Physical;
@@ -25,7 +25,7 @@ internal class AutomatonGrizzlyComplete : DefaultNPCBossFIghter
         DebuffResists.Add(new DebuffResist { Debuff = typeof(EffEntanglement), ResistVal = 0.5 });
 
         //TODO: need implement boss abilities
-        Ability myAttackAbility;
+        Ability? myAttackAbility;
         //Deals minor Physical DMG (250% ATK) to a single target.
         myAttackAbility = new Ability(this)
         {

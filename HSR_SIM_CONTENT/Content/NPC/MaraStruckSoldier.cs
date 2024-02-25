@@ -12,14 +12,14 @@ public class MaraStruckSoldier : DefaultNPCFighter
     //static because max 5 stacks by all units this type
     private static Buff myDoTRef= new Buff(null, null);
     private Buff myDotDeBuff;
-    private Ability Rejuvenate;
+    private Ability? Rejuvenate;
 
     public static double? CalcMyDoT(Event ent)
     {
         return FighterUtils.CalculateDmgByBasicVal(ent.SourceUnit.GetAttack(ent) * 0.5, ent);
     }
 
-    public MaraStruckSoldier(Unit parent) : base(parent)
+    public MaraStruckSoldier(Unit? parent) : base(parent)
     {
         //Elemenet
         Element = Unit.ElementEnm.Wind;
@@ -69,7 +69,7 @@ public class MaraStruckSoldier : DefaultNPCFighter
         Rejuvenate.Events.Add(new ResourceGain(null, this, Parent) { ResType = Resource.ResourceType.Toughness,Val = Parent.Stats.MaxToughness});
         Abilities.Add(Rejuvenate);
 
-        Ability myAttackAbility;
+        Ability? myAttackAbility;
         //Deals minor Physical DMG (250% ATK) to a single target.
         myAttackAbility = new Ability(this)
         {

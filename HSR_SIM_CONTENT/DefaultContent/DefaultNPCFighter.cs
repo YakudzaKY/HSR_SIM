@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -16,7 +17,7 @@ namespace HSR_SIM_LIB.Fighters;
 /// </summary>
 public class DefaultNPCFighter : IFighter
 {
-    public DefaultNPCFighter(Unit parent)
+    public DefaultNPCFighter(Unit? parent)
     {
         Parent = parent;
 
@@ -27,7 +28,7 @@ public class DefaultNPCFighter : IFighter
     public bool IsNpcUnit => true;
     public List<ConditionBuff> ConditionBuffs { get; set; } = new();
 
-    public Unit GetBestTarget(Ability ability)
+    public Unit? GetBestTarget(Ability ability)
     {
         if (ability.TargetType == Ability.TargetTypeEnm.Self) return Parent;
 
@@ -75,7 +76,7 @@ public class DefaultNPCFighter : IFighter
     public List<Unit.ElementEnm> NativeWeaknesses { get; set; } = new();
     public List<Resist> Resists { get; set; } = new();
     public List<DebuffResist> DebuffResists { get; set; } = new();
-    public Unit Parent { get; set; }
+    public Unit? Parent { get; set; }
 
     public string GetSpecialText()
     {
@@ -118,9 +119,9 @@ public class DefaultNPCFighter : IFighter
     {
     }
 
-    public Ability ChoseAbilityToCast(Step step)
+    public Ability? ChoseAbilityToCast(Step step)
     {
-        Ability chosenAbility = null;
+        Ability? chosenAbility = null;
         Parent.ParentTeam.ParentSim?.Parent.LogDebug("========What i can cast=====");
         var abilities = Abilities
             .Where(x => x.Available()&& x.CooldownTimer == 0 &&
@@ -135,19 +136,19 @@ public class DefaultNPCFighter : IFighter
 
     public IFighter.EventHandler EventHandlerProc { get; set; }
     public IFighter.StepHandler StepHandlerProc { get; set; }
-    public List<Ability> Abilities { get; set; } = new();
+    public List<Ability?> Abilities { get; set; } = new();
 
     public object Clone()
     {
        throw new NotImplementedException();
     }
 
-    public IEnumerable<Unit> GetAliveEnemies()
+    public IEnumerable<Unit?> GetAliveEnemies()
     {
         return Parent.Enemies.Where(x => x.IsAlive);
     }
 
-    public IEnumerable<Unit> GetAliveFriends()
+    public IEnumerable<Unit?> GetAliveFriends()
     {
         return Parent.Friends.Where(x => x.IsAlive);
     }

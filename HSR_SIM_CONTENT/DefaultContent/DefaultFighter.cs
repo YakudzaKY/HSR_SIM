@@ -1,42 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using HSR_SIM_LIB.Content;
+using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
-using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using static HSR_SIM_LIB.Fighters.FighterUtils;
 using static HSR_SIM_LIB.UnitStuff.Resource;
-using static HSR_SIM_LIB.Fighters.IFighter;
-using HSR_SIM_LIB.Content;
+using static HSR_SIM_LIB.Content.IFighter;
 
-namespace HSR_SIM_LIB.Fighters;
+namespace HSR_SIM_CONTENT.DefaultContent;
 
 /// <summary>
-///     abstract class for Playable characters
-/// 
+///     abstract class for Playable characters 
 /// </summary>
 public abstract class DefaultFighter : IFighter
 {
     [Flags]
-    public enum ATracesEnm
+    protected enum ATracesEnm
     {
         A2 = 1,
         A4 = 2,
         A6 = 4
     }
 
+    private List<IRelicSet> Relics
+    {
+        get
+        {
+            if (relics != null) return relics;
+            relics = new List<IRelicSet>();
+            foreach (var relicSet in Parent.RelicsClasses.Select(keyValRelic =>
+                         (IRelicSet)Activator.CreateInstance(Type.GetType(keyValRelic.Key)!, this, keyValRelic.Value)!))
+            {
+                relics.Add(relicSet);
+            }
+
+            return relics;
+        }
+    }
+
+
     private ILightCone? lightCone;
-    public MechDictionary Mechanics { get; set; }// dictionary for save mechanics value in combat
+    public MechDictionary Mechanics { get; set; } // dictionary for save mechanics value in combat
     public bool IsEliteUnit => false;
     public bool IsNpcUnit => false;
 
-    private List<IRelicSet> relics;
+    private List<IRelicSet>? relics;
 
 
     //Blade constructor
-    public DefaultFighter(Unit parent)
+    protected DefaultFighter(Unit parent)
     {
         Mechanics = new MechDictionary();
         Mechanics.Reset();
@@ -44,25 +57,22 @@ public abstract class DefaultFighter : IFighter
         EventHandlerProc += DefaultFighter_HandleEvent;
         StepHandlerProc += DefaultFighter_HandleStep;
         //no way to get ascend traces from api :/
-        Atraces = ATracesEnm.A2 | ATracesEnm.A4 | ATracesEnm.A6;
+        ATraces = ATracesEnm.A2 | ATracesEnm.A4 | ATracesEnm.A6;
 
-        Ability defOpener;
-        //Typical left click opener
-        defOpener = new Ability(this)
-        {
-            AbilityType = Ability.AbilityTypeEnm.Technique,
-            Name = "Default opener",
-            Element = Element,
-            AdjacentTargets = Ability.AdjacentTargetsEnm.All
-        };
+        var defOpener =
+            //Typical left click opener
+            new Ability(this)
+            {
+                AbilityType = Ability.AbilityTypeEnm.Technique,
+                Name = "Default opener",
+                AdjacentTargets = Ability.AdjacentTargetsEnm.All
+            };
         defOpener.Events.Add(new ToughnessShred(null, this, Parent)
-        { OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue, Val = 30 });
+            { OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue, Val = 30 });
         Abilities.Add(defOpener);
-
-
     }
 
-    public ATracesEnm Atraces { get; set; }
+    protected ATracesEnm ATraces { get; set; }
 
     public ILightCone? LightCone
     {
@@ -78,38 +88,22 @@ public abstract class DefaultFighter : IFighter
         set => lightCone = value;
     }
 
-    public List<IRelicSet> Relics
-    {
-        get
-        {
-            if (relics == null)
-            {
-                relics = new List<IRelicSet>();
-                foreach (var keyValrelic in Parent.RelicsClasses)
-                {
-                    var relicSet =
-                        (IRelicSet)Activator.CreateInstance(Type.GetType(keyValrelic.Key)!, this, keyValrelic.Value);
-                    relics.Add(relicSet);
-                }
-            }
-
-            return relics;
-        }
-    }
-
     //we need this debuff to track and correctly apply debuff stacks
     public Buff WeaknessBreakDebuff { get; set; } = new(null);
+
     //buffs works only on some conditions
-    public List<ConditionBuff> ConditionBuffs { get; set; } = new();
+    public List<ConditionBuff> ConditionBuffs { get; set; } = [];
+
     //always active buffs
-    public List<PassiveBuff> PassiveBuffs { get; set; } = new();
+    public List<PassiveBuff> PassiveBuffs { get; set; } = [];
     public abstract PathType? Path { get; }
     public abstract Unit.ElementEnm Element { get; }
 
-    public List<Unit.ElementEnm> NativeWeaknesses { get; set; } = new();
-    public List<DebuffResist> DebuffResists { get; set; } = new();
-    public List<Resist> Resists { get; set; } = new();
+    public List<Unit.ElementEnm> NativeWeaknesses { get; set; } = [];
+    public List<DebuffResist> DebuffResists { get; set; } = [];
+    public List<Resist> Resists { get; set; } = [];
     public Unit Parent { get; set; }
+
     /// <summary>
     /// return Unit cost to determine unit role on the battlefield
     /// </summary>
@@ -119,12 +113,12 @@ public abstract class DefaultFighter : IFighter
         {
             var totalCost = Path switch
             {
-                PathType.Hunt => 7 * (GetAliveEnemies()?.Count() == 1 ? 2 : 1) //x2 if 1 target on battlefield
+                PathType.Hunt => 7 * (GetAliveEnemies().Count() == 1 ? 2 : 1) //x2 if 1 target on battlefield
                 ,
                 PathType.Destruction =>
-                    6 * (GetAliveEnemies()?.Count() >= 2 ? 2 : 1) //x2 if 2+ targets on battlefield
+                    6 * (GetAliveEnemies().Count() >= 2 ? 2 : 1) //x2 if 2+ targets on battlefield
                 ,
-                PathType.Erudition => 5 * (GetAliveEnemies()?.Count() >= 3 ? 3 : 1) //x3 if 3+ targets on battlefield
+                PathType.Erudition => 5 * (GetAliveEnemies().Count() > 3 ? 3 : 1) //x3 if 3+ targets on battlefield
                 ,
                 PathType.Nihility => 4,
                 PathType.Harmony => 3,
@@ -137,31 +131,34 @@ public abstract class DefaultFighter : IFighter
     }
 
     private UnitRole? role;
+
     public UnitRole? Role
     {
         get
         {
             if (role == null && Parent.IsAlive)
             {
-
-
-                var unitsToSearch = Parent.ParentTeam.Units.Where(x => x.IsAlive).OrderByDescending(x => x.Fighter.Cost)
-                    .ThenByDescending(x => (x.Stats.BaseAttack * (1 + x.Stats.AttackPrc) + x.Stats.AttackFix) * x.Stats.BaseCritChance * x.Stats.BaseCritDmg).ToList();
+                var unitsToSearch = Parent.ParentTeam.Units.Where(x => x.IsAlive)
+                    .OrderByDescending(x => x.Fighter.Cost)
+                    .ThenByDescending(x =>
+                        (x.Stats.BaseAttack * (1 + x.Stats.AttackPrc) + x.Stats.AttackFix) * x.Stats.BaseCritChance *
+                        x.Stats.BaseCritDmg).ToList();
                 if (Parent == unitsToSearch.First())
                     role = UnitRole.MainDPS;
                 //if second on list then second dps
-                else if (new List<PathType?> { PathType.Hunt, PathType.Destruction, PathType.Erudition, PathType.Nihility }
-                        .Contains(Path) && Parent == unitsToSearch.ElementAt(1))
+                else if (new List<PathType?>
+                                 { PathType.Hunt, PathType.Destruction, PathType.Erudition, PathType.Nihility }
+                             .Contains(Path) && Parent == unitsToSearch.ElementAt(1))
                     role = UnitRole.SecondDPS;
-                else if (new List<PathType?> { PathType.Hunt, PathType.Destruction, PathType.Erudition }.Contains(Path) &&
-                    Parent == unitsToSearch.ElementAt(2))
+                else if (new List<PathType?>
+                             { PathType.Hunt, PathType.Destruction, PathType.Erudition }.Contains(Path) &&
+                         Parent == unitsToSearch.ElementAt(2))
                     role = UnitRole.ThirdDPS;
                 //healer here
                 else if (Path == PathType.Abundance)
                     role = UnitRole.Healer;
                 else
                     role = UnitRole.Support;
-
             }
 
             return role;
@@ -170,13 +167,13 @@ public abstract class DefaultFighter : IFighter
     }
 
     //Try to choose some good ability to cast
-    public virtual Ability ChoseAbilityToCast(Step step)
+    public virtual Ability? ChoseAbilityToCast(Step step)
     {
         //Technique before fight
         if (step.Parent.CurrentFight == null)
         {
             var abilities = Abilities
-                .Where(x => x.Available()&& x.IWannaUseIt()&& x.AbilityType == Ability.AbilityTypeEnm.Technique )
+                .Where(x => x.Available() && x.IWannaUseIt() && x.AbilityType == Ability.AbilityTypeEnm.Technique)
                 .OrderBy(x => x.Attack)
                 .ThenByDescending(x => x.Cost);
             if (step.Parent.Parent.DevMode)
@@ -202,8 +199,8 @@ public abstract class DefaultFighter : IFighter
                                                                     y.AbilityType == Ability.AbilityTypeEnm.Technique
                                                                     && y.Attack)) || x.Fighter.Abilities.Any(y =>
                                                                y.AbilityType == Ability.AbilityTypeEnm.Technique
-                                                               && y.Attack && y.IgnoreWeakness))
-                                                       ) //or others cant penetrate  or otherc can ignore weaknesss
+                                                               && y is { Attack: true, IgnoreWeakness: true }))
+                                                       ) //or others cant penetrate  or others can ignore weakness
                         )
                         && !(Parent.ParentTeam.GetRes(ResourceType.TP).ResVal >= ability.Cost + 1
                              && GetAliveFriends().Any(x => x.Fighter.Abilities.Any(y =>
@@ -222,24 +219,26 @@ public abstract class DefaultFighter : IFighter
                         */
                         if (Parent.ParentTeam.GetRes(ResourceType.TP).ResVal >= ability.Cost + 1
                             || !GetAliveFriends().Any(x => GetWeaknessTargets().Any() && x.Fighter.Abilities.Any(y =>
-                                y.AbilityType == Ability.AbilityTypeEnm.Technique && y.Cost > 0
-                                && y.Attack))
+                                y.AbilityType == Ability.AbilityTypeEnm.Technique && y is { Cost: > 0, Attack: true }))
                            )
                             return ability;
                 }
         }
         else
         {
-            Ability chosenAbility = null;
             Parent.ParentTeam.ParentSim?.Parent.LogDebug("========What i can cast=====");
             //if dev mode then give All available sp else get from function
-            var freeSp = step.Parent.Parent.DevMode ?Parent.ParentTeam.GetRes(ResourceType.SP).ResVal: HowManySpICanSpend();
+            var freeSp = step.Parent.Parent.DevMode
+                ? Parent.ParentTeam.GetRes(ResourceType.SP).ResVal
+                : HowManySpICanSpend();
             Parent.ParentTeam.ParentSim?.Parent.LogDebug($"I have {freeSp:f} SP");
             var abilities = Abilities
                 .Where(x => x.Available() && x.IWannaUseIt() && (x.Cost <= freeSp || x.CostType != ResourceType.SP) &&
                             (x.AbilityType == Ability.AbilityTypeEnm.Basic ||
                              x.AbilityType == Ability.AbilityTypeEnm.Ability));
-            chosenAbility = step.Parent.Parent.DevMode ? DevModeUtils.ChooseAbilityToCast(this, abilities) : abilities.MaxBy(x => x.AbilityType);
+            var chosenAbility = step.Parent.Parent.DevMode
+                ? DevModeUtils.ChooseAbilityToCast(this, abilities)
+                : abilities.MaxBy(x => x.AbilityType);
             Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Choose  {chosenAbility?.Name}");
             return chosenAbility;
         }
@@ -249,13 +248,13 @@ public abstract class DefaultFighter : IFighter
 
     public virtual string GetSpecialText()
     {
-        return null;
+        return "";
     }
 
 
     public IFighter.EventHandler EventHandlerProc { get; set; }
     public StepHandler StepHandlerProc { get; set; }
-    public List<Ability> Abilities { get; set; } = new();
+    public List<Ability> Abilities { get; set; } = [];
 
     public virtual void Reset()
     {
@@ -265,7 +264,7 @@ public abstract class DefaultFighter : IFighter
     }
 
 
-    public virtual Unit GetBestTarget(Ability ability)
+    public virtual Unit? GetBestTarget(Ability ability)
     {
         var leader = Parent.ParentTeam.Units.FirstOrDefault(x => x.Fighter.Role == UnitRole.MainDPS);
         if (ability.TargetType == Ability.TargetTypeEnm.Self) return Parent;
@@ -307,19 +306,19 @@ public abstract class DefaultFighter : IFighter
 
             if (ability.AdjacentTargets == Ability.AdjacentTargetsEnm.Blast)
             {
-                Unit bestTarget = null;
+                Unit? bestTarget = null;
                 double bestScore = -1;
                 foreach (var unit in Parent.GetTargetsForUnit(ability.TargetType))
                 {
-                    double score = 0;
                     var targets = ability.GetAffectedTargets(unit);
-                    score = 10 * targets.Count;
+                    double score = 10 * targets.Count;
                     score += 5 * targets.Count(x => x == unit && x.GetRes(ResourceType.Toughness).ResVal == 0);
-                    score += 3 * targets.Count(x => x == unit && x.GetWeaknesses(null).Any(x => x == Element));
+                    score += 3 * targets.Count(x => x == unit && x.GetWeaknesses(null).Any(z => z == Element));
                     score += 2 * targets.Count(x => x.Fighter is DefaultNPCBossFIghter);
                     //if equal but hp diff go focus big target
                     if (score > bestScore ||
-                        (score == bestScore && unit.GetHpPrc(null) > bestTarget.GetHpPrc(null)))
+                        // ReSharper disable once CompareOfFloatsByEqualityOperator
+                        (score == bestScore && unit.GetHpPrc(null) > bestTarget?.GetHpPrc(null)))
                     {
                         bestTarget = unit;
                         bestScore = score;
@@ -329,13 +328,14 @@ public abstract class DefaultFighter : IFighter
                 return bestTarget;
             }
 
- 
-            throw new NotImplementedException();
 
+            throw new NotImplementedException();
         }
 
         if (ability.TargetType == Ability.TargetTypeEnm.Friend)
-            return Parent.ParentTeam.ParentSim.Parent.DevMode ? DevModeUtils.GetTarget(this, this.GetAliveFriends(), ability) : GetAliveFriends().OrderBy(x => x.Fighter.Role).First();
+            return Parent.ParentTeam.ParentSim.Parent.DevMode
+                ? DevModeUtils.GetTarget(this, this.GetAliveFriends(), ability)
+                : GetAliveFriends().OrderBy(x => x.Fighter.Role).First();
         throw new NotImplementedException();
 
         // return null;
@@ -348,13 +348,13 @@ public abstract class DefaultFighter : IFighter
 
 
     //all alive enemies
-    public IEnumerable<Unit> GetAliveEnemies()
+    protected IEnumerable<Unit> GetAliveEnemies()
     {
-        return Parent.Enemies?.Where(x => x.LivingStatus==Unit.LivingStatusEnm.Alive);
+        return Parent.Enemies.Where(x => x.LivingStatus == Unit.LivingStatusEnm.Alive);
     }
 
     //enemies with weakness to ability and without shield
-    public IEnumerable<Unit> GetWeaknessTargets()
+    private IEnumerable<Unit> GetWeaknessTargets()
     {
         return Parent.Enemies.Where(x => x.IsAlive
                                          && x.GetWeaknesses(null).Any(y => y == Parent.Fighter.Element));
@@ -363,7 +363,7 @@ public abstract class DefaultFighter : IFighter
     //alive friends. select only who not defeated or waiting for rez
     public IEnumerable<Unit> GetAliveFriends()
     {
-        return Parent.Friends.Where(x => x.LivingStatus==Unit.LivingStatusEnm.Alive);
+        return Parent.Friends.Where(x => x.LivingStatus == Unit.LivingStatusEnm.Alive);
     }
 
 
@@ -371,20 +371,24 @@ public abstract class DefaultFighter : IFighter
     ///     I will spend in next turn
     /// </summary>
     /// <returns></returns>
-    public virtual double WillSpend()
+    protected virtual double WillSpend()
     {
-        return 1; 
+        return 1;
     }
 
-    public DefaultFighter GetFriendByRole(UnitRole role)
+    protected DefaultFighter? GetFriendByRole(UnitRole unitRole)
     {
-        return (DefaultFighter)GetAliveFriends().FirstOrDefault(x =>x.Fighter.Role == role) ?.Fighter;
+        IFighter? res = GetAliveFriends().FirstOrDefault(x => x.Fighter.Role == unitRole)?.Fighter;
+        if (res != null)
+            return (DefaultFighter)res;
+        return null;
     }
-    public double GetFriendSpender(UnitRole role)
+
+    protected double GetFriendSpender(UnitRole unitRole)
     {
-        var fhgt = GetFriendByRole(role);
-        if (fhgt != null)
-            return fhgt.WillSpend();
+        var defaultFighter = GetFriendByRole(unitRole);
+        if (defaultFighter != null)
+            return defaultFighter.WillSpend();
         return 0;
     }
 
@@ -392,7 +396,7 @@ public abstract class DefaultFighter : IFighter
     ///     How many SP Fighter can spend on cast
     /// </summary>
     /// <returns></returns>
-    public double HowManySpICanSpend()
+    private double HowManySpICanSpend()
     {
         var totalRes = Parent.ParentTeam.GetRes(ResourceType.SP).ResVal;
         var res = totalRes;
@@ -454,7 +458,7 @@ public abstract class DefaultFighter : IFighter
     ///     How many SP i reserve for next turn VERY IMPORTANT n1 ABILITY!
     /// </summary>
     /// <returns></returns>
-    public virtual double HowManySpIReserve()
+    protected virtual double HowManySpIReserve()
     {
         if (Role == UnitRole.Healer)
             //if hp <=50% or hp<=70% and <=2500(at 80 lvl)
@@ -465,13 +469,13 @@ public abstract class DefaultFighter : IFighter
         return 0;
     }
 
-    public virtual void DefaultFighter_HandleEvent(Event ent)
+    protected virtual void DefaultFighter_HandleEvent(Event ent)
     {
         LightCone?.EventHandlerProc?.Invoke(ent);
         foreach (var relic in Relics) relic.EventHandlerProc?.Invoke(ent);
     }
 
-    public virtual void DefaultFighter_HandleStep(Step step)
+    protected virtual void DefaultFighter_HandleStep(Step step)
     {
         LightCone?.StepHandlerProc?.Invoke(step);
         foreach (var relic in Relics) relic.StepHandlerProc?.Invoke(step);

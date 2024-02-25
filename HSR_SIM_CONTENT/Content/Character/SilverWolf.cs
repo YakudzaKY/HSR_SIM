@@ -1,4 +1,5 @@
-﻿using HSR_SIM_LIB.Fighters;
+﻿using HSR_SIM_CONTENT.DefaultContent;
+using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
@@ -28,7 +29,7 @@ public class SilverWolf : DefaultFighter
     private readonly double ultDmg;
     private readonly Event ultimateHitLastEvent;
 
-    public SilverWolf(Unit parent) : base(parent)
+    public SilverWolf(Unit? parent) : base(parent)
     {
         //on this event we will place debuff
         trgEnt = new TriggerEvent(null, null, Parent);
@@ -52,7 +53,7 @@ public class SilverWolf : DefaultFighter
         talentDebuffChance = FighterUtils.GetAbilityScaling(0.60, 0.72, talentLvl);
 
         //weakness duration depend on A4 traits
-        var weaknessDuration = Atraces.HasFlag(ATracesEnm.A4) ? 3 : 2;
+        var weaknessDuration = ATraces.HasFlag(ATracesEnm.A4) ? 3 : 2;
 
         allowChangesDebuff = new Buff(Parent)
         {
@@ -77,7 +78,7 @@ public class SilverWolf : DefaultFighter
             Effects = new List<Effect> { new EffDefPrc { Value = -ultDef } }
         };
 
-        bugDuration = Atraces.HasFlag(ATracesEnm.A2) ? 4 : 3;
+        bugDuration = ATraces.HasFlag(ATracesEnm.A2) ? 4 : 3;
         var talentAtkDebuff = new Buff(Parent)
         {
             Type = Buff.BuffType.Debuff,
@@ -101,7 +102,7 @@ public class SilverWolf : DefaultFighter
         //Abilities
         //=====================
 
-        Ability ability;
+        Ability? ability;
         //Force Quit Program
         ability = new Ability(this)
         {
@@ -246,7 +247,7 @@ public class SilverWolf : DefaultFighter
         return -res;
     }
 
-    public override void DefaultFighter_HandleEvent(Event ent)
+    protected override void DefaultFighter_HandleEvent(Event ent)
     {
         //if unit consume hp or got attack then apply buff
         if (Parent.Rank >= 2 && Parent.IsAlive && ent is UnitEnteringBattle)
@@ -321,7 +322,7 @@ public class SilverWolf : DefaultFighter
             ImplantBug(ent.TargetUnit, ent, talentDebuffChance);
         }
         //a2. shield got broken by teammate
-        else if (ent is ToughnessBreak && Atraces.HasFlag(ATracesEnm.A2) &&
+        else if (ent is ToughnessBreak && ATraces.HasFlag(ATracesEnm.A2) &&
                  ent.SourceUnit.ParentTeam == Parent.ParentTeam)
         {
             ImplantBug(ent.TargetUnit, ent, 0.65); //fixed chance

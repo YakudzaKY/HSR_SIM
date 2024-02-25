@@ -58,7 +58,7 @@ public sealed partial class MainWindow : INotifyPropertyChanged
         {
             scenarios[i]=Path.GetFileName(files[i]);
         }
-        NotifyPropertyChanged("Scenarios");
+        NotifyPropertyChanged(nameof(Scenarios));
 
         //parse profiles
         Directory.CreateDirectory(GetProfilePath());
@@ -68,14 +68,14 @@ public sealed partial class MainWindow : INotifyPropertyChanged
         {
             profiles[i]=Path.GetFileName(files[i]);
         }
-        NotifyPropertyChanged("Profiles");
+        NotifyPropertyChanged(nameof(Profiles));
 
         //select saved options
         CbScenario.SelectedIndex = CbScenario.Items.IndexOf(IniF.IniReadValue(GetType().Name, CbScenario.Name));
         CbProfile.SelectedIndex = CbProfile.Items.IndexOf(IniF.IniReadValue(GetType().Name, CbProfile.Name));
-        string boolVal = IniF.IniReadValue(GetType().Name, "DevMode");
+        string boolVal = IniF.IniReadValue(GetType().Name, nameof(DevMode));
         DevMode = !String.IsNullOrEmpty(boolVal) && bool.Parse(boolVal);
-        NotifyPropertyChanged("DevMode");
+        NotifyPropertyChanged(nameof(DevMode));
 
     }
     private void BtnLoad_OnClick(object sender, RoutedEventArgs e)
@@ -83,7 +83,7 @@ public sealed partial class MainWindow : INotifyPropertyChanged
         //save to prevent data loss if app crash or freeze
         SaveIni();
         SingleSimWindow singleSimWindow = new SingleSimWindow();
-        singleSimWindow.SetSim(XMLLoader.LoadCombatFromXml(GetScenarioPath() + CbScenario.Text, GetProfilePath() + (string)CbProfile.Text),chkDevMode:DevMode);
+        singleSimWindow.SetSim(XmlLoader.LoadCombatFromXml(GetScenarioPath() + CbScenario.Text, GetProfilePath() + (string)CbProfile.Text),chkDevMode:DevMode);
         singleSimWindow.Show();
 
     }
@@ -120,7 +120,7 @@ public sealed partial class MainWindow : INotifyPropertyChanged
     {
         IniF.IniWriteValue(GetType().Name, CbScenario.Name, CbScenario.Text);
         IniF.IniWriteValue(GetType().Name, CbProfile.Name, CbProfile.Text);
-        IniF.IniWriteValue(GetType().Name, "DevMode", DevMode.ToString());
+        IniF.IniWriteValue(GetType().Name, nameof(DevMode), DevMode.ToString());
     }
     private void MainWindow_OnClosing(object? sender, CancelEventArgs e)
     {

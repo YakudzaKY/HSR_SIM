@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Pipes;
+using System.Linq;
 using System.Xml;
-using System.Xml.Linq;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.UnitStuff;
@@ -12,11 +11,11 @@ using static HSR_SIM_LIB.UnitStuff.Unit;
 
 namespace HSR_SIM_LIB.Utils;
 
-public static class XMLLoader
+public static class XmlLoader
 {
     public static SimCls LoadCombatFromXml(string scenarioPath, string profilePath)
     {
-        SimCls Combat = new()
+        SimCls combat = new()
         {
             CurrentStep = null,
             CurrentScenario = new Scenario
@@ -31,25 +30,37 @@ public static class XMLLoader
         var xRoot = xDoc.DocumentElement;
         if (xRoot != null)
         {
-            Combat.CurrentScenario.Name = $"{xRoot.Attributes.GetNamedItem("name").Value} scenario: {Path.GetFileNameWithoutExtension(scenarioPath)} profile: {Path.GetFileNameWithoutExtension(profilePath)}" ;
+            combat.CurrentScenario.Name = $"{xRoot.Attributes.GetNamedItem("name")?.Value} scenario: {Path.GetFileNameWithoutExtension(scenarioPath)} profile: {Path.GetFileNameWithoutExtension(profilePath)}" ;
 
             //parse all items
-            foreach (XmlElement xnode in xRoot)
+            foreach (XmlElement node in xRoot)
             {
-                if (xnode.Name == "Fights") FillFights(xnode, Combat);
-                if (xnode.Name == "Prelaunch") Combat.PreLaunch = ExtractPreLaunch(xnode);
-                if (xnode.Name == "Party") Combat.CurrentScenario.Party = ExtractUnits(xnode);
-                if (xnode.Name == "Special") Combat.CurrentScenario.SpecialUnits = ExtractUnits(xnode);
+                switch (node.Name)
+                {
+                    case "Fights":
+                        FillFights(node, combat);
+                        break;
+                    // ReSharper disable once StringLiteralTypo
+                    case "Prelaunch":
+                        combat.PreLaunch = ExtractPreLaunch(node);
+                        break;
+                    case "Party":
+                        combat.CurrentScenario.Party = ExtractUnits(node);
+                        break;
+                    case "Special":
+                        combat.CurrentScenario.SpecialUnits = ExtractUnits(node);
+                        break;
+                }
             }
         }
 
         //Profile
-        if (!String.IsNullOrEmpty(profilePath)) Combat.CurrentScenario.Party = ExctractPartyFromXml(profilePath);
+        if (!String.IsNullOrEmpty(profilePath)) combat.CurrentScenario.Party = ExtractPartyFromXml(profilePath);
 
-        return Combat;
+        return combat;
     }
 
-    public static List<Unit> ExctractPartyFromXml(string profilePath)
+    public static List<Unit> ExtractPartyFromXml(string profilePath)
     {
         List<Unit> res = null;
         var xDoc = new XmlDocument();
@@ -58,13 +69,12 @@ public static class XMLLoader
         if (xRoot != null)
         {
             //parse all items
-            foreach (XmlElement xnode in xRoot)
-                if (xnode.Name == "Party")
-                    res = ExtractUnits(xnode);
+            foreach (var node in xRoot.Cast<XmlElement>().Where(node => node.Name == "Party"))
+                res = ExtractUnits(node);
         }
         else
         {
-            res = new List<Unit>();
+            res = [];
         }
 
         return res;
@@ -91,59 +101,57 @@ public static class XMLLoader
 
 
     /// <summary>
-    ///     exctract stats from xml part
+    ///     extract stats from xml part
     /// </summary>
-    /// <param name="xnode"></param>
     /// <returns></returns>
-    private static UnitStats ExctractStats(XmlElement xmlItems, int searchLvl, Unit unit)
+    private static UnitStats ExtractStats(XmlElement xmlItems, int searchLvl, Unit unit)
     {
         UnitStats unitStats = new(unit);
-        int? lvl;
         //parse all items
-        foreach (XmlElement xnode in xmlItems.SelectNodes("Stats"))
+        foreach (XmlElement node in xmlItems.SelectNodes("Stats")!)
         {
-            lvl = SafeToIntNull(xnode.Attributes.GetNamedItem("level")?.Value?.Trim());
+            var lvl = SafeToIntNull(node.Attributes.GetNamedItem("level")?.Value?.Trim());
             if (lvl == null || lvl == searchLvl)
             {
                 //base stats
-                unitStats.BaseMaxHp = SafeToDouble(xnode.Attributes.GetNamedItem("hp")?.Value.Trim());
-                unitStats.BaseAttack = SafeToDouble(xnode.Attributes.GetNamedItem("atk")?.Value.Trim());
-                unitStats.BaseSpeed = SafeToDouble(xnode.Attributes.GetNamedItem("spd")?.Value.Trim());
-                unitStats.MaxToughness = SafeToInt(xnode.Attributes.GetNamedItem("tgh")?.Value.Trim());
-                unitStats.BaseCritChance = SafeToDouble(xnode.Attributes.GetNamedItem("crit_rate")?.Value.Trim());
-                unitStats.BaseCritDmg = SafeToDouble(xnode.Attributes.GetNamedItem("crit_dmg")?.Value.Trim());
-                unitStats.BaseDef = SafeToDouble(xnode.Attributes.GetNamedItem("def")?.Value.Trim());
-                unitStats.BaseEffectRes = SafeToDouble(xnode.Attributes.GetNamedItem("effect_res")?.Value.Trim());
-                unitStats.BaseEffectHit = SafeToDouble(xnode.Attributes.GetNamedItem("effect_hit")?.Value.Trim());
-                unitStats.BaseEnergyRes = SafeToDouble(xnode.Attributes.GetNamedItem("sp_rate")?.Value.Trim());
-                unitStats.BaseHealRate = SafeToDouble(xnode.Attributes.GetNamedItem("heal_rate")?.Value.Trim());
-                if (xnode.Attributes.GetNamedItem("baseActionValue") is not null)
+                unitStats.BaseMaxHp = SafeToDouble(node.Attributes.GetNamedItem("hp")?.Value?.Trim());
+                unitStats.BaseAttack = SafeToDouble(node.Attributes.GetNamedItem("atk")?.Value?.Trim());
+                unitStats.BaseSpeed = SafeToDouble(node.Attributes.GetNamedItem("spd")?.Value?.Trim());
+                unitStats.MaxToughness = SafeToInt(node.Attributes.GetNamedItem("tgh")?.Value?.Trim());
+                unitStats.BaseCritChance = SafeToDouble(node.Attributes.GetNamedItem("crit_rate")?.Value?.Trim());
+                unitStats.BaseCritDmg = SafeToDouble(node.Attributes.GetNamedItem("crit_dmg")?.Value?.Trim());
+                unitStats.BaseDef = SafeToDouble(node.Attributes.GetNamedItem("def")?.Value?.Trim());
+                unitStats.BaseEffectRes = SafeToDouble(node.Attributes.GetNamedItem("effect_res")?.Value?.Trim());
+                unitStats.BaseEffectHit = SafeToDouble(node.Attributes.GetNamedItem("effect_hit")?.Value?.Trim());
+                unitStats.BaseEnergyRes = SafeToDouble(node.Attributes.GetNamedItem("sp_rate")?.Value?.Trim());
+                unitStats.BaseHealRate = SafeToDouble(node.Attributes.GetNamedItem("heal_rate")?.Value?.Trim());
+                if (node.Attributes.GetNamedItem("baseActionValue") is not null)
                     unitStats.LoadedBaseActionValue =
-                        SafeToInt(xnode.Attributes.GetNamedItem("baseActionValue")?.Value.Trim());
+                        SafeToInt(node.Attributes.GetNamedItem("baseActionValue")?.Value?.Trim());
 
                 //PRC stats
-                unitStats.MaxHpPrc = SafeToDouble(xnode.Attributes.GetNamedItem("hp_prc")?.Value.Trim());
-                unitStats.AttackPrc = SafeToDouble(xnode.Attributes.GetNamedItem("atk_prc")?.Value.Trim());
-                unitStats.CritDmgPrc = SafeToDouble(xnode.Attributes.GetNamedItem("crit_dmg_prc")?.Value.Trim());
-                unitStats.BreakDmgPrc = SafeToDouble(xnode.Attributes.GetNamedItem("break_dmg_prc")?.Value.Trim());
-                unitStats.SpeedPrc = SafeToDouble(xnode.Attributes.GetNamedItem("spd_prc")?.Value.Trim());
-                unitStats.DefPrc = SafeToDouble(xnode.Attributes.GetNamedItem("def_prc")?.Value.Trim());
-                unitStats.CritRatePrc = SafeToDouble(xnode.Attributes.GetNamedItem("crit_rate_prc")?.Value.Trim());
-                unitStats.EffectHitPrc = SafeToDouble(xnode.Attributes.GetNamedItem("effect_hit_prc")?.Value.Trim());
-                unitStats.EffectResPrc = SafeToDouble(xnode.Attributes.GetNamedItem("effect_res_prc")?.Value.Trim());
-                unitStats.BaseEnergyResPrc = SafeToDouble(xnode.Attributes.GetNamedItem("sp_rate_prc")?.Value.Trim());
-                unitStats.HealRatePrc = SafeToDouble(xnode.Attributes.GetNamedItem("heal_rate_prc")?.Value.Trim());
+                unitStats.MaxHpPrc = SafeToDouble(node.Attributes.GetNamedItem("hp_prc")?.Value?.Trim());
+                unitStats.AttackPrc = SafeToDouble(node.Attributes.GetNamedItem("atk_prc")?.Value?.Trim());
+                unitStats.CritDmgPrc = SafeToDouble(node.Attributes.GetNamedItem("crit_dmg_prc")?.Value?.Trim());
+                unitStats.BreakDmgPrc = SafeToDouble(node.Attributes.GetNamedItem("break_dmg_prc")?.Value?.Trim());
+                unitStats.SpeedPrc = SafeToDouble(node.Attributes.GetNamedItem("spd_prc")?.Value?.Trim());
+                unitStats.DefPrc = SafeToDouble(node.Attributes.GetNamedItem("def_prc")?.Value?.Trim());
+                unitStats.CritRatePrc = SafeToDouble(node.Attributes.GetNamedItem("crit_rate_prc")?.Value?.Trim());
+                unitStats.EffectHitPrc = SafeToDouble(node.Attributes.GetNamedItem("effect_hit_prc")?.Value?.Trim());
+                unitStats.EffectResPrc = SafeToDouble(node.Attributes.GetNamedItem("effect_res_prc")?.Value?.Trim());
+                unitStats.BaseEnergyResPrc = SafeToDouble(node.Attributes.GetNamedItem("sp_rate_prc")?.Value?.Trim());
+                unitStats.HealRatePrc = SafeToDouble(node.Attributes.GetNamedItem("heal_rate_prc")?.Value?.Trim());
 
 
                 //fix stats
-                unitStats.MaxHpFix = SafeToDouble(xnode.Attributes.GetNamedItem("hp_fix")?.Value.Trim());
-                unitStats.AttackFix = SafeToDouble(xnode.Attributes.GetNamedItem("atk_fix")?.Value.Trim());
-                unitStats.SpeedFix = SafeToDouble(xnode.Attributes.GetNamedItem("spd_fix")?.Value.Trim());
+                unitStats.MaxHpFix = SafeToDouble(node.Attributes.GetNamedItem("hp_fix")?.Value?.Trim());
+                unitStats.AttackFix = SafeToDouble(node.Attributes.GetNamedItem("atk_fix")?.Value?.Trim());
+                unitStats.SpeedFix = SafeToDouble(node.Attributes.GetNamedItem("spd_fix")?.Value?.Trim());
 
                 //weapon damage by element???
-                foreach (var elmn in (ElementEnm[])Enum.GetValues(typeof(ElementEnm)))
-                    unit.GetElemBoost(elmn).Value = SafeToDouble(xnode.Attributes
-                        .GetNamedItem(elmn.ToString().ToLower() + "_dmg_prc")?.Value.Trim());
+                foreach (var elm in (ElementEnm[])Enum.GetValues(typeof(ElementEnm)))
+                    unit.GetElemBoost(elm).Value = SafeToDouble(node.Attributes
+                        .GetNamedItem(elm.ToString().ToLower() + "_dmg_prc")?.Value?.Trim());
             }
         }
 
@@ -169,39 +177,39 @@ public static class XMLLoader
     }
 
     /// <summary>
-    ///     Exctract unit list from xml elemenet
+    ///     Extract unit list from xml element
     /// </summary>
-    /// <param name="wave"></param>
     /// <returns></returns>
-    private static List<Unit> ExtractUnits(XmlElement unitPack)
+    private static List<Unit> ExtractUnits(XmlNode unitPack)
     {
-        List<Unit> units = new();
-        foreach (XmlElement unitNode in unitPack.SelectNodes("Unit"))
+        List<Unit> units = [];
+        foreach (XmlElement unitNode in unitPack.SelectNodes("Unit")!)
         {
             Unit unit = new();
-            //load xml by 
-            var unitCode = unitNode.Attributes.GetNamedItem("template").Value.Trim();
-            var assemblyName = unitNode.Attributes.GetNamedItem("assembly")?.Value.Trim()??"HSR_SIM_CONTENT";
+            string unitCode = unitNode.Attributes.GetNamedItem("template")?.Value?.Trim();
+            if (unitCode is null)
+                throw new Exception("Unit template value is null");
+            var assemblyName = unitNode.Attributes.GetNamedItem("assembly")?.Value?.Trim()??"HSR_SIM_CONTENT";
             var words = unitCode.Split('\\');
             unit.FighterClassName =
                 $"{assemblyName}.Content.{words[0]}.{EscapeReplaceString(words[1])}, {assemblyName}";
             unit.UnitType = (TypeEnm)Enum.Parse(typeof(TypeEnm), words[0], true);
             unit.Level =
                 int.Parse(unitNode.Attributes.GetNamedItem("level")?.Value?.Trim() ??
-                          "1"); //will be overwriten by wargear if possible
+                          "1"); //will be overwritten by wargear if possible
             unit.Rank = int.Parse(unitNode.Attributes.GetNamedItem("rank")?.Value?.Trim() ??
-                                  "0"); //will be overwriten by wargear if possible
+                                  "0"); //will be overwritten by wargear if possible
             unit.Name = words[1];
             //override by wargear
-            var warGear = unitNode.Attributes.GetNamedItem("wargear")?.Value.Trim();
+            var warGear = unitNode.Attributes.GetNamedItem("wargear")?.Value?.Trim();
             //if wargear filled but no file 
             if (!string.IsNullOrEmpty(warGear) && !File.Exists(GetWarGearFile(warGear)))
-                throw new Exception(string.Format("WarGear file {0:s} not found", warGear));
+                throw new Exception($"WarGear file {warGear} not found");
 
             if (File.Exists(GetWarGearFile(warGear ?? unitCode)))
-                ExctractWargear(warGear ?? unitCode, unit);
+                ExtractWargear(warGear ?? unitCode, unit);
             else
-                ExctractUnitSkillsAndGear(unitNode, unit);
+                ExtractUnitSkillsAndGear(unitNode, unit);
 
             units.Add(unit);
         }
@@ -210,19 +218,20 @@ public static class XMLLoader
     }
 
     /// <summary>
-    ///     Exctract pre launch options from xml
+    ///     Extract pre launch options from xml
     /// </summary>
 
     private static List<PreLaunchOption> ExtractPreLaunch(XmlElement preLaunchOptionsXml)
     {
-        List<PreLaunchOption> preLaunchOptions = new();
-        foreach (XmlElement optionNode in preLaunchOptionsXml.SelectNodes("Option"))
+        List<PreLaunchOption> preLaunchOptions = [];
+        foreach (XmlElement optionNode in preLaunchOptionsXml.SelectNodes("Option")!)
         {
 
-            PreLaunchOption option = new();
-            option.OptionType = (PreLaunchOptionEnm)Enum.Parse(typeof(PreLaunchOptionEnm), optionNode.Attributes.GetNamedItem("type").Value.Trim(), true);
-            option.Value = SafeToDouble(optionNode.Attributes.GetNamedItem("value")?.Value.Trim());
-
+            PreLaunchOption option = new()
+            {
+                OptionType = (PreLaunchOptionEnm)Enum.Parse(typeof(PreLaunchOptionEnm), optionNode.Attributes.GetNamedItem("type")?.Value?.Trim()??"", true),
+                Value = SafeToDouble(optionNode.Attributes.GetNamedItem("value")?.Value?.Trim())
+            };
 
 
             preLaunchOptions.Add(option);
@@ -236,57 +245,58 @@ public static class XMLLoader
         return Utl.DataFolder + "WarGear\\" + param + ".xml";
     }
 
-    private static void ExctractUnitSkillsAndGear(XmlElement xmlElement, Unit unit)
+    private static void ExtractUnitSkillsAndGear(XmlElement xmlElement, Unit unit)
     {
 
-        var newLevel = xmlElement.Attributes.GetNamedItem("level")?.Value.Trim();
-        var newRank = xmlElement.Attributes.GetNamedItem("rank")?.Value.Trim();
+        var newLevel = xmlElement.Attributes.GetNamedItem("level")?.Value?.Trim();
+        var newRank = xmlElement.Attributes.GetNamedItem("rank")?.Value?.Trim();
         if (!string.IsNullOrEmpty(newLevel))
             unit.Level = SafeToInt(newLevel);
         if (!string.IsNullOrEmpty(newRank))
             unit.Rank = SafeToInt(newRank);
 
-        unit.Stats = ExctractStats(xmlElement, unit.Level, unit);
+        unit.Stats = ExtractStats(xmlElement, unit.Level, unit);
 
-        foreach (XmlElement xmlSkill in xmlElement.SelectNodes("Skill"))
+        foreach (XmlElement xmlSkill in xmlElement.SelectNodes("Skill")!)
         {
             Skill skill = new()
             {
-                Name = xmlSkill.Attributes.GetNamedItem("name").Value.Trim(),
-                Level = int.Parse(xmlSkill.Attributes.GetNamedItem("level").Value)
+                Name = xmlSkill.Attributes.GetNamedItem("name")?.Value?.Trim(),
+                Level = int.Parse(xmlSkill.Attributes.GetNamedItem("level")?.Value??"0")
             };
             unit.Skills.Add(skill);
         }
 
 
-        foreach (XmlElement xmlLcone in xmlElement.SelectNodes("LightCone"))
+        foreach (XmlElement xmlLCone in xmlElement.SelectNodes("LightCone")!)
         {
-            var assemblyName = xmlLcone.Attributes.GetNamedItem("assembly")?.Value.Trim()??"HSR_SIM_CONTENT";
+            var assemblyName = xmlLCone.Attributes.GetNamedItem("assembly")?.Value?.Trim()??"HSR_SIM_CONTENT";
             unit.LightConeStringPath =
-                $"{assemblyName}.Content.LightCones.{EscapeReplaceString(xmlLcone.Attributes.GetNamedItem("name").Value).Trim()}, {assemblyName}";
-            unit.LightConeInitRank = int.Parse(xmlLcone.Attributes.GetNamedItem("rank").Value.Trim());
+                $"{assemblyName}.Content.LightCones.{EscapeReplaceString(xmlLCone.Attributes.GetNamedItem("name")?.Value).Trim()}, {assemblyName}";
+            unit.LightConeInitRank = int.Parse(xmlLCone.Attributes.GetNamedItem("rank")?.Value?.Trim()??"0");
         }
 
-        foreach (XmlElement xmlRelic in xmlElement.SelectNodes("RelicSet"))
+        foreach (XmlElement xmlRelic in xmlElement.SelectNodes("RelicSet")!)
         {
-            var assemblyName = xmlRelic.Attributes.GetNamedItem("assembly")?.Value.Trim()??"HSR_SIM_CONTENT";
+            var assemblyName = xmlRelic.Attributes.GetNamedItem("assembly")?.Value?.Trim()??"HSR_SIM_CONTENT";
             KeyValuePair<string, int> newRec = new(
-                $"{assemblyName}.Content.Relics.{EscapeReplaceString(xmlRelic.Attributes.GetNamedItem("name").Value)}, {assemblyName}",
-                int.Parse(xmlRelic.Attributes.GetNamedItem("num").Value.Trim()));
+                $"{assemblyName}.Content.Relics.{EscapeReplaceString(xmlRelic.Attributes.GetNamedItem("name")?.Value)}, {assemblyName}",
+                int.Parse(xmlRelic.Attributes.GetNamedItem("num")?.Value?.Trim()??"0"));
             unit.RelicsClasses.Add(newRec);
         }
 
 
     }
-    private static void ExctractWargear(string wargear, Unit unit)
+    private static void ExtractWargear(string wargear, Unit unit)
     {
         XmlDocument unitDoc = new();
         unitDoc.Load(GetWarGearFile(wargear));
         var xRoot = unitDoc.DocumentElement;
-        var unitCode = xRoot.Attributes.GetNamedItem("name").Value.Trim();
-        ExctractUnitSkillsAndGear(xRoot, unit);
+        if (xRoot == null) return;
+        var unitCode = xRoot.Attributes.GetNamedItem("name")!.Value!.Trim();
+        ExtractUnitSkillsAndGear(xRoot, unit);
         if (unitCode != unit.Name)
-            throw new Exception(string.Format("Looking wargear for {0:s} but loaded for {1:s}", unit.Name, unitCode));
+            throw new Exception($"Looking wargear for {unit.Name} but loaded for {unitCode}");
     }
 
 
@@ -294,17 +304,18 @@ public static class XMLLoader
     ///     Parsing XML part of Fights
     /// </summary>
     /// <param name="xnode">xml segment</param>
-    private static void FillFights(XmlElement xnode, SimCls Combat)
+    /// <param name="combat"></param>
+    private static void FillFights(XmlElement xnode, SimCls combat)
     {
         foreach (XmlElement fightXml in xnode.ChildNodes)
         {
             Fight fg = new()
             {
-                Name = fightXml.Attributes.GetNamedItem("name").Value.Trim(),
+                Name = fightXml.Attributes.GetNamedItem("name")?.Value?.Trim(),
                 Waves = new List<Wave>()
             };
 
-            foreach (XmlElement waveXml in fightXml.SelectNodes("Wave"))
+            foreach (XmlElement waveXml in fightXml.SelectNodes("Wave")!)
             {
                 Wave ww = new()
                 {
@@ -314,7 +325,7 @@ public static class XMLLoader
                 fg.Waves.Add(ww);
             }
 
-            Combat.CurrentScenario.Fights.Add(fg);
+            combat.CurrentScenario.Fights.Add(fg);
         }
     }
 }

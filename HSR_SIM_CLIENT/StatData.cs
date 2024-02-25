@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-
-namespace HSR_SIM_GUI.Data;
+﻿namespace HSR_SIM_CLIENT;
 
 internal static class StatData
 {
-    public static Dictionary<string, string> subStatsUpgrades = new()
+    public static readonly Dictionary<string, string> SubStatsUpgrades = new()
     {
         { "spd_fix", "2,3" }, { "hp_fix", "38,103755" }, { "atk_fix", "19,051877" }, { "def", "19,051877" },
         { "hp_prc", "0,03888" }, { "atk_prc", "0,03888" }, { "def_prc", "0,0486" }, { "break_dmg_prc", "0,05832" },
@@ -12,7 +10,7 @@ internal static class StatData
         { "crit_dmg_prc", "0,05832" }
     };
 
-    public static Dictionary<string, string> mainStatsUpgrades = new()
+    public static readonly Dictionary<string, string> MainStatsUpgrades = new()
     {
         { "spd_fix", "1,4" }, { "hp_fix", "39,5136" }, { "atk_fix", "19,7568" }, { "hp_prc", "0,024192" },
         { "atk_prc", "0,024192" }, { "def_prc", "0,03024" }, { "break_dmg_prc", "0,036277" },
@@ -25,7 +23,7 @@ internal static class StatData
         { "imaginary_dmg_prc", "0,021773" }
     };
 
-    public static Dictionary<string, string> mainStatsBase = new()
+    public static readonly Dictionary<string, string> MainStatsBase = new()
     {
         { "spd_fix", "4,032" }, { "hp_fix", "112,896" }, { "atk_fix", "56,448" }, { "hp_prc", "0,069120" },
         { "atk_prc", "0,069120" }, { "def_prc", "0,0864" }, { "break_dmg_prc", "0,103680" },
