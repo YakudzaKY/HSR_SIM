@@ -1,5 +1,4 @@
 ﻿using HSR_SIM_LIB.Content;
-using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -37,7 +36,7 @@ internal class ButtheBattleIsntOver : DefaultLightCone
                 {
                     AppliedBuffToApply = new AppliedBuff(Parent.Parent)
                     {
-                        Type = AppliedBuff.BuffType.Buff,
+                        Type = Buff.BuffType.Buff,
                         Effects = new List<Effect> { new EffAllDamageBoost { Value = modifiersDmg[Rank - 1] } },
                         BaseDuration = 1
                     }

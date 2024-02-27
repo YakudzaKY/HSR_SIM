@@ -1,5 +1,4 @@
 ﻿using HSR_SIM_LIB.Content;
-using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -37,8 +36,8 @@ internal class BeforetheTutorialMissionStarts : DefaultLightCone
         //if hit any target that have def debuff or def ignore by player
         var targetHits = (from p in ent.ParentStep.Events
                 where p is DirectDamage &&
-                      (p.TargetUnit.GetBuffSumByType(typeof(EffDef), buffType: AppliedBuff.BuffType.Debuff) < 0
-                       || p.TargetUnit.GetBuffSumByType(typeof(EffDefPrc), buffType: AppliedBuff.BuffType.Debuff) < 0
+                      (p.TargetUnit.GetBuffSumByType(typeof(EffDef), buffType: Buff.BuffType.Debuff) < 0
+                       || p.TargetUnit.GetBuffSumByType(typeof(EffDefPrc), buffType: Buff.BuffType.Debuff) < 0
                        || p.SourceUnit.DefIgnore(ent) > 0)
                 select p.TargetUnit)
             .Distinct();

@@ -5,7 +5,7 @@ using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using HSR_SIM_LIB.Utils;
-using static HSR_SIM_LIB.Fighters.FighterUtils;
+using static HSR_SIM_LIB.Content.FighterUtils;
 
 namespace HSR_SIM_CONTENT.Content.Character;
 
@@ -46,7 +46,7 @@ public class Bronya : DefaultFighter
             OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
             AppliedBuffToApply = new AppliedBuff(Parent)
             {
-                Type = AppliedBuff.BuffType.Buff,
+                Type = Buff.BuffType.Buff,
                 Effects = new List<Effect> { new EffAtkPrc { Value = 0.15 } },
                 BaseDuration = 2,
                 Dispellable = true
@@ -97,7 +97,7 @@ public class Bronya : DefaultFighter
             AppliedBuffToApply = new AppliedBuff(Parent)
             {
                 BaseDuration = 1,
-                Effects = [ new EffAllDamageBoost { Value = GetAbilityScaling(0.33, 0.66, abilitySkillLvl) } ]
+                Effects = [new EffAllDamageBoost { Value = GetAbilityScaling(0.33, 0.66, abilitySkillLvl) }]
             }
         });
         ability.Events.Add(new EnergyGain(null, this, Parent)
@@ -123,7 +123,7 @@ public class Bronya : DefaultFighter
             AppliedBuffToApply = new AppliedBuff(Parent)
             {
                 CustomIconName = "The_Belobog_March",
-                Type = AppliedBuff.BuffType.Buff,
+                Type = Buff.BuffType.Buff,
                 Effects = new List<Effect>
                 {
                     new EffAtkPrc { Value = GetAbilityScaling(0.33, 0.55, ultimateSkillLvl) },
@@ -199,13 +199,13 @@ public class Bronya : DefaultFighter
      */
     protected override double WillSpend()
     {
-        return WillCastE() ? 1 + GetFriendSpender(UnitRole.MainDPS) : 0;
+        return WillCastE() ? 1 + GetFriendSpender(UnitRole.MainDps) : 0;
     }
 
     //mainDPS have >=50% action value or got CC or 5 sp
     private bool WillCastE()
     {
-        var mainDPS = GetFriendByRole(UnitRole.MainDPS).Parent;
+        var mainDPS = GetFriendByRole(UnitRole.MainDps).Parent;
         if ((mainDPS != Parent &&
              (mainDPS.Controlled || mainDPS.Stats.PerformedActionValue < mainDPS.GetActionValue(null) * 0.5)) ||
             Parent.ParentTeam.GetRes(Resource.ResourceType.SP).ResVal >= Constant.MaxSp - 1)

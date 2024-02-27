@@ -10,10 +10,10 @@ namespace HSR_SIM_LIB.Fighters;
 /// </summary>
 public class DevModeLogger
 {
-    private int curPos;
-    private int[] intArr;
     private readonly string logFilePath;
     private readonly Worker parentWorker;
+    private int curPos;
+    private int[] intArr;
 
     public DevModeLogger(string filePath, Worker parentWorker)
     {

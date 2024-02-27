@@ -22,11 +22,14 @@ public static class Constant
     public static readonly Size EnergyBarSize =
         new(CombatImgSize.Width / 10, (sbyte)Math.Round((double)(CombatImgSize.Height / 40)));
 
+    public static int PassiveBuffHeightSize = ElemSizeMini.Height * 2;
+
     /// <summary>
     ///     total portrait size
     /// </summary>
     public static readonly Size TotalUnitSize =
-        new(PortraitSize.Width, PortraitSize.Height + HealthBarSize.Height + EnergyBarSize.Height);
+        new(PortraitSize.Width,
+            PortraitSize.Height + HealthBarSize.Height + EnergyBarSize.Height + PassiveBuffHeightSize);
 
     //Some of sizes or coords
     public static readonly sbyte BarFontSize = (sbyte)Math.Round((double)(CombatImgSize.Height / 65));

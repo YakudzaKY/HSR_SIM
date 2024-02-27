@@ -1,5 +1,5 @@
 ﻿using HSR_SIM_CONTENT.DefaultContent;
-using HSR_SIM_LIB.Fighters;
+using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
@@ -62,7 +62,6 @@ public class Luocha : DefaultFighter
             Dispellable = false,
             CustomIconName = "Abyss_Flower_CD",
             Effects = []
-            
         };
 
         //=====================
@@ -219,10 +218,9 @@ public class Luocha : DefaultFighter
             //CoL buffs
             Parent.PassiveBuffs.Add(new PassiveBuff(Parent)
             {
-               
-                    Effects = [new EffAtkPrc { Value = 0.2 }],
-                    CustomIconName = uniqueAppliedBuff.CustomIconName,
-              
+                Effects = [new EffAtkPrc { Value = 0.2 }],
+                CustomIconName = uniqueAppliedBuff.CustomIconName,
+
                 Target = Parent.ParentTeam,
                 Condition = new PassiveBuff.ConditionRec
                 {
@@ -240,8 +238,7 @@ public class Luocha : DefaultFighter
         if (Parent.Rank >= 2)
             Parent.PassiveBuffs.Add(new PassiveBuff(Parent)
             {
-               
-                     Effects = [new EffOutgoingHealingPrc { CalculateValue = CalculateE2 }],
+                Effects = [new EffOutgoingHealingPrc { CalculateValue = CalculateE2 }],
                 Target = Parent,
                 IsTargetCheck = true
             });
@@ -251,11 +248,10 @@ public class Luocha : DefaultFighter
             //CoL buffs
             Parent.PassiveBuffs.Add(new PassiveBuff(Parent)
             {
-             
-                    Type = Buff.BuffType.Debuff,
-                    Effects = [new EffAllDamageBoost { Value = -0.12 }],
-                    CustomIconName = uniqueAppliedBuff.CustomIconName,
-                
+                Type = Buff.BuffType.Debuff,
+                Effects = [new EffAllDamageBoost { Value = -0.12 }],
+                CustomIconName = uniqueAppliedBuff.CustomIconName,
+
                 Target = TargetTypeEnm.Enemy,
                 Condition = new PassiveBuff.ConditionRec
                 {

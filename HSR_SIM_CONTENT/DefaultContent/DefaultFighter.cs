@@ -5,7 +5,7 @@ using HSR_SIM_LIB.Skills.ReadyBuffs;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
-using static HSR_SIM_LIB.Fighters.FighterUtils;
+using static HSR_SIM_LIB.Content.FighterUtils;
 using static HSR_SIM_LIB.UnitStuff.Resource;
 using static HSR_SIM_LIB.Content.IFighter;
 
@@ -152,16 +152,16 @@ public abstract class DefaultFighter : IFighter
                         (x.Stats.BaseAttack * (1 + x.Stats.AttackPrc) + x.Stats.AttackFix) * x.Stats.BaseCritChance *
                         x.Stats.BaseCritDmg).ToList();
                 if (Parent == unitsToSearch.First())
-                    role = UnitRole.MainDPS;
+                    role = UnitRole.MainDps;
                 //if second on list then second dps
                 else if (new List<PathType?>
                                  { PathType.Hunt, PathType.Destruction, PathType.Erudition, PathType.Nihility }
                              .Contains(Path) && Parent == unitsToSearch.ElementAt(1))
-                    role = UnitRole.SecondDPS;
+                    role = UnitRole.SecondDps;
                 else if (new List<PathType?>
                              { PathType.Hunt, PathType.Destruction, PathType.Erudition }.Contains(Path) &&
                          Parent == unitsToSearch.ElementAt(2))
-                    role = UnitRole.ThirdDPS;
+                    role = UnitRole.ThirdDps;
                 //healer here
                 else if (Path == PathType.Abundance)
                     role = UnitRole.Healer;
@@ -274,7 +274,7 @@ public abstract class DefaultFighter : IFighter
 
     public virtual Unit? GetBestTarget(Ability ability)
     {
-        var leader = Parent.ParentTeam.Units.FirstOrDefault(x => x.Fighter.Role == UnitRole.MainDPS);
+        var leader = Parent.ParentTeam.Units.FirstOrDefault(x => x.Fighter.Role == UnitRole.MainDps);
         if (ability.TargetType == Ability.TargetTypeEnm.Self) return Parent;
         if (ability.AdjacentTargets == Ability.AdjacentTargetsEnm.All) return null;
 
@@ -291,7 +291,7 @@ public abstract class DefaultFighter : IFighter
             if (ability.AdjacentTargets == Ability.AdjacentTargetsEnm.None)
             {
                 //Support,Healer focus on Shield shred. 
-                if (Role is UnitRole.Support or UnitRole.Healer or UnitRole.SecondDPS)
+                if (Role is UnitRole.Support or UnitRole.Healer or UnitRole.SecondDps)
                     return Parent.GetTargetsForUnit(ability.TargetType)
                         .OrderByDescending(x => x.GetWeaknesses(null).Contains(Element))
                         .ThenBy(x =>
@@ -420,7 +420,7 @@ public abstract class DefaultFighter : IFighter
         Parent.ParentTeam.ParentSim?.Parent.LogDebug(
             $"Resource: {res} .My friends reserve {reservedSp:f} Sp. My reserve is {myReserve:f} Sp");
 
-        if (Role is UnitRole.MainDPS)
+        if (Role is UnitRole.MainDps)
         {
             //Cut Free  res to total-reserve
             res = Math.Min(res, totalRes - reservedSp);
@@ -429,16 +429,16 @@ public abstract class DefaultFighter : IFighter
         }
         else if (Role is UnitRole.Support)
         {
-            var addSpenders = GetFriendSpender(UnitRole.MainDPS);
+            var addSpenders = GetFriendSpender(UnitRole.MainDps);
             res -= addSpenders;
             //Cut Free  res to total-reserve
             res = Math.Min(res, totalRes - reservedSp);
             Parent.ParentTeam.ParentSim?.Parent.LogDebug(
                 $"Im {Role},I care about (reserve+ MainDps spenders)={addSpenders}");
         }
-        else if (Role is UnitRole.SecondDPS or UnitRole.ThirdDPS)
+        else if (Role is UnitRole.SecondDps or UnitRole.ThirdDps)
         {
-            var addSpenders = GetFriendSpender(UnitRole.MainDPS) + GetFriendSpender(UnitRole.Support);
+            var addSpenders = GetFriendSpender(UnitRole.MainDps) + GetFriendSpender(UnitRole.Support);
             res -= addSpenders;
             //Cut Free  res to total-reserve
             res = Math.Min(res, totalRes - reservedSp);

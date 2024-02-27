@@ -1,5 +1,5 @@
 ﻿using HSR_SIM_CONTENT.DefaultContent;
-using HSR_SIM_LIB.Fighters;
+using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
@@ -105,15 +105,15 @@ public class SilverWolf : DefaultFighter
         var ability =
             //Force Quit Program
             new Ability(this)
-        {
-            AbilityType = AbilityTypeEnm.Technique,
-            Name = "Force Quit Program",
-            Cost = 1,
-            CostType = Resource.ResourceType.TP,
-            Element = Element,
-            AdjacentTargets = AdjacentTargetsEnm.All,
-            IgnoreWeakness = true
-        };
+            {
+                AbilityType = AbilityTypeEnm.Technique,
+                Name = "Force Quit Program",
+                Cost = 1,
+                CostType = Resource.ResourceType.TP,
+                Element = Element,
+                AdjacentTargets = AdjacentTargetsEnm.All,
+                IgnoreWeakness = true
+            };
         //dmg events
         ability.Events.Add(new DirectDamage(null, this, Parent)
         {

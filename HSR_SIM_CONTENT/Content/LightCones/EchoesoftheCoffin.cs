@@ -1,6 +1,5 @@
 ﻿using HSR_SIM_CONTENT.DefaultContent;
 using HSR_SIM_LIB.Content;
-using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -27,7 +26,7 @@ internal class EchoesoftheCoffin : DefaultLightCone
                     CalculateTargets = ((DefaultFighter)Parent).GetAliveFriends,
                     AppliedBuffToApply = new AppliedBuff(Parent.Parent)
                     {
-                        Type = AppliedBuff.BuffType.Buff,
+                        Type = Buff.BuffType.Buff,
                         Effects = new List<Effect> { new EffSpeed { Value = modifiersSpd[Rank - 1] } },
                         BaseDuration = 1
                     }

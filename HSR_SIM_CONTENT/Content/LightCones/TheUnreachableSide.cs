@@ -1,5 +1,4 @@
 ﻿using HSR_SIM_LIB.Content;
-using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -19,7 +18,7 @@ internal class TheUnreachableSide : DefaultLightCone
         if (Path == Parent.Path)
             uniqueAppliedBuff = new AppliedBuff(Parent.Parent)
             {
-                Type = AppliedBuff.BuffType.Buff,
+                Type = Buff.BuffType.Buff,
                 BaseDuration = null,
                 MaxStack = 1,
                 Effects = new List<Effect> { new EffAllDamageBoost { Value = modifiers[rank - 1] } }

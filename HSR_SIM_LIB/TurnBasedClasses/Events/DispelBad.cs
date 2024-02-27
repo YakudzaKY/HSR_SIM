@@ -22,7 +22,7 @@ public class DispelBad : Event
         {
             var buffToDispell =
                 TargetUnit.AppliedBuffs.FirstOrDefault(x =>
-                    x.Type is AppliedBuff.BuffType.Debuff or AppliedBuff.BuffType.Dot && x.Dispellable);
+                    x.Type is Buff.BuffType.Debuff or Buff.BuffType.Dot && x.Dispellable);
             if (buffToDispell != null)
                 ChildEvents.Add(new RemoveBuff(ParentStep, Source, SourceUnit)
                     { TargetUnit = TargetUnit, AppliedBuffToApply = buffToDispell });

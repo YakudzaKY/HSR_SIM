@@ -141,19 +141,15 @@ public static class GraphicsCls
     ///     Draw start skills queue(technique etc)
     /// </summary>
     /// <param name="gfx"></param>
-    /// <param name="units"></param>
-    /// <param name="hstl"></param>
     /// <param name="point"></param>
+    /// <param name="startQueue"></param>
     private static void DrawStartQueue(Graphics gfx, Point point, List<Ability> startQueue)
     {
-        short i = 0;
         if (startQueue.Count > 0)
-        {
-            DrawText(point.X, point.Y + (StartQueuefontSize + StartQueuefontSizeSpc) * i, gfx, "Start skills queue:",
+            DrawText(point.X, point.Y, gfx, "Start skills queue:",
                 null, new Font("Tahoma", StartQueuefontSize));
-            i++;
-        }
 
+        short i = 1;
         foreach (var ability in startQueue)
         {
             DrawText(point.X, point.Y + (StartQueuefontSize + StartQueuefontSizeSpc) * i, gfx,
@@ -384,7 +380,8 @@ public static class GraphicsCls
                 {
                     var pointY = 0;
                     if (drawDirection == DrawDirection.TopToBottom)
-                        pointY = portraitPoint.Y + TotalUnitSize.Height + CombatImgSize.Height / 50 * j;
+                        pointY = portraitPoint.Y + TotalUnitSize.Height - PassiveBuffHeightSize +
+                                 CombatImgSize.Height / 50 * j;
                     else
                         pointY = portraitPoint.Y - CombatImgSize.Height / 50 * (j + 2);
                     var dmgIcon = ent switch
@@ -427,17 +424,23 @@ public static class GraphicsCls
 
             //Buffs
             j = 0;
+            var maxIconsVerticalCnt =
+                (int)Math.Floor((double)(PortraitSize.Height + HealthBarSize.Height + EnergyBarSize.Height) /
+                                ElemSizeMini.Height);
             foreach (var buff in unit.AppliedBuffs)
             {
-                var buffPoint = new Point(portraitPoint.X + PortraitSize.Width,
-                    portraitPoint.Y + j * ElemSizeMini.Height);
+                var colModifier = (int)Math.Floor((double)j / maxIconsVerticalCnt);
+
+                var buffPoint = new Point(portraitPoint.X + PortraitSize.Width + colModifier * ElemSizeMini.Width,
+                    portraitPoint.Y + j * ElemSizeMini.Height -
+                    colModifier * maxIconsVerticalCnt * ElemSizeMini.Height);
                 gfx.DrawImage(
                     new Bitmap(Utl.LoadBitmap(buff.CustomIconName ?? buff.Effects.First().GetType().Name),
                         ElemSizeMini), buffPoint);
                 gfx.DrawRectangle(
                     new Pen(
-                        buff.Type == AppliedBuff.BuffType.Buff ? Color.Aquamarine :
-                        buff.Type == AppliedBuff.BuffType.Debuff ? Color.Brown : Color.Violet, 1), buffPoint.X,
+                        buff.Type == Buff.BuffType.Buff ? Color.Aquamarine :
+                        buff.Type == Buff.BuffType.Debuff ? Color.Brown : Color.Violet, 1), buffPoint.X,
                     buffPoint.Y,
                     ElemSizeMini.Width, ElemSizeMini.Height);
 
@@ -478,10 +481,21 @@ public static class GraphicsCls
 
             //Passive buffs
             j = 0;
-            foreach (var buff in unit.GetPassivesForUnit(null, null,null,null,null))
+            var maxIconsHorizontalCnt = (int)Math.Floor((double)PortraitSize.Width / ElemSizeMini.Width);
+            foreach (var buff in unit.GetPassivesForUnit(null, null, null, null, null))
             {
-                var buffPoint = new Point(portraitPoint.X + j * ElemSizeMini.Width,
-                    portraitPoint.Y + PortraitSize.Height - ElemSizeMini.Width);
+                var rowModifier = (int)Math.Floor((double)j / maxIconsHorizontalCnt);
+                int pointY;
+                if (drawDirection == DrawDirection.BottomToTop)
+                    pointY = portraitPoint.Y + PortraitSize.Height + HealthBarSize.Height + EnergyBarSize.Height +
+                             rowModifier * ElemSizeMini.Height;
+                else
+                    pointY = portraitPoint.Y - EnergyBarSize.Height - rowModifier * ElemSizeMini.Height;
+
+                var buffPoint = new Point(
+                    portraitPoint.X + j * ElemSizeMini.Width -
+                    rowModifier * maxIconsHorizontalCnt * ElemSizeMini.Width, pointY
+                );
                 gfx.DrawImage(
                     new Bitmap(Utl.LoadBitmap(buff.CustomIconName ?? buff.Effects.First().GetType().Name),
                         ElemSizeMini), buffPoint);

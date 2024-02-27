@@ -357,7 +357,7 @@ public class Unit : CloneClass
     /// <param name="abilityType">search by ability type(for example Damage boost by ability)</param>
     /// <returns>double value(sum of effect values)</returns>
     public double GetBuffSumByType(Type effTypeToSearch, ElementEnm? elem = null, Event ent = null,
-        List<PassiveBuff> excludePassive = null, AppliedBuff.BuffType? buffType = null,
+        List<PassiveBuff> excludePassive = null, Buff.BuffType? buffType = null,
         AbilityTypeEnm? abilityType = null)
     {
         double res = 0;
@@ -450,7 +450,7 @@ public class Unit : CloneClass
         foreach (var effect in appliedBuff.Effects) effect.BeforeApply(ent, appliedBuff);
         AppliedBuffs.Add(appliedBuff);
         ResetCondition(ConditionCheckParam.Buff);
-        if (appliedBuff.Type != AppliedBuff.BuffType.Buff) ResetCondition(ConditionCheckParam.AnyDebuff);
+        if (appliedBuff.Type != Buff.BuffType.Buff) ResetCondition(ConditionCheckParam.AnyDebuff);
         foreach (var effect in appliedBuff.Effects) effect.OnApply(ent, appliedBuff);
     }
 
@@ -470,7 +470,8 @@ public class Unit : CloneClass
         {
             //add stack
             var oldStacks = foundBuff.Stack;
-            foundBuff.Stack = Math.Min(foundBuff.MaxStack, foundBuff.Stack + (appliedBuff.CalculateStacks?.Invoke(ent) ?? appliedBuff.Stack));
+            foundBuff.Stack = Math.Min(foundBuff.MaxStack,
+                foundBuff.Stack + (appliedBuff.CalculateStacks?.Invoke(ent) ?? appliedBuff.Stack));
             res = foundBuff.Stack - oldStacks;
             if (foundBuff.EffectStackingType == AppliedBuff.EffectStackingTypeEnm.FullReplace)
             {
@@ -509,7 +510,7 @@ public class Unit : CloneClass
         }
 
         ResetCondition(ConditionCheckParam.Buff);
-        if (appliedBuff.Type != AppliedBuff.BuffType.Buff) ResetCondition(ConditionCheckParam.AnyDebuff);
+        if (appliedBuff.Type != Buff.BuffType.Buff) ResetCondition(ConditionCheckParam.AnyDebuff);
         foreach (var effect in foundBuff.Effects) effect.OnApply(ent, foundBuff);
         //reset duration
         foundBuff.IsOld = false; //renew the flag
@@ -536,7 +537,7 @@ public class Unit : CloneClass
         }
 
         ResetCondition(ConditionCheckParam.Buff);
-        if (appliedBuff.Type != AppliedBuff.BuffType.Buff) ResetCondition(ConditionCheckParam.AnyDebuff);
+        if (appliedBuff.Type != Buff.BuffType.Buff) ResetCondition(ConditionCheckParam.AnyDebuff);
 
         return res;
     }
@@ -621,7 +622,7 @@ public class Unit : CloneClass
                 for (var i = 0; i < mod.Stack; i++)
                     res *= 1 - effect.Value ?? 0;
         //Condition
-        foreach (var passiveBuff in GetPassivesForUnit(this, typeof(EffDamageReduction),null,ent,null))
+        foreach (var passiveBuff in GetPassivesForUnit(this, typeof(EffDamageReduction), null, ent, null))
         foreach (var effect in passiveBuff.Effects.Where(x => x is EffDamageReduction))
             for (var i = 0; i < passiveBuff.Stack; i++)
                 res *= 1 - effect.Value ?? 0;

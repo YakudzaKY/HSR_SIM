@@ -26,6 +26,7 @@ public class ToughnessBreak(Step parent, ICloneable source, Unit sourceUnit)
             // https://honkai-star-rail.fandom.com/wiki/Toughness
             TryDebuff(SourceUnit.Fighter.WeaknessBreakDebuff, 1.5);
         }
+
         DamageWorks(revert);
         base.ProcEvent(revert);
     }

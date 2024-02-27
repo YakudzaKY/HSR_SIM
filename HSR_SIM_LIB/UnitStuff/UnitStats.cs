@@ -1,5 +1,5 @@
 ﻿using System;
-using HSR_SIM_LIB.Fighters;
+using HSR_SIM_LIB.Content;
 
 namespace HSR_SIM_LIB.UnitStuff;
 

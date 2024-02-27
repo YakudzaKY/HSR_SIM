@@ -33,7 +33,7 @@ public class PassiveBuff : Buff
 
     private bool truly;
 
-    public PassiveBuff(Unit parent) : base(parent,null)
+    public PassiveBuff(Unit parent) : base(parent)
     {
         CarrierUnit = parent;
     }
@@ -127,8 +127,8 @@ public class PassiveBuff : Buff
                 ConditionCheckParam.Buff => untToCheck.AppliedBuffs.Any(x => x.Reference == Condition.AppliedBuffValue)
                                             == (Condition.ConditionExpression == ConditionCheckExpression.Exists),
                 ConditionCheckParam.AnyDebuff => untToCheck.AppliedBuffs.Any(x =>
-                                                     x.Type is AppliedBuff.BuffType.Debuff
-                                                         or AppliedBuff.BuffType.Dot)
+                                                     x.Type is BuffType.Debuff
+                                                         or BuffType.Dot)
                                                  == (Condition.ConditionExpression == ConditionCheckExpression.Exists),
                 _ => throw new NotImplementedException()
             };

@@ -14,8 +14,8 @@ internal class PioneerDiverofDeadWaters : DefaultRelicSet
 
     public PioneerDiverofDeadWaters(IFighter parent, int num) : base(parent, num)
     {
-        onDebuffHitAppliedBuff = new AppliedBuff(Parent.Parent) 
-            { BaseDuration = 1, Dispellable = false, CustomIconName = "Sword" , Effects = []};
+        onDebuffHitAppliedBuff = new AppliedBuff(Parent.Parent)
+            { BaseDuration = 1, Dispellable = false, CustomIconName = "Sword", Effects = [] };
         if (num >= 2)
             Parent.Parent.PassiveBuffs.Add(new PassiveBuff(parent.Parent)
             {
@@ -71,7 +71,7 @@ internal class PioneerDiverofDeadWaters : DefaultRelicSet
         var debuffs = ent.TargetUnit.AppliedBuffs.Count(x =>
             x.Type == Buff.BuffType.Debuff || x.Type == Buff.BuffType.Dot);
 
-        int mod = ent.SourceUnit.AppliedBuffs.Any(x => x.Reference == onDebuffHitAppliedBuff) ? 2 : 1;
+        var mod = ent.SourceUnit.AppliedBuffs.Any(x => x.Reference == onDebuffHitAppliedBuff) ? 2 : 1;
         return debuffs switch
         {
             >= 3 => 0.12 * mod,

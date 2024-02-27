@@ -5,12 +5,15 @@
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                  mc:Ignorable="d"
-                 Title="Single simulation" Height="Auto" Width="1250"
+                 Title="Single simulation" Height="Auto" Width="Auto"
                  WindowStartupLocation="CenterScreen"
-                 SizeToContent="Height"
+                 SizeToContent="WidthAndHeight"
+
                  DataContext="{Binding RelativeSource={RelativeSource Self}}">
 
+
     <Grid>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -21,9 +24,10 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
-        <Image Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="0" Height="600" Name="CombatImg" />
+        <Image Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="0" Height="600" Name="CombatImg" Stretch="None" />
 
         <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Height="120" Name="LogTextBlock" MaxLines="400"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -50,5 +54,31 @@
             <Button Grid.Row="0" Grid.Column="0" Name="BtnPrev" Click="BtnPrev_OnClick">Prev step</Button>
             <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding Path=DbgMode, Mode=TwoWay}">Debug output</CheckBox>
         </Grid>
+        <Grid Grid.Row="0" Grid.RowSpan="3" Grid.Column="3">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="2*" />
+            </Grid.ColumnDefinitions>
+            <TreeView Grid.Row="0" Grid.Column="0" Name="trvMenu">
+                <Style TargetType="TreeViewItem">
+                    <Setter Property="IsExpanded" Value="True" />
+                </Style>
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Teams }">
+
+                        <TextBlock Text="{Binding InputGestureText  }" />
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+            <DataGrid Grid.Row="0" Grid.Column="1" />
+            <TreeView Grid.Row="1" Grid.Column="0" />
+            <DataGrid Grid.Row="1" Grid.Column="1" />
+        </Grid>
+
     </Grid>
 </mah:MetroWindow>

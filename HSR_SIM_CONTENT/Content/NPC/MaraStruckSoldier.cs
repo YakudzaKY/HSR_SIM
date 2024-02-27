@@ -1,4 +1,5 @@
-﻿using HSR_SIM_LIB.Fighters;
+﻿using HSR_SIM_LIB.Content;
+using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -11,9 +12,8 @@ public class MaraStruckSoldier : DefaultNPCFighter
     //static because max 5 stacks by all units this type
     private static readonly AppliedBuff myDoTRef = new(null)
     {
-        Type = AppliedBuff.BuffType.Dot,
+        Type = Buff.BuffType.Dot,
         Effects = []
-        
     };
 
     private readonly AppliedBuff myDotDeAppliedBuff;
@@ -35,7 +35,7 @@ public class MaraStruckSoldier : DefaultNPCFighter
         myDotDeAppliedBuff = new AppliedBuff(Parent)
         {
             Reference = myDoTRef,
-            Type = AppliedBuff.BuffType.Dot,
+            Type = Buff.BuffType.Dot,
             BaseDuration = 3,
             Stack = 2,
             MaxStack = 5,
@@ -47,7 +47,7 @@ public class MaraStruckSoldier : DefaultNPCFighter
         uniqueAppliedBuff = new AppliedBuff(Parent)
         {
             Dispellable = true,
-            Type = AppliedBuff.BuffType.Buff,
+            Type = Buff.BuffType.Buff,
             Effects = new List<Effect> { new EffRebirth() }
         };
 

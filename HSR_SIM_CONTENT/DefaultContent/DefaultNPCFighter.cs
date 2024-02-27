@@ -4,7 +4,7 @@ using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using HSR_SIM_LIB.Utils.Utils;
-using static HSR_SIM_LIB.Fighters.FighterUtils;
+using static HSR_SIM_LIB.Content.FighterUtils;
 
 namespace HSR_SIM_LIB.Fighters;
 
@@ -70,7 +70,7 @@ public class DefaultNPCFighter : IFighter
         throw new Exception($"no enemy will be chosen by AGGRO counter={counter}");
     }
 
-    public AppliedBuff WeaknessBreakDebuff { get; set; } = new(null) {Effects = []};
+    public AppliedBuff WeaknessBreakDebuff { get; set; } = new(null) { Effects = [] };
     public PathType? Path { get; set; } = null;
     public Unit.ElementEnm Element { get; set; }
     public List<Unit.ElementEnm> NativeWeaknesses { get; set; } = new();
@@ -97,10 +97,10 @@ public class DefaultNPCFighter : IFighter
                     .OrderByDescending(x => x.Fighter.Cost)
                     .ToList();
                 if (Parent == unitsToSearch.First())
-                    role = UnitRole.MainDPS;
+                    role = UnitRole.MainDps;
 
                 else if (Parent == unitsToSearch.ElementAt(1))
-                    role = UnitRole.SecondDPS;
+                    role = UnitRole.SecondDps;
                 else
                     role = UnitRole.Support;
             }

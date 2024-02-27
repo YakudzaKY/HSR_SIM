@@ -61,7 +61,7 @@ public sealed partial class MainWindow : INotifyPropertyChanged
         SaveIni();
         var singleSimWindow = new SingleSimWindow();
         singleSimWindow.SetSim(
-            XmlLoader.LoadCombatFromXml(GetScenarioPath() + CbScenario.Text, GetProfilePath() + (string)CbProfile.Text),
+            XmlLoader.LoadCombatFromXml(GetScenarioPath() + CbScenario.Text, GetProfilePath() + CbProfile.Text),
             chkDevMode: DevMode);
         singleSimWindow.Show();
     }

@@ -16,7 +16,6 @@ public class AppliedBuff(Unit sourceUnit, Buff reference = null) : Buff(sourceUn
     public delegate void StepHandler(Step step);
 
 
-
     public enum EffectStackingTypeEnm
     {
         PickMax,
@@ -28,9 +27,6 @@ public class AppliedBuff(Unit sourceUnit, Buff reference = null) : Buff(sourceUn
     private static readonly List<Type> EarlyProcMods = [typeof(EffEntanglement)];
 
     public EffectStackingTypeEnm EffectStackingType { get; init; } = EffectStackingTypeEnm.PickMax;
-
-
-
 
 
     //buff marked old at turn end

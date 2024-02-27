@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using HSR_SIM_LIB.Content;
-using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -63,8 +62,8 @@ public sealed class SimCls : ICloneable
 
     public List<Step> Steps { get; private set; } = [];
 
-    public CombatFight CurrentFight { get; set; } 
-    public int CurrentFightStep { get; set; } 
+    public CombatFight CurrentFight { get; set; }
+    public int CurrentFightStep { get; set; }
 
     /// <summary>
     ///     Do enter combat on next step proc
@@ -100,7 +99,7 @@ public sealed class SimCls : ICloneable
     }
 
     //Total action value per run
-    public double TotalAv { get; set; } 
+    public double TotalAv { get; set; }
 
     public object Clone()
     {
@@ -110,10 +109,7 @@ public sealed class SimCls : ICloneable
         if (oldTeams != null)
         {
             newClone.Teams = new List<Team>();
-            foreach (var team in oldTeams)
-            {
-                newClone.Teams.Add((Team)team.Clone());
-            }
+            foreach (var team in oldTeams) newClone.Teams.Add((Team)team.Clone());
         }
 
         if (newClone.Steps != null)
@@ -191,7 +187,7 @@ public sealed class SimCls : ICloneable
                     drain.TargetUnit.GetRes(drain.ResType).ResVal == 0)
                 {
                     //temporary give back the THG for calculation break damage. will be reduce at the end
-                    drain.TargetUnit.GetRes(drain.ResType).ResVal += drain.RealVal??0;
+                    drain.TargetUnit.GetRes(drain.ResType).ResVal += drain.RealVal ?? 0;
                     ToughnessBreak shieldBrkEvent = new(drain.ParentStep, drain.Source, drain.SourceUnit)
                     {
                         TargetUnit = drain.TargetUnit
@@ -201,7 +197,7 @@ public sealed class SimCls : ICloneable
 
 
                     //reduce THG  again
-                    drain.TargetUnit.GetRes(drain.ResType).ResVal -= drain.RealVal??0;
+                    drain.TargetUnit.GetRes(drain.ResType).ResVal -= drain.RealVal ?? 0;
                 }
 
                 break;
@@ -347,7 +343,8 @@ public sealed class SimCls : ICloneable
             newStep.StepType = StepTypeEnm.EndWave;
             newStep.Events.Add(new EndWave(newStep, this, null));
         }
-        else if (newStep.StepType == StepTypeEnm.Idle &&CurrentFight is not null &&CurrentFight.Turn == null) //set who wanna move
+        else if (newStep.StepType == StepTypeEnm.Idle && CurrentFight is not null &&
+                 CurrentFight.Turn == null) //set who wanna move
         {
             if (!newStep.FollowUpActions())
             {
@@ -376,7 +373,7 @@ public sealed class SimCls : ICloneable
                     dot.Proceed(newStep);
             }
         }
-        else if (newStep.StepType == StepTypeEnm.Idle &&CurrentFight is not null&&
+        else if (newStep.StepType == StepTypeEnm.Idle && CurrentFight is not null &&
                  CurrentFight.Turn.TurnStage is StepTypeEnm.UnitTurnSelected or StepTypeEnm.UnitTurnContinued)
         {
             //try follow up actions before target do something
@@ -417,7 +414,8 @@ public sealed class SimCls : ICloneable
                 }
             }
         }
-        else if (newStep.StepType == StepTypeEnm.Idle &&CurrentFight is not null &&CurrentFight.Turn.TurnStage == StepTypeEnm.UnitTurnStarted)
+        else if (newStep.StepType == StepTypeEnm.Idle && CurrentFight is not null &&
+                 CurrentFight.Turn.TurnStage == StepTypeEnm.UnitTurnStarted)
         {
             //try follow up actions before target do something.
             //follow up actions disabled at NPC turn end

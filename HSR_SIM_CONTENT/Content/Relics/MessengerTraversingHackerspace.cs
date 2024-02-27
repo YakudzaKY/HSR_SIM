@@ -28,7 +28,7 @@ internal class MessengerTraversingHackerspace : DefaultRelicSet
                             AppliedBuffToApply = new AppliedBuff(Parent.Parent)
                             {
                                 UniqueStr = GetType().ToString(),
-                                Type = AppliedBuff.BuffType.Buff,
+                                Type = Buff.BuffType.Buff,
                                 Effects = new List<Effect> { new EffSpeedPrc { Value = 0.12 } },
                                 BaseDuration = 1,
                                 Dispellable = true

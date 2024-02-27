@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -8,7 +9,7 @@ using HSR_SIM_LIB.UnitStuff;
 using HSR_SIM_LIB.Utils.Utils;
 using static HSR_SIM_LIB.UnitStuff.Unit;
 
-namespace HSR_SIM_LIB.Fighters;
+namespace HSR_SIM_LIB.Content;
 
 /// <summary>
 ///     Combat utilities
@@ -28,14 +29,14 @@ public static class FighterUtils
 
     public enum UnitRole
     {
-        MainDPS,
-        SecondDPS,
-        ThirdDPS,
+        MainDps,
+        SecondDps,
+        ThirdDps,
         Support,
         Healer
     }
 
-    private static readonly Dictionary<int, double> lvlMultiplier;
+    private static readonly Dictionary<int, double> LvlMultiplier;
 
     /// <summary>
     ///     get from table in https://honkai-star-rail.fandom.com/wiki/Toughness#Weakness_Break
@@ -43,7 +44,7 @@ public static class FighterUtils
     /// </summary>
     static FighterUtils()
     {
-        lvlMultiplier = new Dictionary<int, double>
+        LvlMultiplier = new Dictionary<int, double>
         {
             { 1, 54.0000 }, { 2, 58.0000 }, { 3, 62.0000 }, { 4, 67.5264 }, { 5, 70.5094 }, { 6, 73.5228 },
             { 7, 76.5660 }, { 8, 79.6385 }, { 9, 82.7395 }, { 10, 85.8684 }, { 11, 91.4944 }, { 12, 97.0680 },
@@ -68,7 +69,6 @@ public static class FighterUtils
     ///     https://honkai-star-rail.fandom.com/wiki/Toughness#Weakness_Break
     /// </summary>
     /// <param name="ent"></param>
-    /// <param name="caster"></param>
     /// <returns></returns>
     public static double? CalculateShieldBrokeDmg(Event ent)
     {
@@ -88,13 +88,13 @@ public static class FighterUtils
         {
             baseDmg = attackElem switch
             {
-                ElementEnm.Physical => 2 * lvlMultiplier[attacker.Level] * maxToughnessMult,
-                ElementEnm.Fire => 2 * lvlMultiplier[attacker.Level] * maxToughnessMult,
-                ElementEnm.Ice => 1 * lvlMultiplier[attacker.Level] * maxToughnessMult,
-                ElementEnm.Lightning => 1 * lvlMultiplier[attacker.Level] * maxToughnessMult,
-                ElementEnm.Wind => 1.5 * lvlMultiplier[attacker.Level] * maxToughnessMult,
-                ElementEnm.Quantum => 0.5 * lvlMultiplier[attacker.Level] * maxToughnessMult,
-                ElementEnm.Imaginary => 0.5 * lvlMultiplier[attacker.Level] * maxToughnessMult,
+                ElementEnm.Physical => 2 * LvlMultiplier[attacker.Level] * maxToughnessMult,
+                ElementEnm.Fire => 2 * LvlMultiplier[attacker.Level] * maxToughnessMult,
+                ElementEnm.Ice => 1 * LvlMultiplier[attacker.Level] * maxToughnessMult,
+                ElementEnm.Lightning => 1 * LvlMultiplier[attacker.Level] * maxToughnessMult,
+                ElementEnm.Wind => 1.5 * LvlMultiplier[attacker.Level] * maxToughnessMult,
+                ElementEnm.Quantum => 0.5 * LvlMultiplier[attacker.Level] * maxToughnessMult,
+                ElementEnm.Imaginary => 0.5 * LvlMultiplier[attacker.Level] * maxToughnessMult,
                 _ => throw new NotImplementedException()
             };
         }
@@ -104,27 +104,27 @@ public static class FighterUtils
             if (modEnt.BuffThatDamage.Effects.Any(x => x is EffBleed))
             {
                 baseDmg = defender.Fighter.IsEliteUnit ? 0.07 : 0.16 * defender.GetMaxHp(ent);
-                baseDmg = Math.Min(baseDmg, 2 * lvlMultiplier[attacker.Level] * defender.Stats.MaxToughness);
+                baseDmg = Math.Min(baseDmg, 2 * LvlMultiplier[attacker.Level] * defender.Stats.MaxToughness);
             }
             else if (modEnt.BuffThatDamage.Effects.Any(x =>
                          x is EffBurn or EffFreeze))
             {
-                baseDmg = 1 * lvlMultiplier[attacker.Level] * maxToughnessMult;
+                baseDmg = 1 * LvlMultiplier[attacker.Level] * maxToughnessMult;
             }
             else if (modEnt.BuffThatDamage.Effects.Any(x =>
                          x is EffShock))
             {
-                baseDmg = 2 * lvlMultiplier[attacker.Level] * maxToughnessMult;
+                baseDmg = 2 * LvlMultiplier[attacker.Level] * maxToughnessMult;
             }
             else if (modEnt.BuffThatDamage.Effects.Any(x =>
                          x is EffWindShear))
             {
-                baseDmg = 1 * modEnt.BuffThatDamage.Stack * lvlMultiplier[attacker.Level] * maxToughnessMult;
+                baseDmg = 1 * modEnt.BuffThatDamage.Stack * LvlMultiplier[attacker.Level] * maxToughnessMult;
             }
             else if (modEnt.BuffThatDamage.Effects.Any(x =>
                          x is EffEntanglement))
             {
-                baseDmg = 0.6 * modEnt.BuffThatDamage.Stack * lvlMultiplier[attacker.Level] * maxToughnessMult;
+                baseDmg = 0.6 * modEnt.BuffThatDamage.Stack * LvlMultiplier[attacker.Level] * maxToughnessMult;
             }
             else
             {

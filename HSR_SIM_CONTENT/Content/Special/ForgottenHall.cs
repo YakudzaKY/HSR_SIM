@@ -29,7 +29,7 @@ public class ForgottenHall : DefaultNPCFighter
         {
             AppliedBuffToApply = new AppliedBuff(Parent)
             {
-                Type = AppliedBuff.BuffType.Buff,
+                Type = Buff.BuffType.Buff,
                 Effects = new List<Effect> { new EffReduceBAV { Value = 50 } },
                 BaseDuration = 1,
                 Dispellable = false

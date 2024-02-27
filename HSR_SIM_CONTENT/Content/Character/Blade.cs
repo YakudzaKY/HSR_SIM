@@ -1,5 +1,5 @@
 ﻿using HSR_SIM_CONTENT.DefaultContent;
-using HSR_SIM_LIB.Fighters;
+using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
@@ -64,7 +64,7 @@ public class Blade : DefaultFighter
 
         hellscapeAppliedBuff = new AppliedBuff(Parent)
         {
-            Type = AppliedBuff.BuffType.Buff,
+            Type = Buff.BuffType.Buff,
             BaseDuration = 3,
             MaxStack = 1,
             CustomIconName = "Hellscape",

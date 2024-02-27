@@ -28,7 +28,7 @@ public class EffMaxHp : Effect
     {
         var buffOwner = (target ?? buff.CarrierUnit) ?? ent.TargetUnit;
         buffOwner.GetRes(Resource.ResourceType.HP).ResVal -= GetCorrectedHp(ent, buff);
-        base.BeforeRemove(ent, buff,target);
+        base.BeforeRemove(ent, buff, target);
     }
 
     public override void OnApply(Event ent, Buff buff, Unit target = null)
