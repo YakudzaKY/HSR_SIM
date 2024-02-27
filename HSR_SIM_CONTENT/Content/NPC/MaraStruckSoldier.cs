@@ -11,7 +11,9 @@ public class MaraStruckSoldier : DefaultNPCFighter
     //static because max 5 stacks by all units this type
     private static readonly AppliedBuff myDoTRef = new(null)
     {
-        Type = AppliedBuff.BuffType.Dot
+        Type = AppliedBuff.BuffType.Dot,
+        Effects = []
+        
     };
 
     private readonly AppliedBuff myDotDeAppliedBuff;

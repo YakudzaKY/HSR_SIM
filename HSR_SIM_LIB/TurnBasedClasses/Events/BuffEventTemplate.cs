@@ -4,11 +4,8 @@ using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 
-public abstract class BuffEventTemplate : Event
+public abstract class BuffEventTemplate(Step parent, ICloneable source, Unit sourceUnit)
+    : Event(parent, source, sourceUnit)
 {
-    protected BuffEventTemplate(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
-    {
-    }
-
-    public AppliedBuff AppliedBuffToApply { get; set; }
+    public AppliedBuff AppliedBuffToApply { get; init; }
 }

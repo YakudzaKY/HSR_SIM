@@ -470,7 +470,7 @@ public class Unit : CloneClass
         {
             //add stack
             var oldStacks = foundBuff.Stack;
-            foundBuff.Stack = Math.Min(foundBuff.MaxStack, foundBuff.Stack + appliedBuff.Stack);
+            foundBuff.Stack = Math.Min(foundBuff.MaxStack, foundBuff.Stack + (appliedBuff.CalculateStacks?.Invoke(ent) ?? appliedBuff.Stack));
             res = foundBuff.Stack - oldStacks;
             if (foundBuff.EffectStackingType == AppliedBuff.EffectStackingTypeEnm.FullReplace)
             {
@@ -715,7 +715,7 @@ public class Unit : CloneClass
 
     public void ResetCondition(ConditionCheckParam chkPrm)
     {
-        foreach (var cb in PassiveBuffs.Where(x => x.Condition.ConditionParam == chkPrm)) cb.NeedRecalc = true;
+        foreach (var cb in PassiveBuffs.Where(x => x.Condition?.ConditionParam == chkPrm)) cb.NeedRecalc = true;
     }
 
     private double GetInitialBaseActionValue(Event ent)

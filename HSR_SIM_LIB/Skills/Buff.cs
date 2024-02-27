@@ -6,13 +6,15 @@ namespace HSR_SIM_LIB.Skills;
 
 public class Buff(Unit sourceUnit, Buff reference = null) : CloneClass
 {
-    public string CustomIconName { get; set; }
-    public List<Effect> Effects { get; set; }
+    public string CustomIconName { get; init; }
+    public List<Effect> Effects { get; set; } = [];
     public Unit CarrierUnit { get; set; }
     public Buff Reference { get; set; } = reference;
     public Unit SourceUnit { get; set; } = sourceUnit;
     public int Stack { get; set; } = 1;
-    public Event.CalculateValuePrc CalculateStacks { get; init; }
+    //calculated stacks will overwrite Stack value
+    public delegate int CalculateIntVal(Event ent);
+    public CalculateIntVal CalculateStacks { get; init; }
     public int MaxStack { get; init; } = 1;
     public enum BuffType
     {

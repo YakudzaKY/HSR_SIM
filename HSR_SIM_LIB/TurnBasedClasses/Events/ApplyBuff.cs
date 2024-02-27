@@ -31,6 +31,7 @@ public class ApplyBuff : BuffEventTemplate
         if (TargetUnit.LivingStatus == Unit.LivingStatusEnm.Alive)
         {
             //calc value first
+
             foreach (var modEffect in AppliedBuffToApply.Effects.Where(modEffect =>
                          modEffect.CalculateValue != null && modEffect.Value == null))
                 modEffect.Value = modEffect.CalculateValue(this);

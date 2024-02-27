@@ -14,8 +14,8 @@ internal class PioneerDiverofDeadWaters : DefaultRelicSet
 
     public PioneerDiverofDeadWaters(IFighter parent, int num) : base(parent, num)
     {
-        onDebuffHitAppliedBuff = new AppliedBuff(Parent.Parent)
-            { BaseDuration = 1, Dispellable = false, CustomIconName = "Sword" };
+        onDebuffHitAppliedBuff = new AppliedBuff(Parent.Parent) 
+            { BaseDuration = 1, Dispellable = false, CustomIconName = "Sword" , Effects = []};
         if (num >= 2)
             Parent.Parent.PassiveBuffs.Add(new PassiveBuff(parent.Parent)
             {

@@ -70,7 +70,7 @@ public class DefaultNPCFighter : IFighter
         throw new Exception($"no enemy will be chosen by AGGRO counter={counter}");
     }
 
-    public AppliedBuff WeaknessBreakDebuff { get; set; } = new(null);
+    public AppliedBuff WeaknessBreakDebuff { get; set; } = new(null) {Effects = []};
     public PathType? Path { get; set; } = null;
     public Unit.ElementEnm Element { get; set; }
     public List<Unit.ElementEnm> NativeWeaknesses { get; set; } = new();

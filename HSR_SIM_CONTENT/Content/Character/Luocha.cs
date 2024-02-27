@@ -50,7 +50,8 @@ public class Luocha : DefaultFighter
             BaseDuration = 2,
             MaxStack = 1,
             Dispellable = false,
-            CustomIconName = "Icon_Abyss_Flower"
+            CustomIconName = "Icon_Abyss_Flower",
+            Effects = []
         };
 
         triggerCdAppliedBuff = new AppliedBuff(Parent)
@@ -59,7 +60,9 @@ public class Luocha : DefaultFighter
             BaseDuration = 2,
             MaxStack = 1,
             Dispellable = false,
-            CustomIconName = "Abyss_Flower_CD"
+            CustomIconName = "Abyss_Flower_CD",
+            Effects = []
+            
         };
 
         //=====================

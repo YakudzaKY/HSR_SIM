@@ -9,7 +9,7 @@ using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Skills;
 
-public class AppliedBuff(Unit sourceUnit, AppliedBuff reference = null) : Buff(sourceUnit, reference)
+public class AppliedBuff(Unit sourceUnit, Buff reference = null) : Buff(sourceUnit, reference)
 {
     public delegate void EventHandler(Event ent);
 
@@ -25,9 +25,9 @@ public class AppliedBuff(Unit sourceUnit, AppliedBuff reference = null) : Buff(s
     }
 
     //dot will be auto on start
-    public static List<Type> EarlyProcMods = new() { typeof(EffEntanglement) };
+    private static readonly List<Type> EarlyProcMods = [typeof(EffEntanglement)];
 
-    public EffectStackingTypeEnm EffectStackingType { get; set; } = EffectStackingTypeEnm.PickMax;
+    public EffectStackingTypeEnm EffectStackingType { get; init; } = EffectStackingTypeEnm.PickMax;
 
 
 
@@ -97,7 +97,7 @@ public class AppliedBuff(Unit sourceUnit, AppliedBuff reference = null) : Buff(s
                     step.Events.Add(dotProcEvent);
                 }
 
-        //only Buffs aplied before turn started
+        //only Buffs applied before turn started
         if (IsOld)
         {
             //minus duration

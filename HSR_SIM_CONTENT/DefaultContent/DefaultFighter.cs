@@ -352,7 +352,7 @@ public abstract class DefaultFighter : IFighter
         throw new NotImplementedException();
     }
 
-    private double? CalcStacksByTarget(Event ent)
+    private int CalcStacksByTarget(Event ent)
     {
         return ent.TargetUnit.Fighter.IsEliteUnit ? 3 : 1;
     }

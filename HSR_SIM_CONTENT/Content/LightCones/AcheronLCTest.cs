@@ -20,7 +20,8 @@ internal class AcheronLcTst : DefaultLightCone
         {
             CustomIconName = "defeat",
             Type = Buff.BuffType.Debuff,
-            BaseDuration = 1
+            BaseDuration = 1,
+            Effects = []
         };
 
 

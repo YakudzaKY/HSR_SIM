@@ -115,13 +115,10 @@ public class Step
     //get next event
     private Event GetNextEvent(bool revert)
     {
-        Event res;
-        if (!revert)
-            res = Events.FirstOrDefault(x => !ProceedEvents.Contains(x));
-        else
-            res = Events.LastOrDefault(x => !ProceedEvents.Contains(x));
-
-        return res;
+        return !revert
+            ? Events.FirstOrDefault(x => !ProceedEvents.Contains(x))
+            : Events.LastOrDefault(x => !ProceedEvents.Contains(x));
+        ;
     }
 
     /// <summary>

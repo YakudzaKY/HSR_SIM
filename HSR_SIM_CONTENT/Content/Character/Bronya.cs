@@ -97,7 +97,7 @@ public class Bronya : DefaultFighter
             AppliedBuffToApply = new AppliedBuff(Parent)
             {
                 BaseDuration = 1,
-                Effects = { new EffAllDamageBoost { Value = GetAbilityScaling(0.33, 0.66, abilitySkillLvl) } }
+                Effects = [ new EffAllDamageBoost { Value = GetAbilityScaling(0.33, 0.66, abilitySkillLvl) } ]
             }
         });
         ability.Events.Add(new EnergyGain(null, this, Parent)
