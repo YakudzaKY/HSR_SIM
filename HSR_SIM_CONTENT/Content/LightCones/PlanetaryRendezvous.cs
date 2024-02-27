@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using HSR_SIM_LIB.Content;
+﻿using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
@@ -16,11 +15,8 @@ internal class PlanetaryRendezvous : DefaultLightCone
         if (Path == Parent.Path)
             PassiveMods.Add(new PassiveBuff(Parent.Parent)
             {
-                AppliedBuff = new Buff(Parent.Parent)
-                {
-                    Effects = new List<Effect>
-                        { new EffElementalBoost { Element = parent.Element, Value = modifiers[rank] } }
-                },
+                Effects = [new EffElementalBoost { Element = parent.Element, Value = modifiers[rank] }],
+
                 Target = Parent.Parent.ParentTeam
             });
     }

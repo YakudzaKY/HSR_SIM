@@ -1,20 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Skills.ReadyBuffs;
+
 /// <summary>
-/// Entanglement on weakness break
+///     Entanglement on weakness break
 /// </summary>
-public class BuffEntanglementWB : Buff
+public class AppliedBuffEntanglementWb : AppliedBuff
 {
-    public BuffEntanglementWB(Unit caster, Buff reference = null, Event ent=null) : base(caster, reference)
+    public AppliedBuffEntanglementWb(Unit sourceUnit, AppliedBuff reference = null) : base(sourceUnit, reference)
     {
-        DoNotClone = true;
-        Dispellable = true;
         Type = BuffType.Debuff;
         BaseDuration = 1;
         MaxStack = 5;
@@ -23,37 +21,31 @@ public class BuffEntanglementWB : Buff
             new EffEntanglement { DoTCalculateValue = FighterUtils.CalculateShieldBrokeDmg },
             new EffDelay
             {
-                Value = 0.20 * (1 + caster.GetBreakDmg(ent)),
+                CalculateValue = CalcBrkDmg,
                 StackAffectValue = false
             }
         };
         EventHandlerProc += EntanglementEventHandler;
     }
 
+    private double? CalcBrkDmg(Event ent)
+    {
+        return 0.20 * (1 + ent.SourceUnit.GetBreakDmg(ent));
+    }
+
     private bool UnitGotHitByAbility(List<Event> events)
     {
-        foreach (Event ent in events)
-        {
-            if (ent is DirectDamage && ent.TargetUnit == Owner)
-            {
+        foreach (var ent in events)
+            if (ent is DirectDamage && ent.TargetUnit == CarrierUnit)
                 return true;
-            }
-   
-        }
         return false;
     }
 
     private bool UnitGotDebuffByAbility(List<Event> events)
     {
-        foreach (Event ent in events)
-        {
-            if (ent is ApplyBuff aBuff && ent.TargetUnit == Owner && aBuff.BuffToApply == this)
-            {
+        foreach (var ent in events)
+            if (ent is ApplyBuff aBuff && ent.TargetUnit == CarrierUnit && aBuff.AppliedBuffToApply == this)
                 return true;
-            }
-
-
-        }
         return false;
     }
 
@@ -62,7 +54,9 @@ public class BuffEntanglementWB : Buff
         //ability cast is finish. 
         if (ent is ExecuteAbilityFinish && ent.ParentStep.ActorAbility.Attack)
             //if got hit by ability and no debuff applied in this action
-            if (UnitGotHitByAbility(ent.ParentStep.ProceedEvents) && !UnitGotDebuffByAbility(ent.ParentStep.ProceedEvents))
-              ent.ChildEvents.Add(new ApplyBuffStack(ent.ParentStep,this,Caster){Stacks=1,BuffToApply = this,TargetUnit = Owner});  
+            if (UnitGotHitByAbility(ent.ParentStep.ProceedEvents) &&
+                !UnitGotDebuffByAbility(ent.ParentStep.ProceedEvents))
+                ent.ChildEvents.Add(new ApplyBuffStack(ent.ParentStep, this, SourceUnit)
+                    { Stacks = 1, AppliedBuffToApply = this, TargetUnit = CarrierUnit });
     }
 }

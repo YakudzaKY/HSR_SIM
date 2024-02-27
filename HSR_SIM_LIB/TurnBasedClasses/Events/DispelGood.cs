@@ -21,10 +21,10 @@ public class DispelGood : Event
         if (!TriggersHandled)
         {
             var buffToDispell =
-                TargetUnit.Buffs.FirstOrDefault(x => x.Type is Buff.BuffType.Buff && x.Dispellable);
+                TargetUnit.AppliedBuffs.FirstOrDefault(x => x.Type is AppliedBuff.BuffType.Buff && x.Dispellable);
             if (buffToDispell != null)
                 ChildEvents.Add(new RemoveBuff(ParentStep, Source, SourceUnit)
-                    { TargetUnit = TargetUnit, BuffToApply = buffToDispell });
+                    { TargetUnit = TargetUnit, AppliedBuffToApply = buffToDispell });
         }
 
         base.ProcEvent(revert);

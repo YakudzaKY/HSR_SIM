@@ -3,8 +3,6 @@
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-                 xmlns:local="clr-namespace:HSR_SIM_CLIENT"
                  xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                  mc:Ignorable="d"
                  Title="Stat Calc" Height="Auto" Width="Auto"
@@ -18,17 +16,17 @@
     </mah:MetroWindow.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="15"></RowDefinition>
-            <RowDefinition Height="25*"></RowDefinition>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="15" />
+            <RowDefinition Height="25*" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                <ColumnDefinition Width="10"></ColumnDefinition>
-                <ColumnDefinition Width="Auto"> </ColumnDefinition>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="Auto" />
 
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0">
@@ -36,14 +34,13 @@
 
                 <Label Content="Iterations:" />
                 <TextBox PreviewTextInput="NumberValidationTextBox"
-                         Text="{Binding IterationsCnt ,Mode=TwoWay}">
-                </TextBox>
+                         Text="{Binding IterationsCnt ,Mode=TwoWay}" />
                 <Label Content="Threads:" />
-                <TextBox PreviewTextInput="NumberValidationTextBox" Text="{Binding ThrCnt ,Mode=TwoWay}"></TextBox>
+                <TextBox PreviewTextInput="NumberValidationTextBox" Text="{Binding ThrCnt ,Mode=TwoWay}" />
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <Button Grid.Column="0" Click="ButtonBase_OnClick"
                             IsEnabled="{Binding Path=!WorkInProgress,Mode=OneWay}">
@@ -58,7 +55,7 @@
                 <ListBox ItemsSource="{Binding Scenarios}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <CheckBox  Content="{Binding Name}"
+                            <CheckBox Content="{Binding Name}"
                                       IsChecked="{Binding IsSelected}" />
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -69,51 +66,51 @@
                 <ListBox ItemsSource="{Binding Profiles}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <CheckBox Unchecked="ToggleProfileButton_OnChecked" Checked="ToggleProfileButton_OnChecked" Content="{Binding Name}"
-                                       IsChecked="{Binding IsSelected}" />
+                            <CheckBox Unchecked="ToggleProfileButton_OnChecked" Checked="ToggleProfileButton_OnChecked"
+                                      Content="{Binding Name}"
+                                      IsChecked="{Binding IsSelected}" />
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
             </StackPanel>
-            <GridSplitter Grid.Column="3"></GridSplitter>
+            <GridSplitter Grid.Column="3" />
             <mah:MetroTabControl Grid.Column="4" Name="tbCalcType">
                 <mah:MetroTabItem x:Name="tbiStatImpact" Header="Stat impact calc">
                     <mah:MetroTabItem.Content>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
                             </Grid.ColumnDefinitions>
                             <Grid Grid.Column="0">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition></ColumnDefinition>
-                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition></RowDefinition>
-                                    <RowDefinition></RowDefinition>
-                                    <RowDefinition></RowDefinition>
-                                    <RowDefinition></RowDefinition>
-                                    <RowDefinition></RowDefinition>
-                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
                                 </Grid.RowDefinitions>
                                 <Label Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="0">Character:</Label>
-                                <ComboBox   ItemsSource="{Binding AvailableCharacters}" SelectedItem="{Binding SelectedCharacterToCalc,Mode=TwoWay}" Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="0"></ComboBox>
+                                <ComboBox ItemsSource="{Binding AvailableCharacters}"
+                                          SelectedItem="{Binding SelectedCharacterToCalc,Mode=TwoWay}" Grid.Row="1"
+                                          Grid.ColumnSpan="2" Grid.Column="0" />
                                 <Label Grid.Row="2" Grid.Column="0">Upgrades per iteration:</Label>
                                 <TextBox Grid.Row="3" Grid.Column="0" PreviewTextInput="NumberValidationTextBox"
-                                         Text="{Binding UpgradesPerIterations ,Mode=TwoWay}">
-                                </TextBox>
+                                         Text="{Binding UpgradesPerIterations ,Mode=TwoWay}" />
                                 <Label Grid.Row="2" Grid.Column="1">Stat to replace:</Label>
                                 <ComboBox Grid.Row="3" Grid.Column="1" DisplayMemberPath="Name"
                                           ItemsSource="{Binding SelectedStats}"
-                                          SelectedItem="{Binding SelectedStatToReplace,Mode=TwoWay}">
-                                </ComboBox>
+                                          SelectedItem="{Binding SelectedStatToReplace,Mode=TwoWay}" />
                                 <Label Grid.Row="4" Grid.Column="0">Upgrades iterations:</Label>
                                 <TextBox Grid.Row="5" Grid.Column="0" PreviewTextInput="NumberValidationTextBox"
-                                         Text="{Binding UpgradesIterations ,Mode=TwoWay}">
-                                </TextBox>
+                                         Text="{Binding UpgradesIterations ,Mode=TwoWay}" />
                             </Grid>
                             <StackPanel Grid.Column="1" Orientation="Vertical">
                                 <Label>Load stat table:</Label>
@@ -152,6 +149,6 @@
             </mah:MetroTabControl>
 
         </Grid>
-        <ProgressBar Grid.Row="1"></ProgressBar>
+        <ProgressBar Grid.Row="1" />
     </Grid>
 </mah:MetroWindow>

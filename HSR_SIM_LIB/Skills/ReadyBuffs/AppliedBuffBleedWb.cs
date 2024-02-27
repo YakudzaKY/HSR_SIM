@@ -4,14 +4,14 @@ using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Skills.ReadyBuffs;
+
 /// <summary>
-/// Bleed DoT on weakness break
+///     Bleed DoT on weakness break
 /// </summary>
-public class BuffBleedWB : Buff
+public class AppliedBuffBleedWb : AppliedBuff
 {
-    public BuffBleedWB(Unit caster, Buff reference = null) : base(caster, reference)
+    public AppliedBuffBleedWb(Unit sourceUnit, AppliedBuff reference = null) : base(sourceUnit, reference)
     {
-        DoNotClone = true;
         Type = BuffType.Dot;
         BaseDuration = 2;
         Effects = new List<Effect> { new EffBleed { DoTCalculateValue = FighterUtils.CalculateShieldBrokeDmg } };

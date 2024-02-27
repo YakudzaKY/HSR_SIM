@@ -11,7 +11,7 @@ public class EndWave : Event
     {
     }
 
-    public List<Unit> UnloadedUnits { get; set; }=new List<Unit>();
+    public List<Unit> UnloadedUnits { get; set; } = new();
 
     public override string GetDescription()
     {

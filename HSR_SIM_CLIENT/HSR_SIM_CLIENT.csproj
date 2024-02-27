@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\HSR_SIM_CONTENT\HSR_SIM_CONTENT.csproj" />
+        <ProjectReference Include="..\HSR_SIM_CONTENT\HSR_SIM_CONTENT.csproj"/>
         <ProjectReference Include="..\HSR_SIM_LIB\HSR_SIM_LIB.csproj"/>
     </ItemGroup>
 
@@ -22,11 +22,11 @@
     <ItemGroup>
         <Content Include="Data\**">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>       
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="MahApps.Metro" Version="3.0.0-alpha0476" />
+        <PackageReference Include="MahApps.Metro" Version="3.0.0-alpha0476"/>
     </ItemGroup>
 
 

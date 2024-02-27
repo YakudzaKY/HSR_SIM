@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using HSR_SIM_LIB.Content;
-using HSR_SIM_LIB.Fighters;
+﻿using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
@@ -27,10 +25,10 @@ internal class MessengerTraversingHackerspace : DefaultRelicSet
                             OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
                             ParentStep = step,
                             TargetUnit = unit,
-                            BuffToApply = new Buff(Parent.Parent)
+                            AppliedBuffToApply = new AppliedBuff(Parent.Parent)
                             {
                                 UniqueStr = GetType().ToString(),
-                                Type = Buff.BuffType.Buff,
+                                Type = AppliedBuff.BuffType.Buff,
                                 Effects = new List<Effect> { new EffSpeedPrc { Value = 0.12 } },
                                 BaseDuration = 1,
                                 Dispellable = true

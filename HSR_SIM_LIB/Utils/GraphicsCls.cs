@@ -41,23 +41,26 @@ public static class GraphicsCls
             {
                 DrawText(PartyResourceX, PartyResourceY, gfx,
                     $"SP: {(int)sim.PartyTeam.GetRes(ResourceType.SP).ResVal:d}/{MaxSp:d}");
-                
+
                 //render points gain/draw
-                int i = 0;
+                var i = 0;
                 foreach (var ent in sim.CurrentStep.Events.Where(x => x is PartyResourceDrain or PartyResourceGain))
                 {
                     i++;
                     if (ent is PartyResourceGain)
-                        DrawText(PartyResourceX, PartyResourceY + (int)Math.Round((double)DefaultFontSize*1.3*i), gfx, $"+{ent.Val}",new SolidBrush(Color.Green));
+                        DrawText(PartyResourceX, PartyResourceY + (int)Math.Round(DefaultFontSize * 1.3 * i), gfx,
+                            $"+{ent.Val}", new SolidBrush(Color.Green));
                     else
-                        DrawText(PartyResourceX, PartyResourceY + (int)Math.Round((double)DefaultFontSize*1.3*i), gfx, $"-{ent.Val}",new SolidBrush(Color.DarkRed));
-                    
+                        DrawText(PartyResourceX, PartyResourceY + (int)Math.Round(DefaultFontSize * 1.3 * i), gfx,
+                            $"-{ent.Val}", new SolidBrush(Color.DarkRed));
                 }
             }
 
             else
+            {
                 DrawText(PartyResourceX, PartyResourceY, gfx,
                     $"TP: {(int)sim.PartyTeam.GetRes(ResourceType.TP).ResVal:d}/{MaxTp:d}");
+            }
 
             //enemy draw
             if (sim.CurrentFight is { CurrentWave: not null })
@@ -88,10 +91,6 @@ public static class GraphicsCls
                 gfx.DrawImage(Utl.LoadBitmap("replay"),
                     new Point(CombatImgSize.Width - bitmap.Width, CombatImgSize.Height - bitmap.Height));
             }
-
-
-            gfx.Dispose();
-            brush.Dispose();
         }
 
         return res;
@@ -428,7 +427,7 @@ public static class GraphicsCls
 
             //Buffs
             j = 0;
-            foreach (var buff in unit.Buffs)
+            foreach (var buff in unit.AppliedBuffs)
             {
                 var buffPoint = new Point(portraitPoint.X + PortraitSize.Width,
                     portraitPoint.Y + j * ElemSizeMini.Height);
@@ -437,8 +436,9 @@ public static class GraphicsCls
                         ElemSizeMini), buffPoint);
                 gfx.DrawRectangle(
                     new Pen(
-                        buff.Type == Buff.BuffType.Buff ? Color.Aquamarine :
-                        buff.Type == Buff.BuffType.Debuff ? Color.Brown : Color.Violet, 1), buffPoint.X, buffPoint.Y,
+                        buff.Type == AppliedBuff.BuffType.Buff ? Color.Aquamarine :
+                        buff.Type == AppliedBuff.BuffType.Debuff ? Color.Brown : Color.Violet, 1), buffPoint.X,
+                    buffPoint.Y,
                     ElemSizeMini.Width, ElemSizeMini.Height);
 
                 //duration
@@ -476,16 +476,16 @@ public static class GraphicsCls
                 j++;
             }
 
-            //ConditionsBuffs
+            //Passive buffs
             j = 0;
-            foreach (var buff in unit.GetConditionBuffs(null, null).Where(x => x is ConditionBuff))
+            foreach (var buff in unit.GetPassivesForUnit(null, null,null,null,null))
             {
                 var buffPoint = new Point(portraitPoint.X + j * ElemSizeMini.Width,
                     portraitPoint.Y + PortraitSize.Height - ElemSizeMini.Width);
                 gfx.DrawImage(
-                    new Bitmap(Utl.LoadBitmap(buff.AppliedBuff.CustomIconName ?? buff.AppliedBuff.Effects.First().GetType().Name),
+                    new Bitmap(Utl.LoadBitmap(buff.CustomIconName ?? buff.Effects.First().GetType().Name),
                         ElemSizeMini), buffPoint);
-                gfx.DrawRectangle(new Pen((buff.AppliedBuff.Type == Buff.BuffType.Buff) ? Color.Blue : Color.DarkRed, 1), buffPoint.X, buffPoint.Y, ElemSizeMini.Width,
+                gfx.DrawRectangle(new Pen(Color.Cornsilk, 1), buffPoint.X, buffPoint.Y, ElemSizeMini.Width,
                     ElemSizeMini.Height);
 
 

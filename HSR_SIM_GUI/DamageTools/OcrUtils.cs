@@ -14,7 +14,7 @@ namespace HSR_SIM_GUI.DamageTools;
 internal class OcrUtils
 {
     /// <summary>
-    /// Utilities for text recognition
+    ///     Utilities for text recognition
     /// </summary>
     public enum RectModeEnm
     {
@@ -167,7 +167,7 @@ internal class OcrUtils
                     if (xRoot != null)
                         for (var i = 0; i < strings.Count; i++)
                         {
-                            bool replacerFound = false;
+                            var replacerFound = false;
                             //parse all items
                             foreach (var replacer in replacers)
                             {
@@ -197,10 +197,12 @@ internal class OcrUtils
                                     break;
                                 }
                             }
+
                             //if item was not found in replacers
                             if (!replacerFound)
                                 res.Add(res.Count,
-                                    new RStatWordRec { Key = strings[i], Value = stringsNumbers[i], StatMode = itemRectMode });
+                                    new RStatWordRec
+                                        { Key = strings[i], Value = stringsNumbers[i], StatMode = itemRectMode });
                         }
 
                     page.Dispose();

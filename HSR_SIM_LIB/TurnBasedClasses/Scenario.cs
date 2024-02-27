@@ -7,7 +7,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses;
 /// <summary>
 ///     Scenario class. Using for combat
 /// </summary>
-public class Scenario:ICloneable
+public class Scenario : ICloneable
 {
     public string Name { get; internal set; }
     internal List<Fight> Fights { get; set; }
@@ -15,30 +15,24 @@ public class Scenario:ICloneable
     internal List<Unit> Party { get; set; }
 
     public List<Unit> SpecialUnits { get; set; }
+
     public object Clone()
     {
-  
-        Scenario newClone =(Scenario)MemberwiseClone();
+        var newClone = (Scenario)MemberwiseClone();
         if (newClone.Party != null)
         {
             var oldParty = newClone.Party;
             newClone.Party = new List<Unit>();
-            foreach (var unit in oldParty)
-            {
-                newClone.Party.Add((Unit)unit.Clone());
-            }
+            foreach (var unit in oldParty) newClone.Party.Add((Unit)unit.Clone());
         }
+
         if (newClone.SpecialUnits != null)
         {
             var oldSpecial = newClone.SpecialUnits;
             newClone.SpecialUnits = new List<Unit>();
-            foreach (var unit in oldSpecial)
-            {
-                newClone.SpecialUnits.Add((Unit)unit.Clone());
-            }
+            foreach (var unit in oldSpecial) newClone.SpecialUnits.Add((Unit)unit.Clone());
         }
+
         return newClone;
-
-
     }
 }

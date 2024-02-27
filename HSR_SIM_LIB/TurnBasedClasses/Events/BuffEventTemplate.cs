@@ -10,5 +10,5 @@ public abstract class BuffEventTemplate : Event
     {
     }
 
-    public Buff BuffToApply { get; set; }
+    public AppliedBuff AppliedBuffToApply { get; set; }
 }

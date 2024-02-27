@@ -30,11 +30,11 @@ public static class XmlLoader
         var xRoot = xDoc.DocumentElement;
         if (xRoot != null)
         {
-            combat.CurrentScenario.Name = $"{xRoot.Attributes.GetNamedItem("name")?.Value} scenario: {Path.GetFileNameWithoutExtension(scenarioPath)} profile: {Path.GetFileNameWithoutExtension(profilePath)}" ;
+            combat.CurrentScenario.Name =
+                $"{xRoot.Attributes.GetNamedItem("name")?.Value} scenario: {Path.GetFileNameWithoutExtension(scenarioPath)} profile: {Path.GetFileNameWithoutExtension(profilePath)}";
 
             //parse all items
             foreach (XmlElement node in xRoot)
-            {
                 switch (node.Name)
                 {
                     case "Fights":
@@ -51,11 +51,10 @@ public static class XmlLoader
                         combat.CurrentScenario.SpecialUnits = ExtractUnits(node);
                         break;
                 }
-            }
         }
 
         //Profile
-        if (!String.IsNullOrEmpty(profilePath)) combat.CurrentScenario.Party = ExtractPartyFromXml(profilePath);
+        if (!string.IsNullOrEmpty(profilePath)) combat.CurrentScenario.Party = ExtractPartyFromXml(profilePath);
 
         return combat;
     }
@@ -67,15 +66,11 @@ public static class XmlLoader
         xDoc.Load(profilePath);
         var xRoot = xDoc.DocumentElement;
         if (xRoot != null)
-        {
             //parse all items
             foreach (var node in xRoot.Cast<XmlElement>().Where(node => node.Name == "Party"))
                 res = ExtractUnits(node);
-        }
         else
-        {
             res = [];
-        }
 
         return res;
     }
@@ -167,7 +162,7 @@ public static class XmlLoader
 
 
     /// <summary>
-    /// remove special chars from string
+    ///     remove special chars from string
     /// </summary>
     /// <param name="str"></param>
     /// <returns></returns>
@@ -186,10 +181,10 @@ public static class XmlLoader
         foreach (XmlElement unitNode in unitPack.SelectNodes("Unit")!)
         {
             Unit unit = new();
-            string unitCode = unitNode.Attributes.GetNamedItem("template")?.Value?.Trim();
+            var unitCode = unitNode.Attributes.GetNamedItem("template")?.Value?.Trim();
             if (unitCode is null)
                 throw new Exception("Unit template value is null");
-            var assemblyName = unitNode.Attributes.GetNamedItem("assembly")?.Value?.Trim()??"HSR_SIM_CONTENT";
+            var assemblyName = unitNode.Attributes.GetNamedItem("assembly")?.Value?.Trim() ?? "HSR_SIM_CONTENT";
             var words = unitCode.Split('\\');
             unit.FighterClassName =
                 $"{assemblyName}.Content.{words[0]}.{EscapeReplaceString(words[1])}, {assemblyName}";
@@ -220,16 +215,15 @@ public static class XmlLoader
     /// <summary>
     ///     Extract pre launch options from xml
     /// </summary>
-
     private static List<PreLaunchOption> ExtractPreLaunch(XmlElement preLaunchOptionsXml)
     {
         List<PreLaunchOption> preLaunchOptions = [];
         foreach (XmlElement optionNode in preLaunchOptionsXml.SelectNodes("Option")!)
         {
-
             PreLaunchOption option = new()
             {
-                OptionType = (PreLaunchOptionEnm)Enum.Parse(typeof(PreLaunchOptionEnm), optionNode.Attributes.GetNamedItem("type")?.Value?.Trim()??"", true),
+                OptionType = (PreLaunchOptionEnm)Enum.Parse(typeof(PreLaunchOptionEnm),
+                    optionNode.Attributes.GetNamedItem("type")?.Value?.Trim() ?? "", true),
                 Value = SafeToDouble(optionNode.Attributes.GetNamedItem("value")?.Value?.Trim())
             };
 
@@ -247,7 +241,6 @@ public static class XmlLoader
 
     private static void ExtractUnitSkillsAndGear(XmlElement xmlElement, Unit unit)
     {
-
         var newLevel = xmlElement.Attributes.GetNamedItem("level")?.Value?.Trim();
         var newRank = xmlElement.Attributes.GetNamedItem("rank")?.Value?.Trim();
         if (!string.IsNullOrEmpty(newLevel))
@@ -262,7 +255,7 @@ public static class XmlLoader
             Skill skill = new()
             {
                 Name = xmlSkill.Attributes.GetNamedItem("name")?.Value?.Trim(),
-                Level = int.Parse(xmlSkill.Attributes.GetNamedItem("level")?.Value??"0")
+                Level = int.Parse(xmlSkill.Attributes.GetNamedItem("level")?.Value ?? "0")
             };
             unit.Skills.Add(skill);
         }
@@ -270,23 +263,22 @@ public static class XmlLoader
 
         foreach (XmlElement xmlLCone in xmlElement.SelectNodes("LightCone")!)
         {
-            var assemblyName = xmlLCone.Attributes.GetNamedItem("assembly")?.Value?.Trim()??"HSR_SIM_CONTENT";
+            var assemblyName = xmlLCone.Attributes.GetNamedItem("assembly")?.Value?.Trim() ?? "HSR_SIM_CONTENT";
             unit.LightConeStringPath =
                 $"{assemblyName}.Content.LightCones.{EscapeReplaceString(xmlLCone.Attributes.GetNamedItem("name")?.Value).Trim()}, {assemblyName}";
-            unit.LightConeInitRank = int.Parse(xmlLCone.Attributes.GetNamedItem("rank")?.Value?.Trim()??"0");
+            unit.LightConeInitRank = int.Parse(xmlLCone.Attributes.GetNamedItem("rank")?.Value?.Trim() ?? "0");
         }
 
         foreach (XmlElement xmlRelic in xmlElement.SelectNodes("RelicSet")!)
         {
-            var assemblyName = xmlRelic.Attributes.GetNamedItem("assembly")?.Value?.Trim()??"HSR_SIM_CONTENT";
+            var assemblyName = xmlRelic.Attributes.GetNamedItem("assembly")?.Value?.Trim() ?? "HSR_SIM_CONTENT";
             KeyValuePair<string, int> newRec = new(
                 $"{assemblyName}.Content.Relics.{EscapeReplaceString(xmlRelic.Attributes.GetNamedItem("name")?.Value)}, {assemblyName}",
-                int.Parse(xmlRelic.Attributes.GetNamedItem("num")?.Value?.Trim()??"0"));
+                int.Parse(xmlRelic.Attributes.GetNamedItem("num")?.Value?.Trim() ?? "0"));
             unit.RelicsClasses.Add(newRec);
         }
-
-
     }
+
     private static void ExtractWargear(string wargear, Unit unit)
     {
         XmlDocument unitDoc = new();

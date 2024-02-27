@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Linq;
 using HSR_SIM_LIB.UnitStuff;
-using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 
 //starting the combat
-internal class StartCombat : Event
+internal class StartCombat(Step parent, ICloneable source, Unit sourceUnit) : Event(parent, source, sourceUnit)
 {
-    public StartCombat(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
-    {
-    }
-
     public override string GetDescription()
     {
         return "Combat was started";
@@ -25,13 +20,15 @@ internal class StartCombat : Event
         {
             ParentStep.Parent.DoEnterCombat = false;
             ParentStep.Parent.CurrentFight =
-                new CombatFight(ParentStep.Parent.CurrentScenario.Fights[ParentStep.Parent.CurrentFightStep], ParentStep.Parent);
+                new CombatFight(ParentStep.Parent.CurrentScenario.Fights[ParentStep.Parent.CurrentFightStep],
+                    ParentStep.Parent);
             ParentStep.Parent.CurrentFightStep += 1;
             if (!TriggersHandled)
                 ChildEvents.Add(new PartyResourceGain(ParentStep, this, null)
                 {
-                    Val =   ParentStep.Parent.PreLaunch.FirstOrDefault(x => x.OptionType == PreLaunchOption.PreLaunchOptionEnm.SetSp)?.Value??0
-                    , TargetTeam = ParentStep.Parent.PartyTeam, ResType = Resource.ResourceType.SP
+                    Val = ParentStep.Parent.PreLaunch
+                        .FirstOrDefault(x => x.OptionType == PreLaunchOption.PreLaunchOptionEnm.SetSp)?.Value ?? 0,
+                    TargetTeam = ParentStep.Parent.PartyTeam, ResType = Resource.ResourceType.SP
                 });
         }
         else

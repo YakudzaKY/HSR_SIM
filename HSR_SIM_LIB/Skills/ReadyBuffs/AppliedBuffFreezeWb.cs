@@ -5,26 +5,26 @@ using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Skills.ReadyBuffs;
+
 /// <summary>
-/// freeze on weakness break
+///     freeze on weakness break
 /// </summary>
-public class BuffFreezeWB : Buff
+public class AppliedBuffFreezeWb : AppliedBuff
 {
-    public BuffFreezeWB(Unit caster, Buff reference = null) : base(caster, reference)
+    public AppliedBuffFreezeWb(Unit sourceUnit, AppliedBuff reference = null) : base(sourceUnit, reference)
     {
-        DoNotClone = true;
         Type = BuffType.Debuff;
         BaseDuration = 1;
         Effects = new List<Effect> { new EffFreeze { DoTCalculateValue = FighterUtils.CalculateShieldBrokeDmg } };
         EventHandlerProc += FreezeEventHandler;
     }
 
-    public void FreezeEventHandler(Event ent)
+    private void FreezeEventHandler(Event ent)
     {
-        if (ent is ResetAV && ent.TargetUnit == Owner) //50% reduce av if frosted
-            ent.ChildEvents.Add(new ModActionValue(ent.ParentStep, Owner, Owner)
+        if (ent is ResetAV && ent.TargetUnit == CarrierUnit) //50% reduce av if frosted
+            ent.ChildEvents.Add(new ModActionValue(ent.ParentStep, CarrierUnit, CarrierUnit)
             {
-                TargetUnit = Owner, Val = Owner.GetActionValue(ent) * 0.5
+                TargetUnit = CarrierUnit, Val = CarrierUnit.GetActionValue(ent) * 0.5
             });
     }
 }

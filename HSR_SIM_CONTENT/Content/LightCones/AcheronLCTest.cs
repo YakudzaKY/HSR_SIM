@@ -3,49 +3,49 @@ using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
-using HSR_SIM_LIB.UnitStuff;
-using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_CONTENT.Content.LightCones;
 
-internal class IncessantRain : DefaultLightCone
+internal class AcheronLcTst : DefaultLightCone
 {
     private readonly AppliedBuff? aetherCodeDebuff;
 
     private readonly double[] lcMods =
-        [0.12, 0.14, 0.16, 0.18, 0.20];
+        [0.12, 0.14, 0.16, 0.18, 0.40];
 
-    public IncessantRain(IFighter parent, int rank) : base(parent, rank)
+    public AcheronLcTst(IFighter parent, int rank) : base(parent, rank)
     {
         if (Path != Parent.Path) return;
         aetherCodeDebuff = new AppliedBuff(Parent.Parent)
         {
-            Type = Buff.BuffType.Debuff, BaseDuration = 1,
-            Effects = [new EffAllDamageVulnerability { Value = lcMods[Rank - 1] }]
+            CustomIconName = "defeat",
+            Type = Buff.BuffType.Debuff,
+            BaseDuration = 1
         };
 
 
         Parent.Parent.PassiveBuffs.Add(new PassiveBuff(Parent.Parent)
         {
-            Effects = [new EffCritPrc { CalculateValue = CalcCrit }],
+            Effects =
+            [
+                new EffAllDamageBoost { Value = lcMods[Rank - 1] },
+                new EffAbilityTypeBoost
+                    { Value = lcMods[Rank - 1], AbilityType = Ability.AbilityTypeEnm.Ultimate }
+            ],
+
             Target = Parent.Parent,
+            Condition = new PassiveBuff.ConditionRec
+            {
+                AppliedBuffValue = aetherCodeDebuff,
+                ConditionExpression = PassiveBuff.ConditionCheckExpression.Exists,
+                ConditionParam = PassiveBuff.ConditionCheckParam.Buff
+            },
             IsTargetCheck = true
         });
     }
 
 
     public sealed override FighterUtils.PathType Path => FighterUtils.PathType.Nihility;
-
-    //get 0.2 AllDmg per debuff  on target
-    private double? CalcCrit(Event ent)
-    {
-        double debuffs = 0;
-        debuffs += ent.TargetUnit?.AppliedBuffs.Count(x =>
-            x.Type is Buff.BuffType.Debuff or Buff.BuffType.Dot) ?? 0;
-        if (debuffs >= 3)
-            return lcMods[Rank - 1];
-        return 0;
-    }
 
     public override void DefaultLightCone_HandleEvent(Event ent)
     {
@@ -55,10 +55,10 @@ internal class IncessantRain : DefaultLightCone
         {
             var targetHits =
                 ent.ParentStep.TargetsHit.Where(x => x.AppliedBuffs.All(y => y.Reference != aetherCodeDebuff));
-            if (targetHits.Any())
+            foreach (var unit in targetHits)
                 ent.ChildEvents.Add(new AttemptEffect(ent.ParentStep, this, Parent.Parent)
                 {
-                    TargetUnit = (Unit)Utl.GetRandomObject(targetHits, Parent.Parent.ParentTeam.ParentSim.Parent),
+                    TargetUnit = unit,
                     BaseChance = 1,
                     AppliedBuffToApply = aetherCodeDebuff
                 });

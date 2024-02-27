@@ -7,28 +7,28 @@
                  mc:Ignorable="d"
                  DataContext="{Binding RelativeSource={RelativeSource Self}}"
                  Title="Main menu" Height="450" Width="800"
-                 WindowStartupLocation="CenterScreen"   
+                 WindowStartupLocation="CenterScreen"
                  Closing="MainWindow_OnClosing">
 
-    <Grid ShowGridLines="True" >
+    <Grid ShowGridLines="True">
         <Grid.RowDefinitions>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
         <!--Singe Loader-->
         <Grid Grid.Row="0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
             <Label FontWeight="Black" Grid.Row="0">
@@ -36,10 +36,9 @@
             </Label>
             <Label Grid.Row="1" Grid.Column="0">Scenario:</Label>
             <ComboBox Grid.Row="1" Grid.Column="1" Name="CbScenario"
-                      ItemsSource="{Binding Path=Scenarios, Mode=OneWay}">
-            </ComboBox>
+                      ItemsSource="{Binding Path=Scenarios, Mode=OneWay}" />
             <Label Grid.Row="1" Grid.Column="2">Profile:</Label>
-            <ComboBox Grid.Row="1" Grid.Column="3" Name="CbProfile" ItemsSource="{Binding Path=Profiles, Mode=OneWay}"></ComboBox>
+            <ComboBox Grid.Row="1" Grid.Column="3" Name="CbProfile" ItemsSource="{Binding Path=Profiles, Mode=OneWay}" />
 
             <Button Grid.Row="3" Grid.Column="0" Name="BtnLoad" Click="BtnLoad_OnClick">Load into separate window</Button>
             <Button Grid.Row="3" Grid.Column="1" Name="BtnRefresh" Click="BtnRefresh_OnClick">Refresh files</Button>
@@ -47,7 +46,7 @@
 
         </Grid>
         <!--Singe Loader-->
-        <GridSplitter Grid.Row="1"></GridSplitter>
+        <GridSplitter Grid.Row="1" />
         <Grid Grid.Row="2">
             <Button FontWeight="Black" Click="ButtonBase_OnClick" Grid.Row="0">
                 Open stat calc

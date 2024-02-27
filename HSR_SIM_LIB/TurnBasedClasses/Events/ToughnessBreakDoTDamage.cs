@@ -5,7 +5,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 
 public class ToughnessBreakDoTDamage : DoTDamage
 {
-    public ToughnessBreakDoTDamage(Step parent, ICloneable source, Unit sourceUnit,Unit.ElementEnm element) : base(parent, source, sourceUnit,element)
+    public ToughnessBreakDoTDamage(Step parent, ICloneable source, Unit sourceUnit, Unit.ElementEnm element) : base(
+        parent, source, sourceUnit, element)
     {
     }
 

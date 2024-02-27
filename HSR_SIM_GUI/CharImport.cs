@@ -12,8 +12,9 @@ using Newtonsoft.Json;
 using static HSR_SIM_GUI.GuiUtils;
 
 namespace HSR_SIM_GUI;
+
 /// <summary>
-/// Character import from hoyo api.
+///     Character import from hoyo api.
 /// </summary>
 public partial class CharImport : Form
 {
@@ -370,7 +371,7 @@ public partial class CharImport : Form
     }
 
     /// <summary>
-    /// save character gear and stats into XML
+    ///     save character gear and stats into XML
     /// </summary>
     /// <param name="character"></param>
     /// <param name="savePath"></param>
@@ -436,7 +437,7 @@ public partial class CharImport : Form
     }
 
     /// <summary>
-    /// load character from xml
+    ///     load character from xml
     /// </summary>
     /// <param name="openFileFileName"></param>
     /// <returns></returns>
@@ -506,7 +507,7 @@ public partial class CharImport : Form
     }
 
     /// <summary>
-    /// update character skill values after grid end edit
+    ///     update character skill values after grid end edit
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>

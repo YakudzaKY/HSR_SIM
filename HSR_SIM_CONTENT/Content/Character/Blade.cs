@@ -14,16 +14,6 @@ public class Blade : DefaultFighter
 {
     private readonly Ability? deathSentence; //ultimate
 
-
-    private readonly Event forestMainTrgtHit; //last hit in main target by this ability(for event handlers)
-    private readonly Ability? forestOfSwords; //enchanced basic
-    private readonly Buff hellscapeBuff; //E buff
-
-
-    private readonly Ability? shuhuGift; //passive ability
-
-    private readonly double shuHuMaxCnt; // passive max counter
-
     //some modifiers
     private readonly double dsAdjAtk;
     private readonly double dsAdjHp;
@@ -32,13 +22,23 @@ public class Blade : DefaultFighter
 
     private readonly int dsSkillLvl;
     private readonly double forestAdjAtk;
+
+
+    private readonly Event forestMainTrgtHit; //last hit in main target by this ability(for event handlers)
+    private readonly Ability? forestOfSwords; //enchanced basic
     private readonly int fsSkillLvl;
-    private Step lastDamageStep;
+    private readonly AppliedBuff hellscapeAppliedBuff; //E buff
     private readonly double sgAtk;
     private readonly double sgHp;
     private readonly int sgSkillLvl;
 
+
+    private readonly Ability? shuhuGift; //passive ability
+
+    private readonly double shuHuMaxCnt; // passive max counter
+
     private readonly int ssSkillLvl;
+    private Step lastDamageStep;
 
     public Blade(Unit? parent) : base(parent)
     {
@@ -62,9 +62,9 @@ public class Blade : DefaultFighter
         sgAtk = FighterUtils.GetAbilityScaling(0.22, 0.44, sgSkillLvl);
         sgHp = FighterUtils.GetAbilityScaling(0.55, 0.110, sgSkillLvl);
 
-        hellscapeBuff = new Buff(Parent)
+        hellscapeAppliedBuff = new AppliedBuff(Parent)
         {
-            Type = Buff.BuffType.Buff,
+            Type = AppliedBuff.BuffType.Buff,
             BaseDuration = 3,
             MaxStack = 1,
             CustomIconName = "Hellscape",
@@ -293,7 +293,7 @@ public class Blade : DefaultFighter
         Hellscape.Events.Add(new ApplyBuff(null, this, Parent)
         {
             TargetUnit = Parent,
-            BuffToApply = hellscapeBuff
+            AppliedBuffToApply = hellscapeAppliedBuff
         });
 
         Abilities.Add(Hellscape);
@@ -305,42 +305,47 @@ public class Blade : DefaultFighter
         //Ascended Traces
         //=====================
         if (ATraces.HasFlag(ATracesEnm.A2))
-            ConditionBuffs.Add(new ConditionBuff(Parent)
+            Parent.PassiveBuffs.Add(new PassiveBuff(Parent)
             {
-                AppliedBuff = new Buff(Parent)
-                {
-                    Effects = new List<Effect> { new EffIncomeHealingPrc { Value = 0.20 } },
-                    CustomIconName = "Traces\\A2"
-                },
+                Effects = new List<Effect> { new EffIncomeHealingPrc { Value = 0.20 } },
+                CustomIconName = "Traces\\A2",
+
                 Target = Parent,
-                Condition = new ConditionBuff.ConditionRec
+                Condition = new PassiveBuff.ConditionRec
                 {
-                    CondtionParam = ConditionBuff.ConditionCheckParam.HPPrc,
-                    CondtionExpression = ConditionBuff.ConditionCheckExpression.EqualOrLess,
+                    ConditionParam = PassiveBuff.ConditionCheckParam.HpPrc,
+                    ConditionExpression = PassiveBuff.ConditionCheckExpression.EqualOrLess,
                     Value = 0.5
                 }
             });
         if (ATraces.HasFlag(ATracesEnm.A6))
-            PassiveBuffs.Add(new PassiveBuff(Parent)
+            Parent.PassiveBuffs.Add(new PassiveBuff(Parent)
             {
-                AppliedBuff = new Buff(Parent)
+                Effects = new List<Effect>
                 {
-                    Effects = new List<Effect>
-                    {
-                        new EffAbilityTypeBoost { Value = 0.20, AbilityType = AbilityTypeEnm.FollowUpAction }
-                    }
+                    new EffAbilityTypeBoost { Value = 0.20, AbilityType = AbilityTypeEnm.FollowUpAction }
                 },
                 Target = Parent
             });
 
-        e4Buff = new Buff(Parent)
-            { MaxStack = 2, Dispellable = false, Effects = new List<Effect> { new EffMaxHpPrc { Value = 0.2 } } };
+        E4AppliedBuff = new AppliedBuff(Parent)
+        {
+            MaxStack = 2,
+            Dispellable = false,
+            Effects =
+            [
+                new EffMaxHpPrc
+                {
+                    Value = 0.2
+                }
+            ]
+        };
     }
 
     public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Destruction;
     public sealed override Unit.ElementEnm Element { get; } = Unit.ElementEnm.Wind;
 
-    public Buff e4Buff { get; set; }
+    private AppliedBuff E4AppliedBuff { get; }
     //Blade constructor
 
     /*
@@ -349,7 +354,9 @@ public class Blade : DefaultFighter
      */
     protected override double WillSpend()
     {
-        return (Parent.Buffs.FirstOrDefault(x => x.Reference == hellscapeBuff)?.DurationLeft ?? 0) > 2 ? 0 : 1;
+        return (Parent.AppliedBuffs.FirstOrDefault(x => x.Reference == hellscapeAppliedBuff)?.DurationLeft ?? 0) > 2
+            ? 0
+            : 1;
     }
 
 
@@ -368,14 +375,14 @@ public class Blade : DefaultFighter
                 lastDamageStep = ent.ParentStep;
             if (Mechanics.Values[shuhuGift] < shuHuMaxCnt)
                 ent.ChildEvents.Add(new MechanicValChg(ent.ParentStep, this, Parent)
-                    {  Val = 1, AbilityValue = shuhuGift });
+                    { Val = 1, AbilityValue = shuhuGift });
 
             var bladeHalfHp = Parent.GetMaxHp(ent) * 0.5;
             //if hp<=50% but was 50%+ then apply hp buff
             if (Parent.Rank >= 4 && Parent.GetRes(Resource.ResourceType.HP).ResVal <= bladeHalfHp &&
                 Parent.GetRes(Resource.ResourceType.HP).ResVal + ent.RealVal > bladeHalfHp)
                 ent.ChildEvents.Add(new ApplyBuff(ent.ParentStep, this, Parent)
-                    { TargetUnit = Parent, BuffToApply = e4Buff });
+                    { TargetUnit = Parent, AppliedBuffToApply = E4AppliedBuff });
         }
 
         if (ent.Reference == forestMainTrgtHit && ATraces.HasFlag(ATracesEnm.A4) &&
@@ -520,12 +527,12 @@ public class Blade : DefaultFighter
 
     public bool HellscapeActive()
     {
-        return Parent.Buffs.Any(x => x.Reference == hellscapeBuff);
+        return Parent.AppliedBuffs.Any(x => x.Reference == hellscapeAppliedBuff);
     }
 
     public bool HellscapeNotActive()
     {
-        return Parent.Buffs.All(x => x.Reference != hellscapeBuff);
+        return Parent.AppliedBuffs.All(x => x.Reference != hellscapeAppliedBuff);
     }
 
     public double? CalculateSgHeal(Event ent)

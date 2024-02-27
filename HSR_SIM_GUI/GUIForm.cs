@@ -2,29 +2,23 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
-using System.Windows.Forms.DataVisualization.Charting;
 using HSR_SIM_LIB;
 using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Utils;
 using static HSR_SIM_GUI.GuiUtils;
-using static HSR_SIM_LIB.Utils.CallBacks;
-using static HSR_SIM_LIB.Worker;
 
 namespace HSR_SIM_GUI;
 
 public partial class GUIForm : Form
 {
-    private Worker wrk;
-
     private bool busy;
     private DebugWindow dbg;
+    private Worker wrk;
 
 
     public GUIForm()
     {
-
         InitializeComponent();
         ApplyDarkLightTheme(this);
     }
@@ -53,14 +47,14 @@ public partial class GUIForm : Form
     }
 
     /// <summary>
-    /// ask user what decision are pick from options(do we crit etc...)
+    ///     ask user what decision are pick from options(do we crit etc...)
     /// </summary>
     /// <param name="items"></param>
     /// <param name="description"></param>
     /// <returns></returns>
     public int WorkerCallBackGetDecision(string[] items, string description)
     {
-        int yCur = 0;
+        var yCur = 0;
         Size size = new(200, 180);
         Form inputBox = new()
         {
@@ -70,7 +64,7 @@ public partial class GUIForm : Form
             StartPosition = FormStartPosition.CenterScreen
         };
         yCur += 5;
-        TextBox lvlDescr = new TextBox()
+        var lvlDescr = new TextBox
         {
             Size = new Size(size.Width - 10, 105),
             Text = description,
@@ -78,7 +72,6 @@ public partial class GUIForm : Form
             ScrollBars = ScrollBars.Vertical,
             ReadOnly = true,
             Location = new Point(5, yCur)
-
         };
         inputBox.Controls.Add(lvlDescr);
 
@@ -88,10 +81,7 @@ public partial class GUIForm : Form
             Size = new Size(size.Width - 10, 23),
             Location = new Point(5, yCur)
         };
-        foreach (var vaItem in items)
-        {
-            cbBox.Items.Add(vaItem);
-        }
+        foreach (var vaItem in items) cbBox.Items.Add(vaItem);
 
         cbBox.SelectedIndex = 0;
 
@@ -109,7 +99,6 @@ public partial class GUIForm : Form
         inputBox.AcceptButton = okButton;
         var result = inputBox.ShowDialog();
         return cbBox.SelectedIndex;
-
     }
 
 
@@ -132,10 +121,9 @@ public partial class GUIForm : Form
         RefreshCbs();
         cbScenario.Text = IniF.IniReadValue("form", "Scenario");
         cbProfile.Text = IniF.IniReadValue("form", "Profile");
-        string boolVal = IniF.IniReadValue("form", "DevMode");
+        var boolVal = IniF.IniReadValue("form", "DevMode");
 
-        chkDevMode.Checked = !String.IsNullOrEmpty(boolVal) && bool.Parse(boolVal);
-
+        chkDevMode.Checked = !string.IsNullOrEmpty(boolVal) && bool.Parse(boolVal);
     }
 
     private void ControlsDispose()
@@ -152,7 +140,7 @@ public partial class GUIForm : Form
     /// <param name="e"></param>
     private void Button1_Click(object sender, EventArgs e)
     {
-        wrk?.DevModeLog?.WriteToFile();//save prev data
+        wrk?.DevModeLog?.WriteToFile(); //save prev data
 
         wrk = new Worker();
         wrk.CbLog += WorkerCallBackString;
@@ -160,7 +148,7 @@ public partial class GUIForm : Form
         wrk.CbGetDecision = WorkerCallBackGetDecision;
         wrk.DevMode = chkDevMode.Checked;
         wrk.LoadScenarioFromXml(GetScenarioPath() + cbScenario.Text,
-            String.IsNullOrEmpty(cbProfile.Text)?"":GetProfilePath() + cbProfile.Text);
+            string.IsNullOrEmpty(cbProfile.Text) ? "" : GetProfilePath() + cbProfile.Text);
     }
 
 
@@ -168,12 +156,12 @@ public partial class GUIForm : Form
     {
         cbScenario.Items.Clear();
         cbProfile.Items.Clear();
-        var files = Directory.GetFiles(GetScenarioPath(),"*.xml");
+        var files = Directory.GetFiles(GetScenarioPath(), "*.xml");
 
         foreach (var file in files) cbScenario.Items.Add(Path.GetFileName(file));
 
         Directory.CreateDirectory(GetProfilePath());
-        files = Directory.GetFiles(GetProfilePath(),"*.xml");
+        files = Directory.GetFiles(GetProfilePath(), "*.xml");
 
         foreach (var file in files) cbProfile.Items.Add(Path.GetFileName(file));
     }
@@ -223,7 +211,6 @@ public partial class GUIForm : Form
 
     private void Button4_Click(object sender, EventArgs e)
     {
-
     }
 
     private void Button5_Click(object sender, EventArgs e)
@@ -266,7 +253,6 @@ public partial class GUIForm : Form
 
     private void button4_Click_1(object sender, EventArgs e)
     {
-      
         wrk?.DevModeLog?.WriteResToFile();
     }
 }

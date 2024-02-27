@@ -1,6 +1,4 @@
 ﻿using HSR_SIM_LIB.Content;
-using HSR_SIM_LIB.Fighters;
-
 
 namespace HSR_SIM_CONTENT.Content.Relics;
 

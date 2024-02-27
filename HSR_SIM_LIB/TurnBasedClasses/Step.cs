@@ -46,8 +46,8 @@ public class Step
 
     public IEnumerable<Unit> TargetsHit =>
         (from p in Events
-         where p is DirectDamage
-         select p.TargetUnit)
+            where p is DirectDamage
+            select p.TargetUnit)
         .Distinct();
 
     public SimCls Parent { get; }
@@ -177,7 +177,7 @@ public class Step
 
         //set ability to start execute
         Events.Add(new ExecuteAbilityStart(this, ability, ability.Parent.Parent)
-        { TargetUnit = target });
+            { TargetUnit = target });
 
         //res gaining
         if (ability.SpGain > 0)
@@ -194,7 +194,7 @@ public class Step
             //TP wasted before
             if (ability.CostType != ResourceType.TP)
                 Events.Add(new PartyResourceDrain(this, ability.Parent, ability.Parent.Parent)
-                { ResType = (ResourceType)ability.CostType, Val = ability.Cost });
+                    { ResType = (ResourceType)ability.CostType, Val = ability.Cost });
         }
         else if (ability.CostType != null)
         {
@@ -237,7 +237,7 @@ public class Step
             });
         //set ability to finish  execute
         Events.Add(new ExecuteAbilityFinish(this, ability, ability.Parent.Parent)
-        { TargetUnit = target });
+            { TargetUnit = target });
     }
 
     /// <summary>
@@ -292,10 +292,10 @@ public class Step
 
         if (ability.CostType == ResourceType.TP || ability.CostType == ResourceType.SP)
             Events.Add(new PartyResourceDrain(this, null, ability.Parent.Parent)
-            { ResType = (ResourceType)ability.CostType, Val = ability.Cost });
+                { ResType = (ResourceType)ability.CostType, Val = ability.Cost });
         else if (ability.CostType != null)
             Events.Add(new ResourceDrain(this, null, ability.Parent.Parent)
-            { ResType = (ResourceType)ability.CostType, Val = ability.Cost });
+                { ResType = (ResourceType)ability.CostType, Val = ability.Cost });
 
         Actor = ability.Parent
             .Parent; //WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.ParentStep but can change in future)
@@ -323,57 +323,51 @@ public class Step
     {
         //all alive and NO-cced units
         foreach (var prio in Enum.GetValues(typeof(PriorityEnm)).Cast<PriorityEnm>())
-            foreach (var unit in Parent.AllUnits.Where(x => !x.Controlled && x.LivingStatus != Unit.LivingStatusEnm.Defeated).OrderByDescending(x => x.Fighter.Role))//supports cast ultimate first
-                foreach (var ability in unit.Fighter.Abilities.Where(x =>
-                                            (
-                                                //Is ultimate
-                                                (prio == PriorityEnm.UltimateShouldBeHere && x.AbilityType == AbilityTypeEnm.Ultimate && x.IWannaUseIt())
-                                                ||
-                                                //Or follow up
-                                               (x.FollowUpPriority == prio && x.AbilityType == AbilityTypeEnm.FollowUpAction
+        foreach (var unit in Parent.AllUnits
+                     .Where(x => !x.Controlled && x.LivingStatus != Unit.LivingStatusEnm.Defeated)
+                     .OrderByDescending(x => x.Fighter.Role)) //supports cast ultimate first
+        foreach (var ability in unit.Fighter.Abilities.Where(x =>
+                     (
+                         //Is ultimate
+                         (prio == PriorityEnm.UltimateShouldBeHere && x.AbilityType == AbilityTypeEnm.Ultimate &&
+                          x.IWannaUseIt())
+                         ||
+                         //Or follow up
+                         (x.FollowUpPriority == prio && x.AbilityType == AbilityTypeEnm.FollowUpAction
+                                                     && (unit.LivingStatus == Unit.LivingStatusEnm.WaitingForFollowUp ||
+                                                         prio != PriorityEnm.DefeatHandler)
+                                                     && (x.FollowUpTargets.Any(x => x.Key.IsAlive)
+                                                         || x.AdjacentTargets == AdjacentTargetsEnm.All
+                                                         || x.TargetType == TargetTypeEnm.Self
+                                                     )
+                         )
+                     ) &&
+                     x.Available()))
+        {
+            if (ability.AbilityType == AbilityTypeEnm.Ultimate && prio == PriorityEnm.UltimateShouldBeHere)
+                StepType = StepTypeEnm.UnitUltimate;
+            else
+                StepType = StepTypeEnm.UnitFollowUpAction;
 
-                                               && (unit.LivingStatus == Unit.LivingStatusEnm.WaitingForFollowUp || prio != PriorityEnm.DefeatHandler)
-                                                                                                                           && (x.FollowUpTargets.Any(x => x.Key.IsAlive)
-                                                                                                                                || x.AdjacentTargets == AdjacentTargetsEnm.All
-                                                                                                                                || x.TargetType == TargetTypeEnm.Self
-                                                                                                                                )
-                                                                               )
-                                                ) &&
-                                                                          x.Available()))
-                {
-                    if (ability.AbilityType == AbilityTypeEnm.Ultimate && prio == PriorityEnm.UltimateShouldBeHere)
-                    {
-                        StepType = StepTypeEnm.UnitUltimate;
-                    }
-                    else
-                    {
-                        StepType = StepTypeEnm.UnitFollowUpAction;
-                    }
+            Actor = unit;
+            ActorAbility = ability;
+            if (ability.AbilityType == AbilityTypeEnm.Ultimate)
+                ExecuteAbility(ability, Actor.Fighter.GetBestTarget(ability));
+            if (ability.AbilityType == AbilityTypeEnm.FollowUpAction)
+            {
+                //get target from queue
+                var tar = ability.FollowUpTargets.FirstOrDefault(x => x.Key.IsAlive);
+                //remove from q
+                ability.FollowUpTargets.Remove(tar);
+                ExecuteAbility(ability, tar.Key);
+                //Check for Defeat handlers
+                if (ability.FollowUpPriority == PriorityEnm.DefeatHandler)
+                    Events.Add(new CheckForDefeat(this, ability, unit) { TargetSourcePair = tar });
+            }
 
-                    Actor = unit;
-                    ActorAbility = ability;
-                    if (ability.AbilityType == AbilityTypeEnm.Ultimate)
-                        ExecuteAbility(ability, Actor.Fighter.GetBestTarget(ability));
-                    if (ability.AbilityType == AbilityTypeEnm.FollowUpAction)
-                    {
-                        //get target from queue
-                        KeyValuePair<Unit, Unit> tar = ability.FollowUpTargets.FirstOrDefault(x => x.Key.IsAlive);
-                        //remove from q
-                        ability.FollowUpTargets.Remove(tar);
-                        ExecuteAbility(ability, tar.Key);
-                        //Check for Defeat handlers
-                        if (ability.FollowUpPriority == PriorityEnm.DefeatHandler)
-                        {
-                            Events.Add(new CheckForDefeat(this, ability, unit) { TargetSourcePair = tar });
-
-                        }
-                    }
-
-                    return true;
-                }
+            return true;
+        }
 
         return false;
     }
-
-
 }

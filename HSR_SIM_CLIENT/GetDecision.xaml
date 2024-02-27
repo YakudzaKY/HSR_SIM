@@ -3,23 +3,21 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:HSR_SIM_CLIENT"
         mc:Ignorable="d"
         Title="Get Decision" Height="300" Width="400"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="5*"></RowDefinition>
-            <RowDefinition Height="1*"></RowDefinition>
-            <RowDefinition Height="1*"></RowDefinition>
-            <RowDefinition Height="1*"></RowDefinition>
+            <RowDefinition Height="5*" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
-        <Label Grid.Row="0" Content="{Binding Path=Description, Mode=OneWay}"></Label>
+        <Label Grid.Row="0" Content="{Binding Path=Description, Mode=OneWay}" />
         <Label Grid.Row="1">Chose item:</Label>
         <ComboBox Grid.Row="2" ItemsSource="{Binding Items, Mode=OneWay}"
-                  SelectedIndex="{Binding ItemIndex, Mode=TwoWay}">
-        </ComboBox>
+                  SelectedIndex="{Binding ItemIndex, Mode=TwoWay}" />
         <Button Grid.Row="3" Click="ButtonBase_OnClick">OK</Button>
     </Grid>
 </Window>

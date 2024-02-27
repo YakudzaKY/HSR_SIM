@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using HSR_SIM_LIB.Fighters;
-using HSR_SIM_LIB.Skills;
+﻿using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 
@@ -17,11 +15,11 @@ public class DefaultRelicSet : IRelicSet
     }
 
     public IFighter Parent { get; set; }
+    public List<Ability> Abilities { get; set; }
 
     public int Num { get; set; }
     public IRelicSet.EventHandler EventHandlerProc { get; set; }
     public IRelicSet.StepHandler StepHandlerProc { get; set; }
-    public List<Ability> Abilities { get; set; }
 
     public void Reset()
     {

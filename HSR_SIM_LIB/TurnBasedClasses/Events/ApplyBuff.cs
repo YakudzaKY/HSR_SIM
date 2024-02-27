@@ -8,9 +8,11 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 //apply buff debuff dot etc
 public class ApplyBuff : BuffEventTemplate
 {
-    private int stacksApplied = 0;
+    private AppliedBuff appliedAppliedBuff;
+    private int stacksApplied;
+
     /// <summary>
-    /// place buff/debuff on target. If have some chance to place buff then use AttemptEffect instead
+    ///     place buff/debuff on target. If have some chance to place buff then use AttemptEffect instead
     /// </summary>
     /// <param name="parent"></param>
     /// <param name="source"></param>
@@ -19,8 +21,6 @@ public class ApplyBuff : BuffEventTemplate
     {
     }
 
-    private Buff appliedBuff;
-
     public override string GetDescription()
     {
         return $"Apply buff on {TargetUnit.Name}. Source: {Source?.GetType()?.Name:s}";
@@ -28,35 +28,26 @@ public class ApplyBuff : BuffEventTemplate
 
     public override void ProcEvent(bool revert)
     {
-  
-        if (TargetUnit.LivingStatus==Unit.LivingStatusEnm.Alive)
+        if (TargetUnit.LivingStatus == Unit.LivingStatusEnm.Alive)
         {
             //calc value first
-            foreach (var modEffect in BuffToApply.Effects.Where(modEffect =>
+            foreach (var modEffect in AppliedBuffToApply.Effects.Where(modEffect =>
                          modEffect.CalculateValue != null && modEffect.Value == null))
                 modEffect.Value = modEffect.CalculateValue(this);
 
             if (!revert)
             {
-                
-                stacksApplied = TargetUnit.ApplyBuff(this, appliedBuff??BuffToApply, out appliedBuff);
-
+                stacksApplied = TargetUnit.ApplyBuff(this, appliedAppliedBuff ?? AppliedBuffToApply,
+                    out appliedAppliedBuff);
             }
             else
             {
-                if (TargetUnit.GetStacks(BuffToApply) - stacksApplied > 0)
-                    TargetUnit.AddStack(BuffToApply, -stacksApplied);
+                if (TargetUnit.GetStacks(AppliedBuffToApply) - stacksApplied > 0)
+                    TargetUnit.AddStack(AppliedBuffToApply, -stacksApplied);
                 else
-                {
-                    TargetUnit.RemoveBuff(this, BuffToApply);
-                }
-
-
-
+                    TargetUnit.RemoveBuff(this, AppliedBuffToApply);
             }
         }
-
-
 
 
         base.ProcEvent(revert);

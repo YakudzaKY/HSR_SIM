@@ -1,5 +1,4 @@
 ﻿using HSR_SIM_CONTENT.DefaultContent;
-using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
@@ -12,20 +11,19 @@ namespace HSR_SIM_CONTENT.Content.Character;
 
 public class Bronya : DefaultFighter
 {
-    private readonly int abilitySkillLvl;
+    private readonly Ability? ability;
     private readonly int talentSkillLvl;
     private readonly int ultimateSkillLvl;
     private readonly int wbSkillLvl;
-    private readonly Ability? ability;
     private readonly Ability? windriderBullet;
 
     public Bronya(Unit? parent) : base(parent)
     {
         Parent.Stats.BaseMaxEnergy = 120;
-        wbSkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Windrider Bullet").Level;
-        abilitySkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Combat Redeployment").Level;
-        ultimateSkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "The Belobog March").Level;
-        talentSkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Leading the Way").Level;
+        wbSkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Windrider Bullet")!.Level;
+        var abilitySkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Combat Redeployment")!.Level;
+        ultimateSkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "The Belobog March")!.Level;
+        talentSkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Leading the Way")!.Level;
 
         //=====================
         //Abilities
@@ -38,7 +36,6 @@ public class Bronya : DefaultFighter
                 Name = "Banner of Command",
                 Cost = 1,
                 CostType = Resource.ResourceType.TP,
-                Element = Element,
                 AdjacentTargets = Ability.AdjacentTargetsEnm.All,
                 TargetType = Ability.TargetTypeEnm.Friend
             };
@@ -47,9 +44,9 @@ public class Bronya : DefaultFighter
         ApplyBuff eventBuff = new(null, this, Parent)
         {
             OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
-            BuffToApply = new Buff(Parent)
+            AppliedBuffToApply = new AppliedBuff(Parent)
             {
-                Type = Buff.BuffType.Buff,
+                Type = AppliedBuff.BuffType.Buff,
                 Effects = new List<Effect> { new EffAtkPrc { Value = 0.15 } },
                 BaseDuration = 2,
                 Dispellable = true
@@ -97,7 +94,7 @@ public class Bronya : DefaultFighter
         //dmg events
         ability.Events.Add(new ApplyBuff(null, this, Parent)
         {
-            BuffToApply = new Buff(Parent)
+            AppliedBuffToApply = new AppliedBuff(Parent)
             {
                 BaseDuration = 1,
                 Effects = { new EffAllDamageBoost { Value = GetAbilityScaling(0.33, 0.66, abilitySkillLvl) } }
@@ -123,10 +120,10 @@ public class Bronya : DefaultFighter
         //buff apply
         ApplyBuff ultimateBuff = new(null, this, Parent)
         {
-            BuffToApply = new Buff(Parent)
+            AppliedBuffToApply = new AppliedBuff(Parent)
             {
                 CustomIconName = "The_Belobog_March",
-                Type = Buff.BuffType.Buff,
+                Type = AppliedBuff.BuffType.Buff,
                 Effects = new List<Effect>
                 {
                     new EffAtkPrc { Value = GetAbilityScaling(0.33, 0.55, ultimateSkillLvl) },
@@ -147,10 +144,9 @@ public class Bronya : DefaultFighter
         //=====================
 
         if (ATraces.HasFlag(ATracesEnm.A6))
-            PassiveBuffs.Add(new PassiveBuff(Parent)
+            Parent.PassiveBuffs.Add(new PassiveBuff(Parent)
             {
-                AppliedBuff = new Buff(Parent)
-                    { Effects = new List<Effect> { new EffAllDamageBoost { Value = 0.10 } } },
+                Effects = [new EffAllDamageBoost { Value = 0.10 }],
                 Target = Parent.ParentTeam
             });
     }
@@ -180,7 +176,7 @@ public class Bronya : DefaultFighter
             step.Events.Add(new ModActionValue(step, this, Parent)
                 { CalculateValue = CalcTalentAV, TargetUnit = Parent });
             step.Events.Add(new MechanicValChg(step, this, Parent)
-                {  AbilityValue = windriderBullet, Val = -Mechanics.Values[windriderBullet] });
+                { AbilityValue = windriderBullet, Val = -Mechanics.Values[windriderBullet] });
         }
 
         base.DefaultFighter_HandleStep(step);
@@ -199,7 +195,7 @@ public class Bronya : DefaultFighter
 
 
     /*
-        If wanna cast E then return sp cost+ maindps sp cost 
+        If wanna cast E then return sp cost+ maindps sp cost
      */
     protected override double WillSpend()
     {

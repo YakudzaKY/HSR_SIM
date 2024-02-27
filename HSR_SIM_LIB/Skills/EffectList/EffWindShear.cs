@@ -3,7 +3,7 @@
 namespace HSR_SIM_LIB.Skills.EffectList;
 
 /// <summary>
-/// WindShear debuff
+///     WindShear debuff
 /// </summary>
 public class EffWindShear : EffDotTemplate
 {

@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
-using HSR_SIM_LIB.TurnBasedClasses.Events;
-using HSR_SIM_LIB.Utils;
 using static HSR_SIM_LIB.UnitStuff.Resource;
 
 namespace HSR_SIM_LIB.UnitStuff;
@@ -24,35 +20,13 @@ public class Team : CloneClass
     public Team(SimCls parent)
     {
         ParentSim = parent;
+    }
 
-    }
-    public override object Clone()
-    {
-        Team newClone =(Team)MemberwiseClone();
-        //clone teams
-        var oldUnits=newClone.Units;
-        newClone.Units = new ();
-        foreach (var unit  in oldUnits)
-        {
-            Unit newUnit = (Unit)unit.Clone();
-            if (newUnit.ParentTeam != null)
-                newUnit.ParentTeam = newClone;
-            newClone.Units.Add(newUnit); 
-        }
-        return newClone;
-    }
-    public void ResetRoles()
-    {
-        foreach (Unit unit in this.Units)
-        {
-            unit.Fighter.Role = null;
-        }
-    }
     public SimCls ParentSim { get; set; }
     public TeamTypeEnm TeamType { get; set; }
 
 
-    public List<Unit> Units { get; set; }=new();
+    public List<Unit> Units { get; set; } = new();
 
     public double TeamAggro
     {
@@ -73,7 +47,7 @@ public class Team : CloneClass
             if (resources == null)
             {
                 resources = new List<Resource>();
-                foreach (var resourceType in new ResourceType [] { ResourceType.SP ,ResourceType.TP})
+                foreach (var resourceType in new[] { ResourceType.SP, ResourceType.TP })
                 {
                     Resource res = new(this)
                     {
@@ -89,6 +63,28 @@ public class Team : CloneClass
         set => resources = value;
     }
 
+    public override object Clone()
+    {
+        var newClone = (Team)MemberwiseClone();
+        //clone teams
+        var oldUnits = newClone.Units;
+        newClone.Units = new List<Unit>();
+        foreach (var unit in oldUnits)
+        {
+            var newUnit = (Unit)unit.Clone();
+            if (newUnit.ParentTeam != null)
+                newUnit.ParentTeam = newClone;
+            newClone.Units.Add(newUnit);
+        }
+
+        return newClone;
+    }
+
+    public void ResetRoles()
+    {
+        foreach (var unit in Units) unit.Fighter.Role = null;
+    }
+
 
     /// <summary>
     ///     unbind unit from team
@@ -102,16 +98,14 @@ public class Team : CloneClass
         return ndx;
     }
 
-    
+
     /// <summary>
     ///     bind unit to team
     /// </summary>
-    public void BindUnit(Unit unit,int ndx)
+    public void BindUnit(Unit unit, int ndx)
     {
-       
         unit.ParentTeam = this;
-        Units.Insert(ndx,unit);
-    
+        Units.Insert(ndx, unit);
     }
 
     /// <summary>
@@ -119,7 +113,7 @@ public class Team : CloneClass
     /// </summary>
     public void UnBindUnits()
     {
-        List<Unit> UnitsToUnbind =  new List<Unit>();
+        var UnitsToUnbind = new List<Unit>();
         UnitsToUnbind.AddRange(Units);
         foreach (var unit in UnitsToUnbind) UnBindUnit(unit);
         //Units.Clear(); disable this clear coz need save team into event field
@@ -129,7 +123,7 @@ public class Team : CloneClass
     //bind units to team
     public void BindUnits(List<Unit> bindUnits)
     {
-        foreach (var unit in bindUnits) BindUnit(unit,Units.Count);
+        foreach (var unit in bindUnits) BindUnit(unit, Units.Count);
     }
 
     /// <summary>

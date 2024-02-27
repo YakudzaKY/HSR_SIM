@@ -11,7 +11,7 @@ using static HSR_SIM_LIB.UnitStuff.Unit;
 namespace HSR_SIM_LIB.Fighters;
 
 /// <summary>
-///   Combat utilities
+///     Combat utilities
 /// </summary>
 public static class FighterUtils
 {
@@ -40,7 +40,6 @@ public static class FighterUtils
     /// <summary>
     ///     get from table in https://honkai-star-rail.fandom.com/wiki/Toughness#Weakness_Break
     ///     if someone know formula plz rewrite
-    /// 
     /// </summary>
     static FighterUtils()
     {
@@ -102,30 +101,30 @@ public static class FighterUtils
         else
         {
             var modEnt = ent as ToughnessBreakDoTDamage;
-            if (modEnt.Modification.Effects.Any(x => x is EffBleed))
+            if (modEnt.BuffThatDamage.Effects.Any(x => x is EffBleed))
             {
                 baseDmg = defender.Fighter.IsEliteUnit ? 0.07 : 0.16 * defender.GetMaxHp(ent);
                 baseDmg = Math.Min(baseDmg, 2 * lvlMultiplier[attacker.Level] * defender.Stats.MaxToughness);
             }
-            else if (modEnt.Modification.Effects.Any(x =>
+            else if (modEnt.BuffThatDamage.Effects.Any(x =>
                          x is EffBurn or EffFreeze))
             {
                 baseDmg = 1 * lvlMultiplier[attacker.Level] * maxToughnessMult;
             }
-            else if (modEnt.Modification.Effects.Any(x =>
+            else if (modEnt.BuffThatDamage.Effects.Any(x =>
                          x is EffShock))
             {
                 baseDmg = 2 * lvlMultiplier[attacker.Level] * maxToughnessMult;
             }
-            else if (modEnt.Modification.Effects.Any(x =>
+            else if (modEnt.BuffThatDamage.Effects.Any(x =>
                          x is EffWindShear))
             {
-                baseDmg = 1 * modEnt.Modification.Stack * lvlMultiplier[attacker.Level] * maxToughnessMult;
+                baseDmg = 1 * modEnt.BuffThatDamage.Stack * lvlMultiplier[attacker.Level] * maxToughnessMult;
             }
-            else if (modEnt.Modification.Effects.Any(x =>
+            else if (modEnt.BuffThatDamage.Effects.Any(x =>
                          x is EffEntanglement))
             {
-                baseDmg = 0.6 * modEnt.Modification.Stack * lvlMultiplier[attacker.Level] * maxToughnessMult;
+                baseDmg = 0.6 * modEnt.BuffThatDamage.Stack * lvlMultiplier[attacker.Level] * maxToughnessMult;
             }
             else
             {
@@ -169,7 +168,7 @@ public static class FighterUtils
         if (ent is DoTDamage ed)
         {
             attackElem = ed.Element;
-            abilityMultiplier = 0;//DoT have no scaling from ability type
+            abilityMultiplier = 0; //DoT have no scaling from ability type
         }
         else
         {
@@ -183,7 +182,9 @@ public static class FighterUtils
         double dotVulnerability = 0;
         if (ent is DirectDamage)
         {
-            ((DirectDamage)ent).IsCrit = ent.ParentStep.Parent.Parent.DevMode?  DevModeUtils.IsCrit(ent):new MersenneTwister().NextDouble() <= ent.SourceUnit.GetCritRate(ent) ;
+            ((DirectDamage)ent).IsCrit = ent.ParentStep.Parent.Parent.DevMode
+                ? DevModeUtils.IsCrit(ent)
+                : new MersenneTwister().NextDouble() <= ent.SourceUnit.GetCritRate(ent);
             if (((DirectDamage)ent).IsCrit)
                 critMultiplier = 1 + attacker.GetCritDamage(ent);
         }
@@ -209,7 +210,7 @@ public static class FighterUtils
         var vulnMult = 1 + defender.GetElemVulnerability(attackElem, ent) + defender.GetAllDamageVulnerability(ent) +
                        dotVulnerability;
 
-        var dmgReduction = defender.GetDamageReduction(defender,ent);
+        var dmgReduction = defender.GetDamageReduction(ent);
 
         var brokenMultiplier = defender.GetBrokenMultiplier();
         var totalDmg = baseDmg * critMultiplier * damageBoost * defMultiplier * resPen * vulnMult *
@@ -234,17 +235,17 @@ public static class FighterUtils
 
 
     //debuff is resisted?
-    public static bool CalculateDebuffApplied(ApplyBuff ent,double baseChance)
+    public static bool CalculateDebuffApplied(ApplyBuff ent, double baseChance)
     {
         if (ent.ParentStep.Parent.Parent.DevMode)
             return DevModeUtils.IsDebuffed(ent);
         var attacker = ent.SourceUnit;
         var defender = ent.TargetUnit;
-        var mod = ent.BuffToApply.Effects.FirstOrDefault();
-        var isCC = ent.BuffToApply.CrowdControl;
+        var mod = ent.AppliedBuffToApply.Effects.FirstOrDefault();
+        var isCC = ent.AppliedBuffToApply.CrowdControl;
         var effectHitRate = attacker.GetEffectHit(ent);
         var effectRes = defender.GetEffectRes(ent);
-        var debuffRes = defender.GetDebuffResists(mod?.GetType()??typeof(Effect), ent);
+        var debuffRes = defender.GetDebuffResists(mod?.GetType() ?? typeof(Effect), ent);
         double ccRes = 0;
         if (isCC) ccRes = defender.GetDebuffResists(typeof(EffCrowControl));
         var realChance = baseChance * (1 + effectHitRate) * (1 - effectRes) * (1 - debuffRes) * (1 - ccRes);
@@ -299,7 +300,7 @@ public static class FighterUtils
     }
 
     /// <summary>
-    /// Get Skill Modifier By min, max and level
+    ///     Get Skill Modifier By min, max and level
     /// </summary>
     /// <param name="modAt1">skill mod at 1 lvl</param>
     /// <param name="modAt10">skill mod at 10 lvl </param>
@@ -307,23 +308,21 @@ public static class FighterUtils
     /// <returns></returns>
     public static double GetAbilityScaling(double modAt1, double modAt10, int level)
     {
-        int maxLvl = 10;//without Eidolons
-        int firstModLvl = 6;
-        if (level <= firstModLvl)
-        {
-            return modAt1+(modAt10-modAt1)*(level-1)/maxLvl;
-        }
+        var maxLvl = 10; //without Eidolons
+        var firstModLvl = 6;
+        if (level <= firstModLvl) return modAt1 + (modAt10 - modAt1) * (level - 1) / maxLvl;
         if (level <= maxLvl)
         {
             //first get val from 6 lvl
-            double preMod=GetAbilityScaling(modAt1, modAt10, firstModLvl);
-            return preMod + (modAt10 - preMod) * 1 / (maxLvl - firstModLvl) *(level-firstModLvl);
+            var preMod = GetAbilityScaling(modAt1, modAt10, firstModLvl);
+            return preMod + (modAt10 - preMod) * 1 / (maxLvl - firstModLvl) * (level - firstModLvl);
         }
-        return modAt10+((modAt10-modAt1)*1/maxLvl*(level-maxLvl));
+
+        return modAt10 + (modAt10 - modAt1) * 1 / maxLvl * (level - maxLvl);
     }
 
     /// <summary>
-    /// Get Basic ability Modifier By min, max and level
+    ///     Get Basic ability Modifier By min, max and level
     /// </summary>
     /// <param name="modAt1">skill mod at 1 lvl</param>
     /// <param name="modAt6">skill mod at 6 lvl </param>
@@ -331,8 +330,8 @@ public static class FighterUtils
     /// <returns></returns>
     public static double GetBasicScaling(double modAt1, double modAt6, int level)
     {
-        int maxLvl = 6;//without Eidolons
-       
-        return modAt1+(level-1)/(maxLvl-1)*(modAt6-modAt6);
+        var maxLvl = 6; //without Eidolons
+
+        return modAt1 + (level - 1) / (maxLvl - 1) * (modAt6 - modAt6);
     }
 }

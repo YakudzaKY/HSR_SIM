@@ -11,36 +11,32 @@ namespace HSR_SIM_CONTENT.Content.Character;
 
 public class Luocha : DefaultFighter
 {
-    private readonly Ability? cycleOfLife;
+    private readonly double coLfAtk;
+    private readonly double coLfFix;
+    private readonly Ability cycleOfLife;
     private readonly double cycleOfLifeMaxCnt = 2;
-    private readonly Buff e2ShieldBuff;
+    private readonly double deathWish;
+    private readonly AppliedBuff e2ShieldAppliedBuff;
+    private readonly double poAfAtk;
+    private readonly double poAfFix;
 
     private readonly Ability? prayerOfAbyssFlower;
     private readonly Ability? prayerOfAbyssFlowerAuto;
-    private readonly Buff triggerCdBuff;
-    private readonly Ability? ultimateAbility;
-    private readonly Buff uniqueBuff;
-
-    private readonly double coLfAtk;
-    private readonly double coLfFix;
-    private readonly int coLLvl;
-    private readonly double deathWish;
-    private readonly int dWLvl;
-    private readonly double poAfAtk;
-    private readonly double poAfFix;
-    private readonly int poALvl;
     private readonly int totALvl;
+    private readonly AppliedBuff triggerCdAppliedBuff;
+    private readonly Ability ultimateAbility;
+    private readonly AppliedBuff uniqueAppliedBuff;
 
     private List<KeyValuePair<Unit, Unit?>> trackedUnits = new();
 
-    public Luocha(Unit? parent) : base(parent)
+    public Luocha(Unit parent) : base(parent)
     {
         Parent.Stats.BaseMaxEnergy = 100;
 
-        coLLvl = Parent.Skills.First(x => x.Name == "Cycle of Life")!.Level;
-        dWLvl = Parent.Skills.First(x => x.Name == "Death Wish")!.Level;
+        var coLLvl = Parent.Skills.First(x => x.Name == "Cycle of Life")!.Level;
+        var dWLvl = Parent.Skills.First(x => x.Name == "Death Wish")!.Level;
         totALvl = Parent.Skills.First(x => x.Name == "Thorns of the Abyss")!.Level;
-        poALvl = Parent.Skills.First(x => x.Name == "Prayer of Abyss Flower")!.Level;
+        var poALvl = Parent.Skills.First(x => x.Name == "Prayer of Abyss Flower")!.Level;
 
         coLfAtk = FighterUtils.GetAbilityScaling(0.12, 0.18, coLLvl);
         coLfFix = FighterUtils.GetAbilityScaling(60, 240, coLLvl);
@@ -48,7 +44,7 @@ public class Luocha : DefaultFighter
         poAfAtk = FighterUtils.GetAbilityScaling(0.4, 0.6, poALvl);
         poAfFix = FighterUtils.GetAbilityScaling(200, 800, poALvl);
 
-        uniqueBuff = new Buff(Parent)
+        uniqueAppliedBuff = new AppliedBuff(Parent)
         {
             Type = Buff.BuffType.Buff,
             BaseDuration = 2,
@@ -57,7 +53,7 @@ public class Luocha : DefaultFighter
             CustomIconName = "Icon_Abyss_Flower"
         };
 
-        triggerCdBuff = new Buff(Parent)
+        triggerCdAppliedBuff = new AppliedBuff(Parent)
         {
             Type = Buff.BuffType.Debuff,
             BaseDuration = 2,
@@ -77,14 +73,14 @@ public class Luocha : DefaultFighter
             Element = Element,
             Available = ColAvailable,
             FollowUpPriority = PriorityEnm.Medium,
-            TargetType = TargetTypeEnm.Self,
+            TargetType = TargetTypeEnm.Self
         };
         cycleOfLife.Events.Add(new MechanicValChg(null, this, Parent)
-            {  AbilityValue = cycleOfLife, Val = -cycleOfLifeMaxCnt });
+            { AbilityValue = cycleOfLife, Val = -cycleOfLifeMaxCnt });
         cycleOfLife.Events.Add(new ApplyBuff(null, this, Parent)
         {
             TargetUnit = Parent,
-            BuffToApply = uniqueBuff
+            AppliedBuffToApply = uniqueAppliedBuff
         });
         Mechanics.AddVal(cycleOfLife);
         Abilities.Add(cycleOfLife);
@@ -115,7 +111,7 @@ public class Luocha : DefaultFighter
             AbilityType = AbilityTypeEnm.FollowUpAction,
             Name = "Prayer of Abyss Flower (auto)",
             Element = Element,
-            Available = PoAFAvailable,
+            Available = PoAfAvailable,
             FollowUpPriority = PriorityEnm.High,
             TargetType = TargetTypeEnm.Friend,
             FollowUpTargets = trackedUnits
@@ -131,16 +127,15 @@ public class Luocha : DefaultFighter
         prayerOfAbyssFlowerAuto.Events.Add(new ApplyBuff(null, this, Parent)
         {
             TargetUnit = Parent,
-            BuffToApply = triggerCdBuff
+            AppliedBuffToApply = triggerCdAppliedBuff
         });
         Abilities.Add(prayerOfAbyssFlowerAuto);
 
-        e2ShieldBuff = new Buff(Parent)
-            { Effects = new List<Effect> { new EffShield { CalculateValue = CalculateE2Shield } } };
+        e2ShieldAppliedBuff = new AppliedBuff(Parent)
+            { Effects = [new EffShield { CalculateValue = CalculateE2Shield }] };
 
         //basic attack
-        Ability? ThornsoftheAbyss;
-        ThornsoftheAbyss = new Ability(this)
+        var thornsOfTheAbyss = new Ability(this)
         {
             AbilityType = AbilityTypeEnm.Basic,
             Name = "Thorns of the Abyss",
@@ -151,16 +146,16 @@ public class Luocha : DefaultFighter
 
         foreach (var proportion in new[] { 0.3, 0.3, 0.4 })
         {
-            ThornsoftheAbyss.Events.Add(new DirectDamage(null, this, Parent)
+            thornsOfTheAbyss.Events.Add(new DirectDamage(null, this, Parent)
                 { CalculateValue = CalculateBasicDmg, CalculateProportion = proportion });
-            ThornsoftheAbyss.Events.Add(new ToughnessShred(null, this, Parent)
+            thornsOfTheAbyss.Events.Add(new ToughnessShred(null, this, Parent)
                 { Val = 30, CalculateProportion = proportion });
-            ThornsoftheAbyss.Events.Add(new EnergyGain(null, this, Parent)
+            thornsOfTheAbyss.Events.Add(new EnergyGain(null, this, Parent)
                 { Val = 20, TargetUnit = Parent, CalculateProportion = proportion });
         }
 
 
-        Abilities.Add(ThornsoftheAbyss);
+        Abilities.Add(thornsOfTheAbyss);
 
 
         // ULTIMATE
@@ -171,17 +166,17 @@ public class Luocha : DefaultFighter
             AdjacentTargets = AdjacentTargetsEnm.All,
             CostType = Resource.ResourceType.Energy,
             Cost = Parent.Stats.BaseMaxEnergy,
-            IWannaUseIt = IWannaUseDW
+            IWannaUseIt = WannaUseDw
         };
         //dmg events
         //E6
         if (Parent.Rank >= 6)
             ultimateAbility.Events.Add(new ApplyBuff(null, this, Parent)
             {
-                BuffToApply = new Buff(Parent)
+                AppliedBuffToApply = new AppliedBuff(Parent)
                 {
                     CustomIconName = "Ability_Death_Wish", BaseDuration = 2, Type = Buff.BuffType.Debuff,
-                    Effects = new List<Effect> { new EffAllDamageResist { Value = 0.2 } }
+                    Effects = [new EffAllDamageResist { Value = 0.2 }]
                 },
                 CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent
             });
@@ -219,18 +214,18 @@ public class Luocha : DefaultFighter
         //E1
         if (Parent.Rank >= 1)
             //CoL buffs
-            ConditionBuffs.Add(new ConditionBuff(Parent)
+            Parent.PassiveBuffs.Add(new PassiveBuff(Parent)
             {
-                AppliedBuff = new Buff(Parent)
-                {
-                    Effects = new List<Effect> { new EffAtkPrc { Value = 0.2 } },
-                    CustomIconName = uniqueBuff.CustomIconName
-                },
+               
+                    Effects = [new EffAtkPrc { Value = 0.2 }],
+                    CustomIconName = uniqueAppliedBuff.CustomIconName,
+              
                 Target = Parent.ParentTeam,
-                Condition = new ConditionBuff.ConditionRec
+                Condition = new PassiveBuff.ConditionRec
                 {
-                    BuffValue = uniqueBuff, CondtionExpression = ConditionBuff.ConditionCheckExpression.Exists,
-                    CondtionParam = ConditionBuff.ConditionCheckParam.Buff
+                    AppliedBuffValue = uniqueAppliedBuff,
+                    ConditionExpression = PassiveBuff.ConditionCheckExpression.Exists,
+                    ConditionParam = PassiveBuff.ConditionCheckParam.Buff
                 }
             });
 
@@ -240,10 +235,10 @@ public class Luocha : DefaultFighter
             DebuffResists.Add(new DebuffResist { Debuff = typeof(EffCrowControl), ResistVal = 0.7 });
         //E2
         if (Parent.Rank >= 2)
-            PassiveBuffs.Add(new PassiveBuff(Parent)
+            Parent.PassiveBuffs.Add(new PassiveBuff(Parent)
             {
-                AppliedBuff = new Buff(Parent)
-                    { Effects = new List<Effect> { new EffOutgoingHealingPrc { CalculateValue = CalculateE2 } } },
+               
+                     Effects = [new EffOutgoingHealingPrc { CalculateValue = CalculateE2 }],
                 Target = Parent,
                 IsTargetCheck = true
             });
@@ -251,19 +246,19 @@ public class Luocha : DefaultFighter
         //E4
         if (Parent.Rank >= 4)
             //CoL buffs
-            ConditionBuffs.Add(new ConditionBuff(Parent)
+            Parent.PassiveBuffs.Add(new PassiveBuff(Parent)
             {
-                AppliedBuff = new Buff(Parent)
-                {
+             
                     Type = Buff.BuffType.Debuff,
-                    Effects = new List<Effect> { new EffAllDamageBoost { Value = -0.12 } },
-                    CustomIconName = uniqueBuff.CustomIconName
-                },
+                    Effects = [new EffAllDamageBoost { Value = -0.12 }],
+                    CustomIconName = uniqueAppliedBuff.CustomIconName,
+                
                 Target = TargetTypeEnm.Enemy,
-                Condition = new ConditionBuff.ConditionRec
+                Condition = new PassiveBuff.ConditionRec
                 {
-                    BuffValue = uniqueBuff, CondtionExpression = ConditionBuff.ConditionCheckExpression.Exists,
-                    CondtionParam = ConditionBuff.ConditionCheckParam.Buff
+                    AppliedBuffValue = uniqueAppliedBuff,
+                    ConditionExpression = PassiveBuff.ConditionCheckExpression.Exists,
+                    ConditionParam = PassiveBuff.ConditionCheckParam.Buff
                 }
             });
     }
@@ -273,22 +268,23 @@ public class Luocha : DefaultFighter
 
 
     //default all abilities we wanna cast
-    public bool IWannaUseDW()
+    private bool WannaUseDw()
     {
         //if we have no CoL or enemy have buff
         return ultimateAbility.DefaultAbilityWannaUse() && (!ColBuffAvailable() ||
                                                             GetAliveEnemies().Count(x =>
-                                                                x.Buffs.Any(y =>
-                                                                    y.Dispellable && y.Type == Buff.BuffType.Buff)) >
+                                                                x.AppliedBuffs.Any(y =>
+                                                                    y.Dispellable &&
+                                                                    y.Type == Buff.BuffType.Buff)) >
                                                             0);
     }
 
-    public double? CalculateE2Shield(Event ent)
+    private double? CalculateE2Shield(Event ent)
     {
         return FighterUtils.CalculateShield(Parent.GetAttack(ent) * 0.18 + 240, ent, Parent);
     }
 
-    public double? CalculateE2(Event ent)
+    private double? CalculateE2(Event ent)
     {
         double res = 0;
 
@@ -298,18 +294,18 @@ public class Luocha : DefaultFighter
     }
 
     //If unit hp<=50% for Luocha follow up heals
-    private bool UnitAtLowHpForAuto(Unit unit, Event ent)
+    private bool UnitAtLowHpForAuto(Unit unit, Event? ent)
     {
         return unit.GetRes(Resource.ResourceType.HP).ResVal / unit.GetMaxHp(ent) <= 0.5;
     }
 
-    public double? CalcCoLHealing(Event ent)
+    private double? CalcCoLHealing(Event ent)
     {
         return FighterUtils.CalculateHealByBasicVal(Parent.GetAttack(ent) * coLfAtk + coLfFix,
             ent);
     }
 
-    public double? CalcCoLHealingParty(Event ent)
+    private double? CalcCoLHealingParty(Event ent)
     {
         return FighterUtils.CalculateHealByBasicVal(Parent.GetAttack(ent) * 0.07 + 93, ent);
     }
@@ -356,7 +352,7 @@ public class Luocha : DefaultFighter
             //E2 shield part
             if (Parent.Rank >= 2 && ent.TargetUnit.GetHpPrc(ent) >= 0.5)
                 ent.ChildEvents.Add(new ApplyBuff(ent.ParentStep, this, ent.SourceUnit)
-                    { TargetUnit = ent.TargetUnit, BuffToApply = e2ShieldBuff });
+                    { TargetUnit = ent.TargetUnit, AppliedBuffToApply = e2ShieldAppliedBuff });
 
 
         base.DefaultFighter_HandleEvent(ent);
@@ -364,7 +360,7 @@ public class Luocha : DefaultFighter
 
 
     //check unit alive and hp status and add/or remove
-    private void CheckAndAddTarget(Unit entTargetUnit, Event ent)
+    private void CheckAndAddTarget(Unit entTargetUnit, Event? ent)
     {
         //if friend have low hp then add to track
         if (Parent.Friends.Any(x => x == entTargetUnit))
@@ -414,22 +410,22 @@ public class Luocha : DefaultFighter
         return $"CoL: {(int)Mechanics.Values[cycleOfLife]:d}\\{(int)cycleOfLifeMaxCnt:d}";
     }
 
-    public bool ColAvailable()
+    private bool ColAvailable()
     {
         return cycleOfLife.DefaultAbilityAvailable() && Mechanics.Values[cycleOfLife] >= cycleOfLifeMaxCnt;
     }
 
-    public bool PoAFAvailable()
+    private bool PoAfAvailable()
     {
-        return Parent.Buffs.All(x => x.Reference != triggerCdBuff);
+        return Parent.AppliedBuffs.All(x => x.Reference != triggerCdAppliedBuff);
     }
 
-    public bool ColBuffAvailable()
+    private bool ColBuffAvailable()
     {
-        return Parent.Buffs.Any(x => x.Reference == uniqueBuff);
+        return Parent.AppliedBuffs.Any(x => x.Reference == uniqueAppliedBuff);
     }
 
-    public double? CalculateBasicDmg(Event ent)
+    private double? CalculateBasicDmg(Event ent)
     {
         return FighterUtils.CalculateDmgByBasicVal(
             Parent.GetAttack(null) * (0.4 + totALvl * 0.1),
@@ -438,14 +434,14 @@ public class Luocha : DefaultFighter
 
 
     //50-110
-    public double? CalculatePrayerOfAbyssFlower(Event ent)
+    private double? CalculatePrayerOfAbyssFlower(Event ent)
     {
         return FighterUtils.CalculateHealByBasicVal(Parent.GetAttack(null) * poAfAtk + poAfFix,
             ent);
     }
 
 
-    public double? CalculateUltimateDmg(Event ent)
+    private double? CalculateUltimateDmg(Event ent)
     {
         return FighterUtils.CalculateDmgByBasicVal(Parent.GetAttack(null) * deathWish, ent);
     }

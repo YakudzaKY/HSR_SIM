@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -16,19 +15,18 @@ using static HSR_SIM_GUI.GuiUtils;
 using static HSR_SIM_LIB.Worker;
 using static HSR_SIM_GUI.DamageTools.OcrUtils;
 using static HSR_SIM_GUI.Data.StatData;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace HSR_SIM_GUI;
 
 public partial class StatCheck : Form
 {
+    private AggregateThread aggThread;
+
     /// <summary>
     ///     force new OCR rectangles
     /// </summary>
     private bool forceNewRect;
-
-    private AggregateThread aggThread;
 
     private bool interruptFlag;
     private List<SimTask> myTaskList;
@@ -82,7 +80,7 @@ public partial class StatCheck : Form
                 break;
             }
 
-        NmbThreadsCount.Value = Math.Max((Environment.ProcessorCount/2) - 1,1);
+        NmbThreadsCount.Value = Math.Max(Environment.ProcessorCount / 2 - 1, 1);
         aggThread = null;
         reloadProfileCharacters();
 
@@ -98,7 +96,7 @@ public partial class StatCheck : Form
 
             {
                 var newCb = new ComboBox
-                { Name = $"cb{str}Stat{i:d}", Location = new Point(startX, startY + 22 * i), Width = 100 };
+                    { Name = $"cb{str}Stat{i:d}", Location = new Point(startX, startY + 22 * i), Width = 100 };
                 Control tbBox;
                 if (i == 0)
                     tbBox = new Label
@@ -161,7 +159,7 @@ public partial class StatCheck : Form
     {
         var res = new List<RStatMod>();
         res.Add(new RStatMod
-        { Character = character, Stat = item, Val = SearchStatDeltaByName(item) * step });
+            { Character = character, Stat = item, Val = SearchStatDeltaByName(item) * step });
         if (!string.IsNullOrEmpty(minusItem))
             res.Add(new RStatMod
             {
@@ -184,11 +182,12 @@ public partial class StatCheck : Form
                     for (var i = 1; i <= nmbSteps.Value; i++)
                         res.Add(new SimTask
                         {
-                            SimScenario = XmlLoader.LoadCombatFromXml( GetScenarioPath() + cbScenario.Text,  GetProfilePath()+ profile),
+                            SimScenario = XmlLoader.LoadCombatFromXml(GetScenarioPath() + cbScenario.Text,
+                                GetProfilePath() + profile),
                             Parent = simTask,
-                            UpgradesCount=i * (int)nmbUpgradesPerStep.Value,
+                            UpgradesCount = i * (int)nmbUpgradesPerStep.Value,
                             StatMods = GetStatMods(cbCharacter.Text, (string)item,
-                                i * (int)nmbUpgradesPerStep.Value,  cbStatToReplace.Text)
+                                i * (int)nmbUpgradesPerStep.Value, cbStatToReplace.Text)
                         });
         }
         else if (rbGearReplace.Checked)
@@ -219,12 +218,13 @@ public partial class StatCheck : Form
 
                 if (statModList.Count > 0)
                 {
-                    statModList.Insert(0, new RStatMod { Stat = "NEW GEAR"});
+                    statModList.Insert(0, new RStatMod { Stat = "NEW GEAR" });
                     res.Add(new SimTask
                     {
-                        SimScenario = XmlLoader.LoadCombatFromXml( GetScenarioPath() + cbScenario.Text,  GetProfilePath()+ profile),
+                        SimScenario = XmlLoader.LoadCombatFromXml(GetScenarioPath() + cbScenario.Text,
+                            GetProfilePath() + profile),
                         StatMods = statModList,
-                        UpgradesCount=1,
+                        UpgradesCount = 1,
                         Parent = simTask
                     });
                 }
@@ -236,7 +236,7 @@ public partial class StatCheck : Form
 
     private void DoJob()
     {
-        ThreadJob threadJob = new ThreadJob(myTaskList, (int)NmbIterations.Value);
+        var threadJob = new ThreadJob(myTaskList, (int)NmbIterations.Value);
 
 
         interruptFlag = false;
@@ -244,112 +244,82 @@ public partial class StatCheck : Form
         SaveGearReplaceValues();
 
         //check four double call this proc
-        if (this.aggThread?.IsAlive ?? false)
+        if (aggThread?.IsAlive ?? false)
             return;
 
-        BtnGo.Invoke((MethodInvoker)delegate
-        {
-            BtnGo.Enabled = false;
-        });
+        BtnGo.Invoke((MethodInvoker)delegate { BtnGo.Enabled = false; });
 
-        btnCancel.Invoke((MethodInvoker)delegate
-        {
-            btnCancel.Visible = true;
-        });
+        btnCancel.Invoke((MethodInvoker)delegate { btnCancel.Visible = true; });
 
-        this.aggThread = new AggregateThread(threadJob,(int)NmbThreadsCount.Value);
-      
+        aggThread = new AggregateThread(threadJob, (int)NmbThreadsCount.Value);
 
 
-        PB1.Invoke((MethodInvoker)delegate
-        {
-            PB1.Value = 0;
-        });
-        int valMax = myTaskList.Count * threadJob.Iterations;
-        PB1.Invoke((MethodInvoker)delegate
-        {
-            PB1.Maximum = valMax;
-        });
+        PB1.Invoke((MethodInvoker)delegate { PB1.Value = 0; });
+        var valMax = myTaskList.Count * threadJob.Iterations;
+        PB1.Invoke((MethodInvoker)delegate { PB1.Maximum = valMax; });
 
-        this.aggThread.Start();
+        aggThread.Start();
 
 
         do
         {
-
             var stDate = DateTime.Now;
             if (interruptFlag)
-                this.aggThread.Interrupt();
+                aggThread.Interrupt();
 
-            int progressBefore = aggThread.Progress();
+            var progressBefore = aggThread.Progress();
 
             Thread.Sleep(1000);
 
-            int progress = aggThread.Progress();
-            PB1.Invoke((MethodInvoker)delegate
-            {
-                PB1.Value = progress;
-            });
+            var progress = aggThread.Progress();
+            PB1.Invoke((MethodInvoker)delegate { PB1.Value = progress; });
             var crDate = DateTime.Now;
             var diffInSeconds = (crDate - stDate).TotalSeconds;
-            double performance = diffInSeconds > 0 ? ((progress - progressBefore) / diffInSeconds) : 0; //sims per sec
-            int eta = performance>0? (int)((valMax - progress) / performance):0; //sec estimate 
-            int etaM = (int)Math.Floor( (double)eta /60);
+            var performance = diffInSeconds > 0 ? (progress - progressBefore) / diffInSeconds : 0; //sims per sec
+            var eta = performance > 0 ? (int)((valMax - progress) / performance) : 0; //sec estimate 
+            var etaM = (int)Math.Floor((double)eta / 60);
 
 
-            string etaFormated = $"{etaM}m {eta-etaM*60}s";
+            var etaFormated = $"{etaM}m {eta - etaM * 60}s";
             lblProgressCnt.Invoke((MethodInvoker)delegate
             {
                 lblProgressCnt.Text = $"{PB1.Value}\\{PB1.Maximum}  {performance:f}\\sec    ETA:{etaFormated}";
             });
             //Refresh();
-        } while (this.aggThread.IsAlive);
-      
+        } while (aggThread.IsAlive);
+
         //clear old
         var ctr = pnlCharts.Controls.Find("Chart", false).FirstOrDefault();
         while (ctr != null)
         {
-            pnlCharts.Invoke((MethodInvoker)delegate
-            {
-                pnlCharts.Controls.Remove(ctr);
-            });
+            pnlCharts.Invoke((MethodInvoker)delegate { pnlCharts.Controls.Remove(ctr); });
 
             ctr.Dispose();
             ctr = pnlCharts.Controls.Find("Chart", false).FirstOrDefault();
         }
-        
-        foreach (var task in threadJob.CombatData.Where(x=>x.Key.Parent is null))
-        {
-            var newChart = ChartUtils.GetChart(task,threadJob.CombatData.Where(x=>x.Key.Parent ==task.Key));
-            newChart.Name = "Chart";
-            pnlCharts.Invoke((MethodInvoker)delegate
-            {
-                pnlCharts.Controls.Add(newChart);
-            });
 
+        foreach (var task in threadJob.CombatData.Where(x => x.Key.Parent is null))
+        {
+            var newChart = ChartUtils.GetChart(task, threadJob.CombatData.Where(x => x.Key.Parent == task.Key));
+            newChart.Name = "Chart";
+            pnlCharts.Invoke((MethodInvoker)delegate { pnlCharts.Controls.Add(newChart); });
         }
 
-        btnCancel.Invoke((MethodInvoker)delegate
-        {
-            btnCancel.Visible = false;
-        });
+        btnCancel.Invoke((MethodInvoker)delegate { btnCancel.Visible = false; });
 
-        BtnGo.Invoke((MethodInvoker)delegate
-        {
-            BtnGo.Enabled = true;
-        });
+        BtnGo.Invoke((MethodInvoker)delegate { BtnGo.Enabled = true; });
 
-       /* BtnGo.Invoke((MethodInvoker)delegate
-        {
-            BtnGo_Click(null, null);
-        });*/
-       
+        /* BtnGo.Invoke((MethodInvoker)delegate
+         {
+             BtnGo_Click(null, null);
+         });*/
     }
 
     private async Task DoSomeJob()
     {
         await Task.Run(DoJob);
     }
+
     private void BtnGo_Click(object sender, EventArgs e)
     {
         //generate task list
@@ -358,14 +328,14 @@ public partial class StatCheck : Form
         foreach (var item in chkProfiles.CheckedItems)
         {
             // first parent task
-            SimTask prnt = new SimTask()
+            var prnt = new SimTask
             {
-                SimScenario = XmlLoader.LoadCombatFromXml(  GetScenarioPath() + cbScenario.Text,  GetProfilePath() + (string)item),
+                SimScenario = XmlLoader.LoadCombatFromXml(GetScenarioPath() + cbScenario.Text,
+                    GetProfilePath() + (string)item)
             };
             myTaskList.Add(prnt);
             //childs
-            myTaskList.AddRange(GetStatsSubTasks((string)item,prnt));
-
+            myTaskList.AddRange(GetStatsSubTasks((string)item, prnt));
         }
 
         DoSomeJob();
@@ -390,8 +360,7 @@ public partial class StatCheck : Form
     private void chkProfiles_ItemCheck(object sender, ItemCheckEventArgs e)
     {
         //delayed item check(coz in "ItemCheckEventArgs e" new and old values, but in list are old values)
-        BeginInvoke((MethodInvoker)(
-            reloadProfileCharacters));
+        BeginInvoke((MethodInvoker)reloadProfileCharacters);
     }
 
     private void setCalcVisible()
@@ -412,25 +381,11 @@ public partial class StatCheck : Form
 
     private void SaveGearReplaceValues()
     {
-
-
         foreach (Control ctrl in gbMinus.Controls)
-        {
-            ctrl.Invoke((MethodInvoker)delegate
-            {
-                IniF.IniWriteValue("StatCheckForm", ctrl.Name, ctrl.Text);
-            });
-
-
-        }
+            ctrl.Invoke((MethodInvoker)delegate { IniF.IniWriteValue("StatCheckForm", ctrl.Name, ctrl.Text); });
 
         foreach (Control ctrl in gbPlus.Controls)
-        {
-            ctrl.Invoke((MethodInvoker)delegate
-            {
-                IniF.IniWriteValue("StatCheckForm", ctrl.Name, ctrl.Text);
-            });
-        }
+            ctrl.Invoke((MethodInvoker)delegate { IniF.IniWriteValue("StatCheckForm", ctrl.Name, ctrl.Text); });
     }
 
     private void StatCheck_FormClosing(object sender, FormClosingEventArgs e)
@@ -440,7 +395,7 @@ public partial class StatCheck : Form
 
     private void btnImport_Click(object sender, EventArgs e)
     {
-        var keyVal = new OcrUtils().GetComparisonItemStat(this,ref forceNewRect);
+        var keyVal = new OcrUtils().GetComparisonItemStat(this, ref forceNewRect);
         foreach (Control ctrl in gbPlus.Controls)
             if (ctrl is not Label)
                 ctrl.Text = string.Empty;

@@ -21,11 +21,11 @@ public class DispelBad : Event
         if (!TriggersHandled)
         {
             var buffToDispell =
-                TargetUnit.Buffs.FirstOrDefault(x =>
-                    x.Type is Buff.BuffType.Debuff or Buff.BuffType.Dot && x.Dispellable);
+                TargetUnit.AppliedBuffs.FirstOrDefault(x =>
+                    x.Type is AppliedBuff.BuffType.Debuff or AppliedBuff.BuffType.Dot && x.Dispellable);
             if (buffToDispell != null)
                 ChildEvents.Add(new RemoveBuff(ParentStep, Source, SourceUnit)
-                    { TargetUnit = TargetUnit, BuffToApply = buffToDispell });
+                    { TargetUnit = TargetUnit, AppliedBuffToApply = buffToDispell });
         }
 
         base.ProcEvent(revert);

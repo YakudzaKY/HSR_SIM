@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
@@ -8,16 +9,17 @@ using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_CLIENT;
 
-public partial class SingleSimWindow 
+public partial class SingleSimWindow
 {
+    private readonly bool busy = false;
     private Worker wrk;
-    private bool busy = false;
-    public bool DbgMode { get; set; } = false;
 
     public SingleSimWindow()
     {
         InitializeComponent();
     }
+
+    public bool DbgMode { get; set; } = false;
 
     /// <summary>
     ///     For text callback
@@ -45,20 +47,20 @@ public partial class SingleSimWindow
     }
 
     /// <summary>
-    /// ask user what decision are pick from options(do we crit etc...)
+    ///     ask user what decision are pick from options(do we crit etc...)
     /// </summary>
     /// <param name="items"></param>
     /// <param name="description"></param>
     /// <returns></returns>
     public int WorkerCallBackGetDecision(string[] items, string description)
     {
-        GetDecision getDecision = new GetDecision(items,description);
+        var getDecision = new GetDecision(items, description);
         getDecision.ShowDialog();
         return getDecision.ItemIndex;
     }
 
     /// <summary>
-    /// Set worker fields
+    ///     Set worker fields
     /// </summary>
     /// <param name="simCls"></param>
     /// <param name="devModePath"></param>
@@ -73,13 +75,13 @@ public partial class SingleSimWindow
         wrk.LoadScenarioFromSim(simCls, devModePath);
     }
 
-    BitmapImage BitmapToImageSource(Bitmap bitmap)
+    private BitmapImage BitmapToImageSource(Bitmap bitmap)
     {
-        using (MemoryStream memory = new MemoryStream())
+        using (var memory = new MemoryStream())
         {
-            bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
+            bitmap.Save(memory, ImageFormat.Bmp);
             memory.Position = 0;
-            BitmapImage bitmapimage = new BitmapImage();
+            var bitmapimage = new BitmapImage();
             bitmapimage.BeginInit();
             bitmapimage.StreamSource = memory;
             bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
@@ -95,10 +97,7 @@ public partial class SingleSimWindow
     /// <param name="kv"></param>
     public void WorkerCallBackImages(Bitmap combatImg)
     {
-        if (combatImg != null)
-        {
-            CombatImg.Source = BitmapToImageSource(combatImg);
-        }
+        if (combatImg != null) CombatImg.Source = BitmapToImageSource(combatImg);
     }
 
     private void BtnNext_OnClick(object sender, RoutedEventArgs e)

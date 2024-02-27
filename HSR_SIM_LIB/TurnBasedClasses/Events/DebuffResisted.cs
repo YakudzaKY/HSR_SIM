@@ -13,6 +13,6 @@ public class DebuffResisted : BuffEventTemplate
 
     public override string GetDescription()
     {
-        return $"{TargetUnit.Name} debuff resisted: {BuffToApply.Effects.First().GetType()}";
+        return $"{TargetUnit.Name} debuff resisted: {AppliedBuffToApply.Effects.FirstOrDefault()?.GetType()}";
     }
 }

@@ -5,7 +5,6 @@ using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
-using HSR_SIM_LIB.Skills.ReadyBuffs;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using static HSR_SIM_LIB.UnitStuff.Resource;
@@ -13,22 +12,19 @@ using static HSR_SIM_LIB.TurnBasedClasses.Step;
 using static HSR_SIM_LIB.UnitStuff.Unit;
 using static HSR_SIM_LIB.UnitStuff.Team;
 using static HSR_SIM_LIB.TurnBasedClasses.CombatFight;
-using static HSR_SIM_LIB.Skills.Buff;
 
 namespace HSR_SIM_LIB.TurnBasedClasses;
 
 /// <summary>
 ///     Combat simulation class
 /// </summary>
-public class SimCls : ICloneable
+public sealed class SimCls : ICloneable
 {
     public delegate void EventHandler(Event ent);
 
     public delegate void StepHandler(Step step);
 
     public List<PreLaunchOption> PreLaunch;
-
-    private List<Step> steps = new();
 
 
     /// <summary>
@@ -40,12 +36,12 @@ public class SimCls : ICloneable
         StepHandlerProc += HandleStep;
     }
 
-    public IFighter.EventHandler EventHandlerProc { get; set; }
-    public IFighter.StepHandler StepHandlerProc { get; set; }
+    public IFighter.EventHandler EventHandlerProc { get; private set; }
+    private IFighter.StepHandler StepHandlerProc { get; set; }
 
     public Worker Parent { get; set; }
 
-    public List<Team> Teams { get; set; } = new();
+    public List<Team> Teams { get; private set; } = [];
 
 
     public IEnumerable<Unit> AllUnits
@@ -65,21 +61,17 @@ public class SimCls : ICloneable
     public Step CurrentStep { get; set; }
     public Scenario CurrentScenario { get; set; }
 
-    public List<Step> Steps
-    {
-        get => steps;
-        set => steps = value;
-    }
+    public List<Step> Steps { get; private set; } = [];
 
-    public CombatFight CurrentFight { get; set; } = null;
-    public int CurrentFightStep { get; set; } = 0;
+    public CombatFight CurrentFight { get; set; } 
+    public int CurrentFightStep { get; set; } 
 
     /// <summary>
     ///     Do enter combat on next step proc
     /// </summary>
     public bool DoEnterCombat { get; internal set; }
 
-    public List<Ability> BeforeStartQueue { get; set; } = new();
+    public List<Ability> BeforeStartQueue { get; private set; } = [];
 
     public Fight NextFight
     {
@@ -108,113 +100,111 @@ public class SimCls : ICloneable
     }
 
     //Total action value per run
-    public double TotalAv { get; set; } = 0;
+    public double TotalAv { get; set; } 
 
     public object Clone()
     {
-        SimCls newClone = (SimCls)MemberwiseClone();
+        var newClone = (SimCls)MemberwiseClone();
         //clone teams
         var oldTeams = newClone.Teams;
         if (oldTeams != null)
         {
-          
-
             newClone.Teams = new List<Team>();
             foreach (var team in oldTeams)
             {
-                throw new NotImplementedException();
                 newClone.Teams.Add((Team)team.Clone());
             }
-
         }
+
         if (newClone.Steps != null)
-            newClone.Steps = new();
+            newClone.Steps = new List<Step>();
         if (newClone.BeforeStartQueue != null)
-            newClone.BeforeStartQueue = new();
+            newClone.BeforeStartQueue = new List<Ability>();
         newClone.CurrentScenario = (Scenario)newClone.CurrentScenario.Clone();
         //rewrite handlers
-        newClone.EventHandlerProc -= this.HandleEvent;
-        newClone.StepHandlerProc -= this.HandleStep;
+        newClone.EventHandlerProc -= HandleEvent;
+        newClone.StepHandlerProc -= HandleStep;
         newClone.EventHandlerProc += newClone.HandleEvent;
         newClone.StepHandlerProc += newClone.HandleStep;
 
         return newClone;
-
     }
 
-    public void HandleZeroHp(Event ent)
+    private void HandleZeroHp(Event ent)
     {
         //HP reduced to 0
-        if (ent.RealVal != 0 && ent.TargetUnit.GetRes(ResourceType.HP).ResVal == 0)
-        {
-            if (!UnitDefeatHandled(ent, ent.TargetUnit))
-                ent.ChildEvents.Add(new Defeat(ent.ParentStep, ent.Source, ent.SourceUnit)
-                {
-                    TargetUnit = ent.TargetUnit,
-                });
+        if (ent.RealVal == 0 || ent.TargetUnit.GetRes(ResourceType.HP).ResVal != 0) return;
+        if (!UnitDefeatHandled(ent, ent.TargetUnit))
+            ent.ChildEvents.Add(new Defeat(ent.ParentStep, ent.Source, ent.SourceUnit)
+            {
+                TargetUnit = ent.TargetUnit
+            });
 
-            else
-                ent.ChildEvents.Add(new DefeatHandled(ent.ParentStep, ent.Source, ent.SourceUnit)
-                {
-                    TargetUnit = ent.TargetUnit,
-                });
-
-        }
+        else
+            ent.ChildEvents.Add(new DefeatHandled(ent.ParentStep, ent.Source, ent.SourceUnit)
+            {
+                TargetUnit = ent.TargetUnit
+            });
     }
 
     private bool UnitDefeatHandled(Event ent, Unit target)
     {
-        //if already wating for rezz then nothing happened
+        //if already waiting for respawn then nothing happened
         if (target.LivingStatus == LivingStatusEnm.WaitingForFollowUp)
             return true;
-        Ability battleRes = target.ParentTeam.Units.OrderByDescending(x => x == target).Select(x =>
-            x.Fighter.Abilities.FirstOrDefault(y => y.FollowUpPriority == Ability.PriorityEnm.DefeatHandler && y.Available() && y.FollowUpQueueAvailable() && y.GetTargets(target, y.TargetType, Ability.AbilityCurrentTargetEnm.AbilityMain)
-                .Contains(target))).MaxBy(y => y is not null);
-        if (battleRes != null)
-        {
-            battleRes.FollowUpTargets.Add(new KeyValuePair<Unit, Unit>(target, ent.SourceUnit));
-        }
-
+        var battleRes = target.ParentTeam.Units.OrderByDescending(x => x == target).Select(x =>
+            x.Fighter.Abilities.FirstOrDefault(y => y.FollowUpPriority == Ability.PriorityEnm.DefeatHandler &&
+                                                    y.Available() && y.FollowUpQueueAvailable() && y.GetTargets(target,
+                                                            y.TargetType, Ability.AbilityCurrentTargetEnm.AbilityMain)
+                                                        .Contains(target))).MaxBy(y => y is not null);
+        battleRes?.FollowUpTargets.Add(new KeyValuePair<Unit, Unit>(target, ent.SourceUnit));
         return battleRes != null;
     }
 
-    public void HandleEvent(Event ent)
+    private void HandleEvent(Event ent)
     {
-        if (ent is StartWave)
-            foreach (var unit in AllUnits)
-                ent.ChildEvents.Add(new UnitEnteringBattle(ent.ParentStep, this, unit) { TargetUnit = unit });
-
-        if (ent is DamageEventTemplate)
+        switch (ent)
         {
-            var toDispell = new List<Buff>();
-            toDispell.AddRange(ent.TargetUnit.Buffs.Where(x =>
-                x.Effects.Any(y => y is EffShield && y.Value <= 0)));
-            //dispell zero shields
-            foreach (var mod in toDispell) ent.DispelMod(mod, true);
-
-            HandleZeroHp(ent);
-        }
-
-        if (ent is ResourceDrain)
-        {
-            HandleZeroHp(ent);
-
-            //THG reduced tp 0
-            if (((ResourceDrain)ent).ResType == ResourceType.Toughness && ent.RealVal != 0 &&
-                ent.TargetUnit.GetRes(((ResourceDrain)ent).ResType).ResVal == 0)
+            case StartWave:
             {
-                //temporary give back the THG for calculation break damage. will be reduce at the end
-                ent.TargetUnit.GetRes(((ResourceDrain)ent).ResType).ResVal += (double)ent.RealVal;
-                ToughnessBreak shieldBrkEvent = new(ent.ParentStep, ent.Source, ent.SourceUnit)
+                foreach (var unit in AllUnits)
+                    ent.ChildEvents.Add(new UnitEnteringBattle(ent.ParentStep, this, unit) { TargetUnit = unit });
+                break;
+            }
+            case DamageEventTemplate:
+            {
+                var toDispell = new List<AppliedBuff>();
+                toDispell.AddRange(ent.TargetUnit.AppliedBuffs.Where(x =>
+                    x.Effects.Any(y => y is EffShield && y.Value <= 0)));
+                //dispell zero shields
+                foreach (var mod in toDispell) ent.DispelMod(mod, true);
+
+                HandleZeroHp(ent);
+                break;
+            }
+            case ResourceDrain drain:
+            {
+                HandleZeroHp(drain);
+
+                //THG reduced tp 0
+                if (drain.ResType == ResourceType.Toughness && drain.RealVal != 0 &&
+                    drain.TargetUnit.GetRes(drain.ResType).ResVal == 0)
                 {
-                    TargetUnit = ent.TargetUnit
-                };
-                shieldBrkEvent.Val = FighterUtils.CalculateShieldBrokeDmg(shieldBrkEvent);
-                ent.ChildEvents.Add(shieldBrkEvent);
+                    //temporary give back the THG for calculation break damage. will be reduce at the end
+                    drain.TargetUnit.GetRes(drain.ResType).ResVal += drain.RealVal??0;
+                    ToughnessBreak shieldBrkEvent = new(drain.ParentStep, drain.Source, drain.SourceUnit)
+                    {
+                        TargetUnit = drain.TargetUnit
+                    };
+                    shieldBrkEvent.Val = FighterUtils.CalculateShieldBrokeDmg(shieldBrkEvent);
+                    drain.ChildEvents.Add(shieldBrkEvent);
 
 
-                //reduce THG  again
-                ent.TargetUnit.GetRes(((ResourceDrain)ent).ResType).ResVal -= (double)ent.RealVal;
+                    //reduce THG  again
+                    drain.TargetUnit.GetRes(drain.ResType).ResVal -= drain.RealVal??0;
+                }
+
+                break;
             }
         }
 
@@ -222,16 +212,18 @@ public class SimCls : ICloneable
         foreach (var unit in AllUnits)
         {
             unit.Fighter.EventHandlerProc.Invoke(ent);
-            foreach (var mod in unit.Buffs.Where(x => x.EventHandlerProc != null)) mod.EventHandlerProc?.Invoke(ent);
+            foreach (var mod in unit.AppliedBuffs.Where(x => x.EventHandlerProc != null))
+                mod.EventHandlerProc?.Invoke(ent);
         }
     }
 
-    public virtual void HandleStep(Step step)
+    private void HandleStep(Step step)
     {
         foreach (var unit in AllUnits)
         {
             unit.Fighter.StepHandlerProc.Invoke(CurrentStep);
-            foreach (var mod in unit.Buffs.Where(x => x.StepHandlerProc != null)) mod.StepHandlerProc?.Invoke(step);
+            foreach (var mod in unit.AppliedBuffs.Where(x => x.StepHandlerProc != null))
+                mod.StepHandlerProc?.Invoke(step);
         }
     }
 
@@ -247,7 +239,6 @@ public class SimCls : ICloneable
         foreach (var unit in units)
         {
             var newUnit = (Unit)unit.Clone();
-            newUnit.Reference = unit;
             res.Add(newUnit);
             newUnit.Init();
         }
@@ -261,12 +252,11 @@ public class SimCls : ICloneable
     /// <summary>
     ///     prepare things to combat simulation
     /// </summary>
-    public void Prepare()
+    private void Prepare()
     {
-        Team team;
-
-        //main team
-        team = new Team(this);
+        var team =
+            //main team
+            new Team(this);
         team.BindUnits(GetCombatUnits(CurrentScenario.Party));
         team.TeamType = TeamTypeEnm.UnitPack;
         team.controledTeam = true;
@@ -275,12 +265,12 @@ public class SimCls : ICloneable
          * pre launch options
          */
         //load TP
-        team.GetRes(ResourceType.TP).ResVal = PreLaunch.FirstOrDefault(x => x.OptionType == PreLaunchOption.PreLaunchOptionEnm.SetTp)?.Value ?? 0;
+        team.GetRes(ResourceType.TP).ResVal =
+            PreLaunch.FirstOrDefault(x => x.OptionType == PreLaunchOption.PreLaunchOptionEnm.SetTp)?.Value ?? 0;
         //load energy
-        foreach (Unit unit in team.Units)
-        {
-            unit.CurrentEnergy = unit.Stats.BaseMaxEnergy * PreLaunch.FirstOrDefault(x => x.OptionType == PreLaunchOption.PreLaunchOptionEnm.SetEnergy)?.Value ?? 0;
-        }
+        foreach (var unit in team.Units)
+            unit.CurrentEnergy = unit.Stats.BaseMaxEnergy * PreLaunch
+                .FirstOrDefault(x => x.OptionType == PreLaunchOption.PreLaunchOptionEnm.SetEnergy)?.Value ?? 0;
 
 
         //Special
@@ -357,16 +347,14 @@ public class SimCls : ICloneable
             newStep.StepType = StepTypeEnm.EndWave;
             newStep.Events.Add(new EndWave(newStep, this, null));
         }
-        else if (newStep.StepType == StepTypeEnm.Idle && CurrentFight.Turn == null) //set who wanna move
+        else if (newStep.StepType == StepTypeEnm.Idle &&CurrentFight is not null &&CurrentFight.Turn == null) //set who wanna move
         {
             if (!newStep.FollowUpActions())
             {
                 newStep.StepType = StepTypeEnm.UnitTurnSelected;
                 //clear dead units in enemy team
-                foreach (Unit unit in HostileTeam.Units.Where(x => !x.IsAlive))
-                {
+                foreach (var unit in HostileTeam.Units.Where(x => !x.IsAlive))
                     newStep.Events.Add(new UnbindUnit(newStep, unit, unit) { TargetUnit = unit });
-                }
 
                 //get first by AV unit
                 CurrentFight.Turn = new TurnR
@@ -375,19 +363,20 @@ public class SimCls : ICloneable
                     TurnStage = newStep.StepType
                 };
                 newStep.Actor = CurrentFight.Turn.Actor;
-                double reduceAv = CurrentFight.Turn.Actor.GetCurrentActionValue(null);
+                var reduceAv = CurrentFight.Turn.Actor.GetCurrentActionValue(null);
                 if (reduceAv < 0)
                     reduceAv = 0;
                 newStep.Events.Add(new ModActionValue(newStep, this, null)
-                { Val = reduceAv });
+                    { Val = reduceAv });
                 //set all Buffs are "old"
-                foreach (var mod in CurrentFight.Turn.Actor.Buffs) mod.IsOld = true;
+                foreach (var mod in CurrentFight.Turn.Actor.AppliedBuffs) mod.IsOld = true;
                 //dot proc
-                foreach (var dot in CurrentFight.Turn.Actor.Buffs.Where(x => x.Type == BuffType.Dot || x.IsEarlyProc()))
+                foreach (var dot in CurrentFight.Turn.Actor.AppliedBuffs.Where(x =>
+                             x.Type == Buff.BuffType.Dot || x.IsEarlyProc()))
                     dot.Proceed(newStep);
             }
         }
-        else if (newStep.StepType == StepTypeEnm.Idle &&
+        else if (newStep.StepType == StepTypeEnm.Idle &&CurrentFight is not null&&
                  CurrentFight.Turn.TurnStage is StepTypeEnm.UnitTurnSelected or StepTypeEnm.UnitTurnContinued)
         {
             //try follow up actions before target do something
@@ -428,7 +417,7 @@ public class SimCls : ICloneable
                 }
             }
         }
-        else if (newStep.StepType == StepTypeEnm.Idle && CurrentFight.Turn.TurnStage == StepTypeEnm.UnitTurnStarted)
+        else if (newStep.StepType == StepTypeEnm.Idle &&CurrentFight is not null &&CurrentFight.Turn.TurnStage == StepTypeEnm.UnitTurnStarted)
         {
             //try follow up actions before target do something.
             //follow up actions disabled at NPC turn end
@@ -437,7 +426,7 @@ public class SimCls : ICloneable
                 newStep.StepType = StepTypeEnm.UnitTurnEnded;
                 newStep.Actor = CurrentFight.Turn.Actor;
                 newStep.Events.Add(new ResetAV(newStep, this, null)
-                { TargetUnit = CurrentFight.Turn.Actor });
+                    { TargetUnit = CurrentFight.Turn.Actor });
 
                 //reset CD
                 foreach (var ability in CurrentFight.Turn.Actor.Fighter.Abilities.Where(x => x.CooldownTimer > 0))
@@ -445,14 +434,13 @@ public class SimCls : ICloneable
 
 
                 //remove buffs
-                foreach (var dot in CurrentFight.Turn.Actor.Buffs.Where(x =>
-                             x.Type != BuffType.Dot && !x.IsEarlyProc())) dot.Proceed(newStep);
+                foreach (var dot in CurrentFight.Turn.Actor.AppliedBuffs.Where(x =>
+                             x.Type != Buff.BuffType.Dot && !x.IsEarlyProc())) dot.Proceed(newStep);
                 CurrentFight.Turn = null;
             }
         }
 
-
-        //if we doing somethings then need proced the events
+        //if we doing somethings then need proceed the events
         CurrentStep = newStep;
         Steps.Add(CurrentStep);
 

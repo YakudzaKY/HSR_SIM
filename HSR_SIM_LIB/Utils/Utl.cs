@@ -3,12 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using HSR_SIM_LIB.Fighters;
-using HSR_SIM_LIB.UnitStuff;
 using HSR_SIM_LIB.Utils.Utils;
 using ImageMagick;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace HSR_SIM_LIB.Utils;
 
@@ -29,27 +26,28 @@ public static class Utl
     }
 
     /// <summary>
-    /// Get one item from list by random
+    ///     Get one item from list by random
     /// </summary>
     /// <param name="items"></param>
     /// <param name="wrk">link to Worker</param>
     /// <returns></returns>
-    public static object GetRandomObject(object items, Worker wrk =null)
+    public static object GetRandomObject(object items, Worker wrk = null)
     {
         if (wrk.DevMode)
-            return DevModeUtils.GetFixedObject(items,wrk);
-        double rNextDouble = new MersenneTwister().NextDouble();//get rand [0-1)
+            return DevModeUtils.GetFixedObject(items, wrk);
+        var rNextDouble = new MersenneTwister().NextDouble(); //get rand [0-1)
         object res = null;
         if (items is IEnumerable ie)
         {
-            object[] arr = new object[] { };
-            int i = 0;
-            foreach (object element in ie)
+            object[] arr = { };
+            var i = 0;
+            foreach (var element in ie)
             {
-                Array.Resize<object>(ref arr, i + 1);
+                Array.Resize(ref arr, i + 1);
                 arr[i] = element;
                 i = i + 1;
             }
+
             if (arr.Length > 0)
                 res = arr[(int)Math.Floor(rNextDouble * arr.Length)];
         }
@@ -57,6 +55,7 @@ public static class Utl
         {
             throw new NotImplementedException();
         }
+
         return res;
     }
 

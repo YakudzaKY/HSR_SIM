@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -16,16 +13,13 @@ public class Defeat(Step parent, ICloneable source, Unit sourceUnit) : Event(par
 
     public override void ProcEvent(bool revert)
     {
-
         if (!TriggersHandled)
         {
-
             //attacker got 10 energy
             ChildEvents.Add(new EnergyGain(ParentStep, TargetUnit, SourceUnit)
-            { Val = 10, TargetUnit = SourceUnit });
+                { Val = 10, TargetUnit = SourceUnit });
             ChildEvents.Add(new SetLiveStatus(ParentStep, SourceUnit, SourceUnit)
-            { ToState = Unit.LivingStatusEnm.Defeated, TargetUnit = TargetUnit });
-
+                { ToState = Unit.LivingStatusEnm.Defeated, TargetUnit = TargetUnit });
         }
 
         base.ProcEvent(revert);

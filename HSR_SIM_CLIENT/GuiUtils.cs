@@ -8,14 +8,12 @@ using PixelFormat = System.Drawing.Imaging.PixelFormat;
 namespace HSR_SIM_CLIENT;
 
 /// <summary>
-/// Class with utils for graphical interface and forms
+///     Class with utils for graphical interface and forms
 /// </summary>
 internal static class GuiUtils
 {
-
     private const int CURSOR_SHOWING = 0x00000001;
     public static IniFile IniF = new(AppDomain.CurrentDomain.BaseDirectory + "config.ini");
-
 
 
     [DllImport("user32.dll")]
@@ -75,7 +73,7 @@ internal static class GuiUtils
     public static int WaitForActiveWindow(nint windowHandle, int seconds)
     {
         DateTime startTime;
-  
+
 
         startTime = DateTime.Now;
         var activefForegroundWindow = GetForegroundWindow();
@@ -103,7 +101,6 @@ internal static class GuiUtils
     {
         return AppDomain.CurrentDomain.BaseDirectory + "DATA\\Profile\\";
     }
-
 
 
     public static Color Zcolor(int r, int g, int b)

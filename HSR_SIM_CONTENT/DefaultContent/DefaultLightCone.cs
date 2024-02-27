@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using HSR_SIM_LIB.Fighters;
+﻿using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -20,7 +19,7 @@ public abstract class DefaultLightCone : ILightCone
 
 
     public IFighter Parent { get; set; }
-    public List<ConditionBuff> ConditionMods { get; set; } = new();
+    public List<PassiveBuff> ConditionMods { get; set; } = new();
     public List<PassiveBuff> PassiveMods { get; set; } = new();
     public int Rank { get; set; }
     public abstract FighterUtils.PathType Path { get; }

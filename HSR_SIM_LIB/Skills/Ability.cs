@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using HSR_SIM_LIB.Content;
-using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using static HSR_SIM_LIB.UnitStuff.Resource;
@@ -16,6 +15,7 @@ namespace HSR_SIM_LIB.Skills;
 public class Ability : CloneClass
 {
     public delegate bool DCanUsePrc();
+
     public enum AbilityCurrentTargetEnm
     {
         AbilityAdjacent,
@@ -23,7 +23,7 @@ public class Ability : CloneClass
     }
 
     /// <summary>
-    /// Ability type. todo:rewrite into Flags
+    ///     Ability type. todo:rewrite into Flags
     /// </summary>
     public enum AbilityTypeEnm
     {
@@ -46,7 +46,7 @@ public class Ability : CloneClass
 
     public enum PriorityEnm
     {
-        DefeatHandler,//top 1
+        DefeatHandler, //top 1
         High,
         Medium,
         UltimateShouldBeHere,
@@ -66,9 +66,9 @@ public class Ability : CloneClass
         Parent = parent;
         if (Element == ElementEnm.None)
             Element = parent.Element;
-        Available= DefaultAbilityAvailable;//add default then custom
-        IWannaUseIt= DefaultAbilityWannaUse;//set default if no init val
-        FollowUpQueueAvailable= DefaultAbilityQueueAvailable;//set default if no init val
+        Available = DefaultAbilityAvailable; //add default then custom
+        IWannaUseIt = DefaultAbilityWannaUse; //set default if no init val
+        FollowUpQueueAvailable = DefaultAbilityQueueAvailable; //set default if no init val
     }
 
 
@@ -78,7 +78,7 @@ public class Ability : CloneClass
 
     public IFighter Parent { get; set; }
 
-    public string Name { get;  set; }
+    public string Name { get; set; }
     public List<Event> Events { get; set; } = new();
     public double Cost { get; set; } = 0;
     public ResourceType? CostType { get; set; }
@@ -86,16 +86,17 @@ public class Ability : CloneClass
     public AdjacentTargetsEnm AdjacentTargets { get; set; } = AdjacentTargetsEnm.None;
 
     /// <summary>
-    /// Technique attack shred toughness by default without dmg
+    ///     Technique attack shred toughness by default without dmg
     /// </summary>
     public bool Attack
     {
         get { return Events.Any(x => x is DirectDamage or ToughnessShred); }
     }
+
     public bool IgnoreWeakness { get; set; }
 
     public int Cooldown { get; init; } = 0;
-    public int CooldownTimer { get; set; } = 0;
+    public int CooldownTimer { get; set; }
     public bool EndTheTurn { get; set; } = true; //If ability used - end the turn
 
     public PriorityEnm FollowUpPriority { get; set; } = PriorityEnm.Low;
@@ -103,50 +104,48 @@ public class Ability : CloneClass
     public DCanUsePrc Available { get; init; }
 
     /// <summary>
-    /// do we pref cast this or not
+    ///     do we pref cast this or not
     /// </summary>
-    public DCanUsePrc IWannaUseIt { get; init; } 
+    public DCanUsePrc IWannaUseIt { get; init; }
+
     public int SpGain { get; set; } = 0;
-    public List<KeyValuePair<Unit,Unit>> FollowUpTargets { get; set; }=new ();// key=target unit ,value=Queued by unit
-    public DCanUsePrc FollowUpQueueAvailable { get; init; } 
+
+    public List<KeyValuePair<Unit, Unit>> FollowUpTargets { get; set; } =
+        new(); // key=target unit ,value=Queued by unit
+
+    public DCanUsePrc FollowUpQueueAvailable { get; init; }
 
     //reset ability params
     public void OnEnteringBattle()
     {
         CooldownTimer = 0;
-        foreach (Event ent in Events)
-        {
-            ent.OnEnteringBattle();
-        }
+        foreach (var ent in Events) ent.OnEnteringBattle();
     }
 
 
     //default all abilities are ok
-    public  bool DefaultAbilityAvailable()
+    public bool DefaultAbilityAvailable()
     {
         //if no cost type then always true
-        if (CostType is null) 
+        if (CostType is null)
             return true;
         //if type in team res type
         if (CostType is ResourceType.SP or ResourceType.TP)
             return Parent.Parent.ParentTeam.GetRes((ResourceType)CostType).ResVal >= Cost;
         //else get unit res
-        return Parent.Parent.GetRes((ResourceType)CostType).ResVal>=Cost;
-        
-            
+        return Parent.Parent.GetRes((ResourceType)CostType).ResVal >= Cost;
     }
 
-    
+
     //default all abilities we wanna cast
-    public  bool DefaultAbilityWannaUse()
+    public bool DefaultAbilityWannaUse()
     {
         return true;
     }
 
 
-    
     //default followup queue available if target list empty
-    public  bool DefaultAbilityQueueAvailable()
+    public bool DefaultAbilityQueueAvailable()
     {
         return !FollowUpTargets.Any();
     }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.TurnBasedClasses;
@@ -24,7 +23,7 @@ public class Worker
     public CallBackGetDecision CbGetDecision { get; set; } //Callback get decision
     public SimCls Sim { get; set; } //simulation class( combat ,fights etc in this shit)
     public bool Completed { get; set; }
-    public bool DevMode { get; set; } = false;//Developer mode TODO: write documentation about it
+    public bool DevMode { get; set; } = false; //Developer mode TODO: write documentation about it
     public DevModeLogger DevModeLog { get; set; }
 
 
@@ -42,9 +41,8 @@ public class Worker
             DevModeLog = new DevModeLogger(DevModeUtils.GetDevLogPath(scenarioPath, profilePath), this);
     }
 
-    
-    
-    public void LoadScenarioFromSim(SimCls sim,string devLogPath)
+
+    public void LoadScenarioFromSim(SimCls sim, string devLogPath)
     {
         Init();
         Sim = (SimCls)sim.Clone();
@@ -53,7 +51,6 @@ public class Worker
         if (DevMode)
             DevModeLog = new DevModeLogger(devLogPath, this);
     }
-
 
 
     public RCombatResult GetCombatResult(RCombatResult inRslt = null)
@@ -173,7 +170,7 @@ public class Worker
                         {
                             Completed = true;
                             LogText("scenario complete.");
-                            DevModeLog?.WriteToFile();//write dev log 
+                            DevModeLog?.WriteToFile(); //write dev log 
                         }
 
 
@@ -219,9 +216,9 @@ public class Worker
                 OutText = "reproduced: " + OutText;
             LogText(OutText);
             if (ent is BuffEventTemplate)
-                if (((BuffEventTemplate)ent).BuffToApply != null)
+                if (((BuffEventTemplate)ent).AppliedBuffToApply != null)
                 {
-                    OutText = " * " + ((BuffEventTemplate)ent).BuffToApply.GetDescription();
+                    OutText = " * " + ((BuffEventTemplate)ent).AppliedBuffToApply.GetDescription();
                     LogText(OutText);
                 }
         }
@@ -346,7 +343,6 @@ public class Worker
         public string Character { get; set; }
         public string Stat { get; set; }
         public double Val { get; set; }
-  
     }
 
     public record RCombatResult

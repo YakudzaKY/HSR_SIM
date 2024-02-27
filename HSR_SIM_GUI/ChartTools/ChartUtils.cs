@@ -12,7 +12,7 @@ namespace HSR_SIM_GUI.ChartTools;
 internal static class ChartUtils
 {
     /// <summary>
-    /// Generate Chart for one completed sim job 
+    ///     Generate Chart for one completed sim job
     /// </summary>
     /// <param name="task">KeyPair SimTask-Results</param>
     /// <param name="childTasks">array of child results</param>
@@ -113,8 +113,8 @@ internal static class ChartUtils
 
             //create series 
             var mainQuery = (from p in childTasksArr
-                                 // from c in p.StatMods                               
-                             select p.Key.StatMods.First().Stat)
+                    // from c in p.StatMods                               
+                    select p.Key.StatMods.First().Stat)
                 .Distinct();
 
             foreach (var stat in mainQuery)
@@ -125,8 +125,8 @@ internal static class ChartUtils
                 newChart.Series[stat].Legend = statsChartArea.Name;
                 newChart.Series[stat].BorderWidth = 3;
                 newChart.Series[stat].Points.AddXY(0, 0);
-
             }
+
             statsChartArea.AxisX.Minimum = 0;
             statsChartArea.AxisX.Title = "Upgrade";
             statsChartArea.AxisY.Title = "Party DPAV increase(vs normal run)";
@@ -134,7 +134,8 @@ internal static class ChartUtils
             foreach (var subTask in childTasksArr.OrderBy(x => x.Key.UpgradesCount))
             {
                 var statMod = subTask.Key.StatMods.First();
-                newChart.Series[statMod.Stat].Points.AddXY(subTask.Key.UpgradesCount, subTask.Value.avgDPAV - task.Value.avgDPAV);
+                newChart.Series[statMod.Stat].Points
+                    .AddXY(subTask.Key.UpgradesCount, subTask.Value.avgDPAV - task.Value.avgDPAV);
                 newChart.Series[statMod.Stat].Points.Last().Label = $"wr:{subTask.Value.WinRate:f}%";
                 //newChart.Series[statMod.Stat].Points.Last().Label = $"wr:{subtask.Data.WinRate:f}% wcl:{subtask.Data.Cycles:f} dcl:{subtask.Data.DefeatCycles:f}";// extended stats
             }

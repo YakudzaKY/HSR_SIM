@@ -6,7 +6,7 @@ namespace HSR_SIM_LIB.UnitStuff;
 /// <summary>
 ///     Class for unit stats
 /// </summary>
-public class UnitStats:ICloneable
+public class UnitStats : ICloneable
 {
     private double? baseDef;
 
@@ -110,13 +110,13 @@ public class UnitStats:ICloneable
 
     public double HealRate => BaseHealRate + HealRatePrc;
 
-    public void ResetAV()
-    {
-        PerformedActionValue = 0;
-    }
-
     public object Clone()
     {
         return MemberwiseClone();
+    }
+
+    public void ResetAV()
+    {
+        PerformedActionValue = 0;
     }
 }

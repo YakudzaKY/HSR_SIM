@@ -16,9 +16,11 @@ public class Resource(CloneClass parent) : CloneClass
         Energy
     }
 
-    public ResourceType? ResType { get; set; }
-    CloneClass Parent { get; set; } = parent;
     private double resVal;
+
+    public ResourceType? ResType { get; set; }
+    private CloneClass Parent { get; } = parent;
+
     public double ResVal
     {
         get => resVal;
@@ -26,10 +28,7 @@ public class Resource(CloneClass parent) : CloneClass
         set
         {
             resVal = value;
-            if (ResType == ResourceType.HP)
-            {
-                ((Unit)Parent).ResetCondition(ConditionBuff.ConditionCheckParam.HPPrc);
-            }
+            if (ResType == ResourceType.HP) ((Unit)Parent).ResetCondition(PassiveBuff.ConditionCheckParam.HpPrc);
         }
     }
 }

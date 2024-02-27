@@ -1,6 +1,7 @@
 ﻿using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.Skills.ReadyBuffs;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
@@ -11,41 +12,16 @@ using static HSR_SIM_LIB.Content.IFighter;
 namespace HSR_SIM_CONTENT.DefaultContent;
 
 /// <summary>
-///     abstract class for Playable characters 
+///     abstract class for Playable characters
 /// </summary>
 public abstract class DefaultFighter : IFighter
 {
-    [Flags]
-    protected enum ATracesEnm
-    {
-        A2 = 1,
-        A4 = 2,
-        A6 = 4
-    }
-
-    private List<IRelicSet> Relics
-    {
-        get
-        {
-            if (relics != null) return relics;
-            relics = new List<IRelicSet>();
-            foreach (var relicSet in Parent.RelicsClasses.Select(keyValRelic =>
-                         (IRelicSet)Activator.CreateInstance(Type.GetType(keyValRelic.Key)!, this, keyValRelic.Value)!))
-            {
-                relics.Add(relicSet);
-            }
-
-            return relics;
-        }
-    }
-
-
     private ILightCone? lightCone;
-    public MechDictionary Mechanics { get; set; } // dictionary for save mechanics value in combat
-    public bool IsEliteUnit => false;
-    public bool IsNpcUnit => false;
 
     private List<IRelicSet>? relics;
+
+    private UnitRole? role;
+    private AppliedBuff? weaknessBreakDebuff;
 
 
     //Blade constructor
@@ -72,6 +48,20 @@ public abstract class DefaultFighter : IFighter
         Abilities.Add(defOpener);
     }
 
+    private List<IRelicSet> Relics
+    {
+        get
+        {
+            if (relics != null) return relics;
+            relics = new List<IRelicSet>();
+            foreach (var relicSet in Parent.RelicsClasses.Select(keyValRelic =>
+                         (IRelicSet)Activator.CreateInstance(Type.GetType(keyValRelic.Key)!, this, keyValRelic.Value)!))
+                relics.Add(relicSet);
+
+            return relics;
+        }
+    }
+
     protected ATracesEnm ATraces { get; set; }
 
     public ILightCone? LightCone
@@ -88,14 +78,34 @@ public abstract class DefaultFighter : IFighter
         set => lightCone = value;
     }
 
+    public MechDictionary Mechanics { get; set; } // dictionary for save mechanics value in combat
+    public bool IsEliteUnit => false;
+    public bool IsNpcUnit => false;
+
     //we need this debuff to track and correctly apply debuff stacks
-    public Buff WeaknessBreakDebuff { get; set; } = new(null);
+    public AppliedBuff WeaknessBreakDebuff
+    {
+        get
+        {
+            return weaknessBreakDebuff ??= Element switch
+            {
+                Unit.ElementEnm.Physical => new AppliedBuffBleedWb(Parent),
+                Unit.ElementEnm.Fire => new AppliedBuffBurnWb(Parent),
 
-    //buffs works only on some conditions
-    public List<ConditionBuff> ConditionBuffs { get; set; } = [];
+                Unit.ElementEnm.Ice => new AppliedBuffFreezeWb(Parent),
 
-    //always active buffs
-    public List<PassiveBuff> PassiveBuffs { get; set; } = [];
+                Unit.ElementEnm.Lightning => new AppliedBuffShockWb(Parent),
+
+                Unit.ElementEnm.Wind => new AppliedBuffWindShearWb(Parent) { CalculateStacks = CalcStacksByTarget },
+                Unit.ElementEnm.Quantum => new AppliedBuffEntanglementWb(Parent),
+                Unit.ElementEnm.Imaginary => new AppliedBuffImprisonmentWb(Parent),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+        }
+        set => weaknessBreakDebuff = value;
+    }
+
+
     public abstract PathType? Path { get; }
     public abstract Unit.ElementEnm Element { get; }
 
@@ -105,7 +115,7 @@ public abstract class DefaultFighter : IFighter
     public Unit Parent { get; set; }
 
     /// <summary>
-    /// return Unit cost to determine unit role on the battlefield
+    ///     return Unit cost to determine unit role on the battlefield
     /// </summary>
     public double Cost
     {
@@ -129,8 +139,6 @@ public abstract class DefaultFighter : IFighter
             return totalCost;
         }
     }
-
-    private UnitRole? role;
 
     public UnitRole? Role
     {
@@ -273,9 +281,7 @@ public abstract class DefaultFighter : IFighter
         if (ability.TargetType == Ability.TargetTypeEnm.Enemy)
         {
             if (Parent.ParentTeam.ParentSim.Parent.DevMode)
-            {
                 return DevModeUtils.GetTarget(this, Parent.GetTargetsForUnit(ability.TargetType), ability);
-            }
 
             /*
              * MainDD,SecondDD focus on massive dmg, pref max weakness targets
@@ -334,7 +340,7 @@ public abstract class DefaultFighter : IFighter
 
         if (ability.TargetType == Ability.TargetTypeEnm.Friend)
             return Parent.ParentTeam.ParentSim.Parent.DevMode
-                ? DevModeUtils.GetTarget(this, this.GetAliveFriends(), ability)
+                ? DevModeUtils.GetTarget(this, GetAliveFriends(), ability)
                 : GetAliveFriends().OrderBy(x => x.Fighter.Role).First();
         throw new NotImplementedException();
 
@@ -344,6 +350,11 @@ public abstract class DefaultFighter : IFighter
     public object Clone()
     {
         throw new NotImplementedException();
+    }
+
+    private double? CalcStacksByTarget(Event ent)
+    {
+        return ent.TargetUnit.Fighter.IsEliteUnit ? 3 : 1;
     }
 
 
@@ -378,7 +389,7 @@ public abstract class DefaultFighter : IFighter
 
     protected DefaultFighter? GetFriendByRole(UnitRole unitRole)
     {
-        IFighter? res = GetAliveFriends().FirstOrDefault(x => x.Fighter.Role == unitRole)?.Fighter;
+        var res = GetAliveFriends().FirstOrDefault(x => x.Fighter.Role == unitRole)?.Fighter;
         if (res != null)
             return (DefaultFighter)res;
         return null;
@@ -479,5 +490,13 @@ public abstract class DefaultFighter : IFighter
     {
         LightCone?.StepHandlerProc?.Invoke(step);
         foreach (var relic in Relics) relic.StepHandlerProc?.Invoke(step);
+    }
+
+    [Flags]
+    protected enum ATracesEnm
+    {
+        A2 = 1,
+        A4 = 2,
+        A6 = 4
     }
 }

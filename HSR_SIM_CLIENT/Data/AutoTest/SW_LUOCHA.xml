@@ -1,49 +1,58 @@
 <Scenario name="Default test scenario">
-	<Prelaunch>
-		<!--Set enegry at sim loaded-->
-		<Option type="SetEnergy" value="0.5" />
-		<!--Set team points at sim loaded-->
-		<Option type="SetTp" value="5" />
-		<!--Set skill points when Fight start-->
-		<Option type="SetSp" value="3" />
-	</Prelaunch>
-	<Party>
-		<Unit template="Character\Silver Wolf" name="Silver Wolf" level="80" rank="6" >
-		  <Stats hp="2106.2160000000003" atk="1222.4519999999998" def="923.895" spd="107" crit_rate="0.05" crit_dmg="0.5" atk_prc="0.8449600067455402" effect_hit_prc="0.77440000294708" quantum_dmg_prc="0.568803014298894" hp_fix="705.6000000101048" atk_fix="484.0463950210251" crit_dmg_prc="0.648000014014541" effect_res_prc="0.120960001833739" def_fix="114.31137600867078" crit_rate_prc="0.41148000047541705" spd_fix="25.03200000547804" def_prc="0.097199999727308" hp_prc="0.038880000589416" sp_rate_prc="0.194394017569722" />
-		  <LightCone rank="5" level="80" name="Incessant Rain" />
-		  <Skill name="System Warning" level="7" max_level="9" />
-		  <Skill name="Allow Changes?" level="12" max_level="15" />
-		  <Skill name="User Banned" level="12" max_level="15" />
-		  <Skill name="Awaiting System Response..." level="12" max_level="15" />
-		  <Skill name="100606" level="0" max_level="1" />
-		  <Skill name="Force Quit Program" level="1" max_level="1" />
-		  <RelicSet name="Genius of Brilliant Stars" num="4" />
-		  <RelicSet name="Space Sealing Station" num="2" />
-		</Unit>
-		<Unit template="Character\Luocha"  name="Luocha" level="80" rank="1">
-			<Stats hp="2444.9039999999995" atk="1338.8759999999997" def="760.725" spd="101" crit_rate="0.05" crit_dmg="0.5" atk_prc="1.492000016132378" hp_prc="1.107840012945243" def_prc="0.35719999950379" hp_fix="705.6000000101048" def_fix="237.0902600204572" crit_rate_prc="0.139320002635943" atk_fix="469.2282530211378" heal_rate_prc="0.44560600039548803" crit_dmg_prc="0.226800004485994" break_dmg_prc="0.168480003252625" spd_prc="0.06" />
-			<LightCone rank="1" level="80" name="Echoes of the Coffin" />
-			<Skill name="Thorns of the Abyss" level="6" max_level="9" />
-			<Skill name="Prayer of Abyss Flower" level="10" max_level="15" />
-			<Skill name="Death Wish" level="10" max_level="15" />
-			<Skill name="Cycle of Life" level="10" max_level="15" />
-			<Skill name="120306" level="0" max_level="1" />
-			<Skill name="Mercy of a Fool" level="1" max_level="1" />
-			<RelicSet name="Passerby of Wandering Cloud" num="2" />
-			<RelicSet name="Messenger Traversing Hackerspace" num="2" />
-			<RelicSet name="Fleet of the Ageless" num="2" />
-		</Unit>
+    <Prelaunch>
+        <!--Set enegry at sim loaded-->
+        <Option type="SetEnergy" value="0.5"/>
+        <!--Set team points at sim loaded-->
+        <Option type="SetTp" value="5"/>
+        <!--Set skill points when Fight start-->
+        <Option type="SetSp" value="3"/>
+    </Prelaunch>
+    <Party>
+        <Unit template="Character\Silver Wolf" name="Silver Wolf" level="80" rank="6">
+            <Stats hp="2106.2160000000003" atk="1222.4519999999998" def="923.895" spd="107" crit_rate="0.05"
+                   crit_dmg="0.5" atk_prc="0.8449600067455402" effect_hit_prc="0.77440000294708"
+                   quantum_dmg_prc="0.568803014298894" hp_fix="705.6000000101048" atk_fix="484.0463950210251"
+                   crit_dmg_prc="0.648000014014541" effect_res_prc="0.120960001833739" def_fix="114.31137600867078"
+                   crit_rate_prc="0.41148000047541705" spd_fix="25.03200000547804" def_prc="0.097199999727308"
+                   hp_prc="0.038880000589416" sp_rate_prc="0.194394017569722"/>
+            <LightCone rank="5" level="80" name="Incessant Rain"/>
+            <Skill name="System Warning" level="7" max_level="9"/>
+            <Skill name="Allow Changes?" level="12" max_level="15"/>
+            <Skill name="User Banned" level="12" max_level="15"/>
+            <Skill name="Awaiting System Response..." level="12" max_level="15"/>
+            <Skill name="100606" level="0" max_level="1"/>
+            <Skill name="Force Quit Program" level="1" max_level="1"/>
+            <RelicSet name="Genius of Brilliant Stars" num="4"/>
+            <RelicSet name="Space Sealing Station" num="2"/>
+        </Unit>
+        <Unit template="Character\Luocha" name="Luocha" level="80" rank="1">
+            <Stats hp="2444.9039999999995" atk="1338.8759999999997" def="760.725" spd="101" crit_rate="0.05"
+                   crit_dmg="0.5" atk_prc="1.492000016132378" hp_prc="1.107840012945243" def_prc="0.35719999950379"
+                   hp_fix="705.6000000101048" def_fix="237.0902600204572" crit_rate_prc="0.139320002635943"
+                   atk_fix="469.2282530211378" heal_rate_prc="0.44560600039548803" crit_dmg_prc="0.226800004485994"
+                   break_dmg_prc="0.168480003252625" spd_prc="0.06"/>
+            <LightCone rank="1" level="80" name="Echoes of the Coffin"/>
+            <Skill name="Thorns of the Abyss" level="6" max_level="9"/>
+            <Skill name="Prayer of Abyss Flower" level="10" max_level="15"/>
+            <Skill name="Death Wish" level="10" max_level="15"/>
+            <Skill name="Cycle of Life" level="10" max_level="15"/>
+            <Skill name="120306" level="0" max_level="1"/>
+            <Skill name="Mercy of a Fool" level="1" max_level="1"/>
+            <RelicSet name="Passerby of Wandering Cloud" num="2"/>
+            <RelicSet name="Messenger Traversing Hackerspace" num="2"/>
+            <RelicSet name="Fleet of the Ageless" num="2"/>
+        </Unit>
     </Party>
-	<Special>
-		<Unit template="Special\Forgotten Hall" level="0" />
-	</Special>
-	<Fights>
-		<Fight name="First fight">
-			<Wave>
-				<Unit template="NPC\Vagrant" level="74" />
-				<Unit template="NPC\Automaton Beetle" level="74" />
-				<Unit template="NPC\Vagrant" level="74" />
-			</Wave>
-		</Fight>		
-	</Fights>
+    <Special>
+        <Unit template="Special\Forgotten Hall" level="0"/>
+    </Special>
+    <Fights>
+        <Fight name="First fight">
+            <Wave>
+                <Unit template="NPC\Vagrant" level="74"/>
+                <Unit template="NPC\Automaton Beetle" level="74"/>
+                <Unit template="NPC\Vagrant" level="74"/>
+            </Wave>
+        </Fight>
+    </Fights>
 </Scenario>

@@ -9,44 +9,42 @@
                  WindowStartupLocation="CenterScreen"
                  SizeToContent="Height"
                  DataContext="{Binding RelativeSource={RelativeSource Self}}">
-    
-    <Grid >
+
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
 
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"></ColumnDefinition>
-            <ColumnDefinition Width="2*"></ColumnDefinition>
-            <ColumnDefinition Width="2*"></ColumnDefinition>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
-        <Image Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="0"  Height="600"  Name="CombatImg"></Image>
+        <Image Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="0" Height="600" Name="CombatImg" />
 
-        <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Height="120"  Name="LogTextBlock" MaxLines="400"
+        <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Height="120" Name="LogTextBlock" MaxLines="400"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 ScrollViewer.VerticalScrollBarVisibility="Auto">
-        </TextBox>
+                 ScrollViewer.VerticalScrollBarVisibility="Auto" />
 
 
-        <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Height="120"   Name="DebugTextBlock" MaxLines="400"
+        <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Height="120" Name="DebugTextBlock" MaxLines="400"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 ScrollViewer.VerticalScrollBarVisibility="Auto">
-        </TextBox>
+                 ScrollViewer.VerticalScrollBarVisibility="Auto" />
 
         <Grid Grid.Row="1" Grid.RowSpan="2" Grid.Column="0">
             <Grid.RowDefinitions>
-                <RowDefinition></RowDefinition>
-                <RowDefinition></RowDefinition>
-                <RowDefinition></RowDefinition>
-                <RowDefinition></RowDefinition>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="4*"></ColumnDefinition>
-                <ColumnDefinition Width="1*"></ColumnDefinition>
-                <ColumnDefinition Width="4*"></ColumnDefinition>
+                <ColumnDefinition Width="4*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="4*" />
             </Grid.ColumnDefinitions>
             <Button Grid.Row="0" Grid.Column="2" Name="BtnNext" Click="BtnNext_OnClick">Next step</Button>
             <Button Grid.Row="0" Grid.Column="0" Name="BtnPrev" Click="BtnPrev_OnClick">Prev step</Button>

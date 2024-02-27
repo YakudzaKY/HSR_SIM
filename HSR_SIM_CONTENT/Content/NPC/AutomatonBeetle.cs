@@ -8,11 +8,11 @@ namespace HSR_SIM_CONTENT.Content.NPC;
 
 public class AutomatonBeetle : DefaultNPCFighter
 {
-    private readonly Buff barierBuff;
+    private readonly AppliedBuff barierAppliedBuff;
 
     public AutomatonBeetle(Unit? parent) : base(parent)
     {
-        barierBuff = new Buff(Parent)
+        barierAppliedBuff = new AppliedBuff(Parent)
             { EventHandlerProc = MyBarrierEventHandler, Effects = new List<Effect> { new EffBarrier() } };
         //Elemenet
         Element = Unit.ElementEnm.Physical;
@@ -36,12 +36,12 @@ public class AutomatonBeetle : DefaultNPCFighter
         };
         //dmg events
         myAttackAbility.Events.Add(new DirectDamage(null, this, Parent)
-            { CalculateValue = CalcMyAttack});
+            { CalculateValue = CalcMyAttack });
         myAttackAbility.Events.Add(new EnergyGain(null, this, Parent) { Val = 15 });
         myAttackAbility.Events.Add(new ApplyBuff(null, this, Parent)
-            { TargetUnit = Parent, BuffToApply = barierBuff });
+            { TargetUnit = Parent, AppliedBuffToApply = barierAppliedBuff });
         myAttackAbility.Events.Add(new ApplyBuff(null, this, Parent)
-            { TargetUnit = Parent, BuffToApply = barierBuff });
+            { TargetUnit = Parent, AppliedBuffToApply = barierAppliedBuff });
         Abilities.Add(myAttackAbility);
     }
 
@@ -53,14 +53,14 @@ public class AutomatonBeetle : DefaultNPCFighter
     public void MyBarrierEventHandler(Event ent)
     {
         if (ent is DirectDamage && ent.TargetUnit == Parent &&
-            ent.TargetUnit.Buffs.Any(x => x.Effects.Any(y => y is EffBarrier)))
+            ent.TargetUnit.AppliedBuffs.Any(x => x.Effects.Any(y => y is EffBarrier)))
         {
             RemoveBuff newEvent = new(ent.ParentStep, this, Parent)
             {
                 TargetUnit = Parent,
-                BuffToApply = barierBuff,
-                NotFoundIgnore =true//Because this event at bottom of list (waiting all attack hits barrier)
-                                 //a lot of RemoveBuff events cant be generated
+                AppliedBuffToApply = barierAppliedBuff,
+                NotFoundIgnore = true //Because this event at bottom of list (waiting all attack hits barrier)
+                //a lot of RemoveBuff events cant be generated
             };
             ent.ParentStep.Events.Add(newEvent);
         }

@@ -19,8 +19,8 @@ public class ReduceDuration(Step parent, ICloneable source, Unit sourceUnit)
         //reduce MOD turns durationleft
 
 
-        BuffToApply.DurationLeft -= !revert ? 1 : -1;
-        if (!TriggersHandled && BuffToApply.DurationLeft <= 0) DispelMod(BuffToApply, true);
+        AppliedBuffToApply.DurationLeft -= !revert ? 1 : -1;
+        if (!TriggersHandled && AppliedBuffToApply.DurationLeft <= 0) DispelMod(AppliedBuffToApply, true);
 
         base.ProcEvent(revert);
     }

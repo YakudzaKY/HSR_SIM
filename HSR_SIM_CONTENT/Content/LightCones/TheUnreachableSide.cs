@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using HSR_SIM_LIB.Content;
+﻿using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
@@ -13,14 +12,14 @@ internal class TheUnreachableSide : DefaultLightCone
     private readonly double[] modifiers =
         { 0.24, 0.28, 0.32, 0.36, 0.40 };
 
-    private readonly Buff uniqueBuff;
+    private readonly AppliedBuff uniqueAppliedBuff;
 
     public TheUnreachableSide(IFighter parent, int rank) : base(parent, rank)
     {
         if (Path == Parent.Path)
-            uniqueBuff = new Buff(Parent.Parent)
+            uniqueAppliedBuff = new AppliedBuff(Parent.Parent)
             {
-                Type = Buff.BuffType.Buff,
+                Type = AppliedBuff.BuffType.Buff,
                 BaseDuration = null,
                 MaxStack = 1,
                 Effects = new List<Effect> { new EffAllDamageBoost { Value = modifiers[rank - 1] } }
@@ -34,27 +33,26 @@ internal class TheUnreachableSide : DefaultLightCone
     {
         //if unit consume hp or got attack then apply buff
         if ((ent.ParentStep.ActorAbility?.Parent == Parent && ent.TargetUnit == Parent.Parent && ent is ResourceDrain &&
-             ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal != 0
-             || ent.TargetUnit == Parent.Parent && ent is DirectDamage))
+             ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal != 0)
+            || (ent.TargetUnit == Parent.Parent && ent is DirectDamage))
         {
             ApplyBuff newEvent = new(ent.ParentStep, this, Parent.Parent)
             {
                 TargetUnit = Parent.Parent,
-                BuffToApply = uniqueBuff
+                AppliedBuffToApply = uniqueAppliedBuff
             };
             ent.ChildEvents.Add(newEvent);
         }
 
         //remove buff when attack completed
-        if (ent.ParentStep.ActorAbility != null && ent.SourceUnit == Parent.Parent && ent is ExecuteAbilityFinish && ent.ParentStep.ActorAbility.Attack)
-        {
-            if (Parent.Parent.Buffs.Any(x => x.Reference == uniqueBuff))
+        if (ent.ParentStep.ActorAbility != null && ent.SourceUnit == Parent.Parent && ent is ExecuteAbilityFinish &&
+            ent.ParentStep.ActorAbility.Attack)
+            if (Parent.Parent.AppliedBuffs.Any(x => x.Reference == uniqueAppliedBuff))
                 ent.ChildEvents.Add(new RemoveBuff(ent.ParentStep, this, Parent.Parent)
                 {
                     TargetUnit = Parent.Parent,
-                    BuffToApply = uniqueBuff
+                    AppliedBuffToApply = uniqueAppliedBuff
                 });
-        }
 
         base.DefaultLightCone_HandleEvent(ent);
     }

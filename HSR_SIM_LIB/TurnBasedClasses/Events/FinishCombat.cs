@@ -9,9 +9,9 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 //Combat was finished
 public class FinishCombat : Event
 {
+    private readonly Dictionary<Unit, List<AppliedBuff>> removedBuffs = new();
     private CombatFight oldCombatFight;
     private Dictionary<Unit, MechDictionary> oldMechDictionary;
-    private readonly Dictionary<Unit, List<Buff>> removedBuffs = new();
 
     public FinishCombat(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
     {
@@ -44,9 +44,9 @@ public class FinishCombat : Event
             {
                 if (!TriggersHandled)
                 {
-                    removedBuffs.Add(unit, unit.Buffs);
+                    removedBuffs.Add(unit, unit.AppliedBuffs);
                     var md = new MechDictionary();
-                    foreach (var mch in (unit.Fighter).Mechanics.Values)
+                    foreach (var mch in unit.Fighter.Mechanics.Values)
                     {
                         md.AddVal(mch.Key);
                         md.Values[mch.Key] = mch.Value;
@@ -61,7 +61,7 @@ public class FinishCombat : Event
                 foreach (var effect in buff.Effects)
                     effect.BeforeRemove(this, buff);
 
-                unit.Buffs = new List<Buff>();
+                unit.AppliedBuffs = new List<AppliedBuff>();
 
                 foreach (var buff in removedBuffs[unit])
                 foreach (var effect in buff.Effects)
@@ -80,7 +80,7 @@ public class FinishCombat : Event
                 foreach (var effect in buff.Effects)
                     effect.BeforeApply(this, buff);
 
-                unitWBuffs.Key.Buffs = unitWBuffs.Value;
+                unitWBuffs.Key.AppliedBuffs = unitWBuffs.Value;
 
                 foreach (var buff in unitWBuffs.Value)
                 foreach (var effect in buff.Effects)
@@ -89,7 +89,7 @@ public class FinishCombat : Event
 
             foreach (var omd in oldMechDictionary)
             foreach (var mec in omd.Value.Values)
-                (omd.Key.Fighter).Mechanics.Values[mec.Key] = mec.Value;
+                omd.Key.Fighter.Mechanics.Values[mec.Key] = mec.Value;
         }
 
         base.ProcEvent(revert);
