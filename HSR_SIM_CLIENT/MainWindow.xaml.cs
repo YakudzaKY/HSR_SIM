@@ -59,9 +59,7 @@ public sealed partial class MainWindow : INotifyPropertyChanged
     {
         //save to prevent data loss if app crash or freeze
         SaveIni();
-        var singleSimWindow = new SingleSimWindow();
-        singleSimWindow.SetSim(
-            XmlLoader.LoadCombatFromXml(GetScenarioPath() + CbScenario.Text, GetProfilePath() + CbProfile.Text),
+        var singleSimWindow = new SingleSimWindow(   XmlLoader.LoadCombatFromXml(GetScenarioPath() + CbScenario.Text, GetProfilePath() + CbProfile.Text),
             chkDevMode: DevMode);
         singleSimWindow.Show();
     }

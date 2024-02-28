@@ -4,14 +4,16 @@
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                 xmlns:unitStuff="clr-namespace:HSR_SIM_LIB.UnitStuff;assembly=HSR_SIM_LIB"
                  mc:Ignorable="d"
                  Title="Single simulation" Height="Auto" Width="Auto"
                  WindowStartupLocation="CenterScreen"
                  SizeToContent="WidthAndHeight"
+                 DataContext="{Binding RelativeSource={RelativeSource Self}}"
 
-                 DataContext="{Binding RelativeSource={RelativeSource Self}}">
+            >
 
-
+ 
     <Grid>
 
         <Grid.RowDefinitions>
@@ -64,17 +66,35 @@
                 <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
-            <TreeView Grid.Row="0" Grid.Column="0" Name="trvMenu">
-                <Style TargetType="TreeViewItem">
-                    <Setter Property="IsExpanded" Value="True" />
-                </Style>
-                <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate ItemsSource="{Binding Teams }">
-
-                        <TextBlock Text="{Binding InputGestureText  }" />
+      
+                <Grid.Resources>
+                    <HierarchicalDataTemplate DataType    = "{x:Type unitStuff:Team}"
+                                              ItemsSource = "{Binding Path=Units}">
+                        <TextBlock Text="{Binding Path=Name}"/>
+                    
                     </HierarchicalDataTemplate>
-                </TreeView.ItemTemplate>
-            </TreeView>
+                    <DataTemplate DataType="{x:Type unitStuff:Unit}">
+                        <TextBlock Text="{Binding Path=PrintName}"/>
+                    </DataTemplate>
+                </Grid.Resources>
+                <TreeView Grid.Row="0" Grid.Column="0"  SelectedItemChanged ="TreeView_OnSelectedItemChanged" SelectedValuePath="{Binding Path=SelectedObject,Mode=TwoWay}">
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="{x:Type TreeViewItem}">
+                            <Setter Property="IsExpanded" Value="True" />
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+
+                    <TreeViewItem  ItemsSource="{Binding Path=Teams,Mode=OneWay}" Header="Teams and Units" >
+                        <TreeViewItem.ItemContainerStyle>
+                            <Style TargetType="{x:Type TreeViewItem}">
+                                <Setter Property="IsExpanded" Value="True" />
+                            </Style>
+                        </TreeViewItem.ItemContainerStyle>
+                    </TreeViewItem>
+
+                </TreeView>
+        
+            
             <DataGrid Grid.Row="0" Grid.Column="1" />
             <TreeView Grid.Row="1" Grid.Column="0" />
             <DataGrid Grid.Row="1" Grid.Column="1" />

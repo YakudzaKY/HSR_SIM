@@ -11,6 +11,8 @@ public class ToughnessShred : Event
     {
     }
 
+
+
     public override void ProcEvent(bool revert)
     {
         if (!TriggersHandled)

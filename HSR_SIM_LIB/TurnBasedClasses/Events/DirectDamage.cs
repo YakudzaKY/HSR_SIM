@@ -3,11 +3,12 @@ using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 
-// direct damage dealed
+// direct damage dealt
 public class DirectDamage(Step parent, ICloneable source, Unit sourceUnit)
     : DamageEventTemplate(parent, source, sourceUnit)
 {
     public bool IsCrit { get; set; }
+   
 
     public override string GetDescription()
     {

@@ -5,6 +5,7 @@ using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
+using HSR_SIM_LIB.Utils;
 using static HSR_SIM_LIB.Skills.Ability;
 
 
@@ -131,9 +132,9 @@ public class Blade : DefaultFighter
             shardSword.Events.Add(new DirectDamage(null, this, Parent)
                 { CalculateValue = CalculateBasicDmg, CalculateProportion = proportion });
             shardSword.Events.Add(new ToughnessShred(null, this, Parent)
-                { Val = 30, CalculateProportion = proportion });
+                { Val = 30 * proportion });
             shardSword.Events.Add(new EnergyGain(null, this, Parent)
-                { Val = 20, TargetUnit = Parent, CalculateProportion = proportion });
+                { Val = 20 * proportion, TargetUnit = Parent });
         }
 
         Abilities.Add(shardSword);
@@ -169,11 +170,11 @@ public class Blade : DefaultFighter
             });
             //main target thg
             forestMainTrgtHit = new ToughnessShred(null, this, Parent)
-                { Val = 60, CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain, CalculateProportion = proportion };
+                { Val = 60 * proportion, CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain };
             forestOfSwords.Events.Add(forestMainTrgtHit);
             //energy
             forestOfSwords.Events.Add(new EnergyGain(null, this, Parent)
-                { Val = 30, TargetUnit = Parent, CalculateProportion = proportion });
+                { Val = 30 * proportion, TargetUnit = Parent });
         }
 
         //adjacent
@@ -262,13 +263,28 @@ public class Blade : DefaultFighter
         karmaWind.Events.Add(new DirectDamage(null, this, Parent)
         {
             OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
-            CalculateValue = CalculateKarmaDmg
+            CalculateValue = new Formula()
+            {
+                Expression = $"BladeAttack * 2",
+                Variables = new Dictionary<string, Formula.VarVal>()
+                {
+                    {
+                        "BladeAttack",
+                        new()
+                        {
+                            ReplaceExpression =
+                                $"{Formula.DynamicTargetEnm.Attacker}#{Formula.GenerateReference<Unit>(x => x.GetAttackFs(null))}"
+                        }
+                    }
+                }
+            }
         });
 
         Abilities.Add(karmaWind);
 
 
         Ability? Hellscape;
+
         //Hellscape
         Hellscape = new Ability(this)
         {
@@ -281,6 +297,7 @@ public class Blade : DefaultFighter
             EndTheTurn = false,
             Available = HellscapeNotActive
         };
+
         //dmg events
         Hellscape.Events.Add(new ResourceDrain(null, this, Parent)
         {
@@ -290,6 +307,7 @@ public class Blade : DefaultFighter
             CalculateValue = CalculateHellscapeSelfDmg,
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain
         });
+
         Hellscape.Events.Add(new ApplyBuff(null, this, Parent)
         {
             TargetUnit = Parent,
@@ -298,12 +316,12 @@ public class Blade : DefaultFighter
 
         Abilities.Add(Hellscape);
 
-        //=====================
+//=====================
 
 
-        //=====================
-        //Ascended Traces
-        //=====================
+//=====================
+//Ascended Traces
+//=====================
         if (ATraces.HasFlag(ATracesEnm.A2))
             Parent.PassiveBuffs.Add(new PassiveBuff(Parent)
             {
@@ -346,12 +364,12 @@ public class Blade : DefaultFighter
     public sealed override Unit.ElementEnm Element { get; } = Unit.ElementEnm.Wind;
 
     private AppliedBuff E4AppliedBuff { get; }
-    //Blade constructor
+//Blade constructor
 
-    /*
-     * if 2+ turns left we dont need SP.
-     * duration 2= turn+ next from bronya turn or double turn between support turn
-     */
+/*
+ * if 2+ turns left we dont need SP.
+ * duration 2= turn+ next from bronya turn or double turn between support turn
+ */
     protected override double WillSpend()
     {
         return (Parent.AppliedBuffs.FirstOrDefault(x => x.Reference == hellscapeAppliedBuff)?.DurationLeft ?? 0) > 2
@@ -451,7 +469,7 @@ public class Blade : DefaultFighter
         return Mechanics.Values[shuhuGift] == shuHuMaxCnt;
     }
 
-    //50-110
+//50-110
     public double? CalculateBasicDmg(Event ent)
     {
         return FighterUtils.CalculateDmgByBasicVal(
@@ -464,7 +482,7 @@ public class Blade : DefaultFighter
         return Parent.GetMaxHp(ent) * 0.9;
     }
 
-    //damage for ULTI main target
+//damage for ULTI main target
     public double? CalculateDsDmg(Event ent)
     {
         var attackPart = Parent.GetAttack(ent) * dsMainAtk;
@@ -476,7 +494,7 @@ public class Blade : DefaultFighter
         return FighterUtils.CalculateDmgByBasicVal(attackPart + maxHpPart + hpLossPart, ent);
     }
 
-    //damage for ULTI adjacent target
+//damage for ULTI adjacent target
     public double? CalculateDstDmgAdj(Event ent)
     {
         var attackPart = Parent.GetAttack(ent) * dsAdjAtk;
@@ -486,7 +504,7 @@ public class Blade : DefaultFighter
     }
 
 
-    //damage for main target
+//damage for main target
     public double? CalculateForestDmg(Event ent)
     {
         var attackPart = Parent.GetAttack(ent) * (0.16 +
@@ -495,7 +513,7 @@ public class Blade : DefaultFighter
         return FighterUtils.CalculateDmgByBasicVal(attackPart + maxHpPart, ent);
     }
 
-    //damage for adjacent target
+//damage for adjacent target
     public double? CalculateForestDmgAdj(Event ent)
     {
         var attackPart = Parent.GetAttack(ent) * forestAdjAtk;
@@ -503,7 +521,7 @@ public class Blade : DefaultFighter
         return FighterUtils.CalculateDmgByBasicVal(attackPart + maxHpPart, ent);
     }
 
-    //a4 if main target have 0 toughness then heal
+//a4 if main target have 0 toughness then heal
     public double? CalculateForestHeal(Event ent)
     {
         return FighterUtils.CalculateHealByBasicVal(Parent.GetMaxHp(ent) * 0.05 + 100, ent);

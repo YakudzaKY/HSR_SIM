@@ -6,7 +6,7 @@ using static HSR_SIM_LIB.UnitStuff.Resource;
 
 namespace HSR_SIM_LIB.UnitStuff;
 
-public class Team : CloneClass
+public class Team(SimCls parent) : CloneClass
 {
     public enum TeamTypeEnm
     {
@@ -14,28 +14,20 @@ public class Team : CloneClass
         Special
     }
 
-    public bool controledTeam;
+    public bool ControlledTeam;
     private List<Resource> resources;
 
-    public Team(SimCls parent)
-    {
-        ParentSim = parent;
-    }
-
-    public SimCls ParentSim { get; set; }
+    public SimCls ParentSim { get; set; } = parent;
     public TeamTypeEnm TeamType { get; set; }
 
-
-    public List<Unit> Units { get; set; } = new();
+    public string Name => (ControlledTeam ? "Player: " : "") + TeamType;
+    public List<Unit> Units { get; set; } = [];
 
     public double TeamAggro
     {
         get
         {
-            double res = 0;
-            foreach (var unit in Units.Where(x => x.IsAlive))
-                res += unit.GetAggro(null);
-            return res;
+            return Units.Where(x => x.IsAlive).Sum(unit => unit.GetAggro(null));
         }
     }
 
@@ -44,18 +36,16 @@ public class Team : CloneClass
         get
         {
             //create all resources
-            if (resources == null)
+            if (resources != null) return resources;
+            resources = new List<Resource>();
+            foreach (var resourceType in new[] { ResourceType.SP, ResourceType.TP })
             {
-                resources = new List<Resource>();
-                foreach (var resourceType in new[] { ResourceType.SP, ResourceType.TP })
+                Resource res = new(this)
                 {
-                    Resource res = new(this)
-                    {
-                        ResType = resourceType,
-                        ResVal = 0
-                    };
-                    resources.Add(res);
-                }
+                    ResType = resourceType,
+                    ResVal = 0
+                };
+                resources.Add(res);
             }
 
             return resources;
@@ -113,9 +103,9 @@ public class Team : CloneClass
     /// </summary>
     public void UnBindUnits()
     {
-        var UnitsToUnbind = new List<Unit>();
-        UnitsToUnbind.AddRange(Units);
-        foreach (var unit in UnitsToUnbind) UnBindUnit(unit);
+        var unitsToUnbind = new List<Unit>();
+        unitsToUnbind.AddRange(Units);
+        foreach (var unit in unitsToUnbind) UnBindUnit(unit);
         //Units.Clear(); disable this clear coz need save team into event field
         //Units = null;
     }
@@ -126,21 +116,9 @@ public class Team : CloneClass
         foreach (var unit in bindUnits) BindUnit(unit, Units.Count);
     }
 
-    /// <summary>
-    ///     Party have res to cast ability
-    ///     if res not found then false
-    /// </summary>
-    /// <returns></returns>
-    public bool HaveRes(Ability ability)
-    {
-        foreach (var res in Resources)
-            if (res.ResType == ability.CostType)
-                return res.ResVal >= ability.Cost;
-        return false;
-    }
 
     public Resource GetRes(ResourceType rt)
     {
-        return Resources.Where(resource => resource.ResType == rt).First();
+        return Resources.First(resource => resource.ResType == rt);
     }
 }

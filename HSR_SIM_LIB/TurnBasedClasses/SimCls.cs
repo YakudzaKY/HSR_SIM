@@ -84,12 +84,12 @@ public sealed class SimCls : ICloneable
 
     public Team PartyTeam
     {
-        get { return Teams.First(x => x.controledTeam); }
+        get { return Teams.First(x => x.ControlledTeam); }
     }
 
     public Team HostileTeam
     {
-        get { return Teams.First(x => x.controledTeam == false && x.TeamType == TeamTypeEnm.UnitPack); }
+        get { return Teams.First(x => x.ControlledTeam == false && x.TeamType == TeamTypeEnm.UnitPack); }
     }
 
 
@@ -255,7 +255,7 @@ public sealed class SimCls : ICloneable
             new Team(this);
         team.BindUnits(GetCombatUnits(CurrentScenario.Party));
         team.TeamType = TeamTypeEnm.UnitPack;
-        team.controledTeam = true;
+        team.ControlledTeam = true;
         Teams.Add(team);
         /*
          * pre launch options

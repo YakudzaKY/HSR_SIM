@@ -9,10 +9,10 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 public abstract class DamageEventTemplate(Step parent, ICloneable source, Unit sourceUnit)
     : Event(parent, source, sourceUnit)
 {
-    public double? RealBarrierVal { get; private set; }
+    protected double? RealBarrierVal { get; private set; }
     public Buff BuffThatDamage { get; init; }
 
-    public void DamageWorks(bool revert)
+    protected void DamageWorks(bool revert)
     {
         if (RealVal == null)
         {
@@ -21,6 +21,8 @@ public abstract class DamageEventTemplate(Step parent, ICloneable source, Unit s
             {
                 Val = 0;
                 RealVal = 0;
+                if (this is DirectDamage dd)
+                    dd.IsCrit = false;
             }
             else
             {

@@ -151,9 +151,9 @@ public class Luocha : DefaultFighter
             thornsOfTheAbyss.Events.Add(new DirectDamage(null, this, Parent)
                 { CalculateValue = CalculateBasicDmg, CalculateProportion = proportion });
             thornsOfTheAbyss.Events.Add(new ToughnessShred(null, this, Parent)
-                { Val = 30, CalculateProportion = proportion });
+                { Val = 30*proportion });
             thornsOfTheAbyss.Events.Add(new EnergyGain(null, this, Parent)
-                { Val = 20, TargetUnit = Parent, CalculateProportion = proportion });
+                { Val = 20*proportion, TargetUnit = Parent });
         }
 
 

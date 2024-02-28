@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.UnitStuff;
+using HSR_SIM_LIB.Utils;
 using static HSR_SIM_LIB.TurnBasedClasses.Step;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -12,6 +13,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 /// </summary>
 public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit) : CloneClass
 {
+    public double CalculateProportion { get; set; }//todo:delete
     public delegate IEnumerable<Unit> CalculateTargetPrc();
 
     public delegate double? CalculateValuePrc(Event ent);
@@ -22,7 +24,7 @@ public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit)
     private int procRatioCounter = 1; //counter
     private double? val; //Theoretical value
 
-    public CalculateValuePrc CalculateValue { get; set; }
+    public object CalculateValue { get; set; }
     public CalculateTargetPrc CalculateTargets { get; init; }
 
 
@@ -49,8 +51,7 @@ public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit)
     public Unit TargetUnit { get; set; }
     public StepTypeEnm? OnStepType { get; init; }
 
-    //after calc Val will be multiplied by this number
-    public double? CalculateProportion { get; set; }
+
 
     public double? Val
     {
@@ -58,20 +59,23 @@ public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit)
         {
             //calc value first
 
-            if (CalculateValue != null)
+            if (val != null || CalculateValue == null) return val;
+            switch (CalculateValue)
             {
-                val = CalculateValue(this);
-                CalculateValue = null;
+                //if calculate is formula then set reference and calc formula
+                case Formula cFrm:
+                    cFrm.EventRef = this;
+                    val = cFrm.Result;
+                    ParentStep.Parent.Parent.LogDebug(cFrm.Explain());
+                    break;
+                //else call function
+                case Func<Event,double?> cFnc:
+                    val= cFnc(this);
+                    break;
+                default:
+                    throw new NotImplementedException();
             }
-
-            if (CalculateProportion != null)
-            {
-                val *= CalculateProportion;
-                CalculateProportion = null;
-                ParentStep.Parent.Parent?.LogDebug($" new val proportion({CalculateProportion:f})={val:f}");
-            }
-
-
+     
             return val;
         }
 

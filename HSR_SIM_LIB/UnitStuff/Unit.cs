@@ -12,6 +12,7 @@ using static HSR_SIM_LIB.Utils.Constant;
 using static HSR_SIM_LIB.UnitStuff.Resource;
 using static HSR_SIM_LIB.Skills.Ability;
 using static HSR_SIM_LIB.Skills.PassiveBuff;
+using static HSR_SIM_LIB.Utils.Formula;
 
 namespace HSR_SIM_LIB.UnitStuff;
 
@@ -80,6 +81,8 @@ public class Unit : CloneClass
     public List<PassiveBuff> PassiveBuffs { get; set; } = [];
 
     public string Name { get; set; } = string.Empty;
+
+    public string PrintName => ParentTeam is null ? "" : "["+ParentTeam.Units.IndexOf(this) +"]"+ Name;
 
     public UnitStats Stats
     {
@@ -762,6 +765,18 @@ public class Unit : CloneClass
         return Stats.BaseAttack * (1 + GetBuffSumByType(typeof(EffAtkPrc), ent: ent) + Stats.AttackPrc) +
                GetBuffSumByType(typeof(EffAtk), ent: ent) + Stats.AttackFix;
     }
+
+    public Formula GetAttackFs(Event ent)
+    {
+        return new Formula()
+        {
+            EventRef = ent,
+            Expression =  $"1 {DynamicTargetEnm.Attacker}#{nameof(GetBuffSumByType)}#{nameof(EffAtkPrc)} + {DynamicTargetEnm.Attacker}#{nameof(Stats)}#{nameof(UnitStats.AttackPrc)} " +
+                          $"* {DynamicTargetEnm.Attacker}#{nameof(Stats)}#{nameof(UnitStats.BaseAttack)}"
+          
+        };
+    }
+
 
     public double GetBreakDmg(Event ent)
     {

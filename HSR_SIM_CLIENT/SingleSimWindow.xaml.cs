@@ -5,10 +5,10 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using HSR_SIM_LIB;
 using HSR_SIM_LIB.TurnBasedClasses;
+using HSR_SIM_LIB.UnitStuff;
 using HSR_SIM_LIB.Utils;
 using Image = System.Drawing.Image;
 
@@ -17,17 +17,24 @@ namespace HSR_SIM_CLIENT;
 public partial class SingleSimWindow : INotifyPropertyChanged
 {
     private readonly bool busy = false;
-    private ObservableCollection<MenuItem> teams;
-    private Worker? wrk;
+    private ObservableCollection<Team> teams;
+    private readonly Worker wrk;
 
-    public SingleSimWindow()
+    public SingleSimWindow(SimCls simCls, string? devModePath = null, bool chkDevMode = false)
     {
-        Teams = new ObservableCollection<MenuItem>();
         InitializeComponent();
+        wrk = new Worker();
+        wrk.CbLog += WorkerCallBackString;
+        wrk.CbRend += WorkerCallBackImages;
+        wrk.CbGetDecision = WorkerCallBackGetDecision;
+        wrk.DevMode = chkDevMode;
+        wrk.LoadScenarioFromSim(simCls, devModePath);
+        teams = new ObservableCollection<Team>();
+       
     }
 
 
-    public ObservableCollection<MenuItem> Teams
+    public ObservableCollection<Team> Teams
     {
         get => teams;
         private set
@@ -39,6 +46,8 @@ public partial class SingleSimWindow : INotifyPropertyChanged
     }
 
     public bool DbgMode { get; set; }
+    public ICloneable? SelectedObject { get; set; }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
@@ -50,6 +59,7 @@ public partial class SingleSimWindow : INotifyPropertyChanged
     {
         if (PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(name));
     }
+    
 
     /// <summary>
     ///     For text callback
@@ -89,21 +99,7 @@ public partial class SingleSimWindow : INotifyPropertyChanged
         return getDecision.ItemIndex;
     }
 
-    /// <summary>
-    ///     Set worker fields
-    /// </summary>
-    /// <param name="simCls"></param>
-    /// <param name="devModePath"></param>
-    /// <param name="chkDevMode"></param>
-    public void SetSim(SimCls simCls, string? devModePath = null, bool chkDevMode = false)
-    {
-        wrk = new Worker();
-        wrk.CbLog += WorkerCallBackString;
-        wrk.CbRend += WorkerCallBackImages;
-        wrk.CbGetDecision = WorkerCallBackGetDecision;
-        wrk.DevMode = chkDevMode;
-        wrk.LoadScenarioFromSim(simCls, devModePath);
-    }
+
 
     private static BitmapImage BitmapToImageSource(Image bitmap)
     {
@@ -130,7 +126,7 @@ public partial class SingleSimWindow : INotifyPropertyChanged
 
     private void BtnNext_OnClick(object sender, RoutedEventArgs e)
     {
-        wrk?.MoveStep();
+        wrk.MoveStep();
         GetTeamsAndEvents();
     }
 
@@ -139,22 +135,25 @@ public partial class SingleSimWindow : INotifyPropertyChanged
     /// </summary>
     private void GetTeamsAndEvents()
     {
+        //save selected unit
         Teams.Clear();
-        foreach (var team in wrk?.Sim.Teams)
-        {
-            var item = new MenuItem
-            {
-                InputGestureText = team.TeamType.ToString()
-            };
-            Teams.Add(item);
-        }
+        foreach (Team team in wrk.Sim.Teams)
+            Teams.Add(team);
 
+        //render selected unit
+        
         NotifyPropertyChanged(nameof(Teams));
     }
 
     private void BtnPrev_OnClick(object sender, RoutedEventArgs e)
     {
-        wrk?.MoveStep(true);
+        wrk.MoveStep(true);
         GetTeamsAndEvents();
+    }
+
+    
+    private void TreeView_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+    {
+        
     }
 }

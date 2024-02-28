@@ -8,7 +8,7 @@ public class DoTDamage(Step parent, ICloneable source, Unit sourceUnit, Unit.Ele
     : DamageEventTemplate(parent, source,
         sourceUnit)
 {
-    public Unit.ElementEnm Element { get; set; } = element;
+    public Unit.ElementEnm Element { get; } = element;
 
     public override string GetDescription()
     {
