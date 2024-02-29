@@ -36,8 +36,8 @@ internal class BeforetheTutorialMissionStarts : DefaultLightCone
         //if hit any target that have def debuff or def ignore by player
         var targetHits = (from p in ent.ParentStep.Events
                 where p is DirectDamage &&
-                      (p.TargetUnit.GetBuffSumByType(typeof(EffDef), buffType: Buff.BuffType.Debuff) < 0
-                       || p.TargetUnit.GetBuffSumByType(typeof(EffDefPrc), buffType: Buff.BuffType.Debuff) < 0
+                      (p.TargetUnit.GetBuffSumByType(ent,typeof(EffDef), buffType: Buff.BuffType.Debuff) < 0
+                       || p.TargetUnit.GetBuffSumByType(ent,typeof(EffDefPrc), buffType: Buff.BuffType.Debuff) < 0
                        || p.SourceUnit.DefIgnore(ent) > 0)
                 select p.TargetUnit)
             .Distinct();

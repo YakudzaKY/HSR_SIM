@@ -265,7 +265,7 @@ public class Blade : DefaultFighter
             OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
             CalculateValue = new Formula()
             {
-                Expression = $"BladeAttack * 2",
+                Expression = $"BladeAttack * 2 + BladeAttack ",
                 Variables = new Dictionary<string, Formula.VarVal>()
                 {
                     {

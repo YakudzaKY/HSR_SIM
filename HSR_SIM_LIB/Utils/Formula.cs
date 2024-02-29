@@ -172,52 +172,52 @@ public class Formula
     }
 
 
-    public double CalculateResult()
+    private double CalculateResult()
     {
         ParseVariables();
         if (string.IsNullOrWhiteSpace(this.Expression))
             throw new Exception("An expression must be defined in the Expression property.");
 
-        double? result = null;
-        string operation = string.Empty;
+        double? calculationResult = null;
+        var operation = string.Empty;
 
         //This will be necessary for priorities operations such as parentheses, etc... It is not being used at this point.
         List<double> aux = new List<double>();
 
-        foreach (var lexema in Expression.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries))
+        foreach (var lexeme in Expression.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries))
         {
             //If it is an operator
-            if (lexema == "*" || lexema == "/" || lexema == "+" || lexema == "-")
+            if (lexeme == "*" || lexeme == "/" || lexeme == "+" || lexeme == "-")
             {
-                operation = lexema;
+                operation = lexeme;
             }
             else //It is a number or a variable
             {
                 double value = double.MinValue;
-                if (Variables.ContainsKey(lexema)) //If it is a variable, let's get the variable value
-                    value = Variables[lexema].Result ?? 0;
+                if (Variables.ContainsKey(lexeme)) //If it is a variable, let's get the variable value
+                    value = Variables[lexeme].Result ?? 0;
                 else //It is just a number, let's just parse
-                    value = double.Parse(lexema);
+                    value = double.Parse(lexeme);
 
-                if (!result.HasValue) //No value has been assigned yet
+                if (!calculationResult.HasValue) //No value has been assigned yet
                 {
-                    result = value;
+                    calculationResult = value;
                 }
                 else
                 {
                     switch (operation) //Let's check the operation we should perform
                     {
                         case "*":
-                            result = result.Value * value;
+                            calculationResult = calculationResult.Value * value;
                             break;
                         case "/":
-                            result = result.Value / value;
+                            calculationResult = calculationResult.Value / value;
                             break;
                         case "+":
-                            result = result.Value + value;
+                            calculationResult = calculationResult.Value + value;
                             break;
                         case "-":
-                            result = result.Value - value;
+                            calculationResult = calculationResult.Value - value;
                             break;
                         default:
                             throw new Exception("The expression is not properly formatted.");
@@ -226,28 +226,137 @@ public class Formula
             }
         }
 
-        if (result.HasValue)
-            return result.Value;
+        if (calculationResult.HasValue)
+            return calculationResult.Value;
         else
             throw new Exception("The operation could not be completed, a result was not obtained.");
     }
 
-    public string Explain(bool isFinish=true)
+    private record ExplainRec(string Expr, Dictionary<string, VarVal> Dict)
     {
+        public string Expression { get; set; } = Expr;
+        public Dictionary<string, VarVal> Variables { get; set; } = Dict;
+    }
 
-        string finalStr = String.Empty;
-        foreach (var lexema in Expression.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries))
+    /// <summary>
+    /// output formula 
+    /// </summary>
+    /// <param name="shortExplain"></param>
+    /// <param name="pReplaceList"></param>
+    /// <param name="pFormulas"></param>
+    /// <param name="pResults"></param>
+    /// <param name="pRaw"></param>
+    /// <param name="pReplaceListNew"></param>
+    /// <param name="pFormulasNew"></param>
+    /// <param name="pResultsNew"></param>
+    /// <param name="pRawNew"></param>
+    /// <returns></returns>
+    public string Explain(bool shortExplain = false, List<VarVal> pReplaceList = null, List<VarVal> pFormulas = null,
+        List<VarVal> pResults = null, List<VarVal> pRaw = null,
+        List<VarVal> pReplaceListNew = null, List<VarVal> pFormulasNew = null,
+        List<VarVal> pResultsNew = null, List<VarVal> pRawNew = null)
+    {
+        List<VarVal> parsedReplaceExpressions = pReplaceList ?? [];
+        List<VarVal> parsedFormulas = pFormulas ?? [];
+        List<VarVal> parsedResults = pResults ?? [];
+        List<VarVal> parsedRaw = pRaw ?? [];
+
+        //get allowed to replace values once per while run
+        List<VarVal> parsedReplaceExpressionsNew = pReplaceListNew ?? [];
+        List<VarVal> parsedFormulasNew = pFormulasNew ?? [];
+        List<VarVal> parsedResultsNew = pResultsNew ?? [];
+        List<VarVal> parsedRawNew = pRawNew ?? [];
+
+        bool nextRunAllowed = true;
+
+        bool IncompleteLevel(Dictionary<string, VarVal> sVals)
         {
-            if (Variables.TryGetValue(lexema, out var val))
-            {
-                string valStr = val.ResFormula != null ? val.ResFormula.Explain(false) +"=" :String.Empty;
-                finalStr += $"{lexema}[{valStr}{val.Result}]"+Strings.Space(1);
-            }
-            else
-                finalStr += lexema+Strings.Space(1);
+            return nextRunAllowed && sVals.Any(
+                x => (x.Value.ReplaceExpression != null && !parsedReplaceExpressions.Contains(x.Value))
+                     && (x.Value.ResFormula != null || !parsedFormulas.Contains(x.Value))
+                     || !parsedRaw.Contains(x.Value)
+                     || (x.Value.Result != null && !parsedResults.Contains(x.Value))
+            );
         }
 
-        return finalStr+(isFinish?" = "+Result:"");
+        var finalStr = String.Empty;
+
+
+        while (IncompleteLevel(Variables))
+        {
+            foreach (var lexeme in Expression.Split(new string[] { " " },
+                         StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (Variables.TryGetValue(lexeme, out var val))
+                {
+                    //if expression exists and not handled
+                    if (val.ReplaceExpression == lexeme)
+                        if (!parsedRaw.Contains(val))
+                            parsedRaw.Add(val);
+                    if (!parsedRaw.Contains(val))
+                    {
+                        if (!parsedRawNew.Contains(val))
+                            parsedRawNew.Add(val);
+                        finalStr += lexeme + Strings.Space(1);
+                    }
+                    else if (!String.IsNullOrEmpty(val.ReplaceExpression) && !parsedReplaceExpressions.Contains(val))
+                    {
+                        if (!parsedReplaceExpressionsNew.Contains(val))
+                            parsedReplaceExpressionsNew.Add(val);
+                        var valStr = val.ReplaceExpression;
+                        finalStr += $"{valStr}" + Strings.Space(1);
+                    }
+                    else if (val.ResFormula != null && !parsedFormulas.Contains(val))
+                    {
+                        /*
+                         * TODO: убрать () * 2 + () , т.к. на последней итерации Explain зовется когда IncompleteLevel =true
+                         * BladeAttack * 2 + BladeAttack
+                           = Attacker#GetAttackFs * 2 + Attacker#GetAttackFs
+                           = (1 + Attacker#Stats#AttackPrc * Attacker#Stats#BaseAttack ) * 2 + (1 + Attacker#Stats#AttackPrc * Attacker#Stats#BaseAttack )
+                           = (1 + 0,1080000063 * 1125,4319999999998 ) * 2 + (1 + 0,1080000063 * 1125,4319999999998 )
+                           = () * 2 + ()  = 1246,9786630902213 * 2 + 1246,9786630902213  = 3740,935989270664
+
+                         */
+                        var valStr = "(" + val.ResFormula.Explain(true, parsedReplaceExpressions, parsedFormulas,
+                                         parsedResults, parsedRaw, parsedReplaceExpressionsNew, parsedFormulasNew,
+                                         parsedResultsNew, parsedRawNew) +
+                                     ")";
+                        if (!IncompleteLevel(val.ResFormula.Variables))
+                            if (!parsedFormulasNew.Contains(val))
+                                parsedFormulasNew.Add(val);
+                        finalStr += $"{valStr}" + Strings.Space(1);
+                    }
+                    else if (val.Result != null && !parsedResults.Contains(val))
+                    {
+                        if (!parsedResultsNew.Contains(val))
+                            parsedResultsNew.Add(val);
+                        finalStr += val.Result + Strings.Space(1);
+                    }
+                    else
+                    {
+                        finalStr += val.Result + Strings.Space(1);
+                    }
+                }
+                else
+                {
+                    finalStr += lexeme + Strings.Space(1);
+                }
+            }
+
+            if (!shortExplain)
+            {
+                parsedReplaceExpressions.AddRange(parsedReplaceExpressionsNew);
+                parsedFormulas.AddRange(parsedFormulasNew);
+                parsedResults.AddRange(parsedResultsNew);
+                parsedRaw.AddRange(parsedRawNew);
+            }
+
+            finalStr += (shortExplain ? "" : " = ");
+            nextRunAllowed = !shortExplain;
+        }
+
+
+        return finalStr + (shortExplain ? "" : result);
     }
 
     /// <summary>
