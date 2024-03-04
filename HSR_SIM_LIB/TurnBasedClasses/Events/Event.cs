@@ -68,8 +68,12 @@ public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit)
                     val = cFrm.Result;
                     ParentStep.Parent.Parent.LogDebug(cFrm.Explain());
                     break;
-                //else call function
+                //raw function
                 case Func<Event,double?> cFnc:
+                    val= cFnc(this);
+                    break;
+                //or declared function function
+                case CalculateValuePrc cFnc:
                     val= cFnc(this);
                     break;
                 default:
