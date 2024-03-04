@@ -15,9 +15,11 @@ namespace HSR_SIM_LIB.Utils;
 /// Result will be calculated once
 /// part of code got from https://stackoverflow.com/questions/34138314/creating-dynamic-formula
 /// </summary>
-public class Formula
+public class Formula : ICloneable
 {
+    //event where formula is used
     public Event EventRef { get; set; }
+
 
     public enum DynamicTargetEnm
     {
@@ -46,13 +48,13 @@ public class Formula
         public double? Result { get; set; }
         public string ReplaceExpression { get; init; }
         public Formula ResFormula { get; set; }
-        public List<Effect> TraceEffects { get; set; }
+        public List<Effect> TraceEffects { get; set; } = new List<Effect>();
     }
 
     /// <summary>
     /// This simply stores a variable name and its value so when this key is found in a expression it gets the value accordingly.
     /// </summary>
-    public Dictionary<string, VarVal> Variables { get; init; } = new();
+    public Dictionary<string, VarVal> Variables { get; set; } = new();
 
     /// <summary>
     /// return result of Formula
@@ -82,9 +84,15 @@ public class Formula
 
         string GetNextMethod(string pstr, int ndx, out int nextPos)
         {
+            if (ndx == -1)
+            {
+                nextPos = ndx;
+                return string.Empty;
+            }
+
             if (ndx + 1 >= pstr.Length)
             {
-                nextPos = 0;
+                nextPos = -1;
                 return String.Empty;
             }
 
@@ -113,61 +121,85 @@ public class Formula
 
         //calculate variables
         foreach (var variable in Variables.Where(x => x.Value.Result is null))
-        foreach (DynamicTargetEnm dynVar in (DynamicTargetEnm[])Enum.GetValues(typeof(DynamicTargetEnm)))
+        foreach (var dynVar in (DynamicTargetEnm[])Enum.GetValues(typeof(DynamicTargetEnm)))
         {
-            string expr = variable.Value.ReplaceExpression;
-            int ndx = expr.IndexOf(dynVar.ToString(), StringComparison.Ordinal);
-            if (ndx >= 0)
+            var expr = variable.Value.ReplaceExpression;
+            var ndx = expr.IndexOf(dynVar.ToString(), StringComparison.Ordinal);
+            if (ndx < 0) continue;
+            var methodNdx = expr.IndexOf('#') + 1;
+
+            var myFieldInfo = this.GetType().GetProperty(dynVar.ToString());
+
+            var initUnit = (Unit)myFieldInfo!.GetValue(this);
+            object finalMeth = initUnit;
+            var prevObject = finalMeth;
+            var nextMethod = GetNextMethod(expr, methodNdx, out methodNdx);
+            //parsing all method and properties line
+            while (nextMethod != string.Empty)
             {
-                int methodNdx = expr.IndexOf("#", StringComparison.Ordinal) + 1;
-
-                PropertyInfo myFieldInfo = this.GetType().GetProperty(dynVar.ToString());
-
-                Unit initUnit = (Unit)myFieldInfo!.GetValue(this);
-                object finalMeth = initUnit;
-                object prevObject = finalMeth;
-                string nextMethod = GetNextMethod(expr, methodNdx, out methodNdx);
-                //parsing all method and properties line
-                while (nextMethod != String.Empty)
+                var mInfo = finalMeth.GetType().GetMethod(nextMethod);
+                if (mInfo is not null)
                 {
-                    //TODO: check for params if current method is not standard(event)
-                    //TODO:and repeat GetNextMethod additional X times where x= method params-1(event already exists)
-                    MethodInfo mInfo = finalMeth.GetType().GetMethod(nextMethod);
-                    if (mInfo is not null)
+                    prevObject = finalMeth;
+                    object[] objArr = [];
+                    foreach (var prm in mInfo.GetParameters())
                     {
-                        prevObject = finalMeth;
-                        finalMeth = mInfo.Invoke(prevObject, [EventRef]);
-                        ;
+                        Array.Resize(ref objArr, objArr.Length + 1);
+                        if (prm.ParameterType == typeof(Event))
+                        {
+                            objArr[^1] = EventRef;
+                        }
+                        else if (prm.Name == "outputEffects")
+                        {
+                            objArr[^1] = variable.Value.TraceEffects;
+                        }
+                        else
+                        {
+                            var nextPrm = GetNextMethod(expr, methodNdx, out methodNdx);
+                            if (String.IsNullOrEmpty(nextPrm)) continue;
+                            //first search Type
+                            var searchType = Type.GetType(nextPrm);
+                            if (searchType != null)
+                            {
+                                objArr[^1] = searchType;
+                            }
+                            else
+                            {
+                                objArr[^1] = null;
+                            }
+                        }
                     }
 
-                    PropertyInfo pInfo = finalMeth.GetType().GetProperty(nextMethod);
-                    if (pInfo is not null)
-                    {
-                        prevObject = finalMeth;
-                        finalMeth = pInfo.GetValue(finalMeth);
-                    }
+                    finalMeth = mInfo.Invoke(prevObject, objArr);
+                }
 
-
-                    nextMethod = GetNextMethod(expr, methodNdx, out methodNdx);
+                PropertyInfo pInfo = finalMeth.GetType().GetProperty(nextMethod);
+                if (pInfo is not null)
+                {
+                    prevObject = finalMeth;
+                    finalMeth = pInfo.GetValue(finalMeth);
                 }
 
 
-                switch (finalMeth)
-                {
-                    case double ds:
-                        variable.Value.Result = ds;
-                        break;
-                    case Formula fs:
-                        variable.Value.Result = fs.Result;
-                        variable.Value.ResFormula = fs;
-                        break;
-                    case PropertyInfo pf:
-                        variable.Value.Result = (double)pf.GetValue(prevObject)!;
-                        break;
-                }
-
-                break;
+                nextMethod = GetNextMethod(expr, methodNdx, out methodNdx);
             }
+
+
+            switch (finalMeth)
+            {
+                case double ds:
+                    variable.Value.Result = ds;
+                    break;
+                case Formula fs:
+                    variable.Value.Result = fs.Result;
+                    variable.Value.ResFormula = fs;
+                    break;
+                case PropertyInfo pf:
+                    variable.Value.Result = (double)pf.GetValue(prevObject)!;
+                    break;
+            }
+
+            break;
         }
     }
 
@@ -232,58 +264,81 @@ public class Formula
             throw new Exception("The operation could not be completed, a result was not obtained.");
     }
 
-    private record ExplainRec(string Expr, Dictionary<string, VarVal> Dict)
+
+    public IEnumerable<Effect> DescendantsAndSelfEffects()
     {
-        public string Expression { get; set; } = Expr;
-        public Dictionary<string, VarVal> Variables { get; set; } = Dict;
+        foreach (var eff in Variables.Values.SelectMany(x=>x.TraceEffects))
+            yield return eff;
+        foreach (var formula in Variables.Values.Where(x=>x.ResFormula!=null).Select(x=>x.ResFormula))
+        {
+            foreach (var eff in formula.DescendantsAndSelfEffects())
+                yield return eff;
+        }
+    }
+
+    /// <summary>
+    /// Rec with Replace variables
+    /// </summary>
+    public record ReplacersRec
+    {
+        public List<VarVal> ReplacedExpressions { get; set; } = [];
+        public List<VarVal> ReplacedFormulas { get; set; } = [];
+        public List<VarVal> ReplacedRaw { get; set; } = [];
     }
 
     /// <summary>
     /// output formula 
     /// </summary>
-    /// <param name="shortExplain"></param>
-    /// <param name="pReplaceList"></param>
-    /// <param name="pFormulas"></param>
-    /// <param name="pResults"></param>
-    /// <param name="pRaw"></param>
-    /// <param name="pReplaceListNew"></param>
-    /// <param name="pFormulasNew"></param>
-    /// <param name="pResultsNew"></param>
-    /// <param name="pRawNew"></param>
+    /// <param name="shortExplain">is child explanation. will run 1 times</param>
+    /// <param name="replacedResults">previously made replacements of variables with the result of calculations</param>
+    /// <param name="replacedVariables">previously made replacements of variables with contents (formulas, etc.) </param>
+    /// <param name="newlyReplacedVariables">replacements made in child calculations, but not yet added to the main array</param>
     /// <returns></returns>
-    public string Explain(bool shortExplain = false, List<VarVal> pReplaceList = null, List<VarVal> pFormulas = null,
-        List<VarVal> pResults = null, List<VarVal> pRaw = null,
-        List<VarVal> pReplaceListNew = null, List<VarVal> pFormulasNew = null,
-        List<VarVal> pResultsNew = null, List<VarVal> pRawNew = null)
-    {
-        List<VarVal> parsedReplaceExpressions = pReplaceList ?? [];
-        List<VarVal> parsedFormulas = pFormulas ?? [];
-        List<VarVal> parsedResults = pResults ?? [];
-        List<VarVal> parsedRaw = pRaw ?? [];
+    public string Explain(
+        bool shortExplain = false,
+        List<VarVal> replacedResults = null,
+        ReplacersRec replacedVariables = null,
+        ReplacersRec newlyReplacedVariables = null)
 
-        //get allowed to replace values once per while run
-        List<VarVal> parsedReplaceExpressionsNew = pReplaceListNew ?? [];
-        List<VarVal> parsedFormulasNew = pFormulasNew ?? [];
-        List<VarVal> parsedResultsNew = pResultsNew ?? [];
-        List<VarVal> parsedRawNew = pRawNew ?? [];
+    {
+        replacedResults ??= [];
+        replacedVariables ??= new ReplacersRec();
+        newlyReplacedVariables ??= new ReplacersRec();
 
         bool nextRunAllowed = true;
+        //if short explain then always 1 explain iteration
+        bool firstRun = shortExplain;
 
         bool IncompleteLevel(Dictionary<string, VarVal> sVals)
         {
             return nextRunAllowed && sVals.Any(
-                x => (x.Value.ReplaceExpression != null && !parsedReplaceExpressions.Contains(x.Value))
-                     && (x.Value.ResFormula != null || !parsedFormulas.Contains(x.Value))
-                     || !parsedRaw.Contains(x.Value)
-                     || (x.Value.Result != null && !parsedResults.Contains(x.Value))
+                x => (x.Value.ReplaceExpression != null && !replacedVariables.ReplacedExpressions.Contains(x.Value))
+                     || (x.Value.ResFormula != null && !replacedVariables.ReplacedFormulas.Contains(x.Value))
+                     || !replacedVariables.ReplacedRaw.Contains(x.Value)
+                     || (x.Value.Result != null && !replacedResults.Contains(x.Value))
             );
         }
 
         var finalStr = String.Empty;
 
-
-        while (IncompleteLevel(Variables))
+        if (!shortExplain)
         {
+
+            var enumerable =  DescendantsAndSelfEffects().ToArray();
+            if (enumerable.Any())
+                finalStr += "Used effects:"+ Environment.NewLine;
+            //todo ORDER BY TYPE, BUFF/DEBUFF, AppliedDebuff or Passive and mark if got by condition
+            foreach (var effect in enumerable.Distinct())
+            {
+                finalStr += $"{effect.GetType().Name} for {effect.Value}"+ Environment.NewLine;
+            }
+
+
+        }
+
+        while (firstRun || IncompleteLevel(Variables))
+        {
+            firstRun = false;
             foreach (var lexeme in Expression.Split(new string[] { " " },
                          StringSplitOptions.RemoveEmptyEntries))
             {
@@ -291,50 +346,47 @@ public class Formula
                 {
                     //if expression exists and not handled
                     if (val.ReplaceExpression == lexeme)
-                        if (!parsedRaw.Contains(val))
-                            parsedRaw.Add(val);
-                    if (!parsedRaw.Contains(val))
+                        if (!replacedVariables.ReplacedRaw.Contains(val))
+                            replacedVariables.ReplacedRaw.Add(val);
+                    if (!replacedVariables.ReplacedRaw.Contains(val))
                     {
-                        if (!parsedRawNew.Contains(val))
-                            parsedRawNew.Add(val);
+                        if (!newlyReplacedVariables.ReplacedRaw.Contains(val))
+                            newlyReplacedVariables.ReplacedRaw.Add(val);
                         finalStr += lexeme + Strings.Space(1);
                     }
-                    else if (!String.IsNullOrEmpty(val.ReplaceExpression) && !parsedReplaceExpressions.Contains(val))
+                    else if (!String.IsNullOrEmpty(val.ReplaceExpression) &&
+                             !replacedVariables.ReplacedExpressions.Contains(val))
                     {
-                        if (!parsedReplaceExpressionsNew.Contains(val))
-                            parsedReplaceExpressionsNew.Add(val);
+                        if (!newlyReplacedVariables.ReplacedExpressions.Contains(val))
+                            newlyReplacedVariables.ReplacedExpressions.Add(val);
                         var valStr = val.ReplaceExpression;
                         finalStr += $"{valStr}" + Strings.Space(1);
                     }
-                    else if (val.ResFormula != null && !parsedFormulas.Contains(val))
+                    else if (val.ResFormula != null && !replacedVariables.ReplacedFormulas.Contains(val))
                     {
-                        /*
-                         * TODO: убрать () * 2 + () , т.к. на последней итерации Explain зовется когда IncompleteLevel =true
-                         * BladeAttack * 2 + BladeAttack
-                           = Attacker#GetAttackFs * 2 + Attacker#GetAttackFs
-                           = (1 + Attacker#Stats#AttackPrc * Attacker#Stats#BaseAttack ) * 2 + (1 + Attacker#Stats#AttackPrc * Attacker#Stats#BaseAttack )
-                           = (1 + 0,1080000063 * 1125,4319999999998 ) * 2 + (1 + 0,1080000063 * 1125,4319999999998 )
-                           = () * 2 + ()  = 1246,9786630902213 * 2 + 1246,9786630902213  = 3740,935989270664
-
-                         */
-                        var valStr = "(" + val.ResFormula.Explain(true, parsedReplaceExpressions, parsedFormulas,
-                                         parsedResults, parsedRaw, parsedReplaceExpressionsNew, parsedFormulasNew,
-                                         parsedResultsNew, parsedRawNew) +
+                        var valStr = "(" + val.ResFormula.Explain(true, replacedResults, replacedVariables,
+                                         newlyReplacedVariables) +
                                      ")";
                         if (!IncompleteLevel(val.ResFormula.Variables))
-                            if (!parsedFormulasNew.Contains(val))
-                                parsedFormulasNew.Add(val);
+                            if (!newlyReplacedVariables.ReplacedFormulas.Contains(val))
+                                newlyReplacedVariables.ReplacedFormulas.Add(val);
                         finalStr += $"{valStr}" + Strings.Space(1);
                     }
-                    else if (val.Result != null && !parsedResults.Contains(val))
+                    else if (val.Result != null && !replacedResults.Contains(val))
                     {
-                        if (!parsedResultsNew.Contains(val))
-                            parsedResultsNew.Add(val);
-                        finalStr += val.Result + Strings.Space(1);
+                        //add val to primary results array immediately
+                        if (!replacedResults.Contains(val))
+                            replacedResults.Add(val);
+                        //finalStr += val.Result + Strings.Space(1);
+                        finalStr += (val.TraceEffects.Any()
+                            ? "(" + String.Join("+", val.TraceEffects.Select(x => x.Value)) + ")"
+                            : val.Result) + Strings.Space(1);
                     }
                     else
                     {
-                        finalStr += val.Result + Strings.Space(1);
+                        finalStr += (val.TraceEffects.Any()
+                            ? "(" + String.Join("+", val.TraceEffects.Select(x => x.Value)) + ")"
+                            : val.Result) + Strings.Space(1);
                     }
                 }
                 else
@@ -343,15 +395,18 @@ public class Formula
                 }
             }
 
+            //Every iteration in main cycle add new items to main array
             if (!shortExplain)
             {
-                parsedReplaceExpressions.AddRange(parsedReplaceExpressionsNew);
-                parsedFormulas.AddRange(parsedFormulasNew);
-                parsedResults.AddRange(parsedResultsNew);
-                parsedRaw.AddRange(parsedRawNew);
+                replacedVariables.ReplacedExpressions.AddRange(newlyReplacedVariables.ReplacedExpressions);
+                newlyReplacedVariables.ReplacedExpressions.Clear();
+                replacedVariables.ReplacedFormulas.AddRange(newlyReplacedVariables.ReplacedFormulas);
+                newlyReplacedVariables.ReplacedFormulas.Clear();
+                replacedVariables.ReplacedRaw.AddRange(newlyReplacedVariables.ReplacedRaw);
+                newlyReplacedVariables.ReplacedRaw.Clear();
             }
 
-            finalStr += (shortExplain ? "" : " = ");
+            finalStr += (shortExplain ? "" : " = " + Environment.NewLine);
             nextRunAllowed = !shortExplain;
         }
 
@@ -359,27 +414,17 @@ public class Formula
         return finalStr + (shortExplain ? "" : result);
     }
 
-    /// <summary>
-    /// Add variables to the dynamic math formula. The variable should be properly declared.
-    /// </summary>
-    /// <param name="variableDeclaration">Should be declared as "VariableName=VALUE" without spaces</param>
-    public void AddVariable(string variableDeclaration)
-    {
-        if (!string.IsNullOrWhiteSpace(variableDeclaration))
-        {
-            var variable =
-                variableDeclaration.ToLower()
-                    .Split('='); //Let's make sure the variable's name is LOWER case and then get its name/value
-            string variableName = variable[0];
 
-            if (double.TryParse(variable[1], out var variableValue))
-                this.Variables.Add(variableName, new VarVal() { Result = variableValue });
-            else
-                throw new ArgumentException("Variable value is not a number");
-        }
-        else
+    public object Clone()
+    {
+        var newClone = (Formula)MemberwiseClone();
+        var oldVariables = newClone.Variables;
+        newClone.Variables = new Dictionary<string, VarVal>();
+        foreach (var oldVar in oldVariables)
         {
-            //Could throw an exception... or just ignore as it not important...
+            newClone.Variables[oldVar.Key] = oldVar.Value with { TraceEffects = new List<Effect>() };
         }
+
+        return newClone;
     }
 }

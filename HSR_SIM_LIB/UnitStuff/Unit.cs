@@ -254,7 +254,7 @@ public class Unit : CloneClass
 
     public double ResistsPenetration(ElementEnm elem, Event ent = null)
     {
-        return GetBuffSumByType(ent, typeof(EffElementalPenetration), elem);
+        return GetBuffSumByType(ent, typeof(EffElementalPenetration),elem:elem);
     }
 
     /// <summary>
@@ -269,7 +269,7 @@ public class Unit : CloneClass
         if (Fighter.Resists.Any(x => x.ResistType == elem))
             res += Fighter.Resists.First(x => x.ResistType == elem).ResistVal;
 
-        res += GetBuffSumByType(ent, typeof(EffElementalResist), elem);
+        res += GetBuffSumByType(ent, typeof(EffElementalResist), elem:elem);
         res += GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffAllDamageResist));
         return res;
     }
@@ -308,7 +308,7 @@ public class Unit : CloneClass
 
     public double GetElemBoostValue(ElementEnm elem, Event ent = null)
     {
-        return GetElemBoost(elem).Value + GetBuffSumByType(ent, typeof(EffElementalBoost), elem);
+        return GetElemBoost(elem).Value + GetBuffSumByType(ent, typeof(EffElementalBoost), elem:elem);
     }
 
 
@@ -354,13 +354,14 @@ public class Unit : CloneClass
     /// </summary>
     /// <param name="ent">Event ref for calculation</param>
     /// <param name="effTypeToSearch">Effect to search</param>
+    /// <param name="outputEffects">List of effect(!) DONT RENAME THIS PARAM. Formula class search it</param>
     /// <param name="elem">search by element (for example Elemental Damage boost)</param>
     /// <param name="excludePassive">Exclude passive buff for prevent recursion </param>
     /// <param name="buffType">Search by type: debuff,DoT,Buff</param>
     /// <param name="abilityType">search by ability type(for example Damage boost by ability)</param>
     /// <returns>double value(sum of effect values)</returns>
     public double GetBuffSumByType(Event ent = null,
-        Type effTypeToSearch= null, ElementEnm? elem = null,
+        Type effTypeToSearch= null,List<Effect> outputEffects=null,  ElementEnm? elem = null,
         List<PassiveBuff> excludePassive = null, Buff.BuffType? buffType = null,
         AbilityTypeEnm? abilityType = null)
     {
@@ -371,6 +372,8 @@ public class Unit : CloneClass
         foreach (var kp in effList)
         foreach (var effect in kp.Value)
         {
+            if (outputEffects!=null && !outputEffects.Contains(effect))
+                outputEffects.Add(effect);
             double finalValue;
             //if condition\passive buff is target check then recalculate value
             if (effect.CalculateValue != null && kp.Key is PassiveBuff { IsTargetCheck: true })
@@ -585,7 +588,7 @@ public class Unit : CloneClass
     /// <returns>double value:vulnerability</returns>
     public double GetElemVulnerability(ElementEnm attackElem, Event ent = null)
     {
-        return GetBuffSumByType(ent, typeof(EffElementalVulnerability), attackElem);
+        return GetBuffSumByType(ent, typeof(EffElementalVulnerability), elem:attackElem);
     }
 
     /// <summary>
@@ -772,14 +775,12 @@ public class Unit : CloneClass
         return new Formula()
         {
             EventRef = ent,
-            // + {DynamicTargetEnm.Attacker}#{nameof(GetBuffSumByType)}#{nameof(EffAtkPrc)} 
-            Expression =  $"1 + {DynamicTargetEnm.Attacker}#{nameof(Stats)}#{nameof(UnitStats.AttackPrc)} " +
+            Expression =  $"1 + {DynamicTargetEnm.Attacker}#{nameof(GetBuffSumByType)}#{typeof(EffAtkPrc).FullName} + {DynamicTargetEnm.Attacker}#{nameof(Stats)}#{nameof(UnitStats.AttackPrc)} " +
                           $"* {DynamicTargetEnm.Attacker}#{nameof(Stats)}#{nameof(UnitStats.BaseAttack)}"
           
         };
     }
-
-
+    
     public double GetBreakDmg(Event ent)
     {
         return GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffBreakDmgPrc)) + Stats.BreakDmgPrc;
