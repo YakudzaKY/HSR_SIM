@@ -11,7 +11,7 @@ public class SpaceSealingStation : DefaultRelicSet
         if (num >= 2) Parent.Parent.PassiveBuffs.Add(GetMod());
     }
 
-    public PassiveBuff GetMod()
+    private PassiveBuff GetMod()
     {
         return new PassiveBuff(Parent.Parent)
         {
