@@ -73,6 +73,10 @@ public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit)
                 case Func<Event,double?> cFnc:
                     val= cFnc(this);
                     break;
+                //else invoke delegate
+                case Delegate cDlg:
+                    val = (double?)cDlg.DynamicInvoke(this);
+                    break;
                 default:
                     throw new NotImplementedException();
             }

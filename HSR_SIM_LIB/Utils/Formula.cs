@@ -42,6 +42,7 @@ public class Formula : ICloneable
 
 
     private double? result;
+    private string expression;
 
     public record VarVal
     {
@@ -70,7 +71,11 @@ public class Formula : ICloneable
     /// <summary>
     /// The expression itself, each value and operation must be separated with SPACES. The expression does not support PARENTHESES at this point.
     /// </summary>
-    public string Expression { get; init; }
+    public string Expression
+    {
+        get => expression;
+        init => expression = value;
+    }
 
     /// <summary>
     /// Parse  for DynamicTargetEnm and create and calc variable
@@ -79,7 +84,20 @@ public class Formula : ICloneable
     {
         int GetNext(string pstr, int ndx)
         {
+            if (Expression.Length < ndx) return -1;
             return Expression.IndexOf(pstr.ToString(), ndx, StringComparison.Ordinal);
+        }
+
+        int CountCharsUsingFor(string source, char toFind, int startNdx, int endNdx)
+        {
+            int count = 0;
+            for (int n = startNdx; n < endNdx; n++)
+            {
+                if (source[n] == toFind)
+                    count++;
+            }
+
+            return count;
         }
 
         string GetNextMethod(string pstr, int ndx, out int nextPos)
@@ -103,6 +121,37 @@ public class Formula : ICloneable
             return pstr.Substring(ndx, methodEndNdx - ndx);
         }
 
+        //do replace on ( ) expressions
+        int expNdx = GetNext("(", 0);
+        while (expNdx >= 0)
+        {
+            int endNdx = 0;
+            int level = -1;
+            endNdx = expNdx;
+            while (level != 0)
+            {
+                endNdx = GetNext(")", endNdx + 1);
+                level = CountCharsUsingFor(Expression, '(', expNdx + 1, endNdx) -
+                        CountCharsUsingFor(Expression, ')', expNdx + 1, endNdx);
+            }
+
+            //save to repalcers
+            string varExpr = Expression.Substring(expNdx + 1, endNdx - expNdx - 1);
+            //will replace original str
+            string newExp = Expression.Substring(expNdx, endNdx - expNdx + 1).Replace(Strings.Space(1), String.Empty);
+            //remove old expression and replace with trimmed
+            expression = Expression.Remove(expNdx, endNdx - expNdx + 1).Insert(expNdx, newExp);
+            ;
+            var newVal = new VarVal()
+            {
+                ResFormula = new Formula()
+                    { Expression = varExpr, Variables = Variables.ToDictionary(), EventRef = EventRef }
+            };
+            newVal.Result = newVal.ResFormula.Result;
+            Variables.Add(newExp, newVal);
+            expNdx = GetNext("(", endNdx - (varExpr.Length + 2 /*( and ) deleted*/ - newExp.Length));
+        }
+
         //extract variables
         foreach (DynamicTargetEnm dynVar in (DynamicTargetEnm[])Enum.GetValues(typeof(DynamicTargetEnm)))
         {
@@ -124,7 +173,7 @@ public class Formula : ICloneable
         foreach (var dynVar in (DynamicTargetEnm[])Enum.GetValues(typeof(DynamicTargetEnm)))
         {
             var expr = variable.Value.ReplaceExpression;
-            var ndx = expr.IndexOf(dynVar.ToString(), StringComparison.Ordinal);
+            var ndx = expr?.IndexOf(dynVar.ToString(), StringComparison.Ordinal) ?? -1;
             if (ndx < 0) continue;
             var methodNdx = expr.IndexOf('#') + 1;
 
@@ -265,11 +314,11 @@ public class Formula : ICloneable
     }
 
 
-    public IEnumerable<Effect> DescendantsAndSelfEffects()
+    private IEnumerable<Effect> DescendantsAndSelfEffects()
     {
-        foreach (var eff in Variables.Values.SelectMany(x=>x.TraceEffects))
+        foreach (var eff in Variables.Values.SelectMany(x => x.TraceEffects))
             yield return eff;
-        foreach (var formula in Variables.Values.Where(x=>x.ResFormula!=null).Select(x=>x.ResFormula))
+        foreach (var formula in Variables.Values.Where(x => x.ResFormula != null).Select(x => x.ResFormula))
         {
             foreach (var eff in formula.DescendantsAndSelfEffects())
                 yield return eff;
@@ -304,7 +353,7 @@ public class Formula : ICloneable
         replacedResults ??= [];
         replacedVariables ??= new ReplacersRec();
         newlyReplacedVariables ??= new ReplacersRec();
-
+        replacedResults ??= [];
         bool nextRunAllowed = true;
         //if short explain then always 1 explain iteration
         bool firstRun = shortExplain;
@@ -312,10 +361,10 @@ public class Formula : ICloneable
         bool IncompleteLevel(Dictionary<string, VarVal> sVals)
         {
             return nextRunAllowed && sVals.Any(
-                x => (x.Value.ReplaceExpression != null && !replacedVariables.ReplacedExpressions.Contains(x.Value))
-                     || (x.Value.ResFormula != null && !replacedVariables.ReplacedFormulas.Contains(x.Value))
-                     || !replacedVariables.ReplacedRaw.Contains(x.Value)
-                     || (x.Value.Result != null && !replacedResults.Contains(x.Value))
+                x => ((x.Value.ReplaceExpression != null && !replacedVariables.ReplacedExpressions.Contains(x.Value))
+                      || (x.Value.ResFormula != null && !replacedVariables.ReplacedFormulas.Contains(x.Value))
+                      || !replacedVariables.ReplacedRaw.Contains(x.Value)
+                      || (x.Value.Result != null && !replacedResults.Contains(x.Value)))
             );
         }
 
@@ -323,17 +372,14 @@ public class Formula : ICloneable
 
         if (!shortExplain)
         {
-
-            var enumerable =  DescendantsAndSelfEffects().ToArray();
+            var enumerable = DescendantsAndSelfEffects().ToArray();
             if (enumerable.Any())
-                finalStr += "Used effects:"+ Environment.NewLine;
+                finalStr += "Used effects:" + Environment.NewLine;
             //todo ORDER BY TYPE, BUFF/DEBUFF, AppliedDebuff or Passive and mark if got by condition
             foreach (var effect in enumerable.Distinct())
             {
-                finalStr += $"{effect.GetType().Name} for {effect.Value}"+ Environment.NewLine;
+                finalStr += $"{effect.GetType().Name} for {effect.Value}" + Environment.NewLine;
             }
-
-
         }
 
         while (firstRun || IncompleteLevel(Variables))

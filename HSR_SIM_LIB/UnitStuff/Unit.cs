@@ -185,14 +185,18 @@ public class Unit : CloneClass
         newClone.fighter = null;
         //clone resources
         var oldRes = newClone.Resources;
-        newClone.Resources = new List<Resource>();
+        newClone.Resources = [];
         foreach (var res in oldRes) newClone.Resources.Add((Resource)res.Clone());
 
         //clone Buffs
         var oldBuffs = newClone.AppliedBuffs;
-        newClone.AppliedBuffs = new List<AppliedBuff>();
+        newClone.AppliedBuffs = [];
         foreach (var res in oldBuffs) newClone.AppliedBuffs.Add((AppliedBuff)res.Clone());
-
+        //clone Buffs
+        var oldPassives = newClone.PassiveBuffs;
+        newClone.PassiveBuffs = [];
+        foreach (var res in oldPassives) newClone.PassiveBuffs.Add((PassiveBuff)res.Clone());
+        
         //clone Skills
         var oldSkills = newClone.Skills;
         newClone.Skills = new List<Skill>();
@@ -200,13 +204,13 @@ public class Unit : CloneClass
 
         //clone BaseDamageBoost
         var oldBaseDmgBoost = newClone.BaseDamageBoost;
-        newClone.BaseDamageBoost = new List<DamageBoostRec>();
+        newClone.BaseDamageBoost = [];
         foreach (var res in oldBaseDmgBoost) newClone.BaseDamageBoost.Add(res with { });
 
         //clone Stats
         //var oldStats = newClone.Stats;
         newClone.Stats = (UnitStats)newClone.Stats.Clone();
-
+        
 
         return newClone;
     }
@@ -775,8 +779,8 @@ public class Unit : CloneClass
         return new Formula()
         {
             EventRef = ent,
-            Expression =  $"1 + {DynamicTargetEnm.Attacker}#{nameof(GetBuffSumByType)}#{typeof(EffAtkPrc).FullName} + {DynamicTargetEnm.Attacker}#{nameof(Stats)}#{nameof(UnitStats.AttackPrc)} " +
-                          $"* {DynamicTargetEnm.Attacker}#{nameof(Stats)}#{nameof(UnitStats.BaseAttack)}"
+            Expression =  $"1 + {DynamicTargetEnm.Attacker}#{nameof(GetBuffSumByType)}#{typeof(EffAtkPrc).FullName} + ( {DynamicTargetEnm.Attacker}#{nameof(Stats)}#{nameof(UnitStats.AttackPrc)} " +
+                          $"* {DynamicTargetEnm.Attacker}#{nameof(Stats)}#{nameof(UnitStats.BaseAttack)})"
           
         };
     }
