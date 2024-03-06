@@ -20,7 +20,7 @@ public class Buff(Unit sourceUnit, Buff reference = null) : CloneClass
     public List<Effect> Effects { get; set; } = [];
     public Unit CarrierUnit { get; set; }
     public Buff Reference { get; set; } = reference;
-    public Unit SourceUnit { get; set; } = sourceUnit;
+    public Unit SourceUnit { get; init; } = sourceUnit;
     public int Stack { get; set; } = 1;
     public CalculateIntVal CalculateStacks { get; init; }
     public int MaxStack { get; init; } = 1;
@@ -40,5 +40,25 @@ public class Buff(Unit sourceUnit, Buff reference = null) : CloneClass
 
 
         return newClone;
+    }
+
+    public string Explain()
+    {
+        var explainString = $"{GetType().Name} is {Type} {nameof(CarrierUnit)}:{CarrierUnit.PrintName}" +
+                            $" {nameof(SourceUnit)}:{SourceUnit.PrintName}";
+        if (this is not PassiveBuff passiveBuff) return explainString;
+        explainString += $" {nameof(passiveBuff.SourceObject)}={passiveBuff.SourceObject.GetType().Name}" +
+                         $" {nameof(passiveBuff.Target)}={passiveBuff.Target.GetType().Name}";
+        if (passiveBuff.Condition != null)
+        {
+            //additional info if condition
+            explainString +=
+                $" (!) Condition for buff: {nameof(PassiveBuff.IsTargetCheck)}={passiveBuff.IsTargetCheck} ";
+            explainString += $" {nameof(passiveBuff.Condition)} =( {passiveBuff.Condition.ConditionParam}" +
+                             $" {passiveBuff.Condition.ConditionExpression} {passiveBuff.Condition.Value}" +
+                             $" {passiveBuff.Condition.ElemValue} {passiveBuff.Condition.AppliedBuffValue})";
+        }
+
+        return explainString;
     }
 }

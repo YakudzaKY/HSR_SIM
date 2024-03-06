@@ -24,7 +24,7 @@ internal class IncessantRain : DefaultLightCone
         };
 
 
-        Parent.Parent.PassiveBuffs.Add(new PassiveBuff(Parent.Parent)
+        Parent.Parent.PassiveBuffs.Add(new PassiveBuff(Parent.Parent,this)
         {
             Effects = [new EffCritPrc { CalculateValue = CalcCrit }],
             Target = Parent.Parent,

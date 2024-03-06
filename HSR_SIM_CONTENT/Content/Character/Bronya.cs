@@ -144,7 +144,7 @@ public class Bronya : DefaultFighter
         //=====================
 
         if (ATraces.HasFlag(ATracesEnm.A6))
-            Parent.PassiveBuffs.Add(new PassiveBuff(Parent)
+            Parent.PassiveBuffs.Add(new PassiveBuff(Parent,this)
             {
                 Effects = [new EffAllDamageBoost { Value = 0.10 }],
                 Target = Parent.ParentTeam

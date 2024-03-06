@@ -200,7 +200,7 @@ public class SilverWolf : DefaultFighter
         Abilities.Add(userBanned);
 
         if (Parent.Rank >= 6)
-            Parent.PassiveBuffs.Add(new PassiveBuff(Parent)
+            Parent.PassiveBuffs.Add(new PassiveBuff(Parent,this)
             {
                 Effects = [new EffAllDamageBoost { CalculateValue = CalculateE6 }],
                 Target = Parent,

@@ -1,0 +1,83 @@
+﻿using HSR_SIM_LIB.Fighters;
+using HSR_SIM_LIB.Skills.EffectList;
+using HSR_SIM_LIB.TurnBasedClasses.Events;
+using HSR_SIM_LIB.Utils;
+using HSR_SIM_LIB.Utils.Utils;
+
+namespace HSR_SIM_LIB.UnitStuff;
+
+public static class UnitFormulas
+{
+    
+    public static  Formula GetAttack(Event ent,string prefix)
+    {
+        return new Formula()
+        {
+            EventRef = ent,
+            Expression =
+                $"1 + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAtkPrc).FullName} + ( {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Stats)}#{nameof(UnitStats.AttackPrc)} " +
+                $"* {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Stats)}#{nameof(UnitStats.BaseAttack)})"
+        };
+    }
+    
+    public static Formula GetMaxHp(Event ent)
+    {
+        return new Formula()
+        {
+            EventRef = ent,
+            Expression = $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Stats)}#{nameof(UnitStats.BaseMaxHp)} " +
+                         $" * (1 + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffMaxHpPrc).FullName} + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Stats)}#{nameof(UnitStats.MaxHpPrc)} )" +
+                         $" + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Stats)}#{nameof(UnitStats.MaxHpFix)} + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffMaxHp).FullName}  "
+        };
+        
+    }
+    
+    public static Formula GetCritDamage(Event ent)
+    {
+        return new Formula()
+        {
+            EventRef = ent,
+            Expression = $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Stats)}#{nameof(UnitStats.CritDmg)} " +
+                         $"  + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffCritDmg).FullName}  "
+        };
+     
+    }
+    
+    public static Formula CritHit(Event ent)
+    {
+        double critMod = ((DirectDamage)ent).IsCrit ? 1 : 0;
+        return new Formula()
+        {
+            EventRef = ent,
+            Expression = $"{critMod}" 
+                        
+        };
+     
+    }
+
+
+    public static Formula CritChance(Event ent)
+    {
+    
+        return new Formula()
+        {
+            EventRef = ent,
+            Expression = $" {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Stats)}#{nameof(UnitStats.CritChance)} " +
+                         $"  + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffCritPrc).FullName}  "
+        };
+    }
+    /// <summary>
+    /// Crit generating 
+    /// </summary>
+    /// <param name="ent"></param>
+    /// <returns></returns>
+    public static Formula GenerateCrit(Event ent)
+    {
+        Formula res = CritChance(ent);
+       ((DirectDamage)ent).IsCrit = ent.ParentStep.Parent.Parent.DevMode
+           ? DevModeUtils.IsCrit(ent)
+           : new MersenneTwister().NextDouble() <= res.Result;
+       
+       return res;
+    }
+}

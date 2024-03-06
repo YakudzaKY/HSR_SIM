@@ -66,4 +66,9 @@ public class Effect : CloneClass
     public virtual void BeforeRemove(Event ent, Buff buff, Unit target = null)
     {
     }
+
+    public string Explain()
+    {
+        return $"{this.GetType().Name} ({Value}) ";
+    }
 }

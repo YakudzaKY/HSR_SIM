@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -15,7 +16,7 @@ namespace HSR_SIM_LIB.Utils;
 /// Result will be calculated once
 /// part of code got from https://stackoverflow.com/questions/34138314/creating-dynamic-formula
 /// </summary>
-public class Formula : ICloneable
+public partial class Formula : ICloneable
 {
     //event where formula is used
     public Event EventRef { get; set; }
@@ -27,17 +28,22 @@ public class Formula : ICloneable
         Defender
     }
 
+    public record EffectTraceRec(Buff TraceBuff, Effect TraceEffect, double TraceTotalValue)
+    {
+        public Buff TraceBuff { get; } = TraceBuff;
+        public Effect TraceEffect { get; } = TraceEffect;
+        public double TraceTotalValue { get; } = TraceTotalValue;
+    }
+
     public Unit Attacker => EventRef.SourceUnit;
     public Unit Defender => EventRef.TargetUnit;
 
     public static String GenerateReference<T>(Expression<Action<T>> expression)
     {
-        var member = expression.Body as MethodCallExpression;
-
-        if (member != null)
+        if (expression.Body is MethodCallExpression member)
             return member.Method.Name;
 
-        throw new ArgumentException("Expression is not a method", "expression");
+        throw new ArgumentException("Expression is not a method", nameof(expression));
     }
 
 
@@ -49,7 +55,7 @@ public class Formula : ICloneable
         public double? Result { get; set; }
         public string ReplaceExpression { get; init; }
         public Formula ResFormula { get; set; }
-        public List<Effect> TraceEffects { get; set; } = new List<Effect>();
+        public List<EffectTraceRec> TraceEffects { get; init; } = [];
     }
 
     /// <summary>
@@ -85,7 +91,7 @@ public class Formula : ICloneable
         int GetNext(string pstr, int ndx)
         {
             if (Expression.Length < ndx) return -1;
-            return Expression.IndexOf(pstr.ToString(), ndx, StringComparison.Ordinal);
+            return Expression.IndexOf(pstr, ndx, StringComparison.Ordinal);
         }
 
         int CountCharsUsingFor(string source, char toFind, int startNdx, int endNdx)
@@ -125,7 +131,7 @@ public class Formula : ICloneable
         int expNdx = GetNext("(", 0);
         while (expNdx >= 0)
         {
-            int endNdx = 0;
+            int endNdx;
             int level = -1;
             endNdx = expNdx;
             while (level != 0)
@@ -135,13 +141,13 @@ public class Formula : ICloneable
                         CountCharsUsingFor(Expression, ')', expNdx + 1, endNdx);
             }
 
-            //save to repalcers
+            //save to replacers expression without closing parentheses
             string varExpr = Expression.Substring(expNdx + 1, endNdx - expNdx - 1);
             //will replace original str
-            string newExp = Expression.Substring(expNdx, endNdx - expNdx + 1).Replace(Strings.Space(1), String.Empty);
+            string newExp = Expression.Substring(expNdx, endNdx - expNdx + 1).Replace(" ", String.Empty);
             //remove old expression and replace with trimmed
             expression = Expression.Remove(expNdx, endNdx - expNdx + 1).Insert(expNdx, newExp);
-            ;
+
             var newVal = new VarVal()
             {
                 ResFormula = new Formula()
@@ -149,7 +155,8 @@ public class Formula : ICloneable
             };
             newVal.Result = newVal.ResFormula.Result;
             Variables.Add(newExp, newVal);
-            expNdx = GetNext("(", endNdx - (varExpr.Length + 2 /*( and ) deleted*/ - newExp.Length));
+            expNdx = GetNext("(",
+                endNdx - (varExpr.Length + 2 /*"(" and ")" deleted from string then add 2 to length*/ - newExp.Length));
         }
 
         //extract variables
@@ -159,11 +166,19 @@ public class Formula : ICloneable
 
             while (ndx >= 0)
             {
-                int endNdx = GetNext(Strings.Space(1), ndx);
-                if (endNdx < 0)
-                    endNdx = Expression.Length;
-                string varExpr = Expression.Substring(ndx, endNdx - ndx);
-                Variables.Add(varExpr, new VarVal() { ReplaceExpression = varExpr });
+                /*
+                 * since the value in parentheses has been compressed by removing a space,
+                 * we can check as follows: there will be a space before the variable, or an index =0
+                 */
+                if (ndx == 0 || Expression[ndx - 1] == ' ')
+                {
+                    int endNdx = GetNext(" ", ndx);
+                    if (endNdx < 0)
+                        endNdx = Expression.Length;
+                    string varExpr = Expression.Substring(ndx, endNdx - ndx);
+                    Variables.Add(varExpr, new VarVal() { ReplaceExpression = varExpr });
+                }
+
                 ndx = GetNext(dynVar.ToString(), ndx + 1);
             }
         }
@@ -186,7 +201,13 @@ public class Formula : ICloneable
             //parsing all method and properties line
             while (nextMethod != string.Empty)
             {
-                var mInfo = finalMeth.GetType().GetMethod(nextMethod);
+                MethodInfo mInfo;
+                //proxy to unit formulas
+                if (nextMethod == nameof(UnitFormulas))
+                    mInfo =  typeof(UnitFormulas).GetMethod(GetNextMethod(expr, methodNdx, out methodNdx));
+                else
+                    mInfo = finalMeth.GetType().GetMethod(nextMethod);
+           
                 if (mInfo is not null)
                 {
                     prevObject = finalMeth;
@@ -262,23 +283,20 @@ public class Formula : ICloneable
         double? calculationResult = null;
         var operation = string.Empty;
 
-        //This will be necessary for priorities operations such as parentheses, etc... It is not being used at this point.
-        List<double> aux = new List<double>();
-
         foreach (var lexeme in Expression.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries))
         {
             //If it is an operator
-            if (lexeme == "*" || lexeme == "/" || lexeme == "+" || lexeme == "-")
+            if (lexeme is "*" or "/" or "+" or "-")
             {
                 operation = lexeme;
             }
             else //It is a number or a variable
             {
-                double value = double.MinValue;
-                if (Variables.ContainsKey(lexeme)) //If it is a variable, let's get the variable value
-                    value = Variables[lexeme].Result ?? 0;
+                double value;
+                if (Variables.TryGetValue(lexeme, out var variable)) //If it is a variable, let's get the variable value
+                    value = variable.Result ?? 0;
                 else //It is just a number, let's just parse
-                    value = double.Parse(lexeme);
+                    value = double.Parse(lexeme, NumberStyles.Any, CultureInfo.InvariantCulture);
 
                 if (!calculationResult.HasValue) //No value has been assigned yet
                 {
@@ -314,7 +332,7 @@ public class Formula : ICloneable
     }
 
 
-    private IEnumerable<Effect> DescendantsAndSelfEffects()
+    private IEnumerable<EffectTraceRec> DescendantsAndSelfEffects()
     {
         foreach (var eff in Variables.Values.SelectMany(x => x.TraceEffects))
             yield return eff;
@@ -373,19 +391,26 @@ public class Formula : ICloneable
         if (!shortExplain)
         {
             var enumerable = DescendantsAndSelfEffects().ToArray();
+            if (EventRef is DirectDamage dd)
+                finalStr += $"(!) Critical hit={ dd.IsCrit} Crit rate= {UnitFormulas.CritChance(EventRef).Result}" + Environment.NewLine;
             if (enumerable.Any())
-                finalStr += "Used effects:" + Environment.NewLine;
-            //todo ORDER BY TYPE, BUFF/DEBUFF, AppliedDebuff or Passive and mark if got by condition
-            foreach (var effect in enumerable.Distinct())
+                finalStr += "-==USED BUFFS==-" + Environment.NewLine;
+
+            foreach (var buff in enumerable.Distinct().OrderBy(x => x.TraceEffect.GetType())
+                         .ThenBy(x => x.TraceBuff.GetType().Name))
             {
-                finalStr += $"{effect.GetType().Name} for {effect.Value}" + Environment.NewLine;
+                finalStr += $"# {buff.TraceBuff.Explain()} Effect:";
+                finalStr += $" {buff.TraceEffect.Explain()} Value= {buff.TraceTotalValue}" + Environment.NewLine;
             }
+
+            if (enumerable.Any())
+                finalStr += "-============-" + Environment.NewLine;
         }
 
         while (firstRun || IncompleteLevel(Variables))
         {
             firstRun = false;
-            foreach (var lexeme in Expression.Split(new string[] { " " },
+            foreach (var lexeme in Expression.Split([" "],
                          StringSplitOptions.RemoveEmptyEntries))
             {
                 if (Variables.TryGetValue(lexeme, out var val))
@@ -425,13 +450,13 @@ public class Formula : ICloneable
                             replacedResults.Add(val);
                         //finalStr += val.Result + Strings.Space(1);
                         finalStr += (val.TraceEffects.Any()
-                            ? "(" + String.Join("+", val.TraceEffects.Select(x => x.Value)) + ")"
+                            ? "(" + String.Join("+", val.TraceEffects.Select(x => x.TraceTotalValue)) + ")"
                             : val.Result) + Strings.Space(1);
                     }
                     else
                     {
                         finalStr += (val.TraceEffects.Any()
-                            ? "(" + String.Join("+", val.TraceEffects.Select(x => x.Value)) + ")"
+                            ? "(" + String.Join("+", val.TraceEffects.Select(x => x.TraceTotalValue)) + ")"
                             : val.Result) + Strings.Space(1);
                     }
                 }
@@ -468,7 +493,7 @@ public class Formula : ICloneable
         newClone.Variables = new Dictionary<string, VarVal>();
         foreach (var oldVar in oldVariables)
         {
-            newClone.Variables[oldVar.Key] = oldVar.Value with { TraceEffects = new List<Effect>() };
+            newClone.Variables[oldVar.Key] = oldVar.Value with { TraceEffects = new List<EffectTraceRec>() };
         }
 
         return newClone;

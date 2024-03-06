@@ -13,7 +13,7 @@ internal class InertSalsotto : DefaultRelicSet
 
     private PassiveBuff GetMod()
     {
-        return new PassiveBuff(Parent.Parent)
+        return new PassiveBuff(Parent.Parent,this)
         {
             Effects =
             [

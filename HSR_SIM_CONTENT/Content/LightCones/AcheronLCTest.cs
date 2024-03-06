@@ -24,7 +24,7 @@ internal class AcheronLcTst : DefaultLightCone
         };
 
 
-        Parent.Parent.PassiveBuffs.Add(new PassiveBuff(Parent.Parent)
+        Parent.Parent.PassiveBuffs.Add(new PassiveBuff(Parent.Parent,this)
         {
             Effects =
             [

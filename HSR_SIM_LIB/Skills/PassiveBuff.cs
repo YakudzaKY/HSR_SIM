@@ -33,9 +33,10 @@ public class PassiveBuff : Buff
 
     private bool truly;
 
-    public PassiveBuff(Unit parent) : base(parent)
+    public PassiveBuff(Unit parent,object sourceObject) : base(parent)
     {
         CarrierUnit = parent;
+        SourceObject = sourceObject;
     }
 
     public object Target { get; set; } //in most cases target==parent, but when target is full team then not
@@ -44,6 +45,7 @@ public class PassiveBuff : Buff
 
     public ConditionRec Condition { get; init; }
     public bool NeedRecalc { get; set; } = true;
+    public  object SourceObject { get; }
 
     /// <summary>
     ///     get list of affected targets

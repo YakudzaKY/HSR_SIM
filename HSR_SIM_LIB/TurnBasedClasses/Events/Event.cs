@@ -65,9 +65,9 @@ public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit)
                 //if calculate is formula then set reference and calc formula
                 case Formula cFrm:
                     CalculateValue = cFrm.Clone();
-                    cFrm.EventRef = this;
-                    val = cFrm.Result;
-                    ParentStep.Parent.Parent.LogDebug(cFrm.Explain());
+                    Formula newFrm = (Formula)CalculateValue;
+                    newFrm.EventRef = this;
+                    val = newFrm.Result;
                     break;
                 //else call function
                 case Func<Event,double?> cFnc:

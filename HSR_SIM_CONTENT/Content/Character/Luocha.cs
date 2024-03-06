@@ -216,7 +216,7 @@ public class Luocha : DefaultFighter
         //E1
         if (Parent.Rank >= 1)
             //CoL buffs
-            Parent.PassiveBuffs.Add(new PassiveBuff(Parent)
+            Parent.PassiveBuffs.Add(new PassiveBuff(Parent,this)
             {
                 Effects = [new EffAtkPrc { Value = 0.2 }],
                 CustomIconName = uniqueAppliedBuff.CustomIconName,
@@ -236,7 +236,7 @@ public class Luocha : DefaultFighter
             DebuffResists.Add(new DebuffResist { Debuff = typeof(EffCrowControl), ResistVal = 0.7 });
         //E2
         if (Parent.Rank >= 2)
-            Parent.PassiveBuffs.Add(new PassiveBuff(Parent)
+            Parent.PassiveBuffs.Add(new PassiveBuff(Parent,this)
             {
                 Effects = [new EffOutgoingHealingPrc { CalculateValue = CalculateE2 }],
                 Target = Parent,
@@ -246,7 +246,7 @@ public class Luocha : DefaultFighter
         //E4
         if (Parent.Rank >= 4)
             //CoL buffs
-            Parent.PassiveBuffs.Add(new PassiveBuff(Parent)
+            Parent.PassiveBuffs.Add(new PassiveBuff(Parent,this)
             {
                 Type = Buff.BuffType.Debuff,
                 Effects = [new EffAllDamageBoost { Value = -0.12 }],

@@ -263,21 +263,21 @@ public class Blade : DefaultFighter
         karmaWind.Events.Add(new DirectDamage(null, this, Parent)
         {
             OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
-            CalculateValue = new Formula()
+            CalculateValue = FighterUtils.DamageFormula(new Formula()
             {
-                Expression = $" BladeAttack + 2 + (1 + 3 + (3 * 2) + (3 - (2 + 2))) + (2 * 3) + 1 ",
+                Expression = $" BladeMaxHp * 0.4 ",
                 Variables = new Dictionary<string, Formula.VarVal>()
                 {
                     {
-                        "BladeAttack",
+                        "BladeMaxHp",
                         new()
                         {
                             ReplaceExpression =
-                                $"{Formula.DynamicTargetEnm.Attacker}#{Formula.GenerateReference<Unit>(x => x.GetAttackFs(null))}"
+                                $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)}"
                         }
                     }
                 }
-            }
+            })
         });
 
         Abilities.Add(karmaWind);
@@ -323,7 +323,7 @@ public class Blade : DefaultFighter
 //Ascended Traces
 //=====================
         if (ATraces.HasFlag(ATracesEnm.A2))
-            Parent.PassiveBuffs.Add(new PassiveBuff(Parent)
+            Parent.PassiveBuffs.Add(new PassiveBuff(Parent, this)
             {
                 Effects = new List<Effect> { new EffIncomeHealingPrc { Value = 0.20 } },
                 CustomIconName = "Traces\\A2",
@@ -337,7 +337,7 @@ public class Blade : DefaultFighter
                 }
             });
         if (ATraces.HasFlag(ATracesEnm.A6))
-            Parent.PassiveBuffs.Add(new PassiveBuff(Parent)
+            Parent.PassiveBuffs.Add(new PassiveBuff(Parent, this)
             {
                 Effects = new List<Effect>
                 {
