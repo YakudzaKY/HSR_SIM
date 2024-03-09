@@ -15,12 +15,12 @@ public class MechanicValChg : Event
 
     public override string GetDescription()
     {
-        return $"{SourceUnit?.Name:s} mechanic counter change on  {Val:f}";
+        return $"{SourceUnit?.Name:s} mechanic counter change on  {Value:f}";
     }
 
     public override void ProcEvent(bool revert)
     {
-        SourceUnit.Fighter.Mechanics.Values[AbilityValue] += (double)(revert ? -Val : Val);
+        SourceUnit.Fighter.Mechanics.Values[AbilityValue] += (double)(revert ? -Value : Value);
         base.ProcEvent(revert);
     }
 }

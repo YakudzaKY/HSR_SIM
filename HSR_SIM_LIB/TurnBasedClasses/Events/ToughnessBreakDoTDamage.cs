@@ -9,6 +9,6 @@ public class ToughnessBreakDoTDamage(Step parent, ICloneable source, Unit source
     public override string GetDescription()
     {
         return $"DoT(Shield Break) tick from {SourceUnit.Name}" +
-               $" overall={Val:f} to_barrier={RealBarrierVal:f} to_hp={RealVal:f}";
+               $" overall={Value:f} to_barrier={RealBarrierVal:f} to_hp={RealValue:f}";
     }
 }

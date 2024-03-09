@@ -66,7 +66,7 @@ public class MaraStruckSoldier : DefaultNPCFighter
         // Rejuvenate.Events.Add(new RemoveBuff(null,this,Parent) {TargetUnit = Parent,BuffToApply = uniqueBuff});
         Rejuvenate.Events.Add(new Healing(null, this, Parent) { CalculateValue = CalculateReHeal });
         Rejuvenate.Events.Add(new ResourceGain(null, this, Parent)
-            { ResType = Resource.ResourceType.Toughness, Val = Parent.Stats.MaxToughness });
+            { ResType = Resource.ResourceType.Toughness, Value = Parent.Stats.MaxToughness });
         Abilities.Add(Rejuvenate);
 
         Ability? myAttackAbility;
@@ -85,7 +85,7 @@ public class MaraStruckSoldier : DefaultNPCFighter
             myAttackAbility.Events.Add(new DirectDamage(null, this, Parent)
                 { CalculateValue = CalcMyAttack, CalculateProportion = proportion });
             myAttackAbility.Events.Add(
-                new EnergyGain(null, this, Parent) { Val = 15, CalculateProportion = proportion });
+                new EnergyGain(null, this, Parent) { Value = 15, CalculateProportion = proportion });
         }
 
         myAttackAbility.Events.Add(new AttemptEffect(null, this, Parent)

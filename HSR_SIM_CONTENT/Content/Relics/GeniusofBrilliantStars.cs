@@ -22,10 +22,10 @@ internal class GeniusofBrilliantStars : DefaultRelicSet
                 Effects = new List<Effect> { new EffDefIgnore { Value = 0.10 } },
                 IsTargetCheck = true,
                 Target = Parent.Parent,
-                Condition = new PassiveBuff.ConditionRec
+                WorkCondition = new Condition()
                 {
-                    ConditionParam = PassiveBuff.ConditionCheckParam.Weakness,
-                    ConditionExpression = PassiveBuff.ConditionCheckExpression.Exists,
+                    ConditionParam = Condition.ConditionCheckParam.Weakness,
+                    ConditionExpression = Condition.ConditionCheckExpression.Exists,
                     ElemValue = Unit.ElementEnm.Quantum
                 }
             });

@@ -34,11 +34,11 @@ internal class AcheronLcTst : DefaultLightCone
             ],
 
             Target = Parent.Parent,
-            Condition = new PassiveBuff.ConditionRec
+            WorkCondition = new Condition()
             {
                 AppliedBuffValue = aetherCodeDebuff,
-                ConditionExpression = PassiveBuff.ConditionCheckExpression.Exists,
-                ConditionParam = PassiveBuff.ConditionCheckParam.Buff
+                ConditionExpression = Condition.ConditionCheckExpression.Exists,
+                ConditionParam = Condition.ConditionCheckParam.Buff
             },
             IsTargetCheck = true
         });

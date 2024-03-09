@@ -12,18 +12,18 @@ public class Healing : Event
     public override string GetDescription()
     {
         return $"Healing {TargetUnit.Name} " +
-               $" overall={Val:f} to_hp={RealVal:f} Source: {Source.GetType().Name}";
+               $" overall={Value:f} to_hp={RealValue:f} Source: {Source.GetType().Name}";
     }
 
     public override void ProcEvent(bool revert)
     {
         var res = TargetUnit.GetRes(Resource.ResourceType.HP);
-        if (RealVal == null)
+        if (RealValue == null)
             //cant overheal
-            RealVal = Math.Min(TargetUnit.GetMaxHp(null) - res.ResVal, (double)Val);
+            RealValue = Math.Min(TargetUnit.GetMaxHp(null) - res.ResVal, (double)Value);
 
 
-        res.ResVal += (double)(revert ? -RealVal : RealVal);
+        res.ResVal += (double)(revert ? -RealValue : RealValue);
         base.ProcEvent(revert);
     }
 }

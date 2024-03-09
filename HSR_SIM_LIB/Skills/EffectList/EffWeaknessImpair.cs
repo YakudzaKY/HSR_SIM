@@ -13,13 +13,13 @@ public class EffWeaknessImpair : Effect
 
     public override void OnApply(Event ent, Buff buff, Unit target = null)
     {
-        (target ?? buff.CarrierUnit).ResetCondition(PassiveBuff.ConditionCheckParam.Weakness);
+        (target ?? buff.CarrierUnit).ResetCondition(Condition.ConditionCheckParam.Weakness);
         base.OnApply(ent, buff, target);
     }
 
     public override void OnRemove(Event ent, Buff buff, Unit target = null)
     {
-        (target ?? buff.CarrierUnit).ResetCondition(PassiveBuff.ConditionCheckParam.Weakness);
+        (target ?? buff.CarrierUnit).ResetCondition(Condition.ConditionCheckParam.Weakness);
         base.OnRemove(ent, buff, target);
     }
 }

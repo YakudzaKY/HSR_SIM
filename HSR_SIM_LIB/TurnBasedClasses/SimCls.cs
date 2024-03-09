@@ -129,7 +129,7 @@ public sealed class SimCls : ICloneable
     private void HandleZeroHp(Event ent)
     {
         //HP reduced to 0
-        if (ent.RealVal == 0 || ent.TargetUnit.GetRes(ResourceType.HP).ResVal != 0) return;
+        if (ent.RealValue == 0 || ent.TargetUnit.GetRes(ResourceType.HP).ResVal != 0) return;
         if (!UnitDefeatHandled(ent, ent.TargetUnit))
             ent.ChildEvents.Add(new Defeat(ent.ParentStep, ent.Source, ent.SourceUnit)
             {
@@ -183,21 +183,21 @@ public sealed class SimCls : ICloneable
                 HandleZeroHp(drain);
 
                 //THG reduced tp 0
-                if (drain.ResType == ResourceType.Toughness && drain.RealVal != 0 &&
+                if (drain.ResType == ResourceType.Toughness && drain.RealValue != 0 &&
                     drain.TargetUnit.GetRes(drain.ResType).ResVal == 0)
                 {
                     //temporary give back the THG for calculation break damage. will be reduce at the end
-                    drain.TargetUnit.GetRes(drain.ResType).ResVal += drain.RealVal ?? 0;
+                    drain.TargetUnit.GetRes(drain.ResType).ResVal += drain.RealValue ?? 0;
                     ToughnessBreak shieldBrkEvent = new(drain.ParentStep, drain.Source, drain.SourceUnit)
                     {
                         TargetUnit = drain.TargetUnit
                     };
-                    shieldBrkEvent.Val = FighterUtils.CalculateShieldBrokeDmg(shieldBrkEvent);
+                    shieldBrkEvent.Value = FighterUtils.CalculateShieldBrokeDmg(shieldBrkEvent);
                     drain.ChildEvents.Add(shieldBrkEvent);
 
 
                     //reduce THG  again
-                    drain.TargetUnit.GetRes(drain.ResType).ResVal -= drain.RealVal ?? 0;
+                    drain.TargetUnit.GetRes(drain.ResType).ResVal -= drain.RealValue ?? 0;
                 }
 
                 break;
@@ -364,7 +364,7 @@ public sealed class SimCls : ICloneable
                 if (reduceAv < 0)
                     reduceAv = 0;
                 newStep.Events.Add(new ModActionValue(newStep, this, null)
-                    { Val = reduceAv });
+                    { Value = reduceAv });
                 //set all Buffs are "old"
                 foreach (var mod in CurrentFight.Turn.Actor.AppliedBuffs) mod.IsOld = true;
                 //dot proc
@@ -394,7 +394,7 @@ public sealed class SimCls : ICloneable
                         {
                             TargetUnit = CurrentFight.Turn.Actor,
                             ResType = ResourceType.Toughness,
-                            Val = CurrentFight.Turn.Actor.Stats.MaxToughness
+                            Value = CurrentFight.Turn.Actor.Stats.MaxToughness
                         };
                         newStep.Events.Add(gainThg);
                     }

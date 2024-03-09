@@ -49,10 +49,10 @@ public static class GraphicsCls
                     i++;
                     if (ent is PartyResourceGain)
                         DrawText(PartyResourceX, PartyResourceY + (int)Math.Round(DefaultFontSize * 1.3 * i), gfx,
-                            $"+{ent.Val}", new SolidBrush(Color.Green));
+                            $"+{ent.Value}", new SolidBrush(Color.Green));
                     else
                         DrawText(PartyResourceX, PartyResourceY + (int)Math.Round(DefaultFontSize * 1.3 * i), gfx,
-                            $"-{ent.Val}", new SolidBrush(Color.DarkRed));
+                            $"-{ent.Value}", new SolidBrush(Color.DarkRed));
                 }
             }
 
@@ -371,10 +371,10 @@ public static class GraphicsCls
                 foreach (var ent in step.Events.Where(x => x.TargetUnit == unit &&
                                                            (x.IsDamageEvent
                                                             || x is Healing
-                                                            || (x is ResourceDrain && x.Val > 0 &&
+                                                            || (x is ResourceDrain && x.Value > 0 &&
                                                                 ((ResourceDrain)x).ResType is ResourceType.HP
                                                                 or ResourceType.Toughness)
-                                                            || (x is ResourceGain && x.Val > 0 &&
+                                                            || (x is ResourceGain && x.Value > 0 &&
                                                                 ((ResourceGain)x).ResType == ResourceType.HP)
                                                            )))
                 {
@@ -414,7 +414,7 @@ public static class GraphicsCls
                     DrawText(portraitPoint.X + DmgIconSize.Width
                         , pointY
                         , gfx
-                        , $"{(int)Math.Floor(ent.Val ?? 0):D}{(ent is DirectDamage damage && damage.IsCrit ? " crit" : "")}"
+                        , $"{(int)Math.Floor(ent.Value ?? 0):D}{(ent is DirectDamage damage && damage.IsCrit ? " crit" : "")}"
                         , new SolidBrush(nmbrColor)
                         , new Font("Tahoma", BarFontSize, FontStyle.Bold));
 
@@ -510,9 +510,9 @@ public static class GraphicsCls
             if (step.Parent.CurrentFight?.CurrentWave != null)
             {
                 Color fntColor;
-                if (step.Events.Any(x => x is ModActionValue && x.Val < 0 && x.TargetUnit == unit))
+                if (step.Events.Any(x => x is ModActionValue && x.Value < 0 && x.TargetUnit == unit))
                     fntColor = Color.Red;
-                else if (step.Events.Any(x => x is ModActionValue && x.Val > 0 && x.TargetUnit == unit))
+                else if (step.Events.Any(x => x is ModActionValue && x.Value > 0 && x.TargetUnit == unit))
                     fntColor = Color.GreenYellow;
                 else
                     fntColor = Color.Violet;

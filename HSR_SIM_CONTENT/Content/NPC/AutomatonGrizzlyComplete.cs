@@ -37,7 +37,7 @@ internal class AutomatonGrizzlyComplete : DefaultNPCBossFIghter
         //dmg events
         myAttackAbility.Events.Add(new DirectDamage(null, this, Parent)
             { CalculateValue = CalcMyAttack });
-        myAttackAbility.Events.Add(new EnergyGain(null, this, Parent) { Val = 10 });
+        myAttackAbility.Events.Add(new EnergyGain(null, this, Parent) { Value = 10 });
         Abilities.Add(myAttackAbility);
     }
 

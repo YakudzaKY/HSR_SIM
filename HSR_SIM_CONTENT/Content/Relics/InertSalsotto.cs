@@ -23,10 +23,10 @@ internal class InertSalsotto : DefaultRelicSet
             CustomIconName = "gear\\" + GetType().ToString().Split('.').Last(),
 
             Target = Parent.Parent,
-            Condition = new PassiveBuff.ConditionRec
+            WorkCondition = new Condition()
             {
-                ConditionParam = PassiveBuff.ConditionCheckParam.CritRate,
-                ConditionExpression = PassiveBuff.ConditionCheckExpression.EqualOrMore,
+                ConditionParam = Condition.ConditionCheckParam.CritRate,
+                ConditionExpression = Condition.ConditionCheckExpression.EqualOrMore,
                 Value = 0.50
             }
         };

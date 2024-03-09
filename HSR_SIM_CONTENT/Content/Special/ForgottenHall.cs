@@ -23,7 +23,7 @@ public class ForgottenHall : DefaultNPCFighter
         };
         //dmg events
         IncreaseCycle.Events.Add(new IncreaseLevel(null, this, Parent)
-            { Val = 1, TargetType = TargetTypeEnm.Self });
+            { Value = 1, TargetType = TargetTypeEnm.Self });
 
         IncreaseCycle.Events.Add(new ApplyBuff(null, this, Parent)
         {
@@ -49,7 +49,7 @@ public class ForgottenHall : DefaultNPCFighter
                     TargetUnit = unit,
                     CanSetToZero = true,
                     ResType = Resource.ResourceType.HP,
-                    Val = unit.GetRes(Resource.ResourceType.HP).ResVal
+                    Value = unit.GetRes(Resource.ResourceType.HP).ResVal
                 };
 
                 ent.ChildEvents.Add(newEvent);

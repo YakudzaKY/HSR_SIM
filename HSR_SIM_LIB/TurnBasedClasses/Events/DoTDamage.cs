@@ -13,7 +13,7 @@ public class DoTDamage(Step parent, ICloneable source, Unit sourceUnit, Unit.Ele
     public override string GetDescription()
     {
         return $"DoT tick from {SourceUnit.Name}" +
-               $" overall={Val:f} to_barier={RealBarrierVal:f} to_hp={RealVal:f}";
+               $" overall={Value:f} to_barier={RealBarrierVal:f} to_hp={RealValue:f}";
     }
 
     public override void ProcEvent(bool revert)

@@ -68,12 +68,12 @@ public class Bronya : DefaultFighter
         };
         //dmg events
         windriderBullet.Events.Add(new MechanicValChg(null, this, Parent)
-            { AbilityValue = windriderBullet, Val = 1 });
+            { AbilityValue = windriderBullet, Value = 1 });
         windriderBullet.Events.Add(new DirectDamage(null, this, Parent)
             { CalculateValue = CalculateBasicDmg });
-        windriderBullet.Events.Add(new ToughnessShred(null, this, Parent) { Val = 30 });
+        windriderBullet.Events.Add(new ToughnessShred(null, this, Parent) { Value = 30 });
         windriderBullet.Events.Add(new EnergyGain(null, this, Parent)
-            { Val = 20, TargetUnit = Parent });
+            { Value = 20, TargetUnit = Parent });
         Mechanics.AddVal(windriderBullet);
 
         Abilities.Add(windriderBullet);
@@ -101,7 +101,7 @@ public class Bronya : DefaultFighter
             }
         });
         ability.Events.Add(new EnergyGain(null, this, Parent)
-            { Val = 30, TargetUnit = Parent });
+            { Value = 30, TargetUnit = Parent });
         Abilities.Add(ability);
 
 
@@ -134,7 +134,7 @@ public class Bronya : DefaultFighter
         };
         ultimate.Events.Add(ultimateBuff);
         ultimate.Events.Add(new EnergyGain(null, this, Parent)
-            { Val = 5, TargetUnit = Parent });
+            { Value = 5, TargetUnit = Parent });
 
         Abilities.Add(ultimate);
 
@@ -176,7 +176,7 @@ public class Bronya : DefaultFighter
             step.Events.Add(new ModActionValue(step, this, Parent)
                 { CalculateValue = CalcTalentAV, TargetUnit = Parent });
             step.Events.Add(new MechanicValChg(step, this, Parent)
-                { AbilityValue = windriderBullet, Val = -Mechanics.Values[windriderBullet] });
+                { AbilityValue = windriderBullet, Value = -Mechanics.Values[windriderBullet] });
         }
 
         base.DefaultFighter_HandleStep(step);

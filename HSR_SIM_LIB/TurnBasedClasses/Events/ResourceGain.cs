@@ -14,21 +14,21 @@ public class ResourceGain : Event
 
     public override string GetDescription()
     {
-        return TargetUnit.Name + " res gain : " + Val + " " + ResType + "(by " + SourceUnit.Name + ")";
+        return TargetUnit.Name + " res gain : " + Value + " " + ResType + "(by " + SourceUnit.Name + ")";
     }
 
     public override void ProcEvent(bool revert)
     {
         var res = TargetUnit.GetRes(ResType);
         //Resource drain
-        RealVal ??= ResType switch
+        RealValue ??= ResType switch
         {
-            Resource.ResourceType.Toughness => Math.Min((double)Val, TargetUnit.Stats.MaxToughness - res.ResVal),
-            Resource.ResourceType.HP => Math.Min(TargetUnit.GetMaxHp(null) - res.ResVal, (double)Val),
-            Resource.ResourceType.Energy => Math.Min((double)Val, TargetUnit.Stats.BaseMaxEnergy - res.ResVal),
-            _ => Val
+            Resource.ResourceType.Toughness => Math.Min((double)Value, TargetUnit.Stats.MaxToughness - res.ResVal),
+            Resource.ResourceType.HP => Math.Min(TargetUnit.GetMaxHp(null) - res.ResVal, (double)Value),
+            Resource.ResourceType.Energy => Math.Min((double)Value, TargetUnit.Stats.BaseMaxEnergy - res.ResVal),
+            _ => Value
         };
-        res.ResVal += (double)(revert ? -RealVal : RealVal);
+        res.ResVal += (double)(revert ? -RealValue : RealValue);
         base.ProcEvent(revert);
     }
 }

@@ -324,12 +324,12 @@ public class Unit : CloneClass
     /// <param name="effTypeToSearch">Effect to search</param>
     /// <param name="elem">search by element (for example Elemental Damage boost)</param>
     /// <param name="ent">Event ref for calculation</param>
-    /// <param name="excludePassive">Exclude passive buff for prevent recursion </param>
+    /// <param name="excludeCondition"></param>
     /// <param name="buffType">Search by type: debuff,DoT,Buff</param>
     /// <param name="abilityType">search by ability type(for example Damage boost by ability)</param>
     /// <returns>List of buffs that affect Unit</returns>
     private List<KeyValuePair<Buff, List<Effect>>> GetBuffEffectsByType(Type effTypeToSearch,
-        ElementEnm? elem = null, Event ent = null, List<PassiveBuff> excludePassive = null,
+        ElementEnm? elem = null, Event ent = null, List<Condition> excludeCondition = null,
         Buff.BuffType? buffType = null, AbilityTypeEnm? abilityType = null)
     {
         List<KeyValuePair<Buff, List<Effect>>> res = new();
@@ -337,7 +337,7 @@ public class Unit : CloneClass
         List<Buff> buffList = new();
         //get all mods to check
         buffList.AddRange(AppliedBuffs.Where(x => buffType is null || x.Type == buffType));
-        foreach (var passiveBuff in GetPassivesForUnit(this, effTypeToSearch, excludePassive, ent, buffType))
+        foreach (var passiveBuff in GetPassivesForUnit(this, effTypeToSearch, excludeCondition, ent, buffType))
             buffList.Add(passiveBuff);
 
         foreach (var mod in buffList)
@@ -362,18 +362,18 @@ public class Unit : CloneClass
     /// <param name="effTypeToSearch">Effect to search</param>
     /// <param name="outputEffects">List of effect(!) DONT RENAME THIS PARAM. Formula class search it</param>
     /// <param name="elem">search by element (for example Elemental Damage boost)</param>
-    /// <param name="excludePassive">Exclude passive buff for prevent recursion </param>
+    /// <param name="excludeCondition">Exclude passive buff for prevent recursion </param>
     /// <param name="buffType">Search by type: debuff,DoT,Buff</param>
     /// <param name="abilityType">search by ability type(for example Damage boost by ability)</param>
     /// <returns>double value(sum of effect values)</returns>
     public double GetBuffSumByType(Event ent = null,
         Type effTypeToSearch = null, List<EffectTraceRec> outputEffects = null, ElementEnm? elem = null,
-        List<PassiveBuff> excludePassive = null, Buff.BuffType? buffType = null,
+        List<Condition> excludeCondition = null, Buff.BuffType? buffType = null,
         AbilityTypeEnm? abilityType = null)
     {
         double res = 0;
         var effList =
-            GetBuffEffectsByType(effTypeToSearch, elem, ent, excludePassive, buffType, abilityType);
+            GetBuffEffectsByType(effTypeToSearch, elem, ent, excludeCondition, buffType, abilityType);
 
         foreach (var kp in effList)
         foreach (var effect in kp.Value)
@@ -405,19 +405,20 @@ public class Unit : CloneClass
     /// <param name="passiveBuffs">List of buffs(can be from other unit)</param>
     /// <param name="targetForBuff">Target who will be checked for every buff</param>
     /// <param name="effTypeToSearch">effect type to search</param>
-    /// <param name="excludeCondBuff">list of buffs we need exclude (prevent from recursion)</param>
+    /// <param name="excludeCondition"></param>
     /// <param name="ent">reference to Event</param>
+    /// <param name="buffType"></param>
     /// <returns></returns>
     private IEnumerable<PassiveBuff> GetPassivesForUnitByList(List<PassiveBuff> passiveBuffs, Unit targetForBuff,
         Type effTypeToSearch,
-        List<PassiveBuff> excludeCondBuff, Event ent, Buff.BuffType? buffType)
+        List<Condition> excludeCondition, Event ent, Buff.BuffType? buffType)
     {
         var res =
             from passiveBuff in passiveBuffs
                 .Where(z => (z.Type == buffType || buffType is null) &&
                             z.Effects.Any(y => effTypeToSearch == null || y.GetType() == effTypeToSearch)
-                            && (excludeCondBuff == null || !excludeCondBuff.Contains(z)))
-            where passiveBuff.UnitIsAffected(this) && passiveBuff.Truly(targetForBuff, excludeCondBuff, ent)
+                            && (excludeCondition == null || !excludeCondition.Contains(z.WorkCondition)))
+            where passiveBuff.UnitIsAffected(this) && (passiveBuff.WorkCondition?.Truly(passiveBuff,targetForBuff, excludeCondition, ent)??true)
             select passiveBuff;
         return res;
     }
@@ -427,7 +428,7 @@ public class Unit : CloneClass
     /// </summary>
     /// <returns></returns>
     public List<PassiveBuff> GetPassivesForUnit(Unit targetForBuff, Type effTypeToSearch,
-        List<PassiveBuff> excludeCondBuff, Event ent, Buff.BuffType? buffType)
+        List<Condition> excludeCondition, Event ent, Buff.BuffType? buffType)
     {
         List<PassiveBuff> res = [];
         if (ParentTeam == null)
@@ -436,7 +437,7 @@ public class Unit : CloneClass
         foreach (var unit in ParentTeam.ParentSim.AllUnits.Where(x => x.IsAlive))
             if (unit.PassiveBuffs.Any())
                 res.AddRange(GetPassivesForUnitByList(unit.PassiveBuffs,
-                    targetForBuff, effTypeToSearch, excludeCondBuff, ent, buffType));
+                    targetForBuff, effTypeToSearch, excludeCondition, ent, buffType));
 
         return res;
     }
@@ -463,8 +464,8 @@ public class Unit : CloneClass
     {
         foreach (var effect in appliedBuff.Effects) effect.BeforeApply(ent, appliedBuff);
         AppliedBuffs.Add(appliedBuff);
-        ResetCondition(ConditionCheckParam.Buff);
-        if (appliedBuff.Type != Buff.BuffType.Buff) ResetCondition(ConditionCheckParam.AnyDebuff);
+        ResetCondition(Condition.ConditionCheckParam.Buff);
+        if (appliedBuff.Type != Buff.BuffType.Buff) ResetCondition(Condition.ConditionCheckParam.AnyDebuff);
         foreach (var effect in appliedBuff.Effects) effect.OnApply(ent, appliedBuff);
     }
 
@@ -523,8 +524,8 @@ public class Unit : CloneClass
             AppliedBuffs.Add(foundBuff);
         }
 
-        ResetCondition(ConditionCheckParam.Buff);
-        if (appliedBuff.Type != Buff.BuffType.Buff) ResetCondition(ConditionCheckParam.AnyDebuff);
+        ResetCondition(Condition.ConditionCheckParam.Buff);
+        if (appliedBuff.Type != Buff.BuffType.Buff) ResetCondition(Condition.ConditionCheckParam.AnyDebuff);
         foreach (var effect in foundBuff.Effects) effect.OnApply(ent, foundBuff);
         //reset duration
         foundBuff.IsOld = false; //renew the flag
@@ -550,8 +551,8 @@ public class Unit : CloneClass
             res = foundBuff;
         }
 
-        ResetCondition(ConditionCheckParam.Buff);
-        if (appliedBuff.Type != Buff.BuffType.Buff) ResetCondition(ConditionCheckParam.AnyDebuff);
+        ResetCondition(Condition.ConditionCheckParam.Buff);
+        if (appliedBuff.Type != Buff.BuffType.Buff) ResetCondition(Condition.ConditionCheckParam.AnyDebuff);
 
         return res;
     }
@@ -683,24 +684,24 @@ public class Unit : CloneClass
     }
 
      
-    public double GetCritRate(Event ent, List<PassiveBuff> excludeCondBuff = null)
+    public double GetCritRate(Event ent, List<Condition> excludeCondition = null)
     {
         return Stats.CritChance +
-               GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffCritPrc), excludePassive: excludeCondBuff);
+               GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffCritPrc), excludeCondition: excludeCondition);
     }
 
-    public double GetCritDamage(Event ent, List<PassiveBuff> excludeCondBuff = null)
+    public double GetCritDamage(Event ent, List<Condition> excludeCondition = null)
     {
         return Stats.CritDmg +
-               GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffCritDmg), excludePassive: excludeCondBuff);
+               GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffCritDmg), excludeCondition: excludeCondition);
     }
 
-    public double GetMaxHp(Event ent, List<PassiveBuff> excludeCondBuff = null)
+    public double GetMaxHp(Event ent, List<Condition> excludeCondition = null)
     {
         return Stats.BaseMaxHp *
-               (1 + GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffMaxHpPrc), excludePassive: excludeCondBuff) +
+               (1 + GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffMaxHpPrc), excludeCondition: excludeCondition) +
                 Stats.MaxHpPrc) +
-               GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffMaxHp), excludePassive: excludeCondBuff) +
+               GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffMaxHp), excludeCondition: excludeCondition) +
                Stats.MaxHpFix;
     }
 
@@ -721,23 +722,23 @@ public class Unit : CloneClass
         return GetInitialBaseActionValue(ent) - GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffReduceBAV));
     }
 
-    public double GetHpPrc(Event ent, List<PassiveBuff> excludeCondBuff = null)
+    public double GetHpPrc(Event ent, List<Condition> excludeCondition = null)
     {
-        return GetRes(ResourceType.HP).ResVal / GetMaxHp(ent, excludeCondBuff);
+        return GetRes(ResourceType.HP).ResVal / GetMaxHp(ent, excludeCondition);
     }
 
-    public double GetSpeed(Event ent, List<PassiveBuff> excludeCondBuff = null)
+    public double GetSpeed(Event ent, List<Condition> excludeCondition = null)
     {
         return Stats.BaseSpeed *
-               (1 + GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffSpeedPrc), excludePassive: excludeCondBuff) +
+               (1 + GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffSpeedPrc), excludeCondition: excludeCondition) +
                 Stats.SpeedPrc) +
-               GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffSpeed), excludePassive: excludeCondBuff) +
+               GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffSpeed), excludeCondition: excludeCondition) +
                Stats.SpeedFix;
     }
 
-    public void ResetCondition(ConditionCheckParam chkPrm)
+    public void ResetCondition(Condition.ConditionCheckParam chkPrm)
     {
-        foreach (var cb in PassiveBuffs.Where(x => x.Condition?.ConditionParam == chkPrm)) cb.NeedRecalc = true;
+        foreach (var cb in PassiveBuffs.Where(x => x.WorkCondition?.ConditionParam == chkPrm)) cb.WorkCondition.NeedRecalc = true;
     }
 
     private double GetInitialBaseActionValue(Event ent)
@@ -795,13 +796,13 @@ public class Unit : CloneClass
         return GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffBreakDmgPrc)) + Stats.BreakDmgPrc;
     }
 
-    public List<ElementEnm> GetWeaknesses(Event ent, List<PassiveBuff> excludeCondBuff = null)
+    public List<ElementEnm> GetWeaknesses(Event ent, List<Condition> excludeCondition = null)
     {
         List<ElementEnm> res = new();
         //add native weakness to result
         res.AddRange(Fighter.NativeWeaknesses);
         //grab weakness from debuffs
-        var elems = GetBuffEffectsByType(typeof(EffWeaknessImpair), ent: ent, excludePassive: excludeCondBuff)
+        var elems = GetBuffEffectsByType(typeof(EffWeaknessImpair), ent: ent, excludeCondition: excludeCondition)
             .Select(x => x.Value);
         foreach (var lst in elems) res.AddRange(lst.Select(x => ((EffWeaknessImpair)x).Element));
 

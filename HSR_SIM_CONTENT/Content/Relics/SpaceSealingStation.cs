@@ -18,10 +18,10 @@ public class SpaceSealingStation : DefaultRelicSet
             Effects = new List<Effect> { new EffAtkPrc { Value = 0.12 } },
             CustomIconName = "gear\\" + GetType().ToString().Split('.').Last(),
             Target = Parent.Parent,
-            Condition = new PassiveBuff.ConditionRec
+            WorkCondition = new Condition()
             {
-                ConditionParam = PassiveBuff.ConditionCheckParam.Spd,
-                ConditionExpression = PassiveBuff.ConditionCheckExpression.EqualOrMore,
+                ConditionParam = Condition.ConditionCheckParam.Spd,
+                ConditionExpression = Condition.ConditionCheckExpression.EqualOrMore,
                 Value = 120
                
             }

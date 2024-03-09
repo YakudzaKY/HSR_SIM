@@ -126,7 +126,7 @@ public class SilverWolf : DefaultFighter
         {
             OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
             ResType = Resource.ResourceType.Toughness,
-            Val = 60
+            Value = 60
         });
 
         Abilities.Add(ability);
@@ -147,9 +147,9 @@ public class SilverWolf : DefaultFighter
                 { CalculateValue = CalculateBasicDmg, CalculateProportion = proportion });
 
             systemWarning.Events.Add(new ToughnessShred(null, this, Parent)
-                { Val = 30, CalculateProportion = proportion });
+                { Value = 30, CalculateProportion = proportion });
             systemWarning.Events.Add(new EnergyGain(null, this, Parent)
-                { Val = 20, TargetUnit = Parent, CalculateProportion = proportion });
+                { Value = 20, TargetUnit = Parent, CalculateProportion = proportion });
         }
 
         systemWarning.Events.Add(trgEnt);
@@ -171,10 +171,10 @@ public class SilverWolf : DefaultFighter
         //dmg events
         allowChanges.Events.Add(new DirectDamage(null, this, Parent)
             { CalculateValue = CalculateAbilityDmg });
-        allowChanges.Events.Add(new ToughnessShred(null, this, Parent) { Val = 60 });
+        allowChanges.Events.Add(new ToughnessShred(null, this, Parent) { Value = 60 });
         allowChanges.Events.Add(trgEnt);
         allowChanges.Events.Add(new EnergyGain(null, this, Parent)
-            { Val = 30, TargetUnit = Parent });
+            { Value = 30, TargetUnit = Parent });
         Abilities.Add(allowChanges);
 
         //User Banned
@@ -191,10 +191,10 @@ public class SilverWolf : DefaultFighter
         //dmg events
         userBanned.Events.Add(new DirectDamage(null, this, Parent)
             { CalculateValue = CalculateUltimateDmg });
-        userBanned.Events.Add(new ToughnessShred(null, this, Parent) { Val = 90 });
+        userBanned.Events.Add(new ToughnessShred(null, this, Parent) { Value = 90 });
         userBanned.Events.Add(trgEnt);
         ultimateHitLastEvent = new EnergyGain(null, this, Parent)
-            { Val = 5, TargetUnit = Parent };
+            { Value = 5, TargetUnit = Parent };
         userBanned.Events.Add(ultimateHitLastEvent);
         //for E4
         Abilities.Add(userBanned);
@@ -276,7 +276,7 @@ public class SilverWolf : DefaultFighter
             if (Parent.Rank >= 1)
                 for (var i = 0; i < debuffs; i++)
                     ent.ChildEvents.Add(new EnergyGain(ent.ParentStep, this, Parent)
-                        { TargetUnit = Parent, Val = 7 });
+                        { TargetUnit = Parent, Value = 7 });
             if (Parent.Rank >= 4)
                 for (var i = 0; i < debuffs; i++)
                     ent.ChildEvents.Add(new DirectDamage(ent.ParentStep, this, Parent)

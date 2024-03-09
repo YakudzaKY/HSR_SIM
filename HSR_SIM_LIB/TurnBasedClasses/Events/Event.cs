@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.UnitStuff;
@@ -13,7 +14,8 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 /// </summary>
 public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit) : CloneClass
 {
-    public double CalculateProportion { get; set; }//todo:delete
+    public double CalculateProportion { get; set; } //todo:delete
+
     public delegate IEnumerable<Unit> CalculateTargetPrc();
 
     public delegate double? CalculateValuePrc(Event ent);
@@ -22,7 +24,7 @@ public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit)
     private readonly int procRatio = 1;
 
     private int procRatioCounter = 1; //counter
-    private double? val; //Theoretical value
+    private double? value; //Theoretical value
 
     public object CalculateValue { get; set; }
     public CalculateTargetPrc CalculateTargets { get; init; }
@@ -45,6 +47,21 @@ public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit)
     private ProcRatioDirectionEnm ProcRatioDirection { get; } = ProcRatioDirectionEnm.Descending;
 
     public bool IsReady => procRatioCounter == 1; //event is ready to be applied on target
+    public List<Condition> ApplyConditions;
+
+    /// <summary>
+    /// Conditions are OK
+    /// </summary>
+    /// <param name="parentBuff"></param>
+    /// <param name="targetUnit"></param>
+    /// <param name="excludeCondition"></param>
+    /// <param name="ent"></param>
+    /// <returns></returns>
+    public bool Truly(Unit targetUnit = null)
+    {
+        if (ApplyConditions is null || ApplyConditions.Count == 0) return true;
+        return ApplyConditions.All(x => x.Truly(null, targetUnit, null, this));
+    }
 
     public Ability.AbilityCurrentTargetEnm? CurrentTargetType { get; init; }
     public Unit SourceUnit { get; set; } = sourceUnit;
@@ -52,14 +69,13 @@ public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit)
     public StepTypeEnm? OnStepType { get; init; }
 
 
-
-    public double? Val
+    public double? Value
     {
         get
         {
             //calc value first
 
-            if (val != null || CalculateValue == null) return val;
+            if (value != null || CalculateValue == null) return value;
             switch (CalculateValue)
             {
                 //if calculate is formula then set reference and calc formula
@@ -67,27 +83,28 @@ public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit)
                     CalculateValue = cFrm.Clone();
                     Formula newFrm = (Formula)CalculateValue;
                     newFrm.EventRef = this;
-                    val = newFrm.Result;
+                    value = newFrm.Result;
                     break;
                 //else call function
-                case Func<Event,double?> cFnc:
-                    val= cFnc(this);
+                case Func<Event, double?> cFnc:
+                    value = cFnc(this);
                     break;
                 //else invoke delegate
                 case Delegate cDlg:
-                    val = (double?)cDlg.DynamicInvoke(this);
+                    value = (double?)cDlg.DynamicInvoke(this);
                     break;
                 default:
                     throw new NotImplementedException();
             }
-     
-            return val;
+
+            return value;
         }
 
-        set => val = value;
+        set => this.value = value;
     }
 
-    public double? RealVal { get; protected set; }
+    public string PrintName => $"{GetType().Name}" + (Value != null ? $"({Value})" : "");
+    public double? RealValue { get; protected set; }
 
 
     public Step ParentStep { get; set; } = parentStep;

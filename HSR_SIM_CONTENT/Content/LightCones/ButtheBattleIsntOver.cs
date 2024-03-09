@@ -21,7 +21,7 @@ internal class ButtheBattleIsntOver : DefaultLightCone
                 PartyResourceGain spEnt = new(null, this, Parent.Parent)
                 {
                     TargetUnit = Parent.Parent,
-                    Val = 1,
+                    Value = 1,
                     ProcRatio = 2,
                     ResType = Resource.ResourceType.SP
                 };

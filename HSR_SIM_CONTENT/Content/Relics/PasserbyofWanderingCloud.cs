@@ -19,7 +19,7 @@ public class PasserbyofWanderingCloud : DefaultRelicSet
                 PartyResourceGain newEvent = new(step, this, Parent.Parent)
                 {
                     ResType = Resource.ResourceType.SP,
-                    Val = 1,
+                    Value = 1,
                     TargetUnit = Parent.Parent
                 };
 

@@ -13,7 +13,7 @@ public class DirectDamage(Step parent, ICloneable source, Unit sourceUnit)
     public override string GetDescription()
     {
         return "Dealing damage" + (IsCrit ? " (CRITICAL)" : "") +
-               $" overall={Val:f} to_barrier={RealBarrierVal:f} to_hp={RealVal:f}";
+               $" overall={Value:f} to_barrier={RealBarrierVal:f} to_hp={RealValue:f}";
     }
 
     public override void ProcEvent(bool revert)

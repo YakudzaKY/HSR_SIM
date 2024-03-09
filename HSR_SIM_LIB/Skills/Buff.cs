@@ -49,14 +49,14 @@ public class Buff(Unit sourceUnit, Buff reference = null) : CloneClass
         if (this is not PassiveBuff passiveBuff) return explainString;
         explainString += $" {nameof(passiveBuff.SourceObject)}={passiveBuff.SourceObject.GetType().Name}" +
                          $" {nameof(passiveBuff.Target)}={passiveBuff.Target.GetType().Name}";
-        if (passiveBuff.Condition != null)
+        if (passiveBuff.WorkCondition != null)
         {
             //additional info if condition
             explainString +=
                 $" (!) Condition for buff: {nameof(PassiveBuff.IsTargetCheck)}={passiveBuff.IsTargetCheck} ";
-            explainString += $" {nameof(passiveBuff.Condition)} =( {passiveBuff.Condition.ConditionParam}" +
-                             $" {passiveBuff.Condition.ConditionExpression} {passiveBuff.Condition.Value}" +
-                             $" {passiveBuff.Condition.ElemValue} {passiveBuff.Condition.AppliedBuffValue})";
+            explainString += $" {nameof(passiveBuff.WorkCondition)} =( {passiveBuff.WorkCondition.ConditionParam}" +
+                             $" {passiveBuff.WorkCondition.ConditionExpression} {passiveBuff.WorkCondition.Value}" +
+                             $" {passiveBuff.WorkCondition.ElemValue} {passiveBuff.WorkCondition.AppliedBuffValue})";
         }
 
         return explainString;

@@ -10,7 +10,7 @@ public class ToughnessBreak(Step parent, ICloneable source, Unit sourceUnit)
     public override string GetDescription()
     {
         return TargetUnit.Name + " shield broken " +
-               $" overall={Val:f} to_hp={RealVal:f}";
+               $" overall={Value:f} to_hp={RealValue:f}";
     }
 
     public override void ProcEvent(bool revert)
@@ -20,7 +20,7 @@ public class ToughnessBreak(Step parent, ICloneable source, Unit sourceUnit)
             ModActionValue delayAv = new(ParentStep, Source, SourceUnit)
             {
                 TargetUnit = TargetUnit,
-                Val = -TargetUnit.GetActionValue(this) * 0.25
+                Value = -TargetUnit.GetActionValue(this) * 0.25
             }; //default delay
             ChildEvents.Add(delayAv);
             // https://honkai-star-rail.fandom.com/wiki/Toughness

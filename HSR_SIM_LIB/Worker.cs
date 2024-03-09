@@ -71,28 +71,28 @@ public class Worker
                         Sim.Steps.Sum(x =>
                             x.Events.Where(y =>
                                 y is DirectDamage && y.SourceUnit == unit &&
-                                unit.Friends.All(j => j != y.TargetUnit)).Sum(y => y.Val ?? 0))
+                                unit.Friends.All(j => j != y.TargetUnit)).Sum(y => y.Value ?? 0))
                     },
                     {
                         typeof(ToughnessBreak),
                         Sim.Steps.Sum(x =>
                             x.Events.Where(y =>
                                 y is ToughnessBreak && y.SourceUnit == unit &&
-                                unit.Friends.All(j => j != y.TargetUnit)).Sum(y => y.Val ?? 0))
+                                unit.Friends.All(j => j != y.TargetUnit)).Sum(y => y.Value ?? 0))
                     },
                     {
                         typeof(DoTDamage),
                         Sim.Steps.Sum(x =>
                             x.Events.Where(y =>
                                 y is DoTDamage and not ToughnessBreakDoTDamage && y.SourceUnit == unit &&
-                                unit.Friends.All(j => j != y.TargetUnit)).Sum(y => y.Val ?? 0))
+                                unit.Friends.All(j => j != y.TargetUnit)).Sum(y => y.Value ?? 0))
                     },
                     {
                         typeof(ToughnessBreakDoTDamage),
                         Sim.Steps.Sum(x =>
                             x.Events.Where(y =>
                                 y is ToughnessBreakDoTDamage && y.SourceUnit == unit &&
-                                unit.Friends.All(j => j != y.TargetUnit)).Sum(y => y.Val ?? 0))
+                                unit.Friends.All(j => j != y.TargetUnit)).Sum(y => y.Value ?? 0))
                     }
                 };
 

@@ -5,22 +5,24 @@
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                  xmlns:unitStuff="clr-namespace:HSR_SIM_LIB.UnitStuff;assembly=HSR_SIM_LIB"
+                 xmlns:events="clr-namespace:HSR_SIM_LIB.TurnBasedClasses.Events;assembly=HSR_SIM_LIB"
+                 xmlns:views="clr-namespace:HSR_SIM_CLIENT.Views"
+                 xmlns:singleSim="clr-namespace:HSR_SIM_CLIENT.ViewModels"
                  mc:Ignorable="d"
                  Title="Single simulation" Height="Auto" Width="Auto"
                  WindowStartupLocation="CenterScreen"
                  SizeToContent="WidthAndHeight"
                  DataContext="{Binding RelativeSource={RelativeSource Self}}"
+                 d:DesignHeight="800" d:DesignWidth="1200">
 
-            >
 
- 
     <Grid>
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition  />
+            <RowDefinition  />
 
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -66,25 +68,34 @@
                 <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
-      
-                <Grid.Resources>
-                    <HierarchicalDataTemplate DataType    = "{x:Type unitStuff:Team}"
-                                              ItemsSource = "{Binding Path=Units}">
-                        <TextBlock Text="{Binding Path=Name}"/>
-                    
-                    </HierarchicalDataTemplate>
-                    <DataTemplate DataType="{x:Type unitStuff:Unit}">
-                        <TextBlock Text="{Binding Path=PrintName}"/>
-                    </DataTemplate>
-                </Grid.Resources>
-                <TreeView Grid.Row="0" Grid.Column="0"  SelectedItemChanged ="TreeView_OnSelectedItemChanged" SelectedValuePath="{Binding Path=SelectedObject,Mode=TwoWay}">
+
+            <Grid.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type unitStuff:Team}"
+                                          ItemsSource="{Binding Path=Units}">
+                    <TextBlock Text="{Binding Path=Name}" />
+
+                </HierarchicalDataTemplate>
+                <DataTemplate DataType="{x:Type unitStuff:Unit}">
+                    <TextBlock Text="{Binding Path=PrintName}" />
+                </DataTemplate>
+
+
+                <DataTemplate DataType="{x:Type singleSim:EventViewModel }">
+                    <TextBlock Text="{Binding Path=Name}" />
+                </DataTemplate>
+
+            </Grid.Resources>
+            <Border  BorderThickness="1" BorderBrush="Gray" Grid.Row="0" Grid.Column="0">
+             
+                <TreeView  SelectedItemChanged="TreeView_OnSelectedUnitChanged" ScrollViewer.VerticalScrollBarVisibility="Auto" 
+                          SelectedValuePath="{Binding Path=SelectedObject,Mode=TwoWay}">
                     <TreeView.ItemContainerStyle>
                         <Style TargetType="{x:Type TreeViewItem}">
                             <Setter Property="IsExpanded" Value="True" />
                         </Style>
                     </TreeView.ItemContainerStyle>
 
-                    <TreeViewItem  ItemsSource="{Binding Path=Teams,Mode=OneWay}" Header="Teams and Units" >
+                    <TreeViewItem ItemsSource="{Binding Path=Teams,Mode=OneWay}" Header="Teams and Units">
                         <TreeViewItem.ItemContainerStyle>
                             <Style TargetType="{x:Type TreeViewItem}">
                                 <Setter Property="IsExpanded" Value="True" />
@@ -93,11 +104,20 @@
                     </TreeViewItem>
 
                 </TreeView>
-        
-            
+            </Border>
+
             <DataGrid Grid.Row="0" Grid.Column="1" />
-            <TreeView Grid.Row="1" Grid.Column="0" />
-            <DataGrid Grid.Row="1" Grid.Column="1" />
+        
+            <Border  BorderThickness="1" BorderBrush="Gray" Grid.Row="1" Grid.Column="0">
+                <mah:HamburgerMenuListBox SelectedItem="{Binding SelectedEvent,Mode=OneWayToSource}" ItemsSource="{Binding Path=Events,Mode=OneWay}">
+               
+                </mah:HamburgerMenuListBox>
+                
+            </Border>
+
+            <views:EventView Grid.Row="1" Grid.Column="1"  EventToView="{Binding SelectedEvent , Mode=OneWay}">
+            </views:EventView>
+
         </Grid>
 
     </Grid>

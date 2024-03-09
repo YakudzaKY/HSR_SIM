@@ -100,16 +100,16 @@ public class Blade : DefaultFighter
                 CalculateProportion = proportion
             });
             shuhuGift.Events.Add(new ToughnessShred(null, this, Parent)
-                { Val = 30, CalculateProportion = proportion });
+                { Value = 30, CalculateProportion = proportion });
 
             shuhuGift.Events.Add(new EnergyGain(null, this, Parent)
-                { Val = 10, TargetUnit = Parent, CalculateProportion = proportion });
+                { Value = 10, TargetUnit = Parent, CalculateProportion = proportion });
         }
 
         shuhuGift.Events.Add(new Healing(null, this, Parent)
             { TargetUnit = Parent, CalculateValue = CalculateSgHeal });
         shuhuGift.Events.Add(new MechanicValChg(null, this, Parent)
-            { AbilityValue = shuhuGift, Val = -shuHuMaxCnt });
+            { AbilityValue = shuhuGift, Value = -shuHuMaxCnt });
         Abilities.Add(shuhuGift);
         //Passive counter
         Mechanics.AddVal(shuhuGift);
@@ -132,9 +132,9 @@ public class Blade : DefaultFighter
             shardSword.Events.Add(new DirectDamage(null, this, Parent)
                 { CalculateValue = CalculateBasicDmg, CalculateProportion = proportion });
             shardSword.Events.Add(new ToughnessShred(null, this, Parent)
-                { Val = 30 * proportion });
+                { Value = 30 * proportion });
             shardSword.Events.Add(new EnergyGain(null, this, Parent)
-                { Val = 20 * proportion, TargetUnit = Parent });
+                { Value = 20 * proportion, TargetUnit = Parent });
         }
 
         Abilities.Add(shardSword);
@@ -170,11 +170,11 @@ public class Blade : DefaultFighter
             });
             //main target thg
             forestMainTrgtHit = new ToughnessShred(null, this, Parent)
-                { Val = 60 * proportion, CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain };
+                { Value = 60 * proportion, CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain };
             forestOfSwords.Events.Add(forestMainTrgtHit);
             //energy
             forestOfSwords.Events.Add(new EnergyGain(null, this, Parent)
-                { Val = 30 * proportion, TargetUnit = Parent });
+                { Value = 30 * proportion, TargetUnit = Parent });
         }
 
         //adjacent
@@ -184,7 +184,7 @@ public class Blade : DefaultFighter
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent
         });
         forestOfSwords.Events.Add(new ToughnessShred(null, this, Parent)
-            { Val = 30, CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
+            { Value = 30, CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent});
 
 
         Abilities.Add(forestOfSwords);
@@ -220,16 +220,16 @@ public class Blade : DefaultFighter
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain
         });
         deathSentence.Events.Add(new ToughnessShred(null, this, Parent)
-            { Val = 60, CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain });
+            { Value = 60, CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain});
         deathSentence.Events.Add(new EnergyGain(null, this, Parent)
-            { Val = 5, TargetUnit = Parent });
+            { Value = 5, TargetUnit = Parent });
         deathSentence.Events.Add(new DirectDamage(null, this, Parent)
         {
             CalculateValue = CalculateDstDmgAdj,
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent
         });
         deathSentence.Events.Add(new ToughnessShred(null, this, Parent)
-            { Val = 60, CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
+            { Value = 60, CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
         deathSentence.Events.Add(new MechanicValChg(null, this, Parent)
             { AbilityValue = deathSentence, CalculateValue = CalcResetDsCharge });
 
@@ -250,7 +250,7 @@ public class Blade : DefaultFighter
             };
         //dmg events
         karmaWind.Events.Add(new ToughnessShred(null, this, Parent)
-            { OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue, Val = 60 });
+            { OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue, Value = 60 });
         karmaWind.Events.Add(new ResourceDrain(null, this, Parent)
         {
             OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
@@ -329,10 +329,10 @@ public class Blade : DefaultFighter
                 CustomIconName = "Traces\\A2",
 
                 Target = Parent,
-                Condition = new PassiveBuff.ConditionRec
+                WorkCondition = new Condition()
                 {
-                    ConditionParam = PassiveBuff.ConditionCheckParam.HpPrc,
-                    ConditionExpression = PassiveBuff.ConditionCheckExpression.EqualOrLess,
+                    ConditionParam = Condition.ConditionCheckParam.HpPrc,
+                    ConditionExpression = Condition.ConditionCheckExpression.EqualOrLess,
                     Value = 0.5
                 }
             });
@@ -383,8 +383,8 @@ public class Blade : DefaultFighter
         //if unit consume hp or got attack 
         if (ent.TargetUnit == Parent
             && (
-                (ent is ResourceDrain && ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal > 0)
-                || (ent is DamageEventTemplate && ent.RealVal > 0)
+                (ent is ResourceDrain && ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealValue > 0)
+                || (ent is DamageEventTemplate && ent.RealValue > 0)
             ) && (ent is DoTDamage || ent.ParentStep != lastDamageStep)
            )
         {
@@ -393,12 +393,12 @@ public class Blade : DefaultFighter
                 lastDamageStep = ent.ParentStep;
             if (Mechanics.Values[shuhuGift] < shuHuMaxCnt)
                 ent.ChildEvents.Add(new MechanicValChg(ent.ParentStep, this, Parent)
-                    { Val = 1, AbilityValue = shuhuGift });
+                    { Value = 1, AbilityValue = shuhuGift });
 
             var bladeHalfHp = Parent.GetMaxHp(ent) * 0.5;
             //if hp<=50% but was 50%+ then apply hp buff
             if (Parent.Rank >= 4 && Parent.GetRes(Resource.ResourceType.HP).ResVal <= bladeHalfHp &&
-                Parent.GetRes(Resource.ResourceType.HP).ResVal + ent.RealVal > bladeHalfHp)
+                Parent.GetRes(Resource.ResourceType.HP).ResVal + ent.RealValue > bladeHalfHp)
                 ent.ChildEvents.Add(new ApplyBuff(ent.ParentStep, this, Parent)
                     { TargetUnit = Parent, AppliedBuffToApply = E4AppliedBuff });
         }
@@ -410,12 +410,12 @@ public class Blade : DefaultFighter
         //buffering Lost hp pull
         if (ent.TargetUnit == Parent
             && (
-                (ent is ResourceDrain && ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal > 0)
+                (ent is ResourceDrain && ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealValue > 0)
                 || ent.IsDamageEvent
             ))
         {
             var dsValCharge = new MechanicValChg(ent.ParentStep, this, Parent)
-                { Val = ent.RealVal, AbilityValue = deathSentence };
+                { Value = ent.RealValue, AbilityValue = deathSentence };
             ent.ChildEvents.Add(dsValCharge);
         }
 

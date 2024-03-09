@@ -26,7 +26,7 @@ internal class StartCombat(Step parent, ICloneable source, Unit sourceUnit) : Ev
             if (!TriggersHandled)
                 ChildEvents.Add(new PartyResourceGain(ParentStep, this, null)
                 {
-                    Val = ParentStep.Parent.PreLaunch
+                    Value = ParentStep.Parent.PreLaunch
                         .FirstOrDefault(x => x.OptionType == PreLaunchOption.PreLaunchOptionEnm.SetSp)?.Value ?? 0,
                     TargetTeam = ParentStep.Parent.PartyTeam, ResType = Resource.ResourceType.SP
                 });

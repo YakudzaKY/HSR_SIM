@@ -31,7 +31,7 @@ internal class LongevousDisciple : DefaultRelicSet
             if ((ent is ResourceDrain
                  && ent.ParentStep.ActorAbility?.Parent.Parent.ParentTeam == Parent.Parent.ParentTeam
                  && ent.TargetUnit == Parent.Parent
-                 && ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal != 0)
+                 && ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealValue != 0)
                 || (ent.TargetUnit == Parent.Parent && ent is DirectDamage && ent.ParentStep != lastDamageStep))
             {
                 //only one proc per action 

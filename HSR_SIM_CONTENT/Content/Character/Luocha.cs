@@ -78,7 +78,7 @@ public class Luocha : DefaultFighter
             TargetType = TargetTypeEnm.Self
         };
         cycleOfLife.Events.Add(new MechanicValChg(null, this, Parent)
-            { AbilityValue = cycleOfLife, Val = -cycleOfLifeMaxCnt });
+            { AbilityValue = cycleOfLife, Value = -cycleOfLifeMaxCnt });
         cycleOfLife.Events.Add(new ApplyBuff(null, this, Parent)
         {
             TargetUnit = Parent,
@@ -103,7 +103,7 @@ public class Luocha : DefaultFighter
         prayerOfAbyssFlower.Events.Add(new Healing(null, this, Parent)
             { CalculateValue = CalculatePrayerOfAbyssFlower });
         prayerOfAbyssFlower.Events.Add(new EnergyGain(null, this, Parent)
-            { Val = 30, TargetUnit = Parent });
+            { Value = 30, TargetUnit = Parent });
         Abilities.Add(prayerOfAbyssFlower);
 
 
@@ -125,7 +125,7 @@ public class Luocha : DefaultFighter
             CalculateValue = CalculatePrayerOfAbyssFlower
         });
         prayerOfAbyssFlowerAuto.Events.Add(new EnergyGain(null, this, Parent)
-            { Val = 30, TargetUnit = Parent });
+            { Value = 30, TargetUnit = Parent });
         prayerOfAbyssFlowerAuto.Events.Add(new ApplyBuff(null, this, Parent)
         {
             TargetUnit = Parent,
@@ -151,9 +151,9 @@ public class Luocha : DefaultFighter
             thornsOfTheAbyss.Events.Add(new DirectDamage(null, this, Parent)
                 { CalculateValue = CalculateBasicDmg, CalculateProportion = proportion });
             thornsOfTheAbyss.Events.Add(new ToughnessShred(null, this, Parent)
-                { Val = 30*proportion });
+                { Value = 30*proportion });
             thornsOfTheAbyss.Events.Add(new EnergyGain(null, this, Parent)
-                { Val = 20*proportion, TargetUnit = Parent });
+                { Value = 20*proportion, TargetUnit = Parent });
         }
 
 
@@ -190,9 +190,9 @@ public class Luocha : DefaultFighter
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent
         });
         ultimateAbility.Events.Add(new ToughnessShred(null, this, Parent)
-            { Val = 60, CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
+            { Value = 60, CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
         ultimateAbility.Events.Add(new EnergyGain(null, this, Parent)
-            { Val = 5, TargetUnit = Parent });
+            { Value = 5, TargetUnit = Parent });
         Abilities.Add(ultimateAbility);
 
 
@@ -208,7 +208,7 @@ public class Luocha : DefaultFighter
         ability.Events.Add(new MechanicValChg(null, this, Parent)
         {
             OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
-            Val = cycleOfLifeMaxCnt,
+            Value = cycleOfLifeMaxCnt,
             AbilityValue = cycleOfLife
         }); //AbilityValue for Cycle of life
         Abilities.Add(ability);
@@ -222,11 +222,11 @@ public class Luocha : DefaultFighter
                 CustomIconName = uniqueAppliedBuff.CustomIconName,
 
                 Target = Parent.ParentTeam,
-                Condition = new PassiveBuff.ConditionRec
+                WorkCondition = new Condition
                 {
                     AppliedBuffValue = uniqueAppliedBuff,
-                    ConditionExpression = PassiveBuff.ConditionCheckExpression.Exists,
-                    ConditionParam = PassiveBuff.ConditionCheckParam.Buff
+                    ConditionExpression = Condition.ConditionCheckExpression.Exists,
+                    ConditionParam = Condition.ConditionCheckParam.Buff
                 }
             });
 
@@ -253,11 +253,11 @@ public class Luocha : DefaultFighter
                 CustomIconName = uniqueAppliedBuff.CustomIconName,
 
                 Target = TargetTypeEnm.Enemy,
-                Condition = new PassiveBuff.ConditionRec
+                WorkCondition = new Condition()
                 {
                     AppliedBuffValue = uniqueAppliedBuff,
-                    ConditionExpression = PassiveBuff.ConditionCheckExpression.Exists,
-                    ConditionParam = PassiveBuff.ConditionCheckParam.Buff
+                    ConditionExpression = Condition.ConditionCheckExpression.Exists,
+                    ConditionParam = Condition.ConditionCheckParam.Buff
                 }
             });
     }
@@ -396,7 +396,7 @@ public class Luocha : DefaultFighter
                                                                  step.ActorAbility == prayerOfAbyssFlowerAuto ||
                                                                  step.ActorAbility == prayerOfAbyssFlower))
                 step.Events.Add(new MechanicValChg(step, this, Parent)
-                    { Val = 1, AbilityValue = cycleOfLife });
+                    { Value = 1, AbilityValue = cycleOfLife });
         }
 
 

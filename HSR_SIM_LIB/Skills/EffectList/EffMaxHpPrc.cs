@@ -33,13 +33,13 @@ public class EffMaxHpPrc : Effect
 
     public override void OnApply(Event ent, Buff buff, Unit target = null)
     {
-        (target ?? buff.CarrierUnit).ResetCondition(PassiveBuff.ConditionCheckParam.HpPrc);
+        (target ?? buff.CarrierUnit).ResetCondition(Condition.ConditionCheckParam.HpPrc);
         base.OnApply(ent, buff, target);
     }
 
     public override void OnRemove(Event ent, Buff buff, Unit target = null)
     {
-        (target ?? buff.CarrierUnit).ResetCondition(PassiveBuff.ConditionCheckParam.HpPrc);
+        (target ?? buff.CarrierUnit).ResetCondition(Condition.ConditionCheckParam.HpPrc);
         base.OnRemove(ent, buff, target);
     }
 }

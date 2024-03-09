@@ -38,7 +38,7 @@ public class AutomatonBeetle : DefaultNPCFighter
         //dmg events
         myAttackAbility.Events.Add(new DirectDamage(null, this, Parent)
             { CalculateValue = CalcMyAttack });
-        myAttackAbility.Events.Add(new EnergyGain(null, this, Parent) { Val = 15 });
+        myAttackAbility.Events.Add(new EnergyGain(null, this, Parent) { Value = 15 });
         myAttackAbility.Events.Add(new ApplyBuff(null, this, Parent)
             { TargetUnit = Parent, AppliedBuffToApply = barierAppliedBuff });
         myAttackAbility.Events.Add(new ApplyBuff(null, this, Parent)

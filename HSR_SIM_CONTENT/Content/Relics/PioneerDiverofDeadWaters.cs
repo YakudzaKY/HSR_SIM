@@ -22,10 +22,10 @@ internal class PioneerDiverofDeadWaters : DefaultRelicSet
                 Effects = new List<Effect> { new EffAllDamageBoost { Value = 0.12 } },
                 IsTargetCheck = true,
                 Target = Parent.Parent,
-                Condition = new PassiveBuff.ConditionRec
+                WorkCondition = new Condition()
                 {
-                    ConditionParam = PassiveBuff.ConditionCheckParam.AnyDebuff,
-                    ConditionExpression = PassiveBuff.ConditionCheckExpression.Exists
+                    ConditionParam = Condition.ConditionCheckParam.AnyDebuff,
+                    ConditionExpression = Condition.ConditionCheckExpression.Exists
                 }
             });
 
@@ -35,10 +35,10 @@ internal class PioneerDiverofDeadWaters : DefaultRelicSet
                 Effects = new List<Effect> { new EffCritDmg { CalculateValue = Calc4Pieces } },
                 IsTargetCheck = true,
                 Target = Parent.Parent,
-                Condition = new PassiveBuff.ConditionRec
+                WorkCondition = new Condition()
                 {
-                    ConditionParam = PassiveBuff.ConditionCheckParam.AnyDebuff,
-                    ConditionExpression = PassiveBuff.ConditionCheckExpression.Exists
+                    ConditionParam = Condition.ConditionCheckParam.AnyDebuff,
+                    ConditionExpression = Condition.ConditionCheckExpression.Exists
                 }
             });
     }

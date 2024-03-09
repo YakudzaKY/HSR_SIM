@@ -32,7 +32,7 @@ internal class TheUnreachableSide : DefaultLightCone
     {
         //if unit consume hp or got attack then apply buff
         if ((ent.ParentStep.ActorAbility?.Parent == Parent && ent.TargetUnit == Parent.Parent && ent is ResourceDrain &&
-             ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal != 0)
+             ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealValue != 0)
             || (ent.TargetUnit == Parent.Parent && ent is DirectDamage))
         {
             ApplyBuff newEvent = new(ent.ParentStep, this, Parent.Parent)
