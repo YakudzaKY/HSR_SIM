@@ -236,12 +236,11 @@ public abstract class DefaultFighter : IFighter
         }
         else
         {
-            Parent.ParentTeam.ParentSim?.Parent.LogDebug("========What i can cast=====");
+            
             //if dev mode then give All available sp else get from function
             var freeSp = step.Parent.Parent.DevMode
                 ? Parent.ParentTeam.GetRes(ResourceType.SP).ResVal
                 : HowManySpICanSpend();
-            Parent.ParentTeam.ParentSim?.Parent.LogDebug($"I have {freeSp:f} SP");
             var abilities = Abilities
                 .Where(x => x.Available() && x.IWannaUseIt() && (x.Cost <= freeSp || x.CostType != ResourceType.SP) &&
                             (x.AbilityType == Ability.AbilityTypeEnm.Basic ||
@@ -249,7 +248,6 @@ public abstract class DefaultFighter : IFighter
             var chosenAbility = step.Parent.Parent.DevMode
                 ? DevModeUtils.ChooseAbilityToCast(this, abilities)
                 : abilities.MaxBy(x => x.AbilityType);
-            Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Choose  {chosenAbility?.Name}");
             return chosenAbility;
         }
 
@@ -413,21 +411,17 @@ public abstract class DefaultFighter : IFighter
     {
         var totalRes = Parent.ParentTeam.GetRes(ResourceType.SP).ResVal;
         var res = totalRes;
-        Parent.ParentTeam.ParentSim?.Parent.LogDebug("---search for free SP---");
         double reservedSp = 0;
         var myReserve = HowManySpIReserve();
         //get friends reserved SP
         foreach (var friend in GetAliveFriends().Where(x => x != Parent))
             reservedSp += ((DefaultFighter)friend.Fighter).HowManySpIReserve();
-        Parent.ParentTeam.ParentSim?.Parent.LogDebug(
-            $"Resource: {res} .My friends reserve {reservedSp:f} Sp. My reserve is {myReserve:f} Sp");
 
         if (Role is UnitRole.MainDps)
         {
             //Cut Free  res to total-reserve
             res = Math.Min(res, totalRes - reservedSp);
-            Parent.ParentTeam.ParentSim?.Parent.LogDebug(
-                $"Im {Role}, don't care about other spenders except RESERVE SP");
+           
         }
         else if (Role is UnitRole.Support)
         {
@@ -435,8 +429,7 @@ public abstract class DefaultFighter : IFighter
             res -= addSpenders;
             //Cut Free  res to total-reserve
             res = Math.Min(res, totalRes - reservedSp);
-            Parent.ParentTeam.ParentSim?.Parent.LogDebug(
-                $"Im {Role},I care about (reserve+ MainDps spenders)={addSpenders}");
+           
         }
         else if (Role is UnitRole.SecondDps or UnitRole.ThirdDps)
         {
@@ -444,12 +437,11 @@ public abstract class DefaultFighter : IFighter
             res -= addSpenders;
             //Cut Free  res to total-reserve
             res = Math.Min(res, totalRes - reservedSp);
-            Parent.ParentTeam.ParentSim?.Parent.LogDebug(
-                $"Im {Role},I care about (reserve+ MainDps+Support spenders)={addSpenders}");
+       
         }
         else if (Role is UnitRole.Healer)
         {
-            Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Im {Role},i don't care about SP");
+       
             res = myReserve;
         }
 
@@ -457,11 +449,11 @@ public abstract class DefaultFighter : IFighter
         //retake SP if not enough by role but have reserved
         if (res < myReserve)
         {
-            Parent.ParentTeam.ParentSim?.Parent.LogDebug($"I will try use my reserve {myReserve} anyway ");
+            
             res = Math.Min(myReserve, totalRes);
         }
 
-        Parent.ParentTeam.ParentSim?.Parent.LogDebug("----");
+
 
 
         return Math.Max(res, 0);

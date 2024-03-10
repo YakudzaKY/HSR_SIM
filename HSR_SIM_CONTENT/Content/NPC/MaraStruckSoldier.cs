@@ -104,7 +104,7 @@ public class MaraStruckSoldier : DefaultNPCFighter
         return FighterUtils.CalculateHealByBasicVal(ent.TargetUnit.GetMaxHp(ent) * 0.5, ent);
     }
 
-    public override void DefaultFighter_HandleEvent(Event ent)
+    protected override void DefaultFighter_HandleEvent(Event ent)
     {
         if (ent is UnitEnteringBattle && ent.TargetUnit == Parent)
         {

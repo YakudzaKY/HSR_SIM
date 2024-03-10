@@ -6,7 +6,8 @@
              xmlns:local="clr-namespace:HSR_SIM_CLIENT.Views"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="600"
+         
+        
              Name="Parent"
             >
     
@@ -18,10 +19,13 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
             <Label Grid.Row="0" Grid.Column="0" >Name</Label>
             <TextBox Grid.Row="0" Grid.Column="1"  Text="{Binding EventToView.Name, Mode=OneWay}"></TextBox>
@@ -33,9 +37,14 @@
             <TextBox Grid.Row="3" Grid.Column="1"  Text="{Binding EventToView.TargetUnit, Mode=OneWay}"></TextBox>
             <Label Grid.Row="4" Grid.Column="0" >Value</Label>
             <TextBox Grid.Row="4" Grid.Column="1"  Text="{Binding EventToView.Value, Mode=OneWay}"></TextBox>
-            <Label Grid.Row="5" Grid.Column="0" >Real value(real val to hit etc)</Label>
+            <Label Grid.Row="5" Grid.Column="0" >Real value</Label>
             <TextBox Grid.Row="5" Grid.Column="1"  Text="{Binding EventToView.RealValue, Mode=OneWay}"></TextBox>
-        
+            <Label Grid.Row="6" Grid.Column="0" >Description</Label>
+            <TextBox Grid.Row="6" Grid.Column="1"  Text="{Binding EventToView.Description, Mode=OneWay}"></TextBox>
+            <Label Grid.Row="7" Grid.Column="0" Visibility="{Binding ExplainVisible, Mode=OneWay}"> Explain:</Label>
+            <TextBox Width="Auto" Grid.Row="8" Grid.Column="0" Visibility="{Binding ExplainVisible, Mode=OneWay}" Grid.ColumnSpan="2"  TextWrapping="WrapWithOverflow"  Text="{Binding EventToView.Explain, Mode=OneWay}"></TextBox>
+   
+          
        
 
         </Grid>

@@ -738,7 +738,7 @@ public class Unit : CloneClass
 
     public void ResetCondition(Condition.ConditionCheckParam chkPrm)
     {
-        foreach (var cb in PassiveBuffs.Where(x => x.WorkCondition?.ConditionParam == chkPrm)) cb.WorkCondition.NeedRecalc = true;
+        foreach (var cb in PassiveBuffs.Where(x => x.WorkCondition?.ConditionParam == chkPrm)) cb.WorkCondition.NeedRecalculate = true;
     }
 
     private double GetInitialBaseActionValue(Event ent)

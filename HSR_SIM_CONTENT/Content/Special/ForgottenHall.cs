@@ -38,7 +38,7 @@ public class ForgottenHall : DefaultNPCFighter
         Abilities.Add(IncreaseCycle);
     }
 
-    public override void DefaultFighter_HandleEvent(Event ent)
+    protected override void DefaultFighter_HandleEvent(Event ent)
     {
         // wipe party if 1000+cycles
         if (ent.TargetUnit == Parent && ent is IncreaseLevel && Parent.Level >= 1000)

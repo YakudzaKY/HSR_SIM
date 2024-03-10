@@ -36,7 +36,6 @@ public class Worker
         Init();
         Sim = XmlLoader.LoadCombatFromXml(scenarioPath, profilePath);
         Sim.Parent = this;
-        LogText("Scenario  " + Sim.CurrentScenario.Name + " was loaded");
         if (DevMode)
             DevModeLog = new DevModeLogger(DevModeUtils.GetDevLogPath(scenarioPath, profilePath), this);
     }
@@ -47,7 +46,6 @@ public class Worker
         Init();
         Sim = (SimCls)sim.Clone();
         Sim.Parent = this;
-        LogText("Scenario  " + Sim.CurrentScenario.Name + " was loaded");
         if (DevMode)
             DevModeLog = new DevModeLogger(devLogPath, this);
     }
@@ -133,7 +131,6 @@ public class Worker
                 if (stepndx <= 0) break;
                 //revert first
                 replay = true;
-                LogStepDescription(Sim.CurrentStep, true);
                 Sim.CurrentStep.ProcEvents(true, true);
                 stepndx -= 1;
                 Sim.CurrentStep = Sim.Steps[stepndx];
@@ -147,7 +144,6 @@ public class Worker
                     replay = true;
                     Sim.CurrentStep = Sim.Steps[stepndx];
                     Sim.Steps[stepndx].ProcEvents(false, true);
-                    LogStepDescription(Sim.Steps[stepndx]);
                 }
                 else
                 {
@@ -156,7 +152,6 @@ public class Worker
                         replay = false;
                         if (Sim == null)
                         {
-                            LogText("Load scenario first!!!");
                             return;
                         }
 
@@ -164,12 +159,10 @@ public class Worker
 
 
                         Sim.CurrentStep = newStep;
-                        LogStepDescription(newStep);
 
                         if (newStep.StepType == StepTypeEnm.Idle)
                         {
                             Completed = true;
-                            LogText("scenario complete.");
                             DevModeLog?.WriteToFile(); //write dev log 
                         }
 
@@ -187,43 +180,7 @@ public class Worker
         if (Sim?.CurrentStep != oldStep) DrawCombat();
     }
 
-
-    /// <summary>
-    ///     output text description of completed step
-    /// </summary>
-    /// <param name="step">completed step</param>
-    /// <param name="revert">we revert this step? </param>
-    /// <exception cref="NotImplementedException"></exception>
-    private void LogStepDescription(Step step, bool revert = false)
-    {
-        var OutText = "===================================\n";
-        OutText = OutText + " Step# " + Sim.Steps.IndexOf(Sim.CurrentStep) + " [" + step.StepType + "] " +
-                  step.GetDescription();
-        if (revert)
-            OutText = "reverted: " + OutText;
-        else if (replay)
-            OutText = "reproduced: " + OutText;
-        LogText(OutText);
-
-        foreach (var ent in step.Events)
-        {
-            if (string.IsNullOrEmpty(ent.GetDescription()))
-                continue;
-            OutText = " * " + ent.GetDescription();
-            if (revert)
-                OutText = "reverted: " + OutText;
-            else if (replay)
-                OutText = "reproduced: " + OutText;
-            LogText(OutText);
-            if (ent is BuffEventTemplate)
-                if (((BuffEventTemplate)ent).AppliedBuffToApply != null)
-                {
-                    OutText = " * " + ((BuffEventTemplate)ent).AppliedBuffToApply.GetDescription();
-                    LogText(OutText);
-                }
-        }
-    }
-
+    
 
     /// <summary>
     ///     Draw combat in client
@@ -239,29 +196,9 @@ public class Worker
     }
 
 
-    /// <summary>
-    ///     wrapper for Text callback using for log output
-    /// </summary>
-    /// <param name="msg">message to print</param>
-    private void LogText(string msg)
-    {
-        CbLog?.Invoke(new KeyValuePair<string, string>(MsgLog, msg));
-    }
-
-    /// <summary>
-    ///     wrapper for Text callback using for log output
-    /// </summary>
-    /// <param name="msg">message to print</param>
-    public void LogDebug(string msg)
-    {
-        CbLog?.Invoke(new KeyValuePair<string, string>(MsgDebug, msg));
-    }
-
-
-    public void Init()
+    private void Init()
     {
         Completed = false;
-        LogText("lib loaded");
     }
 
     //Apply modes(stats??) to sim elements

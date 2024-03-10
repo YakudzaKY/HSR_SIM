@@ -368,7 +368,6 @@ public class Luocha : DefaultFighter
                 UnitAtLowHpForAuto(entTargetUnit, ent))
             {
                 trackedUnits.Add(new KeyValuePair<Unit, Unit?>(entTargetUnit, Parent));
-                Parent.ParentTeam.ParentSim.Parent.LogDebug($"{Parent.Name} add {entTargetUnit.Name} to track list");
             }
             else if (trackedUnits.Any(x => x.Key == entTargetUnit) &&
                      (!UnitAtLowHpForAuto(entTargetUnit, ent) || !entTargetUnit.IsAlive))
@@ -376,8 +375,7 @@ public class Luocha : DefaultFighter
                 //remove high hp unit from track
                 var tarPair = trackedUnits.FirstOrDefault(x => x.Key == entTargetUnit);
                 trackedUnits.Remove(tarPair);
-                Parent.ParentTeam.ParentSim.Parent.LogDebug(
-                    $"{Parent.Name} remove {entTargetUnit.Name} from track list");
+   
             }
         }
     }

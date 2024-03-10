@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using HSR_SIM_CLIENT.ViewModels;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
+using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_CLIENT.Views;
 
@@ -20,8 +21,9 @@ public partial class EventView : INotifyPropertyChanged
 
     private static void PropChangedCb(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-      
-        
+
+        if (d is EventView ev)
+            ev.RefreshData();
     }
    
 
@@ -33,15 +35,23 @@ public partial class EventView : INotifyPropertyChanged
     }
 
 
+    private void RefreshData()
+    {
+        NotifyPropertyChanged(nameof(ExplainVisible));
+    }
+        
+
 
 
     public  EventViewModel EventToView
     {
        get => (EventViewModel)GetValue(EventToViewProperty);
-       set =>SetValue(EventToViewProperty, value);
+       set =>SetValue(EventToViewProperty, value) ;
        
        
     }
+
+    public Visibility ExplainVisible => (EventToView?.CalculateValue is Formula) ? Visibility.Visible : Visibility.Hidden;
     public event PropertyChangedEventHandler? PropertyChanged;
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)

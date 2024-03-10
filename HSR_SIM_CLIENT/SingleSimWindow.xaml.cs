@@ -28,7 +28,6 @@ public partial class SingleSimWindow : INotifyPropertyChanged
     {
         InitializeComponent();
         wrk = new Worker();
-        wrk.CbLog += WorkerCallBackString;
         wrk.CbRend += WorkerCallBackImages;
         wrk.CbGetDecision = WorkerCallBackGetDecision;
         wrk.DevMode = chkDevMode;
@@ -59,8 +58,7 @@ public partial class SingleSimWindow : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
-
-    public bool DbgMode { get; set; }
+    
     public ICloneable? SelectedObject { get; set; }
     private EventViewModel selectedEvent;
 
@@ -89,32 +87,7 @@ public partial class SingleSimWindow : INotifyPropertyChanged
         if (PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(name));
     }
 
-
-    /// <summary>
-    ///     For text callback
-    /// </summary>
-    /// <param name="kv"></param>
-    private void WorkerCallBackString(KeyValuePair<string, string> kv)
-    {
-        if (string.Equals(kv.Key, Constant.MsgLog))
-        {
-            LogTextBlock.AppendText(kv.Value);
-            LogTextBlock.AppendText(Environment.NewLine);
-            if (!busy)
-                LogTextBlock.ScrollToEnd();
-        }
-        else if (string.Equals(kv.Key, Constant.MsgDebug))
-        {
-            if (DbgMode)
-            {
-                DebugTextBlock.AppendText(kv.Value);
-                DebugTextBlock.AppendText(Environment.NewLine);
-                if (!busy)
-                    DebugTextBlock.ScrollToEnd();
-            }
-        }
-    }
-
+    
     /// <summary>
     ///     ask user what decision are pick from options(do we crit etc...)
     /// </summary>

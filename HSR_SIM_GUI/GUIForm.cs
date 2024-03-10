@@ -23,28 +23,7 @@ public partial class GUIForm : Form
         ApplyDarkLightTheme(this);
     }
 
-    /// <summary>
-    ///     For text callback
-    /// </summary>
-    /// <param name="kv"></param>
-    public void WorkerCallBackString(KeyValuePair<string, string> kv)
-    {
-        if (string.Equals(kv.Key, Constant.MsgLog))
-        {
-            LogWindow.AddLine(kv.Value, 400);
-            if (!busy)
-                LogWindow.ScrollToCaret();
-        }
-        else if (string.Equals(kv.Key, Constant.MsgDebug))
-        {
-            if (dbg != null && !dbg.IsDisposed)
-            {
-                dbg.dbgText.AddLine(kv.Value);
-                if (!busy)
-                    LogWindow.ScrollToCaret();
-            }
-        }
-    }
+   
 
     /// <summary>
     ///     ask user what decision are pick from options(do we crit etc...)
@@ -143,7 +122,6 @@ public partial class GUIForm : Form
         wrk?.DevModeLog?.WriteToFile(); //save prev data
 
         wrk = new Worker();
-        wrk.CbLog += WorkerCallBackString;
         wrk.CbRend += WorkerCallBackImages;
         wrk.CbGetDecision = WorkerCallBackGetDecision;
         wrk.DevMode = chkDevMode.Checked;

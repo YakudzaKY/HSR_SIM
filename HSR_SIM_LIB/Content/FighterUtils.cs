@@ -79,9 +79,6 @@ public static class FighterUtils
         var defender = ent.TargetUnit;
         var attackElem = ent.ParentStep.ActorAbility?.Element ?? attacker.Fighter.Element;
 
-        ent.ParentStep.Parent.Parent?.LogDebug("=======================");
-        ent.ParentStep.Parent.Parent?.LogDebug(
-            $"{attacker.Name:s} ({attacker.ParentTeam.Units.IndexOf(attacker) + 1:d}) Break shield of {defender.Name} ({defender.ParentTeam.Units.IndexOf(defender) + 1:d})");
         double baseDmg;
         var maxToughnessMult = 0.5 + (double)defender.Stats.MaxToughness / 120;
         //if this is direct shield break
@@ -140,15 +137,6 @@ public static class FighterUtils
         var vulnMult = 1 + defender.GetElemVulnerability(attackElem, ent) + defender.GetAllDamageVulnerability(ent);
         var brokenMultiplier = defender.GetBrokenMultiplier();
         var totalDmg = baseDmg * breakEffect * defMultiplier * resPen * vulnMult * brokenMultiplier;
-        if (ent.ParentStep.Parent.Parent?.CbLog != null)
-        {
-            ent.ParentStep.Parent.Parent?.LogDebug($"baseDmg({baseDmg:f}) ; breakEffect({breakEffect:f})");
-            ent.ParentStep.Parent.Parent?.LogDebug(
-                $"defMultiplier({defMultiplier:f}) = 1-(defender.Stats.Def({def:f})/(defender.Stats.Def({def:f})+200+(10*attacker.Level({attacker.Level:d}))))");
-            ent.ParentStep.Parent.Parent?.LogDebug(
-                $"resPen= {resPen:f} ; vulnMult= {vulnMult:f} ; brokenMultiplier= {brokenMultiplier:f}");
-            ent.ParentStep.Parent.Parent?.LogDebug($"TOTAL DAMAGE= {totalDmg:f}");
-        }
 
         return totalDmg;
     }
@@ -160,16 +148,16 @@ public static class FighterUtils
     /// <returns></returns>
     public static Formula DamageFormula(Formula abilityFormula)
     {
-        string expression=$"{abilityFormula.Expression} * " +
-                          //crit
-                          $"( ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GenerateCrit)} * 0) " +
-                          $"+ ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetCritDamage)} * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.CritHit)} )  +1 )";
+        string expression = $"{abilityFormula.Expression} * " +
+                            //crit
+                            $"( ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GenerateCrit)} * 0) " +
+                            $"+ ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetCritDamage)} * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.CritHit)} )  +1 )";
         var newFormula = new Formula() { Expression = expression, Variables = abilityFormula.Variables };
-     
+
         return newFormula;
     }
-    
-    
+
+
     /// <summary>
     ///     calc real value by stats
     ///     https://honkai-star-rail.fandom.com/wiki/Damage
@@ -233,20 +221,6 @@ public static class FighterUtils
         var brokenMultiplier = defender.GetBrokenMultiplier();
         var totalDmg = baseDmg * critMultiplier * damageBoost * defMultiplier * resPen * vulnMult *
                        dmgReduction * brokenMultiplier;
-        if (ent.ParentStep.Parent.Parent?.CbLog != null)
-        {
-            ent.ParentStep.Parent.Parent?.LogDebug("=======================");
-            ent.ParentStep.Parent.Parent?.LogDebug($"baseDmg={baseDmg:f} crit chance={attacker.GetCritRate(ent):f} ");
-            ent.ParentStep.Parent.Parent?.LogDebug(
-                $"{attacker.Name:s} ({attacker.ParentTeam?.Units.IndexOf(attacker) + 1:d}) Damaging {defender.Name} ({defender.ParentTeam?.Units.IndexOf(defender) + 1:d})");
-            ent.ParentStep.Parent.Parent?.LogDebug(
-                $"damageBoost({damageBoost:f}) = 1+ GetElemBoostValue({attacker.GetElemBoostValue(attackElem, ent):f})  +AllDmgBoost({attacker.AllDmgBoost(ent):f}) + dotMultiplier({dotMultiplier:f})");
-            ent.ParentStep.Parent.Parent?.LogDebug(
-                $"defMultiplier({defMultiplier:f}) = 1-(defender.Stats.Def({def:f})/(defender.Stats.Def({def:f})+200+(10*attacker.Level({attacker.Level:d}))))");
-            ent.ParentStep.Parent.Parent?.LogDebug(
-                $"resPen= {resPen:f} ; vulnMult= {vulnMult:f} ; critMultiplier={critMultiplier:f} ; dmgReduction= {dmgReduction:f} ; brokenMultiplier= {brokenMultiplier:f} ; abilityTypeMultiplier {abilityMultiplier:f} dmg proportion={((DamageEventTemplate)ent).CalculateProportion:f}");
-            ent.ParentStep.Parent.Parent?.LogDebug($"TOTAL DAMAGE= {totalDmg:f}");
-        }
 
         return totalDmg;
     }
@@ -268,13 +242,6 @@ public static class FighterUtils
         if (isCC) ccRes = defender.GetDebuffResists(typeof(EffCrowControl));
         var realChance = baseChance * (1 + effectHitRate) * (1 - effectRes) * (1 - debuffRes) * (1 - ccRes);
 
-
-        ent.ParentStep.Parent.Parent?.LogDebug("=======================");
-        ent.ParentStep.Parent.Parent?.LogDebug(
-            $"Debuff realChance {realChance:f} =baseChance {baseChance:f} * (1+ effectHitRate {effectHitRate:f})* (1- effectRes {effectRes:f})  * (1- debuffRes {debuffRes:f})" +
-            (isCC ? $"* (1- ccRes {ccRes:f})" : ""));
-
-
         return new MersenneTwister().NextDouble() <= realChance;
     }
 
@@ -292,9 +259,7 @@ public static class FighterUtils
         var prcShieldBonus = attacker.PrcShieldBonus(ent);
         var shieldVal = (baseVal + additiveShieldBonus) * (1 + prcShieldBonus);
 
-        ent.ParentStep.Parent.Parent?.LogDebug("=======================");
-        ent.ParentStep.Parent.Parent?.LogDebug(
-            $"Shield val is {shieldVal:f} = (baseVal {baseVal:f} + additiveShieldBonus {additiveShieldBonus:f}) * (1+ prcShieldBonus{prcShieldBonus:f})");
+
         return shieldVal;
     }
 
@@ -311,9 +276,7 @@ public static class FighterUtils
         var outMod = healer.GetOutgoingHealMultiplier(ent);
         var inMod = receiver.GetIncomingHealMultiplier(ent);
         var res = baseHeal * outMod * inMod;
-        ent.ParentStep.Parent.Parent?.LogDebug("=======================");
-        ent.ParentStep.Parent.Parent?.LogDebug(
-            $"Heal val is {res:f} = baseHeal{baseHeal:f} * outMod{outMod:f} *  inMod{inMod:f}");
+
         return res;
     }
 

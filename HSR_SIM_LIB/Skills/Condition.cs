@@ -34,7 +34,7 @@ public class Condition()
         AnyDebuff,
         Resource
     }
-    public bool NeedRecalc { get; set; } = true;
+    public bool NeedRecalculate { get; set; } = true;
     private bool truly;
 
     public ConditionCheckExpression ConditionExpression { get; init; }
@@ -52,6 +52,7 @@ public class Condition()
     /// <summary>
     ///     Expression are true?
     /// </summary>
+    /// <param name="parentBuff">Buff for check(who affected to reset condition NeedCalculate)</param>
     /// <param name="targetUnit"></param>
     /// <param name="excludeCondition">prevent from recursion</param>
     /// <param name="ent"></param>
@@ -69,7 +70,7 @@ public class Condition()
 
         bool res;
         //if NeedRecalc condition buff or is target check (or no buff)
-        if (NeedRecalc || (parentBuff?.IsTargetCheck??true))
+        if (NeedRecalculate || (parentBuff?.IsTargetCheck??true))
         {
             res = this.ConditionParam switch
             {
@@ -94,7 +95,7 @@ public class Condition()
                                                                  ConditionCheckExpression.Exists),
                 _ => throw new NotImplementedException()
             };
-            NeedRecalc = false;
+            NeedRecalculate = false;
 
 
             //reset depended conditions/buffs if switched "truly"
