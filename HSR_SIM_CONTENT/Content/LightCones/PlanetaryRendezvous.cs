@@ -12,10 +12,10 @@ internal class PlanetaryRendezvous : DefaultLightCone
     public PlanetaryRendezvous(IFighter parent, int rank) : base(parent, rank)
     {
         if (Path == Parent.Path)
-            PassiveMods.Add(new PassiveBuff(Parent.Parent,this)
+            PassiveMods.Add(new PassiveBuff(Parent.Parent, this)
             {
                 Effects = [new EffElementalBoost { Element = parent.Element, Value = modifiers[rank] }],
-                
+
                 Target = Parent.Parent.ParentTeam
             });
     }

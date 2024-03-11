@@ -9,8 +9,8 @@ namespace HSR_SIM_LIB.Skills.ReadyBuffs;
 /// </summary>
 public class AppliedBuffImprisonmentWb : AppliedBuff
 {
-    public AppliedBuffImprisonmentWb(Unit sourceUnit, AppliedBuff reference = null, Event ent = null) : base(sourceUnit,
-        reference)
+    public AppliedBuffImprisonmentWb(Unit sourceUnit, AppliedBuff reference =null , Event ent  =null ) : base(sourceUnit,
+        reference,typeof(AppliedBuffImprisonmentWb))
     {
         Type = BuffType.Debuff;
         BaseDuration = 1;

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using static HSR_SIM_LIB.Skills.Ability;
 
@@ -9,20 +7,26 @@ namespace HSR_SIM_LIB.Skills;
 
 public class PassiveBuff : Buff
 {
-
-    public PassiveBuff(Unit parent,object sourceObject) : base(parent)
+    public PassiveBuff(Unit parent, object sourceObject) : base(parent,null,sourceObject)
     {
         CarrierUnit = parent;
-        SourceObject = sourceObject;
     }
 
     public object Target { get; set; } //in most cases target==parent, but when target is full team then not
 
-
-
-    public Condition WorkCondition { get; init; }
+    /// <summary>
+    ///     Conditions are OK
+    /// </summary>
+    /// <param name="targetUnit"></param>
+    /// <returns></returns>
+    public bool Truly(Unit targetUnit = null)
+    {
+        if (ApplyConditions is null || ApplyConditions.Count == 0) return true;
+        return ApplyConditions.All(x => x.Truly(null, targetUnit, null, null));
+    }
+    public List<Condition> ApplyConditions;
     public bool IsTargetCheck { get; init; }
-    public  object SourceObject { get; }
+
 
     /// <summary>
     ///     get list of affected targets
@@ -56,11 +60,4 @@ public class PassiveBuff : Buff
             return true;
         return false;
     }
-
-
-
-
-
-
-
 }

@@ -63,7 +63,6 @@ public abstract class DefaultFighter : IFighter
     }
 
 
-
     protected ATracesEnm ATraces { get; set; }
 
     public ILightCone? LightCone
@@ -236,7 +235,6 @@ public abstract class DefaultFighter : IFighter
         }
         else
         {
-            
             //if dev mode then give All available sp else get from function
             var freeSp = step.Parent.Parent.DevMode
                 ? Parent.ParentTeam.GetRes(ResourceType.SP).ResVal
@@ -421,7 +419,6 @@ public abstract class DefaultFighter : IFighter
         {
             //Cut Free  res to total-reserve
             res = Math.Min(res, totalRes - reservedSp);
-           
         }
         else if (Role is UnitRole.Support)
         {
@@ -429,7 +426,6 @@ public abstract class DefaultFighter : IFighter
             res -= addSpenders;
             //Cut Free  res to total-reserve
             res = Math.Min(res, totalRes - reservedSp);
-           
         }
         else if (Role is UnitRole.SecondDps or UnitRole.ThirdDps)
         {
@@ -437,23 +433,15 @@ public abstract class DefaultFighter : IFighter
             res -= addSpenders;
             //Cut Free  res to total-reserve
             res = Math.Min(res, totalRes - reservedSp);
-       
         }
         else if (Role is UnitRole.Healer)
         {
-       
             res = myReserve;
         }
 
 
         //retake SP if not enough by role but have reserved
-        if (res < myReserve)
-        {
-            
-            res = Math.Min(myReserve, totalRes);
-        }
-
-
+        if (res < myReserve) res = Math.Min(myReserve, totalRes);
 
 
         return Math.Max(res, 0);

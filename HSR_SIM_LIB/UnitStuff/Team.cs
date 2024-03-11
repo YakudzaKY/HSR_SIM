@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
 using static HSR_SIM_LIB.UnitStuff.Resource;
 
@@ -25,10 +24,7 @@ public class Team(SimCls parent) : CloneClass
 
     public double TeamAggro
     {
-        get
-        {
-            return Units.Where(x => x.IsAlive).Sum(unit => unit.GetAggro(null));
-        }
+        get { return Units.Where(x => x.IsAlive).Sum(unit => unit.GetAggro(null)); }
     }
 
     public List<Resource> Resources

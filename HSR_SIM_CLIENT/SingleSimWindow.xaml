@@ -5,7 +5,6 @@
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                  xmlns:unitStuff="clr-namespace:HSR_SIM_LIB.UnitStuff;assembly=HSR_SIM_LIB"
-                 xmlns:events="clr-namespace:HSR_SIM_LIB.TurnBasedClasses.Events;assembly=HSR_SIM_LIB"
                  xmlns:views="clr-namespace:HSR_SIM_CLIENT.Views"
                  xmlns:singleSim="clr-namespace:HSR_SIM_CLIENT.ViewModels"
                  mc:Ignorable="d"
@@ -36,15 +35,15 @@
 
         <Grid Grid.Row="1" Grid.Column="0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="2*"/>
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="2*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="4*" />
                 <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="4*" />
             </Grid.ColumnDefinitions>
-            <mah:Pivot Grid.Row="0" Grid.ColumnSpan="3"></mah:Pivot>
+            <mah:Pivot Grid.Row="0" Grid.ColumnSpan="3" />
             <Button Grid.Row="1" Grid.Column="2" Click="BtnNext_OnClick">Next step</Button>
             <Button Grid.Row="1" Grid.Column="0" Click="BtnPrev_OnClick">Prev step</Button>
         </Grid>
@@ -97,37 +96,33 @@
                 </TreeView>
             </Border>
 
-          
 
-            <Border Grid.Row="0" Grid.Column="1"  BorderThickness="1" BorderBrush="Gray">
-                <ScrollViewer >
+            <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="Gray">
+                <ScrollViewer>
                     <ScrollViewer.HorizontalScrollBarVisibility>Disabled</ScrollViewer.HorizontalScrollBarVisibility>
-                    <DataGrid  HorizontalAlignment="Stretch"
-                               VerticalAlignment="Stretch" />
+                    <DataGrid HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch" />
                 </ScrollViewer>
             </Border>
-            
-            <Border Grid.Row="1" Grid.Column="0"  BorderThickness="1" BorderBrush="Gray">
-            <ScrollViewer >
-                <ScrollViewer.HorizontalScrollBarVisibility>Disabled</ScrollViewer.HorizontalScrollBarVisibility>
-                <mah:HamburgerMenuListBox HorizontalAlignment="Stretch"
-                                          VerticalAlignment="Stretch" SelectedItem="{Binding SelectedEvent,Mode=OneWayToSource}"
-                                          ItemsSource="{Binding Path=Events,Mode=OneWay}">
 
-                </mah:HamburgerMenuListBox>
-            </ScrollViewer>
-            </Border>
-
-            <Border Grid.Row="1" Grid.Column="1"  BorderThickness="1" BorderBrush="Gray">
-                <ScrollViewer >
+            <Border Grid.Row="1" Grid.Column="0" BorderThickness="1" BorderBrush="Gray">
+                <ScrollViewer>
                     <ScrollViewer.HorizontalScrollBarVisibility>Disabled</ScrollViewer.HorizontalScrollBarVisibility>
-                    <views:EventView  HorizontalAlignment="Stretch"
-                                      VerticalAlignment="Stretch"  EventToView="{Binding SelectedEvent , Mode=OneWay}">
-                    </views:EventView>
+                    <mah:HamburgerMenuListBox HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Stretch"
+                                              SelectedItem="{Binding SelectedEvent,Mode=OneWayToSource}"
+                                              ItemsSource="{Binding Path=Events,Mode=OneWay}" />
                 </ScrollViewer>
             </Border>
-            
-          
+
+            <Border Grid.Row="1" Grid.Column="1" BorderThickness="1" BorderBrush="Gray">
+                <ScrollViewer>
+                    <ScrollViewer.HorizontalScrollBarVisibility>Disabled</ScrollViewer.HorizontalScrollBarVisibility>
+                    <views:EventView HorizontalAlignment="Stretch"
+                                     VerticalAlignment="Stretch" EventToView="{Binding SelectedEvent , Mode=OneWay}" />
+                </ScrollViewer>
+            </Border>
+
 
         </Grid>
 

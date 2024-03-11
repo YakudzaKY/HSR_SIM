@@ -11,7 +11,7 @@ namespace HSR_SIM_LIB.Skills.ReadyBuffs;
 /// </summary>
 public class AppliedBuffEntanglementWb : AppliedBuff
 {
-    public AppliedBuffEntanglementWb(Unit sourceUnit, AppliedBuff reference = null) : base(sourceUnit, reference)
+    public AppliedBuffEntanglementWb(Unit sourceUnit, AppliedBuff reference =null  ) : base(sourceUnit, reference,typeof(AppliedBuffEntanglementWb))
     {
         Type = BuffType.Debuff;
         BaseDuration = 1;

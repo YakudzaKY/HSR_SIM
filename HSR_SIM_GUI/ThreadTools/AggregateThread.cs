@@ -16,11 +16,11 @@ internal class AggregateThread
 {
     private const int QueueSlotMultiplier = 100;
     private readonly int childThreadCount;
-    private readonly ConcurrentQueue<SimTask> taskQueue = new();
-    private readonly ConcurrentQueue<KeyValuePair<SimTask, Worker.RCombatResult>> taskResultQueue = new();
     private readonly ThreadJob job;
     private readonly Thread mainThread;
     private readonly List<TaskProgress> taskProgress = new();
+    private readonly ConcurrentQueue<SimTask> taskQueue = new();
+    private readonly ConcurrentQueue<KeyValuePair<SimTask, Worker.RCombatResult>> taskResultQueue = new();
     private readonly List<SimThread> threads = new();
 
     public AggregateThread(ThreadJob pJob, int pChildThreadCount)
@@ -32,7 +32,10 @@ internal class AggregateThread
 
     public bool IsAlive => mainThread.IsAlive;
 
-    private bool HaveTaskToWait() => taskProgress.Any(x => x.EndCount < job.Iterations);
+    private bool HaveTaskToWait()
+    {
+        return taskProgress.Any(x => x.EndCount < job.Iterations);
+    }
 
     private void StopChildThreads()
     {
@@ -60,10 +63,7 @@ internal class AggregateThread
 
             var insertCount = Math.Min(freeQueueSlots, job.Iterations - taskToQueue.StartCount);
             freeQueueSlots -= insertCount;
-            for (var i = 0; i < insertCount; i++)
-            {
-                taskQueue.Enqueue(taskToQueue.STask);
-            }
+            for (var i = 0; i < insertCount; i++) taskQueue.Enqueue(taskToQueue.STask);
 
             taskToQueue.StartCount += insertCount;
         }
@@ -118,7 +118,10 @@ internal class AggregateThread
         mainThread.Interrupt();
     }
 
-    public int Progress() => taskProgress.Sum(x => x.EndCount);
+    public int Progress()
+    {
+        return taskProgress.Sum(x => x.EndCount);
+    }
 
     internal record TaskProgress
     {

@@ -142,17 +142,17 @@ public static class FighterUtils
     }
 
     /// <summary>
-    /// Generate damage output formula
+    ///     Generate damage output formula
     /// </summary>
     /// <param name="abilityFormula">formula to take ability damage</param>
     /// <returns></returns>
     public static Formula DamageFormula(Formula abilityFormula)
     {
-        string expression = $"{abilityFormula.Expression} * " +
-                            //crit
-                            $"( ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GenerateCrit)} * 0) " +
-                            $"+ ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetCritDamage)} * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.CritHit)} )  +1 )";
-        var newFormula = new Formula() { Expression = expression, Variables = abilityFormula.Variables };
+        var expression = $"{abilityFormula.Expression} * " +
+                         //crit
+                         $"( ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GenerateCrit)} * 0) " +
+                         $"+ ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetCritDamage)} * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.CritHit)} )  +1 )";
+        var newFormula = new Formula { Expression = expression, Variables = abilityFormula.Variables };
 
         return newFormula;
     }

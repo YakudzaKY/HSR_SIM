@@ -55,7 +55,7 @@ public class SilverWolf : DefaultFighter
         //weakness duration depend on A4 traits
         var weaknessDuration = ATraces.HasFlag(ATracesEnm.A4) ? 3 : 2;
 
-        allowChangesDebuff = new AppliedBuff(Parent)
+        allowChangesDebuff = new AppliedBuff(Parent,null,this)
         {
             Type = Buff.BuffType.Debuff,
             BaseDuration = weaknessDuration,
@@ -64,14 +64,14 @@ public class SilverWolf : DefaultFighter
             EffectStackingType = AppliedBuff.EffectStackingTypeEnm.FullReplace
         };
 
-        var allowChangesDebuffAllDmgRes = new AppliedBuff(Parent)
+        var allowChangesDebuffAllDmgRes = new AppliedBuff(Parent,null,this)
         {
             Type = Buff.BuffType.Debuff,
             BaseDuration = 2,
             Effects = [new EffAllDamageResist { CalculateValue = CalcSkillAllDmgRes }]
         };
 
-        var ultDefDebuff = new AppliedBuff(Parent)
+        var ultDefDebuff = new AppliedBuff(Parent,null,this)
         {
             Type = Buff.BuffType.Debuff,
             BaseDuration = 3,
@@ -79,19 +79,19 @@ public class SilverWolf : DefaultFighter
         };
 
         bugDuration = ATraces.HasFlag(ATracesEnm.A2) ? 4 : 3;
-        var talentAtkDebuff = new AppliedBuff(Parent)
+        var talentAtkDebuff = new AppliedBuff(Parent,null,this)
         {
             Type = Buff.BuffType.Debuff,
             BaseDuration = bugDuration,
             Effects = [new EffAtkPrc { Value = -FighterUtils.GetAbilityScaling(0.05, 0.1, talentLvl) }]
         };
-        var talentDefDebuff = new AppliedBuff(Parent)
+        var talentDefDebuff = new AppliedBuff(Parent,null,this)
         {
             Type = Buff.BuffType.Debuff,
             BaseDuration = bugDuration,
             Effects = [new EffDefPrc { Value = -FighterUtils.GetAbilityScaling(0.04, 0.08, talentLvl) }]
         };
-        var talentSpdDebuff = new AppliedBuff(Parent)
+        var talentSpdDebuff = new AppliedBuff(Parent,null,this)
         {
             Type = Buff.BuffType.Debuff,
             BaseDuration = bugDuration,
@@ -200,7 +200,7 @@ public class SilverWolf : DefaultFighter
         Abilities.Add(userBanned);
 
         if (Parent.Rank >= 6)
-            Parent.PassiveBuffs.Add(new PassiveBuff(Parent,this)
+            Parent.PassiveBuffs.Add(new PassiveBuff(Parent, this)
             {
                 Effects = [new EffAllDamageBoost { CalculateValue = CalculateE6 }],
                 Target = Parent,
@@ -255,7 +255,7 @@ public class SilverWolf : DefaultFighter
                 ApplyBuff newEvent = new(ent.ParentStep, this, Parent)
                 {
                     TargetUnit = ent.TargetUnit,
-                    AppliedBuffToApply = new AppliedBuff(Parent)
+                    AppliedBuffToApply = new AppliedBuff(Parent,null,this)
                     {
                         Dispellable = false,
                         Type = Buff.BuffType.Debuff,

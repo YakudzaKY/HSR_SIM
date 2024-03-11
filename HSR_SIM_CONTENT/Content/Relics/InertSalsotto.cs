@@ -13,7 +13,7 @@ internal class InertSalsotto : DefaultRelicSet
 
     private PassiveBuff GetMod()
     {
-        return new PassiveBuff(Parent.Parent,this)
+        return new PassiveBuff(Parent.Parent, this)
         {
             Effects =
             [
@@ -23,12 +23,12 @@ internal class InertSalsotto : DefaultRelicSet
             CustomIconName = "gear\\" + GetType().ToString().Split('.').Last(),
 
             Target = Parent.Parent,
-            WorkCondition = new Condition()
+            ApplyConditions = [new Condition
             {
                 ConditionParam = Condition.ConditionCheckParam.CritRate,
                 ConditionExpression = Condition.ConditionCheckExpression.EqualOrMore,
                 Value = 0.50
-            }
+            }]
         };
     }
 }

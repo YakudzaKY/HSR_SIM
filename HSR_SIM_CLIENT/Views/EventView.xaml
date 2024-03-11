@@ -3,50 +3,68 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:HSR_SIM_CLIENT.Views"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:singleSim="clr-namespace:HSR_SIM_CLIENT.ViewModels"
+             xmlns:views="clr-namespace:HSR_SIM_CLIENT.Views"
+             xmlns:unitStuff="clr-namespace:HSR_SIM_LIB.Skills;assembly=HSR_SIM_LIB"
              mc:Ignorable="d"
-         
+
+
+             Name="Parent">
+
+    <Grid DataContext="{Binding ElementName=Parent}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="2*" />
+        </Grid.ColumnDefinitions>
+        <Grid.Resources>
+
+           
+            
+            <DataTemplate DataType="{x:Type unitStuff:Buff }">
+                <views:BuffView BuffToView="{Binding ., Mode=OneWay}" />
+            </DataTemplate>
+
+        </Grid.Resources>
         
-             Name="Parent"
-            >
-    
-        <Grid   DataContext="{Binding ElementName=Parent}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="2*"/>
-            </Grid.ColumnDefinitions>
-            <Label Grid.Row="0" Grid.Column="0" >Name</Label>
-            <TextBox Grid.Row="0" Grid.Column="1"  Text="{Binding EventToView.Name, Mode=OneWay}"></TextBox>
-            <Label Grid.Row="1" Grid.Column="0" >Source</Label>
-            <TextBox Grid.Row="1" Grid.Column="1"  Text="{Binding EventToView.Source, Mode=OneWay}"></TextBox>
-            <Label Grid.Row="2" Grid.Column="0" >Source unit</Label>
-            <TextBox Grid.Row="2" Grid.Column="1"  Text="{Binding EventToView.SourceUnit, Mode=OneWay}"></TextBox>
-            <Label Grid.Row="3" Grid.Column="0" >Target unit</Label>
-            <TextBox Grid.Row="3" Grid.Column="1"  Text="{Binding EventToView.TargetUnit, Mode=OneWay}"></TextBox>
-            <Label Grid.Row="4" Grid.Column="0" >Value</Label>
-            <TextBox Grid.Row="4" Grid.Column="1"  Text="{Binding EventToView.Value, Mode=OneWay}"></TextBox>
-            <Label Grid.Row="5" Grid.Column="0" >Real value</Label>
-            <TextBox Grid.Row="5" Grid.Column="1"  Text="{Binding EventToView.RealValue, Mode=OneWay}"></TextBox>
-            <Label Grid.Row="6" Grid.Column="0" >Description</Label>
-            <TextBox Grid.Row="6" Grid.Column="1"  Text="{Binding EventToView.Description, Mode=OneWay}"></TextBox>
-            <Label Grid.Row="7" Grid.Column="0" Visibility="{Binding ExplainVisible, Mode=OneWay}"> Explain:</Label>
-            <TextBox Width="Auto" Grid.Row="8" Grid.Column="0" Visibility="{Binding ExplainVisible, Mode=OneWay}" Grid.ColumnSpan="2"  TextWrapping="WrapWithOverflow"  Text="{Binding EventToView.Explain, Mode=OneWay}"></TextBox>
-   
-          
+        <Label Grid.Row="0" Grid.Column="0">Name</Label>
+        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding EventToView.Name, Mode=OneWay}" />
+        <Label Grid.Row="1" Grid.Column="0">Source</Label>
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding EventToView.Source, Mode=OneWay}" />
+        <Label Grid.Row="2" Grid.Column="0">Source unit</Label>
+        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding EventToView.SourceUnit, Mode=OneWay}" />
+        <Label Grid.Row="3" Grid.Column="0">Target unit</Label>
+        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding EventToView.TargetUnit, Mode=OneWay}" />
+        <Label Grid.Row="4" Grid.Column="0">Value</Label>
+        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding EventToView.Value, Mode=OneWay}" />
+        <Label Grid.Row="5" Grid.Column="0">Real value</Label>
+        <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding EventToView.RealValue, Mode=OneWay}" />
+        <Label Grid.Row="6" Grid.Column="0">Description</Label>
+        <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding EventToView.Description, Mode=OneWay}" />
+        <Label Grid.Row="7" Grid.Column="0">Affecting buffs</Label>
+        <mah:HamburgerMenuListBox Grid.Row="8" Grid.Column="0"  Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch" 
+                                  ItemsSource="{Binding Path=EventToView.Buffs,Mode=OneWay}">
+        </mah:HamburgerMenuListBox>
+        
+        <Label Grid.Row="9" Grid.Column="0" Visibility="{Binding ExplainVisible, Mode=OneWay}">Explain</Label>
+        <TextBox Width="Auto" Grid.Row="10" Grid.Column="0" Visibility="{Binding ExplainVisible, Mode=OneWay}"
+                 Grid.ColumnSpan="2" TextWrapping="WrapWithOverflow" Text="{Binding EventToView.Explain, Mode=OneWay}" />
        
 
-        </Grid>
-    
+    </Grid>
+
 </UserControl>

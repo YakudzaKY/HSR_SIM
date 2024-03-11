@@ -11,7 +11,7 @@ namespace HSR_SIM_LIB.Skills.ReadyBuffs;
 /// </summary>
 public class AppliedBuffFreezeWb : AppliedBuff
 {
-    public AppliedBuffFreezeWb(Unit sourceUnit, AppliedBuff reference = null) : base(sourceUnit, reference)
+    public AppliedBuffFreezeWb(Unit sourceUnit, AppliedBuff reference =null ) : base(sourceUnit, reference,typeof(AppliedBuffFreezeWb))
     {
         Type = BuffType.Debuff;
         BaseDuration = 1;

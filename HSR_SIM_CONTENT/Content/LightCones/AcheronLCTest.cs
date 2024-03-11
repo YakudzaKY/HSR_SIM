@@ -15,7 +15,7 @@ internal class AcheronLcTst : DefaultLightCone
     public AcheronLcTst(IFighter parent, int rank) : base(parent, rank)
     {
         if (Path != Parent.Path) return;
-        aetherCodeDebuff = new AppliedBuff(Parent.Parent)
+        aetherCodeDebuff = new AppliedBuff(Parent.Parent,null,this)
         {
             CustomIconName = "defeat",
             Type = Buff.BuffType.Debuff,
@@ -24,7 +24,7 @@ internal class AcheronLcTst : DefaultLightCone
         };
 
 
-        Parent.Parent.PassiveBuffs.Add(new PassiveBuff(Parent.Parent,this)
+        Parent.Parent.PassiveBuffs.Add(new PassiveBuff(Parent.Parent, this)
         {
             Effects =
             [
@@ -34,12 +34,12 @@ internal class AcheronLcTst : DefaultLightCone
             ],
 
             Target = Parent.Parent,
-            WorkCondition = new Condition()
+            ApplyConditions = [new Condition
             {
                 AppliedBuffValue = aetherCodeDebuff,
                 ConditionExpression = Condition.ConditionCheckExpression.Exists,
                 ConditionParam = Condition.ConditionCheckParam.Buff
-            },
+            }],
             IsTargetCheck = true
         });
     }

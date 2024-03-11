@@ -435,8 +435,7 @@ public static class GraphicsCls
                     portraitPoint.Y + j * ElemSizeMini.Height -
                     colModifier * maxIconsVerticalCnt * ElemSizeMini.Height);
                 gfx.DrawImage(
-                    new Bitmap(Utl.LoadBitmap(buff.CustomIconName ?? buff.Effects.First().GetType().Name),
-                        ElemSizeMini), buffPoint);
+                    buff.IconImage, buffPoint);
                 gfx.DrawRectangle(
                     new Pen(
                         buff.Type == Buff.BuffType.Buff ? Color.Aquamarine :

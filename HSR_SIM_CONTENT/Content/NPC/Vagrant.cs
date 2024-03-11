@@ -9,7 +9,7 @@ namespace HSR_SIM_CONTENT.Content.NPC;
 
 public class Vagrant : DefaultNPCFighter
 {
-    private static readonly AppliedBuff AtkAppliedBuff = new(null)
+    private static readonly AppliedBuff AtkAppliedBuff = new(null,null,typeof(Vagrant))
     {
         BaseDuration = 2, Effects = new List<Effect> { new EffAtkPrc { Value = 0.3 } }
     };

@@ -44,7 +44,7 @@ public class Bronya : DefaultFighter
         ApplyBuff eventBuff = new(null, this, Parent)
         {
             OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
-            AppliedBuffToApply = new AppliedBuff(Parent)
+            AppliedBuffToApply = new AppliedBuff(Parent,null,this)
             {
                 Type = Buff.BuffType.Buff,
                 Effects = new List<Effect> { new EffAtkPrc { Value = 0.15 } },
@@ -94,7 +94,7 @@ public class Bronya : DefaultFighter
         //dmg events
         ability.Events.Add(new ApplyBuff(null, this, Parent)
         {
-            AppliedBuffToApply = new AppliedBuff(Parent)
+            AppliedBuffToApply = new AppliedBuff(Parent,null,this)
             {
                 BaseDuration = 1,
                 Effects = [new EffAllDamageBoost { Value = GetAbilityScaling(0.33, 0.66, abilitySkillLvl) }]
@@ -120,7 +120,7 @@ public class Bronya : DefaultFighter
         //buff apply
         ApplyBuff ultimateBuff = new(null, this, Parent)
         {
-            AppliedBuffToApply = new AppliedBuff(Parent)
+            AppliedBuffToApply = new AppliedBuff(Parent,null,this)
             {
                 CustomIconName = "The_Belobog_March",
                 Type = Buff.BuffType.Buff,
@@ -144,7 +144,7 @@ public class Bronya : DefaultFighter
         //=====================
 
         if (ATraces.HasFlag(ATracesEnm.A6))
-            Parent.PassiveBuffs.Add(new PassiveBuff(Parent,this)
+            Parent.PassiveBuffs.Add(new PassiveBuff(Parent, this)
             {
                 Effects = [new EffAllDamageBoost { Value = 0.10 }],
                 Target = Parent.ParentTeam

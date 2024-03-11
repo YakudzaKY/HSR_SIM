@@ -6,7 +6,6 @@ using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.Utils;
 using static HSR_SIM_LIB.Utils.CallBacks;
-using static HSR_SIM_LIB.Utils.Constant;
 using static HSR_SIM_LIB.TurnBasedClasses.Step;
 using static HSR_SIM_LIB.UnitStuff.Unit;
 
@@ -150,10 +149,7 @@ public class Worker
                     if (!Completed)
                     {
                         replay = false;
-                        if (Sim == null)
-                        {
-                            return;
-                        }
+                        if (Sim == null) return;
 
                         var newStep = Sim.WorkIteration();
 
@@ -180,7 +176,6 @@ public class Worker
         if (Sim?.CurrentStep != oldStep) DrawCombat();
     }
 
-    
 
     /// <summary>
     ///     Draw combat in client

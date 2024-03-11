@@ -14,17 +14,17 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 /// </summary>
 public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit) : CloneClass
 {
-    public double CalculateProportion { get; set; } //todo:delete
-
     public delegate IEnumerable<Unit> CalculateTargetPrc();
 
     public delegate double? CalculateValuePrc(Event ent);
 
     public readonly List<Event> ChildEvents = [];
     private readonly int procRatio = 1;
+    public List<Condition> ApplyConditions;
 
     private int procRatioCounter = 1; //counter
     private double? value; //Theoretical value
+    public double CalculateProportion { get; set; } //todo:delete
 
     public object CalculateValue { get; set; }
     public CalculateTargetPrc CalculateTargets { get; init; }
@@ -47,21 +47,6 @@ public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit)
     private ProcRatioDirectionEnm ProcRatioDirection { get; } = ProcRatioDirectionEnm.Descending;
 
     public bool IsReady => procRatioCounter == 1; //event is ready to be applied on target
-    public List<Condition> ApplyConditions;
-
-    /// <summary>
-    /// Conditions are OK
-    /// </summary>
-    /// <param name="parentBuff"></param>
-    /// <param name="targetUnit"></param>
-    /// <param name="excludeCondition"></param>
-    /// <param name="ent"></param>
-    /// <returns></returns>
-    public bool Truly(Unit targetUnit = null)
-    {
-        if (ApplyConditions is null || ApplyConditions.Count == 0) return true;
-        return ApplyConditions.All(x => x.Truly(null, targetUnit, null, this));
-    }
 
     public Ability.AbilityCurrentTargetEnm? CurrentTargetType { get; init; }
     public Unit SourceUnit { get; set; } = sourceUnit;
@@ -81,7 +66,7 @@ public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit)
                 //if calculate is formula then set reference and calc formula
                 case Formula cFrm:
                     CalculateValue = cFrm.Clone();
-                    Formula newFrm = (Formula)CalculateValue;
+                    var newFrm = (Formula)CalculateValue;
                     newFrm.EventRef = this;
                     value = newFrm.Result;
                     break;
@@ -112,6 +97,17 @@ public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit)
 
     public bool IsDamageEvent => this is ToughnessBreak or DoTDamage or DirectDamage or ToughnessBreakDoTDamage;
     public Event Reference { get; set; }
+
+    /// <summary>
+    ///     Conditions are OK
+    /// </summary>
+    /// <param name="targetUnit"></param>
+    /// <returns></returns>
+    public bool Truly(Unit targetUnit = null)
+    {
+        if (ApplyConditions is null || ApplyConditions.Count == 0) return true;
+        return ApplyConditions.All(x => x.Truly(null, targetUnit, null, this));
+    }
 
     /*
     public int Cooldown { get; init; } = 0;

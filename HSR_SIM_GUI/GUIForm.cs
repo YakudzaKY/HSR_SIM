@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using HSR_SIM_LIB;
 using HSR_SIM_LIB.Fighters;
-using HSR_SIM_LIB.Utils;
 using static HSR_SIM_GUI.GuiUtils;
 
 namespace HSR_SIM_GUI;
@@ -23,7 +21,6 @@ public partial class GUIForm : Form
         ApplyDarkLightTheme(this);
     }
 
-   
 
     /// <summary>
     ///     ask user what decision are pick from options(do we crit etc...)

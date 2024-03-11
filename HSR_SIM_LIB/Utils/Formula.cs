@@ -12,60 +12,38 @@ using Microsoft.VisualBasic;
 namespace HSR_SIM_LIB.Utils;
 
 /// <summary>
-/// Formula class.
-/// Result will be calculated once
-/// part of code got from https://stackoverflow.com/questions/34138314/creating-dynamic-formula
+///     Formula class.
+///     Result will be calculated once
+///     part of code got from https://stackoverflow.com/questions/34138314/creating-dynamic-formula
 /// </summary>
-public partial class Formula : ICloneable
+public class Formula : ICloneable
 {
-    //event where formula is used
-    public Event EventRef { get; set; }
-
-
     public enum DynamicTargetEnm
     {
         Attacker,
         Defender
     }
 
-    public record EffectTraceRec(Buff TraceBuff, Effect TraceEffect, double TraceTotalValue)
-    {
-        public Buff TraceBuff { get; } = TraceBuff;
-        public Effect TraceEffect { get; } = TraceEffect;
-        public double TraceTotalValue { get; } = TraceTotalValue;
-    }
+    private string expression;
+
+
+    private double? result;
+
+    //event where formula is used
+    public Event EventRef { get; set; }
 
     public Unit Attacker => EventRef.SourceUnit;
     public Unit Defender => EventRef.TargetUnit;
 
-    public static String GenerateReference<T>(Expression<Action<T>> expression)
-    {
-        if (expression.Body is MethodCallExpression member)
-            return member.Method.Name;
-
-        throw new ArgumentException("Expression is not a method", nameof(expression));
-    }
-
-
-    private double? result;
-    private string expression;
-
-    public record VarVal
-    {
-        public double? Result { get; set; }
-        public string ReplaceExpression { get; init; }
-        public Formula ResFormula { get; set; }
-        public List<EffectTraceRec> TraceEffects { get; init; } = [];
-    }
-
     /// <summary>
-    /// This simply stores a variable name and its value so when this key is found in a expression it gets the value accordingly.
+    ///     This simply stores a variable name and its value so when this key is found in a expression it gets the value
+    ///     accordingly.
     /// </summary>
     public Dictionary<string, VarVal> Variables { get; set; } = new();
 
     /// <summary>
-    /// return result of Formula
-    /// if no result then calculate it
+    ///     return result of Formula
+    ///     if no result then calculate it
     /// </summary>
     public double Result
     {
@@ -75,7 +53,8 @@ public partial class Formula : ICloneable
 
 
     /// <summary>
-    /// The expression itself, each value and operation must be separated with SPACES. The expression does not support PARENTHESES at this point.
+    ///     The expression itself, each value and operation must be separated with SPACES. The expression does not support
+    ///     PARENTHESES at this point.
     /// </summary>
     public string Expression
     {
@@ -83,8 +62,28 @@ public partial class Formula : ICloneable
         init => expression = value;
     }
 
+
+    public object Clone()
+    {
+        var newClone = (Formula)MemberwiseClone();
+        var oldVariables = newClone.Variables;
+        newClone.Variables = new Dictionary<string, VarVal>();
+        foreach (var oldVar in oldVariables)
+            newClone.Variables[oldVar.Key] = oldVar.Value with { TraceEffects = new List<EffectTraceRec>() };
+
+        return newClone;
+    }
+
+    public static string GenerateReference<T>(Expression<Action<T>> expression)
+    {
+        if (expression.Body is MethodCallExpression member)
+            return member.Method.Name;
+
+        throw new ArgumentException("Expression is not a method", nameof(expression));
+    }
+
     /// <summary>
-    /// Parse  for DynamicTargetEnm and create and calc variable
+    ///     Parse  for DynamicTargetEnm and create and calc variable
     /// </summary>
     private void ParseVariables()
     {
@@ -96,12 +95,10 @@ public partial class Formula : ICloneable
 
         int CountCharsUsingFor(string source, char toFind, int startNdx, int endNdx)
         {
-            int count = 0;
-            for (int n = startNdx; n < endNdx; n++)
-            {
+            var count = 0;
+            for (var n = startNdx; n < endNdx; n++)
                 if (source[n] == toFind)
                     count++;
-            }
 
             return count;
         }
@@ -117,10 +114,10 @@ public partial class Formula : ICloneable
             if (ndx + 1 >= pstr.Length)
             {
                 nextPos = -1;
-                return String.Empty;
+                return string.Empty;
             }
 
-            int methodEndNdx = pstr.IndexOf("#", ndx, StringComparison.Ordinal);
+            var methodEndNdx = pstr.IndexOf("#", ndx, StringComparison.Ordinal);
             if (methodEndNdx == -1)
                 methodEndNdx = pstr.Length;
             nextPos = methodEndNdx + 1;
@@ -128,11 +125,11 @@ public partial class Formula : ICloneable
         }
 
         //do replace on ( ) expressions
-        int expNdx = GetNext("(", 0);
+        var expNdx = GetNext("(", 0);
         while (expNdx >= 0)
         {
             int endNdx;
-            int level = -1;
+            var level = -1;
             endNdx = expNdx;
             while (level != 0)
             {
@@ -142,15 +139,15 @@ public partial class Formula : ICloneable
             }
 
             //save to replacers expression without closing parentheses
-            string varExpr = Expression.Substring(expNdx + 1, endNdx - expNdx - 1);
+            var varExpr = Expression.Substring(expNdx + 1, endNdx - expNdx - 1);
             //will replace original str
-            string newExp = Expression.Substring(expNdx, endNdx - expNdx + 1).Replace(" ", String.Empty);
+            var newExp = Expression.Substring(expNdx, endNdx - expNdx + 1).Replace(" ", string.Empty);
             //remove old expression and replace with trimmed
             expression = Expression.Remove(expNdx, endNdx - expNdx + 1).Insert(expNdx, newExp);
 
-            var newVal = new VarVal()
+            var newVal = new VarVal
             {
-                ResFormula = new Formula()
+                ResFormula = new Formula
                     { Expression = varExpr, Variables = Variables.ToDictionary(), EventRef = EventRef }
             };
             newVal.Result = newVal.ResFormula.Result;
@@ -160,9 +157,9 @@ public partial class Formula : ICloneable
         }
 
         //extract variables
-        foreach (DynamicTargetEnm dynVar in (DynamicTargetEnm[])Enum.GetValues(typeof(DynamicTargetEnm)))
+        foreach (var dynVar in (DynamicTargetEnm[])Enum.GetValues(typeof(DynamicTargetEnm)))
         {
-            int ndx = GetNext(dynVar.ToString(), 0);
+            var ndx = GetNext(dynVar.ToString(), 0);
 
             while (ndx >= 0)
             {
@@ -172,11 +169,11 @@ public partial class Formula : ICloneable
                  */
                 if (ndx == 0 || Expression[ndx - 1] == ' ')
                 {
-                    int endNdx = GetNext(" ", ndx);
+                    var endNdx = GetNext(" ", ndx);
                     if (endNdx < 0)
                         endNdx = Expression.Length;
-                    string varExpr = Expression.Substring(ndx, endNdx - ndx);
-                    Variables.Add(varExpr, new VarVal() { ReplaceExpression = varExpr });
+                    var varExpr = Expression.Substring(ndx, endNdx - ndx);
+                    Variables.Add(varExpr, new VarVal { ReplaceExpression = varExpr });
                 }
 
                 ndx = GetNext(dynVar.ToString(), ndx + 1);
@@ -192,7 +189,7 @@ public partial class Formula : ICloneable
             if (ndx < 0) continue;
             var methodNdx = expr.IndexOf('#') + 1;
 
-            var myFieldInfo = this.GetType().GetProperty(dynVar.ToString());
+            var myFieldInfo = GetType().GetProperty(dynVar.ToString());
 
             var initUnit = (Unit)myFieldInfo!.GetValue(this);
             object finalMeth = initUnit;
@@ -204,10 +201,10 @@ public partial class Formula : ICloneable
                 MethodInfo mInfo;
                 //proxy to unit formulas
                 if (nextMethod == nameof(UnitFormulas))
-                    mInfo =  typeof(UnitFormulas).GetMethod(GetNextMethod(expr, methodNdx, out methodNdx));
+                    mInfo = typeof(UnitFormulas).GetMethod(GetNextMethod(expr, methodNdx, out methodNdx));
                 else
                     mInfo = finalMeth.GetType().GetMethod(nextMethod);
-           
+
                 if (mInfo is not null)
                 {
                     prevObject = finalMeth;
@@ -226,24 +223,20 @@ public partial class Formula : ICloneable
                         else
                         {
                             var nextPrm = GetNextMethod(expr, methodNdx, out methodNdx);
-                            if (String.IsNullOrEmpty(nextPrm)) continue;
+                            if (string.IsNullOrEmpty(nextPrm)) continue;
                             //first search Type
                             var searchType = Type.GetType(nextPrm);
                             if (searchType != null)
-                            {
                                 objArr[^1] = searchType;
-                            }
                             else
-                            {
                                 objArr[^1] = null;
-                            }
                         }
                     }
 
                     finalMeth = mInfo.Invoke(prevObject, objArr);
                 }
 
-                PropertyInfo pInfo = finalMeth.GetType().GetProperty(nextMethod);
+                var pInfo = finalMeth.GetType().GetProperty(nextMethod);
                 if (pInfo is not null)
                 {
                     prevObject = finalMeth;
@@ -277,14 +270,13 @@ public partial class Formula : ICloneable
     private double CalculateResult()
     {
         ParseVariables();
-        if (string.IsNullOrWhiteSpace(this.Expression))
+        if (string.IsNullOrWhiteSpace(Expression))
             throw new Exception("An expression must be defined in the Expression property.");
 
         double? calculationResult = null;
         var operation = string.Empty;
 
-        foreach (var lexeme in Expression.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries))
-        {
+        foreach (var lexeme in Expression.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries))
             //If it is an operator
             if (lexeme is "*" or "/" or "+" or "-")
             {
@@ -299,11 +291,8 @@ public partial class Formula : ICloneable
                     value = double.Parse(lexeme, NumberStyles.Any, CultureInfo.InvariantCulture);
 
                 if (!calculationResult.HasValue) //No value has been assigned yet
-                {
                     calculationResult = value;
-                }
                 else
-                {
                     switch (operation) //Let's check the operation we should perform
                     {
                         case "*":
@@ -321,40 +310,25 @@ public partial class Formula : ICloneable
                         default:
                             throw new Exception("The expression is not properly formatted.");
                     }
-                }
             }
-        }
 
         if (calculationResult.HasValue)
             return calculationResult.Value;
-        else
-            throw new Exception("The operation could not be completed, a result was not obtained.");
+        throw new Exception("The operation could not be completed, a result was not obtained.");
     }
 
 
-    private IEnumerable<EffectTraceRec> DescendantsAndSelfEffects()
+    public IEnumerable<EffectTraceRec> DescendantsAndSelfEffects()
     {
         foreach (var eff in Variables.Values.SelectMany(x => x.TraceEffects))
             yield return eff;
         foreach (var formula in Variables.Values.Where(x => x.ResFormula != null).Select(x => x.ResFormula))
-        {
-            foreach (var eff in formula.DescendantsAndSelfEffects())
-                yield return eff;
-        }
+        foreach (var eff in formula.DescendantsAndSelfEffects())
+            yield return eff;
     }
 
     /// <summary>
-    /// Rec with Replace variables
-    /// </summary>
-    public record ReplacersRec
-    {
-        public List<VarVal> ReplacedExpressions { get; set; } = [];
-        public List<VarVal> ReplacedFormulas { get; set; } = [];
-        public List<VarVal> ReplacedRaw { get; set; } = [];
-    }
-
-    /// <summary>
-    /// output formula 
+    ///     output formula
     /// </summary>
     /// <param name="shortExplain">is child explanation. will run 1 times</param>
     /// <param name="replacedResults">previously made replacements of variables with the result of calculations</param>
@@ -372,27 +346,28 @@ public partial class Formula : ICloneable
         replacedVariables ??= new ReplacersRec();
         newlyReplacedVariables ??= new ReplacersRec();
         replacedResults ??= [];
-        bool nextRunAllowed = true;
+        var nextRunAllowed = true;
         //if short explain then always 1 explain iteration
-        bool firstRun = shortExplain;
+        var firstRun = shortExplain;
 
         bool IncompleteLevel(Dictionary<string, VarVal> sVals)
         {
             return nextRunAllowed && sVals.Any(
-                x => ((x.Value.ReplaceExpression != null && !replacedVariables.ReplacedExpressions.Contains(x.Value))
-                      || (x.Value.ResFormula != null && !replacedVariables.ReplacedFormulas.Contains(x.Value))
-                      || !replacedVariables.ReplacedRaw.Contains(x.Value)
-                      || (x.Value.Result != null && !replacedResults.Contains(x.Value)))
+                x => (x.Value.ReplaceExpression != null && !replacedVariables.ReplacedExpressions.Contains(x.Value))
+                     || (x.Value.ResFormula != null && !replacedVariables.ReplacedFormulas.Contains(x.Value))
+                     || !replacedVariables.ReplacedRaw.Contains(x.Value)
+                     || (x.Value.Result != null && !replacedResults.Contains(x.Value))
             );
         }
 
-        var finalStr = String.Empty;
+        var finalStr = string.Empty;
 
         if (!shortExplain)
         {
             var enumerable = DescendantsAndSelfEffects().ToArray();
             if (EventRef is DirectDamage dd)
-                finalStr += $"(!) Critical hit={ dd.IsCrit} Crit rate= {UnitFormulas.CritChance(EventRef).Result}" + Environment.NewLine;
+                finalStr += $"(!) Critical hit={dd.IsCrit} Crit rate= {dd.CritRate}" +
+                            Environment.NewLine;
             if (enumerable.Any())
                 finalStr += "-==USED BUFFS==-" + Environment.NewLine;
 
@@ -412,7 +387,6 @@ public partial class Formula : ICloneable
             firstRun = false;
             foreach (var lexeme in Expression.Split([" "],
                          StringSplitOptions.RemoveEmptyEntries))
-            {
                 if (Variables.TryGetValue(lexeme, out var val))
                 {
                     //if expression exists and not handled
@@ -425,7 +399,7 @@ public partial class Formula : ICloneable
                             newlyReplacedVariables.ReplacedRaw.Add(val);
                         finalStr += lexeme + Strings.Space(1);
                     }
-                    else if (!String.IsNullOrEmpty(val.ReplaceExpression) &&
+                    else if (!string.IsNullOrEmpty(val.ReplaceExpression) &&
                              !replacedVariables.ReplacedExpressions.Contains(val))
                     {
                         if (!newlyReplacedVariables.ReplacedExpressions.Contains(val))
@@ -450,13 +424,13 @@ public partial class Formula : ICloneable
                             replacedResults.Add(val);
                         //finalStr += val.Result + Strings.Space(1);
                         finalStr += (val.TraceEffects.Any()
-                            ? "(" + String.Join("+", val.TraceEffects.Select(x => x.TraceTotalValue)) + ")"
+                            ? "(" + string.Join("+", val.TraceEffects.Select(x => x.TraceTotalValue)) + ")"
                             : val.Result) + Strings.Space(1);
                     }
                     else
                     {
                         finalStr += (val.TraceEffects.Any()
-                            ? "(" + String.Join("+", val.TraceEffects.Select(x => x.TraceTotalValue)) + ")"
+                            ? "(" + string.Join("+", val.TraceEffects.Select(x => x.TraceTotalValue)) + ")"
                             : val.Result) + Strings.Space(1);
                     }
                 }
@@ -464,7 +438,6 @@ public partial class Formula : ICloneable
                 {
                     finalStr += lexeme + Strings.Space(1);
                 }
-            }
 
             //Every iteration in main cycle add new items to main array
             if (!shortExplain)
@@ -477,7 +450,7 @@ public partial class Formula : ICloneable
                 newlyReplacedVariables.ReplacedRaw.Clear();
             }
 
-            finalStr += (shortExplain ? "" : " = " + Environment.NewLine);
+            finalStr += shortExplain ? "" : " = " + Environment.NewLine;
             nextRunAllowed = !shortExplain;
         }
 
@@ -485,17 +458,28 @@ public partial class Formula : ICloneable
         return finalStr + (shortExplain ? "" : result);
     }
 
-
-    public object Clone()
+    public record EffectTraceRec(Buff TraceBuff, Effect TraceEffect, double TraceTotalValue)
     {
-        var newClone = (Formula)MemberwiseClone();
-        var oldVariables = newClone.Variables;
-        newClone.Variables = new Dictionary<string, VarVal>();
-        foreach (var oldVar in oldVariables)
-        {
-            newClone.Variables[oldVar.Key] = oldVar.Value with { TraceEffects = new List<EffectTraceRec>() };
-        }
+        public Buff TraceBuff { get; } = TraceBuff;
+        public Effect TraceEffect { get; } = TraceEffect;
+        public double TraceTotalValue { get; } = TraceTotalValue;
+    }
 
-        return newClone;
+    public record VarVal
+    {
+        public double? Result { get; set; }
+        public string ReplaceExpression { get; init; }
+        public Formula ResFormula { get; set; }
+        public List<EffectTraceRec> TraceEffects { get; init; } = [];
+    }
+
+    /// <summary>
+    ///     Rec with Replace variables
+    /// </summary>
+    public record ReplacersRec
+    {
+        public List<VarVal> ReplacedExpressions { get; set; } = [];
+        public List<VarVal> ReplacedFormulas { get; set; } = [];
+        public List<VarVal> ReplacedRaw { get; set; } = [];
     }
 }

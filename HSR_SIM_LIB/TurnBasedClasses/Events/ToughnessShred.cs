@@ -9,33 +9,31 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 
 public class ToughnessShred : Event
 {
-
-    public List<Condition> DefaultToughnessCondition()
-    {
-        return
-            [
-                new Condition()
-                {
-                    ConditionParam = Condition.ConditionCheckParam.Weakness,
-                    ConditionExpression = Condition.ConditionCheckExpression.Exists,
-                    ElemValue =null
-                },
-                new Condition()
-                {
-                    ConditionParam = Condition.ConditionCheckParam.Resource,
-                    ConditionExpression = Condition.ConditionCheckExpression.More,
-                    Value = 0,
-                    ResourceValue = Resource.ResourceType.Toughness
-                },
-            ]
-            ;
-    }
-    
     public ToughnessShred(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
     {
         ApplyConditions = DefaultToughnessCondition();
     }
 
+    public List<Condition> DefaultToughnessCondition()
+    {
+        return
+            [
+                new Condition
+                {
+                    ConditionParam = Condition.ConditionCheckParam.Weakness,
+                    ConditionExpression = Condition.ConditionCheckExpression.Exists,
+                    ElemValue = null
+                },
+                new Condition
+                {
+                    ConditionParam = Condition.ConditionCheckParam.Resource,
+                    ConditionExpression = Condition.ConditionCheckExpression.More,
+                    Value = 0,
+                    ResourceValue = Resource.ResourceType.Toughness
+                }
+            ]
+            ;
+    }
 
 
     public override void ProcEvent(bool revert)

@@ -17,14 +17,14 @@ internal class IncessantRain : DefaultLightCone
     public IncessantRain(IFighter parent, int rank) : base(parent, rank)
     {
         if (Path != Parent.Path) return;
-        aetherCodeDebuff = new AppliedBuff(Parent.Parent)
+        aetherCodeDebuff = new AppliedBuff(Parent.Parent,null,this)
         {
             Type = Buff.BuffType.Debuff, BaseDuration = 1,
             Effects = [new EffAllDamageVulnerability { Value = lcMods[Rank - 1] }]
         };
 
 
-        Parent.Parent.PassiveBuffs.Add(new PassiveBuff(Parent.Parent,this)
+        Parent.Parent.PassiveBuffs.Add(new PassiveBuff(Parent.Parent, this)
         {
             Effects = [new EffCritPrc { CalculateValue = CalcCrit }],
             Target = Parent.Parent,

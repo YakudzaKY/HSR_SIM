@@ -9,7 +9,7 @@ namespace HSR_SIM_LIB.Skills.ReadyBuffs;
 /// </summary>
 public class AppliedBuffShockWb : AppliedBuff
 {
-    public AppliedBuffShockWb(Unit sourceUnit, AppliedBuff reference = null) : base(sourceUnit, reference)
+    public AppliedBuffShockWb(Unit sourceUnit, AppliedBuff reference =null ) : base(sourceUnit, reference, typeof(AppliedBuffShockWb) )
     {
         Type = BuffType.Dot;
         BaseDuration = 2;

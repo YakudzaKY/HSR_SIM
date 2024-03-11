@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.AccessControl;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Skills;
 
-public class Condition()
+public class Condition
 
 {
     public enum ConditionCheckExpression
@@ -34,13 +33,14 @@ public class Condition()
         AnyDebuff,
         Resource
     }
-    public bool NeedRecalculate { get; set; } = true;
+
     private bool truly;
+    public bool NeedRecalculate { get; set; } = true;
 
     public ConditionCheckExpression ConditionExpression { get; init; }
     public ConditionCheckParam ConditionParam { get; init; }
     public Unit.ElementEnm? ElemValue { get; init; }
-    public Resource.ResourceType ResourceValue { get; init; }
+    public Resource.ResourceType? ResourceValue { get; init; }
 
     public double Value { get; init; }
     public AppliedBuff AppliedBuffValue { get; init; }
@@ -58,48 +58,49 @@ public class Condition()
     /// <param name="ent"></param>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
-    public bool Truly(PassiveBuff parentBuff,Unit targetUnit = null, List<Condition> excludeCondition = null, Event ent = null)
+    public bool Truly(PassiveBuff parentBuff, Unit targetUnit = null, List<Condition> excludeCondition = null,
+        Event ent = null)
     {
         if (excludeCondition == null)
             excludeCondition = new List<Condition>();
         excludeCondition.Add(this);
         //if target check, then check conditions by target. Else get parent
-        var untToCheck = (parentBuff?.IsTargetCheck??false)? ent?.TargetUnit : targetUnit ??parentBuff?.CarrierUnit;
+        var untToCheck = parentBuff?.IsTargetCheck ?? false ? ent?.TargetUnit : targetUnit ?? parentBuff?.CarrierUnit;
         if (untToCheck == null)
             return false;
 
         bool res;
         //if NeedRecalc condition buff or is target check (or no buff)
-        if (NeedRecalculate || (parentBuff?.IsTargetCheck??true))
+        if (NeedRecalculate || (parentBuff?.IsTargetCheck ?? true))
         {
-            res = this.ConditionParam switch
+            res = ConditionParam switch
             {
                 ConditionCheckParam.Spd => CheckExpression(untToCheck.GetSpeed(ent, excludeCondition)),
                 ConditionCheckParam.CritRate => CheckExpression(
                     untToCheck.GetCritRate(ent, excludeCondition)),
                 ConditionCheckParam.HpPrc => untToCheck.GetMaxHp(ent, excludeCondition) != 0 &&
-                                                         CheckExpression(untToCheck.GetHpPrc(ent, excludeCondition)),
-                ConditionCheckParam.Resource => CheckExpression(untToCheck.GetRes(ResourceValue).ResVal),
+                                             CheckExpression(untToCheck.GetHpPrc(ent, excludeCondition)),
+                ConditionCheckParam.Resource => ResourceValue!=null && CheckExpression(untToCheck.GetRes((Resource.ResourceType)ResourceValue).ResVal),
                 ConditionCheckParam.Weakness => untToCheck.GetWeaknesses(ent, excludeCondition)
-                                                                .Any(x => x == (ElemValue??ent?.SourceUnit.Fighter.Element))
-                                                            == (ConditionExpression ==
-                                                                ConditionCheckExpression.Exists),
+                                                    .Any(x => x == (ElemValue ?? ent?.SourceUnit.Fighter.Element))
+                                                == (ConditionExpression ==
+                                                    ConditionCheckExpression.Exists),
                 ConditionCheckParam.Buff => untToCheck.AppliedBuffs.Any(x =>
-                                                            x.Reference == AppliedBuffValue)
-                                                        == (ConditionExpression ==
-                                                            ConditionCheckExpression.Exists),
+                                                x.Reference == AppliedBuffValue)
+                                            == (ConditionExpression ==
+                                                ConditionCheckExpression.Exists),
                 ConditionCheckParam.AnyDebuff => untToCheck.AppliedBuffs.Any(x =>
-                                                                 x.Type is Buff.BuffType.Debuff
-                                                                     or Buff.BuffType.Dot)
-                                                             == (ConditionExpression ==
-                                                                 ConditionCheckExpression.Exists),
+                                                     x.Type is Buff.BuffType.Debuff
+                                                         or Buff.BuffType.Dot)
+                                                 == (ConditionExpression ==
+                                                     ConditionCheckExpression.Exists),
                 _ => throw new NotImplementedException()
             };
             NeedRecalculate = false;
 
 
             //reset depended conditions/buffs if switched "truly"
-            if (res != truly&&parentBuff!=null)
+            if (res != truly && parentBuff != null)
                 foreach (var target in parentBuff.AffectedUnits())
                     if (truly)
                         foreach (var eff in parentBuff.Effects)

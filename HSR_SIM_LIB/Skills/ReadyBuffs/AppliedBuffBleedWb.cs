@@ -10,7 +10,7 @@ namespace HSR_SIM_LIB.Skills.ReadyBuffs;
 /// </summary>
 public class AppliedBuffBleedWb : AppliedBuff
 {
-    public AppliedBuffBleedWb(Unit sourceUnit, AppliedBuff reference = null) : base(sourceUnit, reference)
+    public AppliedBuffBleedWb(Unit sourceUnit, AppliedBuff reference =null ) : base(sourceUnit, reference,typeof(AppliedBuffBleedWb))
     {
         Type = BuffType.Dot;
         BaseDuration = 2;

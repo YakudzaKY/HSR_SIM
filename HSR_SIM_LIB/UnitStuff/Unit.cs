@@ -3,17 +3,14 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using HSR_SIM_LIB.Content;
-using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.Utils;
-using HSR_SIM_LIB.Utils.Utils;
 using static HSR_SIM_LIB.Utils.Constant;
 using static HSR_SIM_LIB.UnitStuff.Resource;
 using static HSR_SIM_LIB.Skills.Ability;
-using static HSR_SIM_LIB.Skills.PassiveBuff;
 using static HSR_SIM_LIB.Utils.Formula;
 
 namespace HSR_SIM_LIB.UnitStuff;
@@ -245,17 +242,17 @@ public class Unit : CloneClass
 
     public double AllDmgBoost(Event ent = null)
     {
-        return GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffAllDamageBoost));
+        return GetBuffSumByType(ent, typeof(EffAllDamageBoost));
     }
 
     public double AdditiveShieldBonus(Event ent = null)
     {
-        return GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffAdditiveShieldBonus));
+        return GetBuffSumByType(ent, typeof(EffAdditiveShieldBonus));
     }
 
     public double PrcShieldBonus(Event ent = null)
     {
-        return GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffPrcShieldBonus));
+        return GetBuffSumByType(ent, typeof(EffPrcShieldBonus));
     }
 
     public double ResistsPenetration(ElementEnm elem, Event ent = null)
@@ -276,7 +273,7 @@ public class Unit : CloneClass
             res += Fighter.Resists.First(x => x.ResistType == elem).ResistVal;
 
         res += GetBuffSumByType(ent, typeof(EffElementalResist), elem: elem);
-        res += GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffAllDamageResist));
+        res += GetBuffSumByType(ent, typeof(EffAllDamageResist));
         return res;
     }
 
@@ -286,18 +283,18 @@ public class Unit : CloneClass
         if (Fighter.DebuffResists.Any(x => x.Debuff == debuff))
             res += Fighter.DebuffResists.First(x => x.Debuff == debuff).ResistVal;
 
-        res += GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffDebufResist));
+        res += GetBuffSumByType(ent, typeof(EffDebufResist));
         return res;
     }
 
     public double DotBoost(Event ent = null)
     {
-        return GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffDoTBoost));
+        return GetBuffSumByType(ent, typeof(EffDoTBoost));
     }
 
     public double DefIgnore(Event ent = null)
     {
-        return GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffDefIgnore));
+        return GetBuffSumByType(ent, typeof(EffDefIgnore));
     }
 
     /// <summary>
@@ -378,7 +375,6 @@ public class Unit : CloneClass
         foreach (var kp in effList)
         foreach (var effect in kp.Value)
         {
-
             double finalValue;
             //if condition\passive buff is target check then recalculate value
             if (effect.CalculateValue != null && kp.Key is PassiveBuff { IsTargetCheck: true })
@@ -386,12 +382,12 @@ public class Unit : CloneClass
             else
                 finalValue = (double)effect.Value;
             //multiply by stack
-           
+
             if (kp.Key is AppliedBuff appliedBuff && effect.StackAffectValue)
                 finalValue *= appliedBuff.Stack;
             res += finalValue;
             if (outputEffects != null && outputEffects.All(x => x.TraceEffect != effect))
-                outputEffects.Add( new EffectTraceRec(kp.Key,effect,finalValue));
+                outputEffects.Add(new EffectTraceRec(kp.Key, effect, finalValue));
         }
 
 
@@ -417,8 +413,9 @@ public class Unit : CloneClass
             from passiveBuff in passiveBuffs
                 .Where(z => (z.Type == buffType || buffType is null) &&
                             z.Effects.Any(y => effTypeToSearch == null || y.GetType() == effTypeToSearch)
-                            && (excludeCondition == null || !excludeCondition.Contains(z.WorkCondition)))
-            where passiveBuff.UnitIsAffected(this) && (passiveBuff.WorkCondition?.Truly(passiveBuff,targetForBuff, excludeCondition, ent)??true)
+                            && (excludeCondition == null || z.ApplyConditions.Any(cd=>!excludeCondition.Contains(cd)) ))
+            where passiveBuff.UnitIsAffected(this) &&
+                  (passiveBuff.Truly())
             select passiveBuff;
         return res;
     }
@@ -607,7 +604,7 @@ public class Unit : CloneClass
     /// <returns>double value:vulnerability</returns>
     public double GetAllDamageVulnerability(Event ent = null)
     {
-        return GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffAllDamageVulnerability));
+        return GetBuffSumByType(ent, typeof(EffAllDamageVulnerability));
     }
 
     /// <summary>
@@ -618,7 +615,7 @@ public class Unit : CloneClass
     /// <returns>double value:vulnerability</returns>
     public double GetDotVulnerability(Event ent = null)
     {
-        return GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffDoTVulnerability));
+        return GetBuffSumByType(ent, typeof(EffDoTVulnerability));
     }
 
     /// <summary>
@@ -663,45 +660,45 @@ public class Unit : CloneClass
     /// <returns></returns>
     public double GetAbilityTypeMultiplier(Event ent, Ability ability)
     {
-        return GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffAbilityTypeBoost),
+        return GetBuffSumByType(ent, typeof(EffAbilityTypeBoost),
                    abilityType: ability.AbilityType)
                // plus follow up bonus for non follow up attacks in follow up step
                + (ability.AbilityType != AbilityTypeEnm.FollowUpAction &&
                   ent.ParentStep.StepType == Step.StepTypeEnm.UnitFollowUpAction
-                   ? GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffAbilityTypeBoost),
+                   ? GetBuffSumByType(ent, typeof(EffAbilityTypeBoost),
                        abilityType: AbilityTypeEnm.FollowUpAction)
                    : 0);
     }
 
     public double GetOutgoingHealMultiplier(Event ent)
     {
-        return 1 + Stats.HealRate + GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffOutgoingHealingPrc));
+        return 1 + Stats.HealRate + GetBuffSumByType(ent, typeof(EffOutgoingHealingPrc));
     }
 
     public double GetIncomingHealMultiplier(Event ent)
     {
-        return 1 + GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffIncomeHealingPrc));
+        return 1 + GetBuffSumByType(ent, typeof(EffIncomeHealingPrc));
     }
 
-     
+
     public double GetCritRate(Event ent, List<Condition> excludeCondition = null)
     {
         return Stats.CritChance +
-               GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffCritPrc), excludeCondition: excludeCondition);
+               GetBuffSumByType(ent, typeof(EffCritPrc), excludeCondition: excludeCondition);
     }
 
     public double GetCritDamage(Event ent, List<Condition> excludeCondition = null)
     {
         return Stats.CritDmg +
-               GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffCritDmg), excludeCondition: excludeCondition);
+               GetBuffSumByType(ent, typeof(EffCritDmg), excludeCondition: excludeCondition);
     }
 
     public double GetMaxHp(Event ent, List<Condition> excludeCondition = null)
     {
         return Stats.BaseMaxHp *
-               (1 + GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffMaxHpPrc), excludeCondition: excludeCondition) +
+               (1 + GetBuffSumByType(ent, typeof(EffMaxHpPrc), excludeCondition: excludeCondition) +
                 Stats.MaxHpPrc) +
-               GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffMaxHp), excludeCondition: excludeCondition) +
+               GetBuffSumByType(ent, typeof(EffMaxHp), excludeCondition: excludeCondition) +
                Stats.MaxHpFix;
     }
 
@@ -713,13 +710,13 @@ public class Unit : CloneClass
     public double GetActionValue(Event ent)
     {
         return GetBaseActionValue(ent) *
-               (1 - GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffAdvance)) +
-                GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffDelay)));
+               (1 - GetBuffSumByType(ent, typeof(EffAdvance)) +
+                GetBuffSumByType(ent, typeof(EffDelay)));
     }
 
     private double GetBaseActionValue(Event ent)
     {
-        return GetInitialBaseActionValue(ent) - GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffReduceBAV));
+        return GetInitialBaseActionValue(ent) - GetBuffSumByType(ent, typeof(EffReduceBAV));
     }
 
     public double GetHpPrc(Event ent, List<Condition> excludeCondition = null)
@@ -730,15 +727,17 @@ public class Unit : CloneClass
     public double GetSpeed(Event ent, List<Condition> excludeCondition = null)
     {
         return Stats.BaseSpeed *
-               (1 + GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffSpeedPrc), excludeCondition: excludeCondition) +
+               (1 + GetBuffSumByType(ent, typeof(EffSpeedPrc), excludeCondition: excludeCondition) +
                 Stats.SpeedPrc) +
-               GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffSpeed), excludeCondition: excludeCondition) +
+               GetBuffSumByType(ent, typeof(EffSpeed), excludeCondition: excludeCondition) +
                Stats.SpeedFix;
     }
 
     public void ResetCondition(Condition.ConditionCheckParam chkPrm)
     {
-        foreach (var cb in PassiveBuffs.Where(x => x.WorkCondition?.ConditionParam == chkPrm)) cb.WorkCondition.NeedRecalculate = true;
+       
+        foreach (var cb in PassiveBuffs.Where(x=>x.ApplyConditions!=null).SelectMany(x=>x.ApplyConditions.Where(y=>y.ConditionParam==chkPrm)))
+            cb.NeedRecalculate = true;
     }
 
     private double GetInitialBaseActionValue(Event ent)
@@ -749,51 +748,51 @@ public class Unit : CloneClass
 
     public double GetEffectRes(Event ent)
     {
-        return GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffEffectResPrc)) + Stats.EffectResPrc +
+        return GetBuffSumByType(ent, typeof(EffEffectResPrc)) + Stats.EffectResPrc +
                Stats.BaseEffectRes +
-               GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffEffectRes));
+               GetBuffSumByType(ent, typeof(EffEffectRes));
     }
 
     public double GetEffectHit(Event ent)
     {
-        return GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffEffectHitPrc)) + Stats.EffectHitPrc +
+        return GetBuffSumByType(ent, typeof(EffEffectHitPrc)) + Stats.EffectHitPrc +
                Stats.BaseEffectHit +
-               GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffEffectHit));
+               GetBuffSumByType(ent, typeof(EffEffectHit));
     }
 
     public double EnergyRegenPrc(Event ent)
     {
-        return 1 + GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffEnergyRatePrc)) + Stats.BaseEnergyResPrc +
+        return 1 + GetBuffSumByType(ent, typeof(EffEnergyRatePrc)) + Stats.BaseEnergyResPrc +
                Stats.BaseEnergyRes;
     }
 
     public double GetDef(Event ent)
     {
-        return Stats.BaseDef * (1 + GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffDefPrc)) -
+        return Stats.BaseDef * (1 + GetBuffSumByType(ent, typeof(EffDefPrc)) -
                                 ent.SourceUnit?.DefIgnore(ent) ??
                                 0 + Stats.DefPrc) +
-               GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffDef));
+               GetBuffSumByType(ent, typeof(EffDef));
     }
 
     public double GetAggro(Event ent)
     {
         if (IsAlive)
-            return Stats.BaseAggro * (1 + GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffBaseAgrroPrc))) *
-                   (1 + GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffAgrroPrc)));
+            return Stats.BaseAggro * (1 + GetBuffSumByType(ent, typeof(EffBaseAgrroPrc))) *
+                   (1 + GetBuffSumByType(ent, typeof(EffAgrroPrc)));
         return 0;
     }
 
     public double GetAttack(Event ent)
     {
         return Stats.BaseAttack *
-               (1 + GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffAtkPrc)) + Stats.AttackPrc) +
-               GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffAtk)) + Stats.AttackFix;
+               (1 + GetBuffSumByType(ent, typeof(EffAtkPrc)) + Stats.AttackPrc) +
+               GetBuffSumByType(ent, typeof(EffAtk)) + Stats.AttackFix;
     }
-   
+
 
     public double GetBreakDmg(Event ent)
     {
-        return GetBuffSumByType(ent: ent, effTypeToSearch: typeof(EffBreakDmgPrc)) + Stats.BreakDmgPrc;
+        return GetBuffSumByType(ent, typeof(EffBreakDmgPrc)) + Stats.BreakDmgPrc;
     }
 
     public List<ElementEnm> GetWeaknesses(Event ent, List<Condition> excludeCondition = null)

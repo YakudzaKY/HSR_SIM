@@ -24,7 +24,7 @@ internal class EchoesoftheCoffin : DefaultLightCone
                 ApplyBuff eventBuff = new(null, this, Parent.Parent)
                 {
                     CalculateTargets = ((DefaultFighter)Parent).GetAliveFriends,
-                    AppliedBuffToApply = new AppliedBuff(Parent.Parent)
+                    AppliedBuffToApply = new AppliedBuff(Parent.Parent,null,this)
                     {
                         Type = Buff.BuffType.Buff,
                         Effects = new List<Effect> { new EffSpeed { Value = modifiersSpd[Rank - 1] } },

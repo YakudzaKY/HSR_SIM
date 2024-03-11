@@ -1,4 +1,5 @@
-﻿using HSR_SIM_LIB.Content;
+﻿using System.Runtime.CompilerServices;
+using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
@@ -10,7 +11,7 @@ namespace HSR_SIM_CONTENT.Content.NPC;
 public class MaraStruckSoldier : DefaultNPCFighter
 {
     //static because max 5 stacks by all units this type
-    private static readonly AppliedBuff myDoTRef = new(null)
+    private static readonly AppliedBuff myDoTRef = new(null,null,typeof(MaraStruckSoldier))
     {
         Type = Buff.BuffType.Dot,
         Effects = []
@@ -32,7 +33,7 @@ public class MaraStruckSoldier : DefaultNPCFighter
         Resists.Add(new Resist { ResistType = Unit.ElementEnm.Lightning, ResistVal = 0.20 });
         Resists.Add(new Resist { ResistType = Unit.ElementEnm.Wind, ResistVal = 0.20 });
         Resists.Add(new Resist { ResistType = Unit.ElementEnm.Imaginary, ResistVal = 0.20 });
-        myDotDeAppliedBuff = new AppliedBuff(Parent)
+        myDotDeAppliedBuff = new AppliedBuff(Parent,null,this)
         {
             Reference = myDoTRef,
             Type = Buff.BuffType.Dot,
@@ -44,7 +45,7 @@ public class MaraStruckSoldier : DefaultNPCFighter
                 new EffWindShear { DoTCalculateValue = CalcMyDoT }
             }
         };
-        uniqueAppliedBuff = new AppliedBuff(Parent)
+        uniqueAppliedBuff = new AppliedBuff(Parent,null,this)
         {
             Dispellable = true,
             Type = Buff.BuffType.Buff,

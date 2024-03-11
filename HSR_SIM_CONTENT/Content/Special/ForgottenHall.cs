@@ -27,7 +27,7 @@ public class ForgottenHall : DefaultNPCFighter
 
         IncreaseCycle.Events.Add(new ApplyBuff(null, this, Parent)
         {
-            AppliedBuffToApply = new AppliedBuff(Parent)
+            AppliedBuffToApply = new AppliedBuff(Parent,null,this)
             {
                 Type = Buff.BuffType.Buff,
                 Effects = new List<Effect> { new EffReduceBAV { Value = 50 } },

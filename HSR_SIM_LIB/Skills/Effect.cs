@@ -69,6 +69,6 @@ public class Effect : CloneClass
 
     public string Explain()
     {
-        return $"{this.GetType().Name} ({Value}) ";
+        return $"{GetType().Name} ({Value}) ";
     }
 }

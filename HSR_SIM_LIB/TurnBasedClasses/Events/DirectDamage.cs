@@ -8,7 +8,8 @@ public class DirectDamage(Step parent, ICloneable source, Unit sourceUnit)
     : DamageEventTemplate(parent, source, sourceUnit)
 {
     public bool IsCrit { get; set; }
-   
+    public double CritRate { get; set; }
+
 
     public override string GetDescription()
     {

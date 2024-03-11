@@ -63,7 +63,7 @@ public class Blade : DefaultFighter
         sgAtk = FighterUtils.GetAbilityScaling(0.22, 0.44, sgSkillLvl);
         sgHp = FighterUtils.GetAbilityScaling(0.55, 0.110, sgSkillLvl);
 
-        hellscapeAppliedBuff = new AppliedBuff(Parent)
+        hellscapeAppliedBuff = new AppliedBuff(Parent,null,this)
         {
             Type = Buff.BuffType.Buff,
             BaseDuration = 3,
@@ -184,7 +184,7 @@ public class Blade : DefaultFighter
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent
         });
         forestOfSwords.Events.Add(new ToughnessShred(null, this, Parent)
-            { Value = 30, CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent});
+            { Value = 30, CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
 
 
         Abilities.Add(forestOfSwords);
@@ -220,7 +220,7 @@ public class Blade : DefaultFighter
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain
         });
         deathSentence.Events.Add(new ToughnessShred(null, this, Parent)
-            { Value = 60, CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain});
+            { Value = 60, CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain });
         deathSentence.Events.Add(new EnergyGain(null, this, Parent)
             { Value = 5, TargetUnit = Parent });
         deathSentence.Events.Add(new DirectDamage(null, this, Parent)
@@ -263,10 +263,10 @@ public class Blade : DefaultFighter
         karmaWind.Events.Add(new DirectDamage(null, this, Parent)
         {
             OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
-            CalculateValue = FighterUtils.DamageFormula(new Formula()
+            CalculateValue = FighterUtils.DamageFormula(new Formula
             {
-                Expression = $" BladeMaxHp * 0.4 ",
-                Variables = new Dictionary<string, Formula.VarVal>()
+                Expression = " BladeMaxHp * 0.4 ",
+                Variables = new Dictionary<string, Formula.VarVal>
                 {
                     {
                         "BladeMaxHp",
@@ -329,12 +329,12 @@ public class Blade : DefaultFighter
                 CustomIconName = "Traces\\A2",
 
                 Target = Parent,
-                WorkCondition = new Condition()
+                ApplyConditions = [new Condition
                 {
                     ConditionParam = Condition.ConditionCheckParam.HpPrc,
                     ConditionExpression = Condition.ConditionCheckExpression.EqualOrLess,
                     Value = 0.5
-                }
+                }]
             });
         if (ATraces.HasFlag(ATracesEnm.A6))
             Parent.PassiveBuffs.Add(new PassiveBuff(Parent, this)
@@ -346,7 +346,7 @@ public class Blade : DefaultFighter
                 Target = Parent
             });
 
-        E4AppliedBuff = new AppliedBuff(Parent)
+        E4AppliedBuff = new AppliedBuff(Parent,null,this)
         {
             MaxStack = 2,
             Dispellable = false,

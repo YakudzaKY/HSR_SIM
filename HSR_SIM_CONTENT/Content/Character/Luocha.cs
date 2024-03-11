@@ -44,7 +44,7 @@ public class Luocha : DefaultFighter
         poAfAtk = FighterUtils.GetAbilityScaling(0.4, 0.6, poALvl);
         poAfFix = FighterUtils.GetAbilityScaling(200, 800, poALvl);
 
-        uniqueAppliedBuff = new AppliedBuff(Parent)
+        uniqueAppliedBuff = new AppliedBuff(Parent,null,this)
         {
             Type = Buff.BuffType.Buff,
             BaseDuration = 2,
@@ -54,7 +54,7 @@ public class Luocha : DefaultFighter
             Effects = []
         };
 
-        triggerCdAppliedBuff = new AppliedBuff(Parent)
+        triggerCdAppliedBuff = new AppliedBuff(Parent,null,this)
         {
             Type = Buff.BuffType.Debuff,
             BaseDuration = 2,
@@ -133,7 +133,7 @@ public class Luocha : DefaultFighter
         });
         Abilities.Add(prayerOfAbyssFlowerAuto);
 
-        e2ShieldAppliedBuff = new AppliedBuff(Parent)
+        e2ShieldAppliedBuff = new AppliedBuff(Parent,null,this)
             { Effects = [new EffShield { CalculateValue = CalculateE2Shield }] };
 
         //basic attack
@@ -151,9 +151,9 @@ public class Luocha : DefaultFighter
             thornsOfTheAbyss.Events.Add(new DirectDamage(null, this, Parent)
                 { CalculateValue = CalculateBasicDmg, CalculateProportion = proportion });
             thornsOfTheAbyss.Events.Add(new ToughnessShred(null, this, Parent)
-                { Value = 30*proportion });
+                { Value = 30 * proportion });
             thornsOfTheAbyss.Events.Add(new EnergyGain(null, this, Parent)
-                { Value = 20*proportion, TargetUnit = Parent });
+                { Value = 20 * proportion, TargetUnit = Parent });
         }
 
 
@@ -175,7 +175,7 @@ public class Luocha : DefaultFighter
         if (Parent.Rank >= 6)
             ultimateAbility.Events.Add(new ApplyBuff(null, this, Parent)
             {
-                AppliedBuffToApply = new AppliedBuff(Parent)
+                AppliedBuffToApply = new AppliedBuff(Parent,null,this)
                 {
                     CustomIconName = "Ability_Death_Wish", BaseDuration = 2, Type = Buff.BuffType.Debuff,
                     Effects = [new EffAllDamageResist { Value = 0.2 }]
@@ -216,18 +216,18 @@ public class Luocha : DefaultFighter
         //E1
         if (Parent.Rank >= 1)
             //CoL buffs
-            Parent.PassiveBuffs.Add(new PassiveBuff(Parent,this)
+            Parent.PassiveBuffs.Add(new PassiveBuff(Parent, this)
             {
                 Effects = [new EffAtkPrc { Value = 0.2 }],
                 CustomIconName = uniqueAppliedBuff.CustomIconName,
 
                 Target = Parent.ParentTeam,
-                WorkCondition = new Condition
+                ApplyConditions = [new Condition
                 {
                     AppliedBuffValue = uniqueAppliedBuff,
                     ConditionExpression = Condition.ConditionCheckExpression.Exists,
                     ConditionParam = Condition.ConditionCheckParam.Buff
-                }
+                }]
             });
 
 
@@ -236,7 +236,7 @@ public class Luocha : DefaultFighter
             DebuffResists.Add(new DebuffResist { Debuff = typeof(EffCrowControl), ResistVal = 0.7 });
         //E2
         if (Parent.Rank >= 2)
-            Parent.PassiveBuffs.Add(new PassiveBuff(Parent,this)
+            Parent.PassiveBuffs.Add(new PassiveBuff(Parent, this)
             {
                 Effects = [new EffOutgoingHealingPrc { CalculateValue = CalculateE2 }],
                 Target = Parent,
@@ -246,19 +246,19 @@ public class Luocha : DefaultFighter
         //E4
         if (Parent.Rank >= 4)
             //CoL buffs
-            Parent.PassiveBuffs.Add(new PassiveBuff(Parent,this)
+            Parent.PassiveBuffs.Add(new PassiveBuff(Parent, this)
             {
                 Type = Buff.BuffType.Debuff,
                 Effects = [new EffAllDamageBoost { Value = -0.12 }],
                 CustomIconName = uniqueAppliedBuff.CustomIconName,
 
                 Target = TargetTypeEnm.Enemy,
-                WorkCondition = new Condition()
+                ApplyConditions = [new Condition
                 {
                     AppliedBuffValue = uniqueAppliedBuff,
                     ConditionExpression = Condition.ConditionCheckExpression.Exists,
                     ConditionParam = Condition.ConditionCheckParam.Buff
-                }
+                }]
             });
     }
 
@@ -375,7 +375,6 @@ public class Luocha : DefaultFighter
                 //remove high hp unit from track
                 var tarPair = trackedUnits.FirstOrDefault(x => x.Key == entTargetUnit);
                 trackedUnits.Remove(tarPair);
-   
             }
         }
     }

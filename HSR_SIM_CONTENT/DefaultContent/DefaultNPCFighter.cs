@@ -70,7 +70,7 @@ public class DefaultNPCFighter : IFighter
         throw new Exception($"no enemy will be chosen by AGGRO counter={counter}");
     }
 
-    public AppliedBuff WeaknessBreakDebuff { get; set; } = new(null) { Effects = [] };
+    public AppliedBuff WeaknessBreakDebuff { get; set; } = new(null,null,typeof(DefaultNPCFighter)) { Effects = [] };
     public PathType? Path { get; set; } = null;
     public Unit.ElementEnm Element { get; set; }
     public List<Unit.ElementEnm> NativeWeaknesses { get; set; } = new();
@@ -80,7 +80,7 @@ public class DefaultNPCFighter : IFighter
 
     public string GetSpecialText()
     {
-        return String.Empty;
+        return string.Empty;
     }
 
     public virtual double Cost => (Parent.Stats.BaseAttack * (1 + Parent.Stats.AttackPrc) + Parent.Stats.AttackFix) /

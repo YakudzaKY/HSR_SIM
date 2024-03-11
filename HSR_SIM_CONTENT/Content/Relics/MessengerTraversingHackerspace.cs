@@ -25,7 +25,7 @@ internal class MessengerTraversingHackerspace : DefaultRelicSet
                             OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
                             ParentStep = step,
                             TargetUnit = unit,
-                            AppliedBuffToApply = new AppliedBuff(Parent.Parent)
+                            AppliedBuffToApply = new AppliedBuff(Parent.Parent,null,this)
                             {
                                 UniqueStr = GetType().ToString(),
                                 Type = Buff.BuffType.Buff,

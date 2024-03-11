@@ -5,13 +5,12 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using HSR_SIM_CLIENT.ViewModels;
 using HSR_SIM_LIB;
 using HSR_SIM_LIB.TurnBasedClasses;
-using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
-using HSR_SIM_LIB.Utils;
 using Image = System.Drawing.Image;
 
 namespace HSR_SIM_CLIENT;
@@ -19,9 +18,10 @@ namespace HSR_SIM_CLIENT;
 public partial class SingleSimWindow : INotifyPropertyChanged
 {
     private readonly bool busy = false;
-    private ObservableCollection<Team> teams;
-    private ObservableCollection<EventViewModel> events;
     private readonly Worker wrk;
+    private ObservableCollection<EventViewModel> events;
+    private EventViewModel selectedEvent;
+    private ObservableCollection<Team> teams;
 
 
     public SingleSimWindow(SimCls simCls, string? devModePath = null, bool chkDevMode = false)
@@ -58,9 +58,8 @@ public partial class SingleSimWindow : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
-    
+
     public ICloneable? SelectedObject { get; set; }
-    private EventViewModel selectedEvent;
 
     public EventViewModel SelectedEvent
     {
@@ -87,7 +86,7 @@ public partial class SingleSimWindow : INotifyPropertyChanged
         if (PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(name));
     }
 
-    
+
     /// <summary>
     ///     ask user what decision are pick from options(do we crit etc...)
     /// </summary>
@@ -138,7 +137,7 @@ public partial class SingleSimWindow : INotifyPropertyChanged
     {
         //save selected unit
         Teams.Clear();
-        foreach (Team team in wrk.Sim.Teams)
+        foreach (var team in wrk.Sim.Teams)
             Teams.Add(team);
 
         //render selected unit
@@ -165,7 +164,7 @@ public partial class SingleSimWindow : INotifyPropertyChanged
     private void TreeView_OnSelectedEventChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
         // on event click
-        if (((System.Windows.Controls.TreeView)sender).SelectedItem is EventViewModel evm)
+        if (((TreeView)sender).SelectedItem is EventViewModel evm)
 
             SelectedEvent = evm;
     }

@@ -1,21 +1,34 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
+using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_LIB.Skills;
 
-public class Buff(Unit sourceUnit, Buff reference = null) : CloneClass
+public class Buff(Unit sourceUnit, Buff reference,object sourceObject ) : CloneClass
 {
     //calculated stacks will overwrite Stack value
     public delegate int CalculateIntVal(Event ent);
 
+    public object SourceObject { get; } = sourceObject;
     public enum BuffType
     {
         Buff,
         Debuff,
         Dot
     }
+    private Bitmap iconImage;
+    public Bitmap IconImage
+    {
+        get
+        {
+            return iconImage ??= new Bitmap(Utl.LoadBitmap(this.CustomIconName ?? this.Effects.First().GetType().Name),
+                Constant.ElemSizeMini);
 
+        }
+    }
     public string CustomIconName { get; init; }
     public List<Effect> Effects { get; set; } = [];
     public Unit CarrierUnit { get; set; }
@@ -49,14 +62,18 @@ public class Buff(Unit sourceUnit, Buff reference = null) : CloneClass
         if (this is not PassiveBuff passiveBuff) return explainString;
         explainString += $" {nameof(passiveBuff.SourceObject)}={passiveBuff.SourceObject.GetType().Name}" +
                          $" {nameof(passiveBuff.Target)}={passiveBuff.Target.GetType().Name}";
-        if (passiveBuff.WorkCondition != null)
+        if (passiveBuff.ApplyConditions != null)
         {
-            //additional info if condition
-            explainString +=
-                $" (!) Condition for buff: {nameof(PassiveBuff.IsTargetCheck)}={passiveBuff.IsTargetCheck} ";
-            explainString += $" {nameof(passiveBuff.WorkCondition)} =( {passiveBuff.WorkCondition.ConditionParam}" +
-                             $" {passiveBuff.WorkCondition.ConditionExpression} {passiveBuff.WorkCondition.Value}" +
-                             $" {passiveBuff.WorkCondition.ElemValue} {passiveBuff.WorkCondition.AppliedBuffValue})";
+            foreach (var WorkCondition in passiveBuff.ApplyConditions)
+            {
+                //additional info if condition
+                explainString +=
+                    $" (!) Condition for buff: {nameof(PassiveBuff.IsTargetCheck)}={passiveBuff.IsTargetCheck} ";
+                explainString += $" {nameof(WorkCondition)} =( {WorkCondition.ConditionParam}" +
+                                 $" {WorkCondition.ConditionExpression} {WorkCondition.Value}" +
+                                 $" {WorkCondition.ElemValue} {WorkCondition.AppliedBuffValue})";
+            }
+          
         }
 
         return explainString;

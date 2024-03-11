@@ -16,7 +16,7 @@ internal class TheUnreachableSide : DefaultLightCone
     public TheUnreachableSide(IFighter parent, int rank) : base(parent, rank)
     {
         if (Path == Parent.Path)
-            uniqueAppliedBuff = new AppliedBuff(Parent.Parent)
+            uniqueAppliedBuff = new AppliedBuff(Parent.Parent,null,this)
             {
                 Type = Buff.BuffType.Buff,
                 BaseDuration = null,
