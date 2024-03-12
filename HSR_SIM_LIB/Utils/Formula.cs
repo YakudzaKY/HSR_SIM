@@ -74,13 +74,6 @@ public class Formula : ICloneable
         return newClone;
     }
 
-    public static string GenerateReference<T>(Expression<Action<T>> expression)
-    {
-        if (expression.Body is MethodCallExpression member)
-            return member.Method.Name;
-
-        throw new ArgumentException("Expression is not a method", nameof(expression));
-    }
 
     /// <summary>
     ///     Parse  for DynamicTargetEnm and create and calc variable
@@ -209,6 +202,8 @@ public class Formula : ICloneable
                 {
                     prevObject = finalMeth;
                     object[] objArr = [];
+
+
                     foreach (var prm in mInfo.GetParameters())
                     {
                         Array.Resize(ref objArr, objArr.Length + 1);
@@ -216,7 +211,22 @@ public class Formula : ICloneable
                         {
                             objArr[^1] = EventRef;
                         }
-                        else if (prm.Name == "outputEffects")
+                        else if (prm.ParameterType == typeof(Unit.ElementEnm))
+                        {
+                            if (EventRef is DoTDamage dt)
+                                objArr[^1] = dt.Element;
+                            else
+                                objArr[^1] = EventRef.ParentStep.ActorAbility.Element;
+                        }
+                        else if (prm.ParameterType == typeof(Ability.AbilityTypeEnm))
+                        {
+                            objArr[^1] = EventRef.ParentStep.ActorAbility.AbilityType;
+                        }
+                        else if (prm.ParameterType == typeof(Ability))
+                        {
+                            objArr[^1] = EventRef.ParentStep.ActorAbility;
+                        }
+                        else if (prm.ParameterType == typeof(List<EffectTraceRec>))
                         {
                             objArr[^1] = variable.Value.TraceEffects;
                         }

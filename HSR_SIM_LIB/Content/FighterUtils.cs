@@ -151,7 +151,10 @@ public static class FighterUtils
         var expression = $"{abilityFormula.Expression} * " +
                          //crit
                          $"( ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GenerateCrit)} * 0) " +
-                         $"+ ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetCritDamage)} * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.CritHit)} )  +1 )";
+                         $"+ ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetCritDamage)} * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.CritHit)} )  +1 ) " +
+                         //damage boost
+                         $"* (1 + {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetElemBoostValue)} " +
+                         $" + {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAbilityTypeMultiplier)} )";
         var newFormula = new Formula { Expression = expression, Variables = abilityFormula.Variables };
 
         return newFormula;

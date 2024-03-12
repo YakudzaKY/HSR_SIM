@@ -1,5 +1,7 @@
 ﻿using HSR_SIM_LIB.Fighters;
+using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
+using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.Utils;
 using HSR_SIM_LIB.Utils.Utils;
@@ -14,7 +16,7 @@ public static class UnitFormulas
         {
             EventRef = ent,
             Expression =
-                $"1 + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAtkPrc).FullName} + ( {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Stats)}#{nameof(UnitStats.AttackPrc)} " +
+                $"1 + {Formula.DynamicTargetEnm.Attacker}#{typeof(System.Type)}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAtkPrc).FullName} + ( {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Stats)}#{nameof(UnitStats.AttackPrc)} " +
                 $"* {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Stats)}#{nameof(UnitStats.BaseAttack)})"
         };
     }
@@ -37,6 +39,39 @@ public static class UnitFormulas
             EventRef = ent,
             Expression = $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Stats)}#{nameof(UnitStats.CritDmg)} " +
                          $"  + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffCritDmg).FullName}  "
+        };
+    }
+
+    public static Formula GetElemBoostValue(Event ent = null)
+    {
+        return new Formula
+        {
+            EventRef = ent,
+            Expression = $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetElemBoostVal)} " +
+                         $"  + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffElementalBoost).FullName}  "
+        };
+    }
+
+    /// <summary>
+    ///     get  abilityDamage multiplier by ability type
+    /// </summary>
+    /// <param name="ent">reference to event</param>
+    /// <param name="ability">reference to ability</param>
+    /// <returns></returns>
+    public static Formula GetAbilityTypeMultiplier(Event ent, Ability ability)
+    {
+        if (ent is DoTDamage)
+            return new Formula
+            {
+                EventRef = ent,
+                Expression = $" 0 "
+            };
+
+        return new Formula
+        {
+            EventRef = ent,
+            Expression =
+                $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAbilityTypeBoost).FullName}  "
         };
     }
 

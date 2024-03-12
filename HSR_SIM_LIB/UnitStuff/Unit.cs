@@ -308,10 +308,16 @@ public class Unit : CloneClass
             BaseDamageBoost.Add(new DamageBoostRec { ElemType = elem, Value = 0 });
         return BaseDamageBoost.First(dmg => dmg.ElemType == elem);
     }
+    
+    public double GetElemBoostVal(ElementEnm elem)
+    {
+        
+        return GetElemBoost(elem).Value;
+    }
 
     public double GetElemBoostValue(ElementEnm elem, Event ent = null)
     {
-        return GetElemBoost(elem).Value + GetBuffSumByType(ent, typeof(EffElementalBoost), elem: elem);
+        return GetElemBoostVal(elem) + GetBuffSumByType(ent, typeof(EffElementalBoost), elem: elem);
     }
 
 
@@ -357,7 +363,7 @@ public class Unit : CloneClass
     /// </summary>
     /// <param name="ent">Event ref for calculation</param>
     /// <param name="effTypeToSearch">Effect to search</param>
-    /// <param name="outputEffects">List of effect(!) DONT RENAME THIS PARAM. Formula class search it</param>
+    /// <param name="outputEffects">List of effect used for val calculation</param>
     /// <param name="elem">search by element (for example Elemental Damage boost)</param>
     /// <param name="excludeCondition">Exclude passive buff for prevent recursion </param>
     /// <param name="buffType">Search by type: debuff,DoT,Buff</param>
