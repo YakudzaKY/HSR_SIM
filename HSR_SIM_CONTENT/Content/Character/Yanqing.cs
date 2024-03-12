@@ -8,8 +8,8 @@ public class Yanqing : DefaultFighter
 {
     public Yanqing(Unit? parent) : base(parent)
     {
+        Parent.Element = Unit.ElementEnm.Ice;
     }
 
     public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Hunt;
-    public override Unit.ElementEnm Element { get; } = Unit.ElementEnm.Ice;
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using Microsoft.VisualBasic;
@@ -23,7 +24,8 @@ public class Formula : ICloneable
         Attacker,
         Defender
     }
-
+    
+    
     private string expression;
 
 
@@ -211,16 +213,32 @@ public class Formula : ICloneable
                         {
                             objArr[^1] = EventRef;
                         }
-                        else if (prm.ParameterType == typeof(Unit.ElementEnm))
+                        else if (prm.ParameterType == typeof(DynamicTargetEnm))
+                        {
+                            objArr[^1] = dynVar;
+                        }
+                        else if (prm.ParameterType == typeof(Unit.ElementEnm)||prm.ParameterType == typeof(Unit.ElementEnm?))
                         {
                             if (EventRef is DoTDamage dt)
                                 objArr[^1] = dt.Element;
                             else
                                 objArr[^1] = EventRef.ParentStep.ActorAbility.Element;
                         }
-                        else if (prm.ParameterType == typeof(Ability.AbilityTypeEnm))
+                        else if (prm.ParameterType == typeof(Unit.ElementEnm)||prm.ParameterType == typeof(Unit.ElementEnm?))
                         {
-                            objArr[^1] = EventRef.ParentStep.ActorAbility.AbilityType;
+                            if (EventRef is DoTDamage dt)
+                                objArr[^1] = dt.Element;
+                            else
+                                objArr[^1] = EventRef.ParentStep.ActorAbility.Element;
+                        }
+                        else if (prm.ParameterType == typeof(Ability.AbilityTypeEnm) || prm.ParameterType ==typeof(Ability.AbilityTypeEnm?))
+                        {
+                            //if Followup action and ability is not follow up type then add flag
+                            Ability.AbilityTypeEnm abilityTypeEnm = EventRef.ParentStep.ActorAbility.AbilityType;
+                            if (EventRef.ParentStep.ActorAbility.AbilityType != Ability.AbilityTypeEnm.FollowUpAction &&
+                                EventRef.ParentStep.StepType == Step.StepTypeEnm.UnitFollowUpAction)
+                                abilityTypeEnm |= Ability.AbilityTypeEnm.FollowUpAction;
+                            objArr[^1] = abilityTypeEnm;
                         }
                         else if (prm.ParameterType == typeof(Ability))
                         {
@@ -230,8 +248,9 @@ public class Formula : ICloneable
                         {
                             objArr[^1] = variable.Value.TraceEffects;
                         }
-                        else
+                        else if (prm.ParameterType == typeof(Type))
                         {
+                            objArr[^1] = EventRef.ParentStep.ActorAbility;
                             var nextPrm = GetNextMethod(expr, methodNdx, out methodNdx);
                             if (string.IsNullOrEmpty(nextPrm)) continue;
                             //first search Type
@@ -241,6 +260,7 @@ public class Formula : ICloneable
                             else
                                 objArr[^1] = null;
                         }
+                       
                     }
 
                     finalMeth = mInfo.Invoke(prevObject, objArr);
@@ -257,9 +277,13 @@ public class Formula : ICloneable
                 nextMethod = GetNextMethod(expr, methodNdx, out methodNdx);
             }
 
+            //get result by type
 
             switch (finalMeth)
             {
+                case int nt:
+                    variable.Value.Result = (double) nt;
+                    break;
                 case double ds:
                     variable.Value.Result = ds;
                     break;
@@ -381,7 +405,7 @@ public class Formula : ICloneable
             if (enumerable.Any())
                 finalStr += "-==USED BUFFS==-" + Environment.NewLine;
 
-            foreach (var buff in enumerable.Distinct().OrderBy(x => x.TraceEffect.GetType())
+            foreach (var buff in enumerable.Distinct().OrderBy(x => x.TraceEffect.GetType().Name)
                          .ThenBy(x => x.TraceBuff.GetType().Name))
             {
                 finalStr += $"# {buff.TraceBuff.Explain()} Effect:";

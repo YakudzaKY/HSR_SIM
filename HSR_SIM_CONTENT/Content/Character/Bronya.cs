@@ -19,6 +19,7 @@ public class Bronya : DefaultFighter
 
     public Bronya(Unit? parent) : base(parent)
     {
+        Parent.Element = Unit.ElementEnm.Wind;
         Parent.Stats.BaseMaxEnergy = 120;
         wbSkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Windrider Bullet")!.Level;
         var abilitySkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Combat Redeployment")!.Level;
@@ -152,7 +153,6 @@ public class Bronya : DefaultFighter
     }
 
     public override PathType? Path { get; } = PathType.Harmony;
-    public override Unit.ElementEnm Element { get; } = Unit.ElementEnm.Wind;
 
 
     private double? CalcUltCritDmg(Event ent)

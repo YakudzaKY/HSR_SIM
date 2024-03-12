@@ -262,7 +262,7 @@ public static class GraphicsCls
                     $"aggro: {(int)Math.Round(unit.GetAggro(null)):d} ({(int)Math.Round(unit.GetAggro(null) / unit.ParentTeam.TeamAggro * 100):d}%)",
                     new SolidBrush(Color.Coral), new Font("Tahoma", BarFontSize, FontStyle.Bold), true);
             //elements
-            gfx.DrawImage(new Bitmap(Utl.LoadBitmap(unit.Fighter.Element.ToString()), ElemSizeMini),
+            gfx.DrawImage(new Bitmap(Utl.LoadBitmap(unit.Element.ToString()), ElemSizeMini),
                 new Point(portraitPoint.X + PortraitSize.Width - ElemSizeMini.Width, portraitPoint.Y));
             //weaknesses
             short j = 0;

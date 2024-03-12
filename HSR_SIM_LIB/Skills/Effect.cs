@@ -1,4 +1,5 @@
-﻿using HSR_SIM_LIB.TurnBasedClasses.Events;
+﻿using System;
+using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.Skills;
@@ -71,4 +72,6 @@ public class Effect : CloneClass
     {
         return $"{GetType().Name} ({Value}) ";
     }
+
+
 }

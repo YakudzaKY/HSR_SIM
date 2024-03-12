@@ -23,11 +23,12 @@ public class Ability : CloneClass
     }
 
     /// <summary>
-    ///     Ability type. todo:rewrite into Flags
+    ///     Ability type. 
     /// </summary>
+    [Flags]
     public enum AbilityTypeEnm
     {
-        None = 0,
+      
         Basic = 1,
         Ability = 2,
         Ultimate = 4,
@@ -65,7 +66,7 @@ public class Ability : CloneClass
     {
         Parent = parent;
         if (Element == ElementEnm.None)
-            Element = parent.Element;
+            Element = parent.Parent.Element;
         Available = DefaultAbilityAvailable; //add default then custom
         IWannaUseIt = DefaultAbilityWannaUse; //set default if no init val
         FollowUpQueueAvailable = DefaultAbilityQueueAvailable; //set default if no init val

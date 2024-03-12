@@ -32,7 +32,7 @@ public class Luocha : DefaultFighter
     public Luocha(Unit parent) : base(parent)
     {
         Parent.Stats.BaseMaxEnergy = 100;
-
+        Parent.Element = Unit.ElementEnm.Imaginary;
         var coLLvl = Parent.Skills.First(x => x.Name == "Cycle of Life")!.Level;
         var dWLvl = Parent.Skills.First(x => x.Name == "Death Wish")!.Level;
         totALvl = Parent.Skills.First(x => x.Name == "Thorns of the Abyss")!.Level;
@@ -72,7 +72,6 @@ public class Luocha : DefaultFighter
         {
             AbilityType = AbilityTypeEnm.FollowUpAction,
             Name = "Cycle of life",
-            Element = Element,
             Available = ColAvailable,
             FollowUpPriority = PriorityEnm.Medium,
             TargetType = TargetTypeEnm.Self
@@ -92,7 +91,6 @@ public class Luocha : DefaultFighter
         {
             AbilityType = AbilityTypeEnm.Ability,
             Name = "Prayer of Abyss Flower",
-            Element = Element,
             TargetType = TargetTypeEnm.Friend,
             CostType = Resource.ResourceType.SP,
             Cost = 1
@@ -112,7 +110,6 @@ public class Luocha : DefaultFighter
         {
             AbilityType = AbilityTypeEnm.FollowUpAction,
             Name = "Prayer of Abyss Flower (auto)",
-            Element = Element,
             Available = PoAfAvailable,
             FollowUpPriority = PriorityEnm.High,
             TargetType = TargetTypeEnm.Friend,
@@ -141,7 +138,6 @@ public class Luocha : DefaultFighter
         {
             AbilityType = AbilityTypeEnm.Basic,
             Name = "Thorns of the Abyss",
-            Element = Element,
             AdjacentTargets = AdjacentTargetsEnm.None,
             SpGain = 1
         };
@@ -203,7 +199,6 @@ public class Luocha : DefaultFighter
             Name = "Mercy of a Fool",
             Cost = 1,
             CostType = Resource.ResourceType.TP,
-            Element = Element
         };
         ability.Events.Add(new MechanicValChg(null, this, Parent)
         {
@@ -263,7 +258,7 @@ public class Luocha : DefaultFighter
     }
 
     public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Abundance;
-    public sealed override Unit.ElementEnm Element { get; } = Unit.ElementEnm.Imaginary;
+
 
 
     //default all abilities we wanna cast

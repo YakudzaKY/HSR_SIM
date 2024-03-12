@@ -72,10 +72,8 @@ public class DefaultNPCFighter : IFighter
 
     public AppliedBuff WeaknessBreakDebuff { get; set; } = new(null,null,typeof(DefaultNPCFighter)) { Effects = [] };
     public PathType? Path { get; set; } = null;
-    public Unit.ElementEnm Element { get; set; }
-    public List<Unit.ElementEnm> NativeWeaknesses { get; set; } = new();
-    public List<Resist> Resists { get; set; } = new();
-    public List<DebuffResist> DebuffResists { get; set; } = new();
+
+
     public Unit Parent { get; set; }
 
     public string GetSpecialText()

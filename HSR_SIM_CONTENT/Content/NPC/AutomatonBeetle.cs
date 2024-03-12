@@ -16,15 +16,15 @@ public class AutomatonBeetle : DefaultNPCFighter
         barierAppliedBuff = new AppliedBuff(Parent,null,this)
             { EventHandlerProc = MyBarrierEventHandler, Effects = new List<Effect> { new EffBarrier() } };
         //Elemenet
-        Element = Unit.ElementEnm.Physical;
+        Parent.Element = Unit.ElementEnm.Physical;
 
-        NativeWeaknesses.Add(Unit.ElementEnm.Wind);
-        NativeWeaknesses.Add(Unit.ElementEnm.Lightning);
-        NativeWeaknesses.Add(Unit.ElementEnm.Imaginary);
-        Resists.Add(new Resist { ResistType = Unit.ElementEnm.Lightning, ResistVal = 0.20 });
-        Resists.Add(new Resist { ResistType = Unit.ElementEnm.Physical, ResistVal = 0.20 });
-        Resists.Add(new Resist { ResistType = Unit.ElementEnm.Ice, ResistVal = 0.20 });
-        Resists.Add(new Resist { ResistType = Unit.ElementEnm.Quantum, ResistVal = 0.20 });
+        Parent.NativeWeaknesses.Add(Unit.ElementEnm.Wind);
+        Parent.NativeWeaknesses.Add(Unit.ElementEnm.Lightning);
+        Parent.NativeWeaknesses.Add(Unit.ElementEnm.Imaginary);
+        Parent.Resists.Add(new Resist { ResistType = Unit.ElementEnm.Lightning, ResistVal = 0.20 });
+        Parent.Resists.Add(new Resist { ResistType = Unit.ElementEnm.Physical, ResistVal = 0.20 });
+        Parent.Resists.Add(new Resist { ResistType = Unit.ElementEnm.Ice, ResistVal = 0.20 });
+        Parent.Resists.Add(new Resist { ResistType = Unit.ElementEnm.Quantum, ResistVal = 0.20 });
 
         Ability? myAttackAbility;
         //Deals Physical DMG (300% ATK) to a single target, and grants a Barrier to self. The Barrier nullifies all DMG received except for DoT until after being attacked.
@@ -32,7 +32,7 @@ public class AutomatonBeetle : DefaultNPCFighter
         {
             AbilityType = Ability.AbilityTypeEnm.Basic,
             Name = "Unstable Forcefield",
-            Element = Element,
+            Element = Parent.Element,
             AdjacentTargets = Ability.AdjacentTargetsEnm.None
         };
         //dmg events

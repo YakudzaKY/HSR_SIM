@@ -34,6 +34,7 @@ public class SilverWolf : DefaultFighter
         //on this event we will place debuff
         trgEnt = new TriggerEvent(null, null, Parent);
         Parent.Stats.BaseMaxEnergy = 110;
+        Parent.Element = Unit.ElementEnm.Quantum;
 
         var allowChangeChance =
             FighterUtils.GetAbilityScaling(0.75, 0.85, Parent.Skills.First(x => x.Name == "Allow Changes?").Level);
@@ -110,7 +111,6 @@ public class SilverWolf : DefaultFighter
                 Name = "Force Quit Program",
                 Cost = 1,
                 CostType = Resource.ResourceType.TP,
-                Element = Element,
                 AdjacentTargets = AdjacentTargetsEnm.All,
                 IgnoreWeakness = true
             };
@@ -209,7 +209,6 @@ public class SilverWolf : DefaultFighter
     }
 
     public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Nihility;
-    public sealed override Unit.ElementEnm Element { get; } = Unit.ElementEnm.Quantum;
 
     private double? CalculateAbilityDmg(Event ent)
     {
@@ -290,12 +289,12 @@ public class SilverWolf : DefaultFighter
             {
                 //first find elements not in native weakness
                 var reduceResists = true;
-                var elemListToApply = GetAliveFriends().Select(x => x.Fighter.Element)
-                    .Where(x => !ent.TargetUnit.Fighter.NativeWeaknesses.Contains(x)).Distinct();
+                var elemListToApply = GetAliveFriends().Select(x => x.Element)
+                    .Where(x => !ent.TargetUnit.NativeWeaknesses.Contains(x)).Distinct();
                 if (!elemListToApply.Any())
                 {
                     elemListToApply =
-                        GetAliveFriends().Select(x => x.Fighter.Element).Distinct(); //else pick all elements
+                        GetAliveFriends().Select(x => x.Element).Distinct(); //else pick all elements
                     reduceResists = false;
                 }
 

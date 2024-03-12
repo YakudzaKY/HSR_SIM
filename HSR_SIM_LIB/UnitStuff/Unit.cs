@@ -32,6 +32,8 @@ public class Unit : CloneClass
         Imaginary
     }
 
+    public ElementEnm Element { get; set; }
+    
     public enum LivingStatusEnm
     {
         Alive,
@@ -45,6 +47,22 @@ public class Unit : CloneClass
         Npc,
         Character
     }
+
+    /// <summary>
+    ///     native weaknesses defined by profile
+    /// </summary>
+    public List<ElementEnm> NativeWeaknesses { get; } = [];
+
+    /// <summary>
+    ///     native resists defined by profile
+    /// </summary>
+    public List<Resist> Resists { get;   }= [];
+
+    /// <summary>
+    ///     native debuff resists defined by profile
+    /// </summary>
+    public List<DebuffResist> DebuffResists { get;  }= [];
+
 
     private List<DamageBoostRec> baseDamageBoost; //Elemental damage boost list
 
@@ -61,8 +79,7 @@ public class Unit : CloneClass
 
     public IFighter Fighter
     {
-        get =>
-            fighter ??= (IFighter)Activator.CreateInstance(Type.GetType(FighterClassName, true)!, this);
+        get => fighter;
         private set => fighter = value;
     }
 
@@ -137,6 +154,8 @@ public class Unit : CloneClass
                 if (ParentTeam.ParentSim.NextFight != null)
                     foreach (var wave in ParentTeam.ParentSim.NextFight.Waves)
                         nextEnemies.AddRange(wave.Units);
+                foreach (var unit in nextEnemies)
+                    unit.Init();
                 return nextEnemies.DistinctBy(x => x.Name).ToList();
             }
 
@@ -163,6 +182,7 @@ public class Unit : CloneClass
     public int LightConeInitRank { get; set; }
 
     public List<KeyValuePair<string, int>> RelicsClasses { get; set; } = new();
+
     public string FighterClassName { get; set; }
 
     //if unit under control
@@ -182,6 +202,9 @@ public class Unit : CloneClass
         var newClone = (Unit)MemberwiseClone();
         //clear fighter
         newClone.fighter = null;
+        newClone.Resists.Clear();
+        newClone.DebuffResists.Clear();
+        newClone.NativeWeaknesses.Clear();
         //clone resources
         var oldRes = newClone.Resources;
         newClone.Resources = [];
@@ -209,7 +232,8 @@ public class Unit : CloneClass
         //clone Stats
         //var oldStats = newClone.Stats;
         newClone.Stats = (UnitStats)newClone.Stats.Clone();
-
+        newClone.Stats.Parent = newClone;
+        
 
         return newClone;
     }
@@ -221,7 +245,7 @@ public class Unit : CloneClass
     {
         GetRes(ResourceType.HP).ResVal = GetMaxHp(null);
         GetRes(ResourceType.Toughness).ResVal = Stats.MaxToughness;
-        Fighter = null;
+        Fighter = (IFighter)Activator.CreateInstance(Type.GetType(FighterClassName, true)!, this);
     }
 
     //call when unit enter battle
@@ -266,22 +290,31 @@ public class Unit : CloneClass
     /// <param name="elem"></param>
     /// <param name="ent"></param>
     /// <returns>double value: sum of resists effects</returns>
-    public double GetResists(ElementEnm elem, Event ent = null)
+    public double GetResistsAndBuffResists(ElementEnm elem, Event ent = null)
     {
         double res = 0;
-        if (Fighter.Resists.Any(x => x.ResistType == elem))
-            res += Fighter.Resists.First(x => x.ResistType == elem).ResistVal;
+        if (Resists.Any(x => x.ResistType == elem))
+            res += Resists.First(x => x.ResistType == elem).ResistVal;
 
         res += GetBuffSumByType(ent, typeof(EffElementalResist), elem: elem);
         res += GetBuffSumByType(ent, typeof(EffAllDamageResist));
+        return res;
+    }
+    
+    public double GetResists(ElementEnm elem, Event ent = null)
+    {
+        double res = 0;
+        if (Resists.Any(x => x.ResistType == elem))
+            res += Resists.First(x => x.ResistType == elem).ResistVal;
+
         return res;
     }
 
     public double GetDebuffResists(Type debuff, Event ent = null)
     {
         double res = 0;
-        if (Fighter.DebuffResists.Any(x => x.Debuff == debuff))
-            res += Fighter.DebuffResists.First(x => x.Debuff == debuff).ResistVal;
+        if (DebuffResists.Any(x => x.Debuff == debuff))
+            res += DebuffResists.First(x => x.Debuff == debuff).ResistVal;
 
         res += GetBuffSumByType(ent, typeof(EffDebufResist));
         return res;
@@ -349,7 +382,7 @@ public class Unit : CloneClass
             effectList.AddRange(mod.Effects.Where(y => y.GetType() == effTypeToSearch
                                                        && (y is not EffElementalTemplate eft || eft.Element == elem)
                                                        && (y is not EffAbilityTypeBoost efa ||
-                                                           efa.AbilityType == abilityType)
+                                                           efa.AbilityType.HasFlag(abilityType ?? throw new ArgumentNullException(nameof(abilityType))) )
             ));
             if (effectList.Count > 0) res.Add(new KeyValuePair<Buff, List<Effect>>(mod, effectList));
         }
@@ -392,6 +425,49 @@ public class Unit : CloneClass
             if (kp.Key is AppliedBuff appliedBuff && effect.StackAffectValue)
                 finalValue *= appliedBuff.Stack;
             res += finalValue;
+            if (outputEffects != null && outputEffects.All(x => x.TraceEffect != effect))
+                outputEffects.Add(new EffectTraceRec(kp.Key, effect, finalValue));
+        }
+
+
+        return res;
+    }
+
+    /// <summary>
+    ///     the multiply of stats whose effects we found using the criteria
+    /// 1 * (1- X)*(1-Y)...*(1-N)
+    /// </summary>
+    /// <param name="ent">Event ref for calculation</param>
+    /// <param name="effTypeToSearch">Effect to search</param>
+    /// <param name="outputEffects">List of effect used for val calculation</param>
+    /// <param name="elem">search by element (for example Elemental Damage boost)</param>
+    /// <param name="excludeCondition">Exclude passive buff for prevent recursion </param>
+    /// <param name="buffType">Search by type: debuff,DoT,Buff</param>
+    /// <param name="abilityType">search by ability type(for example Damage boost by ability)</param>
+    /// <returns>double value(sum of effect values)</returns>
+    public double GetBuffMultiplyByType(Event ent = null,
+        Type effTypeToSearch = null, List<EffectTraceRec> outputEffects = null, ElementEnm? elem = null,
+        List<Condition> excludeCondition = null, Buff.BuffType? buffType = null,
+        AbilityTypeEnm? abilityType = null)
+    {
+        double res = 1;
+        var effList =
+            GetBuffEffectsByType(effTypeToSearch, elem, ent, excludeCondition, buffType, abilityType);
+
+        foreach (var kp in effList)
+        foreach (var effect in kp.Value)
+        {
+            double finalValue;
+            //if condition\passive buff is target check then recalculate value
+            if (effect.CalculateValue != null && kp.Key is PassiveBuff { IsTargetCheck: true })
+                finalValue = (double)effect.CalculateValue(ent);
+            else
+                finalValue = (double)effect.Value;
+            //multiply by stack
+
+            if (kp.Key is AppliedBuff appliedBuff && effect.StackAffectValue)
+                finalValue *= appliedBuff.Stack;
+            res *= (1-finalValue);
             if (outputEffects != null && outputEffects.All(x => x.TraceEffect != effect))
                 outputEffects.Add(new EffectTraceRec(kp.Key, effect, finalValue));
         }
@@ -805,7 +881,8 @@ public class Unit : CloneClass
     {
         List<ElementEnm> res = new();
         //add native weakness to result
-        res.AddRange(Fighter.NativeWeaknesses);
+        
+        res.AddRange(NativeWeaknesses);
         //grab weakness from debuffs
         var elems = GetBuffEffectsByType(typeof(EffWeaknessImpair), ent: ent, excludeCondition: excludeCondition)
             .Select(x => x.Value);

@@ -88,7 +88,7 @@ public abstract class DefaultFighter : IFighter
     {
         get
         {
-            return weaknessBreakDebuff ??= Element switch
+            return weaknessBreakDebuff ??= Parent.Element switch
             {
                 Unit.ElementEnm.Physical => new AppliedBuffBleedWb(Parent),
                 Unit.ElementEnm.Fire => new AppliedBuffBurnWb(Parent),
@@ -108,7 +108,6 @@ public abstract class DefaultFighter : IFighter
 
 
     public abstract PathType? Path { get; }
-    public abstract Unit.ElementEnm Element { get; }
 
     public List<Unit.ElementEnm> NativeWeaknesses { get; set; } = [];
     public List<DebuffResist> DebuffResists { get; set; } = [];
@@ -291,7 +290,7 @@ public abstract class DefaultFighter : IFighter
                 //Support,Healer focus on Shield shred. 
                 if (Role is UnitRole.Support or UnitRole.Healer or UnitRole.SecondDps)
                     return Parent.GetTargetsForUnit(ability.TargetType)
-                        .OrderByDescending(x => x.GetWeaknesses(null).Contains(Element))
+                        .OrderByDescending(x => x.GetWeaknesses(null).Contains(Parent.Element))
                         .ThenBy(x =>
                             x.GetRes(ResourceType.Toughness).ResVal *
                             (leader?.Fighter.Path is PathType.Destruction or PathType.Erudition ? -1 : 1)).ThenBy(
@@ -302,7 +301,7 @@ public abstract class DefaultFighter : IFighter
 
                 // focus on High hp if main dps Destruction,Erudition. Other- low hp
                 return Parent.GetTargetsForUnit(ability.TargetType)
-                    .OrderByDescending(x => x.GetWeaknesses(null).Contains(Element)).ThenBy(x =>
+                    .OrderByDescending(x => x.GetWeaknesses(null).Contains(Parent.Element)).ThenBy(x =>
                         x.GetRes(ResourceType.HP).ResVal *
                         (leader?.Fighter.Path is PathType.Destruction or PathType.Erudition ? -1 : 1))
                     .FirstOrDefault();
@@ -317,7 +316,7 @@ public abstract class DefaultFighter : IFighter
                     var targets = ability.GetAffectedTargets(unit);
                     double score = 10 * targets.Count;
                     score += 5 * targets.Count(x => x == unit && x.GetRes(ResourceType.Toughness).ResVal == 0);
-                    score += 3 * targets.Count(x => x == unit && x.GetWeaknesses(null).Any(z => z == Element));
+                    score += 3 * targets.Count(x => x == unit && x.GetWeaknesses(null).Any(z => z == Parent.Element));
                     score += 2 * targets.Count(x => x.Fighter is DefaultNPCBossFIghter);
                     //if equal but hp diff go focus big target
                     if (score > bestScore ||
@@ -366,7 +365,7 @@ public abstract class DefaultFighter : IFighter
     private IEnumerable<Unit> GetWeaknessTargets()
     {
         return Parent.Enemies.Where(x => x.IsAlive
-                                         && x.GetWeaknesses(null).Any(y => y == Parent.Fighter.Element));
+                                         && x.GetWeaknesses(null).Any(y => y == Parent.Element));
     }
 
     //alive friends. select only who not defeated or waiting for rez

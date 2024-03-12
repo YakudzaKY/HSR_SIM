@@ -186,8 +186,6 @@ public static class XmlLoader
                 throw new Exception("Unit template value is null");
             var assemblyName = unitNode.Attributes.GetNamedItem("assembly")?.Value?.Trim() ?? "HSR_SIM_CONTENT";
             var words = unitCode.Split('\\');
-            unit.FighterClassName =
-                $"{assemblyName}.Content.{words[0]}.{EscapeReplaceString(words[1])}, {assemblyName}";
             unit.UnitType = (TypeEnm)Enum.Parse(typeof(TypeEnm), words[0], true);
             unit.Level =
                 int.Parse(unitNode.Attributes.GetNamedItem("level")?.Value?.Trim() ??
@@ -205,7 +203,8 @@ public static class XmlLoader
                 ExtractWargear(warGear ?? unitCode, unit);
             else
                 ExtractUnitSkillsAndGear(unitNode, unit);
-
+            unit.FighterClassName =
+                $"{assemblyName}.Content.{words[0]}.{EscapeReplaceString(words[1])}, {assemblyName}";
             units.Add(unit);
         }
 

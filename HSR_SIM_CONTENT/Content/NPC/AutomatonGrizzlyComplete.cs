@@ -12,18 +12,18 @@ internal class AutomatonGrizzlyComplete : DefaultNPCBossFIghter
     public AutomatonGrizzlyComplete(Unit? parent) : base(parent)
     {
         //Elemenet
-        Element = Unit.ElementEnm.Physical;
+        Parent.Element = Unit.ElementEnm.Physical;
 
-        NativeWeaknesses.Add(Unit.ElementEnm.Fire);
-        NativeWeaknesses.Add(Unit.ElementEnm.Lightning);
-        NativeWeaknesses.Add(Unit.ElementEnm.Ice);
-        Resists.Add(new Resist { ResistType = Unit.ElementEnm.Physical, ResistVal = 0.20 });
-        Resists.Add(new Resist { ResistType = Unit.ElementEnm.Wind, ResistVal = 0.20 });
-        Resists.Add(new Resist { ResistType = Unit.ElementEnm.Quantum, ResistVal = 0.20 });
-        Resists.Add(new Resist { ResistType = Unit.ElementEnm.Imaginary, ResistVal = 0.20 });
-        DebuffResists.Add(new DebuffResist { Debuff = typeof(EffFreeze), ResistVal = 0.5 });
-        DebuffResists.Add(new DebuffResist { Debuff = typeof(EffImprisonment), ResistVal = 0.5 });
-        DebuffResists.Add(new DebuffResist { Debuff = typeof(EffEntanglement), ResistVal = 0.5 });
+        Parent.NativeWeaknesses.Add(Unit.ElementEnm.Fire);
+        Parent.NativeWeaknesses.Add(Unit.ElementEnm.Lightning);
+        Parent.NativeWeaknesses.Add(Unit.ElementEnm.Ice);
+        Parent.Resists.Add(new Resist { ResistType = Unit.ElementEnm.Physical, ResistVal = 0.20 });
+        Parent.Resists.Add(new Resist { ResistType = Unit.ElementEnm.Wind, ResistVal = 0.20 });
+        Parent.Resists.Add(new Resist { ResistType = Unit.ElementEnm.Quantum, ResistVal = 0.20 });
+        Parent.Resists.Add(new Resist { ResistType = Unit.ElementEnm.Imaginary, ResistVal = 0.20 });
+        Parent.DebuffResists.Add(new DebuffResist { Debuff = typeof(EffFreeze), ResistVal = 0.5 });
+        Parent.DebuffResists.Add(new DebuffResist { Debuff = typeof(EffImprisonment), ResistVal = 0.5 });
+        Parent.DebuffResists.Add(new DebuffResist { Debuff = typeof(EffEntanglement), ResistVal = 0.5 });
 
         //TODO: need implement boss abilities
         Ability? myAttackAbility;
@@ -32,7 +32,7 @@ internal class AutomatonGrizzlyComplete : DefaultNPCBossFIghter
         {
             AbilityType = Ability.AbilityTypeEnm.Basic,
             Name = "Shovel Attack",
-            Element = Element
+            Element = Parent.Element
         };
         //dmg events
         myAttackAbility.Events.Add(new DirectDamage(null, this, Parent)

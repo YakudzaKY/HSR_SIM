@@ -77,7 +77,7 @@ public static class FighterUtils
 
         var attacker = ent.SourceUnit;
         var defender = ent.TargetUnit;
-        var attackElem = ent.ParentStep.ActorAbility?.Element ?? attacker.Fighter.Element;
+        var attackElem = ent.ParentStep.ActorAbility?.Element ?? attacker.Element;
 
         double baseDmg;
         var maxToughnessMult = 0.5 + (double)defender.Stats.MaxToughness / 120;
@@ -133,7 +133,7 @@ public static class FighterUtils
         var breakEffect = 1 + attacker.GetBreakDmg(ent);
         var def = defender.GetDef(ent);
         var defMultiplier = 1 - def / (def + 200 + 10 * attacker.Level);
-        var resPen = 1 - (defender.GetResists(attackElem, ent) - attacker.ResistsPenetration(attackElem, ent));
+        var resPen = 1 - (defender.GetResistsAndBuffResists(attackElem, ent) - attacker.ResistsPenetration(attackElem, ent));
         var vulnMult = 1 + defender.GetElemVulnerability(attackElem, ent) + defender.GetAllDamageVulnerability(ent);
         var brokenMultiplier = defender.GetBrokenMultiplier();
         var totalDmg = baseDmg * breakEffect * defMultiplier * resPen * vulnMult * brokenMultiplier;
@@ -150,11 +150,22 @@ public static class FighterUtils
     {
         var expression = $"{abilityFormula.Expression} * " +
                          //crit
-                         $"( ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GenerateCrit)} * 0) " +
-                         $"+ ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetCritDamage)} * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.CritHit)} )  +1 ) " +
+                         $" ( ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GenerateCrit)} * 0) " +
+                         $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetCritDamage)} * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.CritHit)} )  +1 ) " +
                          //damage boost
-                         $"* (1 + {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetElemBoostValue)} " +
-                         $" + {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAbilityTypeMultiplier)} )";
+                         $" * (1 + {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetElemBoostValue)} " +
+                         $" + {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAbilityTypeMultiplier)} " +
+                         $" + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAllDamageBoost).FullName} " +
+                         $" + {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.DotBoost)}  ) " +
+                         //def
+                         $" * ({Formula.DynamicTargetEnm.Defender}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetDefMultiplier)}) "  +
+                         //resist and  penetration
+                         $" *  {Formula.DynamicTargetEnm.Defender}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.ResPen)}  " +
+                         //vulnerability 
+                         $" *  {Formula.DynamicTargetEnm.Defender}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.VulnerabilityMulti)} " +
+                         //damage reduction
+                         $" * {Formula.DynamicTargetEnm.Defender}#{nameof(Unit.GetBuffMultiplyByType)}#{typeof(EffDamageReduction).FullName} " +
+                         $" *  {Formula.DynamicTargetEnm.Defender}#{nameof(Unit.GetBrokenMultiplier)}";
         var newFormula = new Formula { Expression = expression, Variables = abilityFormula.Variables };
 
         return newFormula;
@@ -214,7 +225,7 @@ public static class FighterUtils
         var def = defender.GetDef(ent);
         var defMultiplier = 1 - def / (def + 200 + 10 * attacker.Level);
 
-        var resPen = 1 - (defender.GetResists(attackElem, ent) - attacker.ResistsPenetration(attackElem, ent));
+        var resPen = 1 - (defender.GetResistsAndBuffResists(attackElem, ent) - attacker.ResistsPenetration(attackElem, ent));
 
         var vulnMult = 1 + defender.GetElemVulnerability(attackElem, ent) + defender.GetAllDamageVulnerability(ent) +
                        dotVulnerability;

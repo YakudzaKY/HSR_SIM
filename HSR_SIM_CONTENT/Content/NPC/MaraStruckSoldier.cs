@@ -24,15 +24,15 @@ public class MaraStruckSoldier : DefaultNPCFighter
     public MaraStruckSoldier(Unit? parent) : base(parent)
     {
         //Elemenet
-        Element = Unit.ElementEnm.Wind;
+        Parent.Element = Unit.ElementEnm.Wind;
 
-        NativeWeaknesses.Add(Unit.ElementEnm.Fire);
-        NativeWeaknesses.Add(Unit.ElementEnm.Ice);
-        NativeWeaknesses.Add(Unit.ElementEnm.Quantum);
-        Resists.Add(new Resist { ResistType = Unit.ElementEnm.Physical, ResistVal = 0.20 });
-        Resists.Add(new Resist { ResistType = Unit.ElementEnm.Lightning, ResistVal = 0.20 });
-        Resists.Add(new Resist { ResistType = Unit.ElementEnm.Wind, ResistVal = 0.20 });
-        Resists.Add(new Resist { ResistType = Unit.ElementEnm.Imaginary, ResistVal = 0.20 });
+        Parent.NativeWeaknesses.Add(Unit.ElementEnm.Fire);
+        Parent.NativeWeaknesses.Add(Unit.ElementEnm.Ice);
+        Parent.NativeWeaknesses.Add(Unit.ElementEnm.Quantum);
+        Parent.Resists.Add(new Resist { ResistType = Unit.ElementEnm.Physical, ResistVal = 0.20 });
+        Parent.Resists.Add(new Resist { ResistType = Unit.ElementEnm.Lightning, ResistVal = 0.20 });
+        Parent.Resists.Add(new Resist { ResistType = Unit.ElementEnm.Wind, ResistVal = 0.20 });
+        Parent.Resists.Add(new Resist { ResistType = Unit.ElementEnm.Imaginary, ResistVal = 0.20 });
         myDotDeAppliedBuff = new AppliedBuff(Parent,null,this)
         {
             Reference = myDoTRef,
@@ -76,7 +76,7 @@ public class MaraStruckSoldier : DefaultNPCFighter
         {
             AbilityType = Ability.AbilityTypeEnm.Basic,
             Name = "Callous Tailwind",
-            Element = Element,
+            Element = Parent.Element,
             AdjacentTargets = Ability.AdjacentTargetsEnm.None
         };
         //dmg events

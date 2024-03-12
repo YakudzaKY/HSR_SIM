@@ -44,7 +44,7 @@ public class Blade : DefaultFighter
     public Blade(Unit? parent) : base(parent)
     {
         Parent.Stats.BaseMaxEnergy = 130;
-
+        Parent.Element=Unit.ElementEnm.Wind;
         //load lvl
         dsSkillLvl = Parent.Skills.First(x => x.Name == "Death Sentence").Level;
         fsSkillLvl = Parent.Skills.First(x => x.Name == "Forest of Swords").Level;
@@ -84,7 +84,6 @@ public class Blade : DefaultFighter
         {
             AbilityType = AbilityTypeEnm.FollowUpAction,
             Name = "Shuhu's Gift",
-            Element = Element,
             TargetType = TargetTypeEnm.Enemy,
             AdjacentTargets = AdjacentTargetsEnm.All,
             Available = SGAvailable,
@@ -121,7 +120,6 @@ public class Blade : DefaultFighter
         {
             AbilityType = AbilityTypeEnm.Basic,
             Name = "Shard Sword",
-            Element = Element,
             AdjacentTargets = AdjacentTargetsEnm.None,
             SpGain = 1,
             Available = HellscapeNotActive
@@ -144,7 +142,6 @@ public class Blade : DefaultFighter
         {
             AbilityType = AbilityTypeEnm.Basic,
             Name = "Forest of Swords",
-            Element = Element,
             AdjacentTargets = AdjacentTargetsEnm.Blast,
             Available = HellscapeActive
         };
@@ -244,7 +241,6 @@ public class Blade : DefaultFighter
                 Name = "Karma Wind",
                 Cost = 1,
                 CostType = Resource.ResourceType.TP,
-                Element = Element,
                 TargetType = TargetTypeEnm.Enemy,
                 AdjacentTargets = AdjacentTargetsEnm.All
             };
@@ -361,7 +357,7 @@ public class Blade : DefaultFighter
     }
 
     public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Destruction;
-    public sealed override Unit.ElementEnm Element { get; } = Unit.ElementEnm.Wind;
+
 
     private AppliedBuff E4AppliedBuff { get; }
 //Blade constructor

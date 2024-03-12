@@ -82,7 +82,7 @@ public class Condition
                                              CheckExpression(untToCheck.GetHpPrc(ent, excludeCondition)),
                 ConditionCheckParam.Resource => ResourceValue!=null && CheckExpression(untToCheck.GetRes((Resource.ResourceType)ResourceValue).ResVal),
                 ConditionCheckParam.Weakness => untToCheck.GetWeaknesses(ent, excludeCondition)
-                                                    .Any(x => x == (ElemValue ?? ent?.SourceUnit.Fighter.Element))
+                                                    .Any(x => x == (ElemValue ?? ent?.SourceUnit.Element))
                                                 == (ConditionExpression ==
                                                     ConditionCheckExpression.Exists),
                 ConditionCheckParam.Buff => untToCheck.AppliedBuffs.Any(x =>

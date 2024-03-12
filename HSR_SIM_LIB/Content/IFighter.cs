@@ -22,24 +22,8 @@ public interface IFighter : ICloneable
     ///     A debuff that is applied when a vulnerability is broken.
     /// </summary>
     public AppliedBuff WeaknessBreakDebuff { get; set; }
-
-    public Unit.ElementEnm Element { get; }
+    
     public PathType? Path { get; }
-
-    /// <summary>
-    ///     native weaknesses defined by profile
-    /// </summary>
-    public List<Unit.ElementEnm> NativeWeaknesses { get; set; }
-
-    /// <summary>
-    ///     native resists defined by profile
-    /// </summary>
-    public List<Resist> Resists { get; set; }
-
-    /// <summary>
-    ///     native debuff resists defined by profile
-    /// </summary>
-    public List<DebuffResist> DebuffResists { get; set; }
 
     public EventHandler EventHandlerProc { get; set; }
 
