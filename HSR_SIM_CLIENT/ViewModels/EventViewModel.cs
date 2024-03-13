@@ -1,4 +1,6 @@
-﻿using HSR_SIM_LIB.Skills;
+﻿using System.Runtime.InteropServices.JavaScript;
+using System.Windows.Forms;
+using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.Utils;
 
@@ -23,15 +25,16 @@ public class EventViewModel(Event ent)
         {
             if (ent is DamageEventTemplate de)
             {
-                IEnumerable<Buff>? res=(de.CalculateValue is Formula fm)
+                IEnumerable<Buff>? res = (de.CalculateValue is Formula fm)
                     ? fm.DescendantsAndSelfEffects().Select(y => y.TraceBuff).Distinct()
                     : null;
                 return res;
             }
 
 
-
             return null;
         }
     }
+
+    public IEnumerable<Formula> Formulas => (ent.CalculateValue is Formula fm) ? new List<Formula>() { fm } : [];
 }

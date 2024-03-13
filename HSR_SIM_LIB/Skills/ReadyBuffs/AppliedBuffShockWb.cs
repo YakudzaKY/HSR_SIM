@@ -13,6 +13,6 @@ public class AppliedBuffShockWb : AppliedBuff
     {
         Type = BuffType.Dot;
         BaseDuration = 2;
-        Effects = [new EffShock { DoTCalculateValue = FighterUtils.CalculateShieldBrokeDmg }];
+        Effects = [new EffShock { DoTCalculateValue =FighterUtils.WeaknessBreakFormula() }];
     }
 }

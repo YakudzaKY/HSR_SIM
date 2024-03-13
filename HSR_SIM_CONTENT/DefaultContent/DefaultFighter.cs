@@ -351,7 +351,7 @@ public abstract class DefaultFighter : IFighter
 
     private int CalcStacksByTarget(Event ent)
     {
-        return ent.TargetUnit.Fighter.IsEliteUnit ? 3 : 1;
+        return ent.TargetUnit.IsEliteUnit ? 3 : 1;
     }
 
 

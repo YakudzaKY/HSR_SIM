@@ -43,6 +43,14 @@ public class Formula : ICloneable
     /// </summary>
     public Dictionary<string, VarVal> Variables { get; set; } = new();
 
+    public IEnumerable<Formula> ChildFormulas
+    {
+        get
+        {
+            return Variables.Select(x => x.Value.ResFormula).Where(z => z != null);
+        }
+    }
+
     /// <summary>
     ///     return result of Formula
     ///     if no result then calculate it
@@ -312,7 +320,7 @@ public class Formula : ICloneable
 
         foreach (var lexeme in Expression.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries))
             //If it is an operator
-            if (lexeme is "*" or "/" or "+" or "-")
+            if (lexeme is "*" or "/" or "+" or "-"or "min"or "max")
             {
                 operation = lexeme;
             }
@@ -322,7 +330,7 @@ public class Formula : ICloneable
                 if (Variables.TryGetValue(lexeme, out var variable)) //If it is a variable, let's get the variable value
                     value = variable.Result ?? 0;
                 else //It is just a number, let's just parse
-                    value = double.Parse(lexeme, NumberStyles.Any, CultureInfo.InvariantCulture);
+                    value = double.Parse(lexeme.Replace(",","."), NumberStyles.Any, CultureInfo.InvariantCulture);
 
                 if (!calculationResult.HasValue) //No value has been assigned yet
                     calculationResult = value;
@@ -340,6 +348,12 @@ public class Formula : ICloneable
                             break;
                         case "-":
                             calculationResult = calculationResult.Value - value;
+                            break;
+                        case "min":
+                            calculationResult = Math.Min(calculationResult.Value, value);
+                            break;
+                        case "max":
+                            calculationResult = Math.Max(calculationResult.Value , value);
                             break;
                         default:
                             throw new Exception("The expression is not properly formatted.");

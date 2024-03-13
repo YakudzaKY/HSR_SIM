@@ -7,6 +7,7 @@
              xmlns:singleSim="clr-namespace:HSR_SIM_CLIENT.ViewModels"
              xmlns:views="clr-namespace:HSR_SIM_CLIENT.Views"
              xmlns:unitStuff="clr-namespace:HSR_SIM_LIB.Skills;assembly=HSR_SIM_LIB"
+             xmlns:utils="clr-namespace:HSR_SIM_LIB.Utils;assembly=HSR_SIM_LIB"
              mc:Ignorable="d"
 
 
@@ -25,6 +26,10 @@
             <RowDefinition Height="Auto" />
             <RowDefinition />
             <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
@@ -37,7 +42,12 @@
             <DataTemplate DataType="{x:Type unitStuff:Buff }">
                 <views:BuffView BuffToView="{Binding ., Mode=OneWay}" />
             </DataTemplate>
-
+            
+            
+            <HierarchicalDataTemplate DataType="{x:Type utils:Formula}"
+                                      ItemsSource="{Binding Path=ChildFormulas}">
+                <TextBlock Text="{Binding Path=Expression}" />
+            </HierarchicalDataTemplate>
         </Grid.Resources>
         
         <Label Grid.Row="0" Grid.Column="0">Name</Label>
@@ -59,11 +69,33 @@
                                   VerticalAlignment="Stretch" 
                                   ItemsSource="{Binding Path=EventToView.Buffs,Mode=OneWay}">
         </mah:HamburgerMenuListBox>
+      
         
-        <Label Grid.Row="9" Grid.Column="0" Visibility="{Binding ExplainVisible, Mode=OneWay}">Explain</Label>
-        <TextBox Width="Auto" Grid.Row="10" Grid.Column="0" Visibility="{Binding ExplainVisible, Mode=OneWay}"
+        <Label Grid.Row="9" Grid.Column="0" Visibility="{Binding ExplainVisible, Mode=OneWay}">Formula</Label>
+        <TextBox Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding ExplainVisible, Mode=OneWay}" Text="{Binding SelectedFormula.Expression, Mode=OneWay}" />
+        <TextBox Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding ExplainVisible, Mode=OneWay}" Text="{Binding SelectedFormula.Result, Mode=OneWay}" />
+        <TreeView Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding ExplainVisible, Mode=OneWay}"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  SelectedItemChanged="TreeView_OnSelectedFormulaChanged" >
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="IsExpanded" Value="False" />
+                </Style>
+            </TreeView.ItemContainerStyle>
+
+            <TreeViewItem ItemsSource="{Binding Path=EventToView.Formulas,Mode=OneWay}" Header="Formulas">
+                <TreeViewItem.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}">
+                        <Setter Property="IsExpanded" Value="False" />
+                    </Style>
+                </TreeViewItem.ItemContainerStyle>
+            </TreeViewItem>
+
+        </TreeView>
+        
+        <Label Grid.Row="13" Grid.Column="0" Visibility="{Binding ExplainVisible, Mode=OneWay}">Explain</Label>
+        <TextBox Width="Auto" Grid.Row="14" Grid.Column="0" Visibility="{Binding ExplainVisible, Mode=OneWay}"
                  Grid.ColumnSpan="2" TextWrapping="WrapWithOverflow" Text="{Binding EventToView.Explain, Mode=OneWay}" />
-       
 
     </Grid>
 

@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls;
 using HSR_SIM_CLIENT.ViewModels;
 using HSR_SIM_LIB.Utils;
 
@@ -9,6 +10,7 @@ namespace HSR_SIM_CLIENT.Views;
 public partial class EventView : INotifyPropertyChanged
 {
     public static readonly DependencyProperty EventToViewProperty;
+    private Formula selectedFormula;
 
     static EventView()
     {
@@ -30,6 +32,19 @@ public partial class EventView : INotifyPropertyChanged
     }
 
     public Visibility ExplainVisible => EventToView?.CalculateValue is Formula ? Visibility.Visible : Visibility.Hidden;
+
+    public Formula SelectedFormula
+    {
+        get => selectedFormula;
+        set
+        {
+            if (Equals(value, selectedFormula)) return;
+            selectedFormula = value;
+
+            OnPropertyChanged();
+        }
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     private static void PropChangedCb(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -55,13 +70,13 @@ public partial class EventView : INotifyPropertyChanged
         if (PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(name));
     }
 
-    private void downButton_Click(object sender, RoutedEventArgs e)
-    {
-        throw new NotImplementedException();
-    }
 
-    private void upButton_Click(object sender, RoutedEventArgs e)
+
+    private void TreeView_OnSelectedFormulaChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
-        throw new NotImplementedException();
+        // on event click
+        if (((TreeView)sender).SelectedItem is Formula fm)
+
+            SelectedFormula = fm;
     }
 }

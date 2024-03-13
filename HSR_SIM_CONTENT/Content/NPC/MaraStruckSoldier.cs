@@ -5,6 +5,7 @@ using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
+using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_CONTENT.Content.NPC;
 
@@ -42,7 +43,7 @@ public class MaraStruckSoldier : DefaultNPCFighter
             MaxStack = 5,
             Effects = new List<Effect>
             {
-                new EffWindShear { DoTCalculateValue = CalcMyDoT }
+                new EffWindShear { DoTCalculateValue = FighterUtils.DamageFormula(new Formula(){Expression = $"0.5 * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetMaxHp)}"}) }
             }
         };
         uniqueAppliedBuff = new AppliedBuff(Parent,null,this)
@@ -95,10 +96,7 @@ public class MaraStruckSoldier : DefaultNPCFighter
         Abilities.Add(myAttackAbility);
     }
 
-    public static double? CalcMyDoT(Event ent)
-    {
-        return FighterUtils.CalculateDmgByBasicVal(ent.SourceUnit.GetAttack(ent) * 0.5, ent);
-    }
+
 
     public double? CalculateReHeal(Event ent)
     {

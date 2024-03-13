@@ -7,8 +7,9 @@ internal class DefaultNPCBossFIghter : DefaultNPCFighter
 {
     public DefaultNPCBossFIghter(Unit? parent) : base(parent)
     {
+        parent.IsEliteUnit = true;
     }
 
     public override double Cost => Parent.GetAttack(null) * 1.5;
-    public override bool IsEliteUnit => true;
+
 }

@@ -1,8 +1,7 @@
-﻿using System.Runtime.InteropServices.JavaScript;
+﻿using System;
+using System.Linq;
 using HSR_SIM_LIB.Fighters;
-using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
-using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.Utils;
 using HSR_SIM_LIB.Utils.Utils;
@@ -109,6 +108,83 @@ public static class UnitFormulas
                 $"{unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffDoTVulnerability).FullName}  "
         };  
     }
+    
+    public static Formula WeaknessMaxToughnessMultiplier(Formula.DynamicTargetEnm unitToCheck,Event ent = null)
+    {
+        return new Formula
+        {
+            EventRef = ent,
+            Expression = $"{unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.MaxToughness)} / 120 + 0.5"
+        };
+    }
+    
+    public static Formula WeaknessBreakBaseDamage(Formula.DynamicTargetEnm unitToCheck,Event ent,Unit.ElementEnm elem)
+    {
+
+        //if DoT proceed
+        if (ent is ToughnessBreakDoTDamage modEnt)
+        {
+            string baseDmgExpr =
+                $"{unitToCheck}#{nameof(Unit.UnitLvlMultiplier)} * {OppositeTarget(unitToCheck)}#{nameof(UnitFormulas)}#{nameof(WeaknessMaxToughnessMultiplier)}";
+        if (modEnt.BuffThatDamage.Effects.Any(x => x is EffBleed))
+        {
+            baseDmgExpr = $"({OppositeTarget(unitToCheck)}#{nameof(Unit.BleedEliteMultiplier)} * {OppositeTarget(unitToCheck)}#{nameof(UnitFormulas)}#{nameof(GetMaxHp)}) min (2 * {baseDmgExpr}))";
+        }
+        else if (modEnt.BuffThatDamage.Effects.Any(x =>
+                     x is EffBurn or EffFreeze))
+        {
+            baseDmgExpr = "1 * "+baseDmgExpr;
+        }
+        else if (modEnt.BuffThatDamage.Effects.Any(x =>
+                     x is EffShock))
+        {
+            baseDmgExpr = "2 * "+baseDmgExpr;
+        }
+        else if (modEnt.BuffThatDamage.Effects.Any(x =>
+                     x is EffWindShear))
+        {
+            baseDmgExpr = $"1 * {modEnt.BuffThatDamage.Stack} * "+baseDmgExpr;
+        }
+        else if (modEnt.BuffThatDamage.Effects.Any(x =>
+                     x is EffEntanglement))
+        {
+            baseDmgExpr = $"0.6 * {modEnt.BuffThatDamage.Stack} * "+baseDmgExpr;
+        }
+        else
+        {
+            throw new Exception($"{nameof(ToughnessBreakDoTDamage)} contains unknown effect");
+        }
+            return new Formula
+            {
+                EventRef = ent,
+                Expression =baseDmgExpr
+            };  
+        }
+
+        else
+        {
+            //immediate weakness break
+            var baseDmg = elem switch
+            {
+                Unit.ElementEnm.Physical => 2 ,
+                Unit.ElementEnm.Fire => 2 ,
+                Unit.ElementEnm.Ice => 1 ,
+                Unit.ElementEnm.Lightning => 1,
+                Unit.ElementEnm.Wind => 1.5 ,
+                Unit.ElementEnm.Quantum => 0.5 ,
+                Unit.ElementEnm.Imaginary => 0.5 ,
+                _ => throw new NotImplementedException()
+            };
+            return new Formula
+            {
+                EventRef = ent,
+                Expression =
+                    $"  {baseDmg} * {unitToCheck}#{nameof(Unit.UnitLvlMultiplier)} * {OppositeTarget(unitToCheck)}#{nameof(UnitFormulas)}#{nameof(WeaknessMaxToughnessMultiplier)}"
+            };  
+        }
+       
+        
+    }
 
     
     public static Formula CritHit(Event ent)
@@ -180,7 +256,8 @@ public static class UnitFormulas
         };  
       
     }
-    public static Formula CritChance(Formula.DynamicTargetEnm unitToCheck,Event ent)
+
+    private static Formula CritChance(Formula.DynamicTargetEnm unitToCheck,Event ent)
     {
         return new Formula
         {

@@ -15,6 +15,6 @@ public class AppliedBuffWindShearWb : AppliedBuff
         Type = BuffType.Dot;
         BaseDuration = 2;
         MaxStack = 5;
-        Effects = new List<Effect> { new EffWindShear { DoTCalculateValue = FighterUtils.CalculateShieldBrokeDmg } };
+        Effects = [new EffWindShear { DoTCalculateValue = FighterUtils.WeaknessBreakFormula() }];
     }
 }

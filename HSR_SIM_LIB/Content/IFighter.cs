@@ -54,10 +54,7 @@ public interface IFighter : ICloneable
     /// </summary>
     public MechDictionary Mechanics { get; set; }
 
-    /// <summary>
-    ///     Is Elite flag. Need for some weakness break calculations
-    /// </summary>
-    public bool IsEliteUnit { get; }
+
 
     /// <summary>
     ///     flag that unit is NPC

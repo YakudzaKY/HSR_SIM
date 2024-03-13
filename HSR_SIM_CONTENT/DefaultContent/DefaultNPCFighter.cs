@@ -26,7 +26,6 @@ public class DefaultNPCFighter : IFighter
     public List<PassiveBuff> ConditionBuffs { get; set; } = new();
 
     public List<PassiveBuff> PassiveBuffs { get; set; } = new();
-    public virtual bool IsEliteUnit => false;
     public bool IsNpcUnit => true;
 
     public Unit? GetBestTarget(Ability ability)

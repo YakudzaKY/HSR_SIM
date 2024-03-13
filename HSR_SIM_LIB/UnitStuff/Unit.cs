@@ -47,7 +47,10 @@ public class Unit : CloneClass
         Npc,
         Character
     }
-
+    /// <summary>
+    ///     Is Elite flag. Need for some weakness break calculations
+    /// </summary>
+    public bool IsEliteUnit { get; set; }
     /// <summary>
     ///     native weaknesses defined by profile
     /// </summary>
@@ -171,7 +174,10 @@ public class Unit : CloneClass
     /// <returns></returns>
     public List<Unit> Friends => ParentTeam.Units;
 
+    public double UnitLvlMultiplier => FighterUtils.LvlMultiplier[Level];
 
+    public double BleedEliteMultiplier => IsEliteUnit ? 0.07 : 0.16;
+    
     public int Rank { get; set; }
 
     /// <summary>

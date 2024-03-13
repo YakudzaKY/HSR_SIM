@@ -269,7 +269,7 @@ public class Blade : DefaultFighter
                         new()
                         {
                             ReplaceExpression =
-                                $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)}"
+                                $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetMaxHp)}"
                         }
                     }
                 }
@@ -429,11 +429,6 @@ public class Blade : DefaultFighter
         return Parent.GetMaxHp(ent) * 0.1;
     }
 
-
-    public double? CalculateKarmaDmg(Event ent)
-    {
-        return FighterUtils.CalculateDmgByBasicVal(Parent.GetMaxHp(ent) * 0.4, ent);
-    }
 
     private double getSgBasicDmg(Event ent)
     {

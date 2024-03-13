@@ -15,7 +15,7 @@ public class AppliedBuffFreezeWb : AppliedBuff
     {
         Type = BuffType.Debuff;
         BaseDuration = 1;
-        Effects = new List<Effect> { new EffFreeze { DoTCalculateValue = FighterUtils.CalculateShieldBrokeDmg } };
+        Effects = new List<Effect> { new EffFreeze { DoTCalculateValue = FighterUtils.WeaknessBreakFormula()  } };
         EventHandlerProc += FreezeEventHandler;
     }
 

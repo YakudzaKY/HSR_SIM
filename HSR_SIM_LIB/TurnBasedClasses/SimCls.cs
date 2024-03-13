@@ -192,7 +192,7 @@ public sealed class SimCls : ICloneable
                     {
                         TargetUnit = drain.TargetUnit
                     };
-                    shieldBrkEvent.Value = FighterUtils.CalculateShieldBrokeDmg(shieldBrkEvent);
+                    shieldBrkEvent.CalculateValue = FighterUtils.WeaknessBreakFormula();
                     drain.ChildEvents.Add(shieldBrkEvent);
 
 

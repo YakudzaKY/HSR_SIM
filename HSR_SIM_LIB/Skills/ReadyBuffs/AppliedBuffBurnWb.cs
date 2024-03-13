@@ -14,6 +14,6 @@ public class AppliedBuffBurnWb : AppliedBuff
     {
         Type = BuffType.Dot;
         BaseDuration = 2;
-        Effects = new List<Effect> { new EffBurn { DoTCalculateValue = FighterUtils.CalculateShieldBrokeDmg } };
+        Effects = new List<Effect> { new EffBurn { DoTCalculateValue =FighterUtils.WeaknessBreakFormula()  } };
     }
 }
