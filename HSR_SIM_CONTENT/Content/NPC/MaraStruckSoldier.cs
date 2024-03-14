@@ -12,7 +12,7 @@ namespace HSR_SIM_CONTENT.Content.NPC;
 public class MaraStruckSoldier : DefaultNPCFighter
 {
     //static because max 5 stacks by all units this type
-    private static readonly AppliedBuff myDoTRef = new(null,null,typeof(MaraStruckSoldier))
+    private static readonly AppliedBuff myDoTRef = new(null, null, typeof(MaraStruckSoldier))
     {
         Type = Buff.BuffType.Dot,
         Effects = []
@@ -34,7 +34,7 @@ public class MaraStruckSoldier : DefaultNPCFighter
         Parent.Resists.Add(new Resist { ResistType = Unit.ElementEnm.Lightning, ResistVal = 0.20 });
         Parent.Resists.Add(new Resist { ResistType = Unit.ElementEnm.Wind, ResistVal = 0.20 });
         Parent.Resists.Add(new Resist { ResistType = Unit.ElementEnm.Imaginary, ResistVal = 0.20 });
-        myDotDeAppliedBuff = new AppliedBuff(Parent,null,this)
+        myDotDeAppliedBuff = new AppliedBuff(Parent, null, this)
         {
             Reference = myDoTRef,
             Type = Buff.BuffType.Dot,
@@ -43,10 +43,17 @@ public class MaraStruckSoldier : DefaultNPCFighter
             MaxStack = 5,
             Effects = new List<Effect>
             {
-                new EffWindShear { DoTCalculateValue = FighterUtils.DamageFormula(new Formula(){Expression = $"0.5 * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetMaxHp)}"}) }
+                new EffWindShear
+                {
+                    DoTCalculateValue = FighterUtils.DamageFormula(new Formula()
+                    {
+                        Expression =
+                            $"0.5 * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetMaxHp)}"
+                    })
+                }
             }
         };
-        uniqueAppliedBuff = new AppliedBuff(Parent,null,this)
+        uniqueAppliedBuff = new AppliedBuff(Parent, null, this)
         {
             Dispellable = true,
             Type = Buff.BuffType.Buff,
@@ -85,9 +92,15 @@ public class MaraStruckSoldier : DefaultNPCFighter
         foreach (var proportion in new[] { 0.25, 0.25, 0.5 })
         {
             myAttackAbility.Events.Add(new DirectDamage(null, this, Parent)
-                { CalculateValue = CalcMyAttack, CalculateProportion = proportion });
+            {
+                CalculateValue = FighterUtils.DamageFormula(new Formula()
+                {
+                    Expression =
+                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAttack)} * 2 * {proportion}"
+                })
+            });
             myAttackAbility.Events.Add(
-                new EnergyGain(null, this, Parent) { Value = 15, CalculateProportion = proportion });
+                new EnergyGain(null, this, Parent) { Value = 15 * proportion });
         }
 
         myAttackAbility.Events.Add(new AttemptEffect(null, this, Parent)
@@ -95,7 +108,6 @@ public class MaraStruckSoldier : DefaultNPCFighter
 
         Abilities.Add(myAttackAbility);
     }
-
 
 
     public double? CalculateReHeal(Event ent)
@@ -122,10 +134,5 @@ public class MaraStruckSoldier : DefaultNPCFighter
     {
         return Parent.AppliedBuffs.Any(x => x.Reference == uniqueAppliedBuff) ||
                Parent.LivingStatus == Unit.LivingStatusEnm.WaitingForFollowUp;
-    }
-
-    public double? CalcMyAttack(Event ent)
-    {
-        return FighterUtils.CalculateDmgByBasicVal(Parent.GetAttack(ent) * 2, ent);
     }
 }

@@ -80,7 +80,7 @@ public abstract class DefaultFighter : IFighter
     }
 
     public MechDictionary Mechanics { get; set; } // dictionary for save mechanics value in combat
-    public bool IsEliteUnit => false;
+
     public bool IsNpcUnit => false;
 
     //we need this debuff to track and correctly apply debuff stacks

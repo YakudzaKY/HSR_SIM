@@ -18,6 +18,7 @@ public class DefaultNPCFighter : IFighter
     public DefaultNPCFighter(Unit? parent)
     {
         Parent = parent;
+        Parent.IsNpcUnit = true;
 
         EventHandlerProc += DefaultFighter_HandleEvent;
         StepHandlerProc += DefaultFighter_HandleStep;

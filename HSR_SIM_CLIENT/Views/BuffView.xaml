@@ -11,7 +11,8 @@
     <Grid DataContext="{Binding ElementName=Parent}">
         <Grid.Resources>
             <DataTemplate DataType="{x:Type unitStuff:Effect }">
-                <local:EffectView EffectToView="{Binding ., Mode=OneWay}" />
+                <local:EffectView EffectToView="{Binding ., Mode=OneWay}" FormulaToView="{Binding  ElementName=Parent ,Path = FormulaToView, Mode=OneWay}"
+                                />
             </DataTemplate>
         </Grid.Resources>
         

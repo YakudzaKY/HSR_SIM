@@ -36,5 +36,9 @@ public class EventViewModel(Event ent)
         }
     }
 
+    /// <summary>
+    /// adoptation to TreeView
+    /// </summary>
     public IEnumerable<Formula> Formulas => (ent.CalculateValue is Formula fm) ? new List<Formula>() { fm } : [];
+    public Formula? Formula => (ent.CalculateValue is Formula fm) ? fm : null;
 }

@@ -419,7 +419,7 @@ public sealed class SimCls : ICloneable
         {
             //try follow up actions before target do something.
             //follow up actions disabled at NPC turn end
-            if (CurrentFight.Turn.Actor.Fighter.IsNpcUnit || !newStep.FollowUpActions())
+            if (CurrentFight.Turn.Actor.IsNpcUnit || !newStep.FollowUpActions())
             {
                 newStep.StepType = StepTypeEnm.UnitTurnEnded;
                 newStep.Actor = CurrentFight.Turn.Actor;

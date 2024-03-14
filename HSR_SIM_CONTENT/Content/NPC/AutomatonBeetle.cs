@@ -4,6 +4,7 @@ using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
+using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_CONTENT.Content.NPC;
 
@@ -13,7 +14,7 @@ public class AutomatonBeetle : DefaultNPCFighter
 
     public AutomatonBeetle(Unit? parent) : base(parent)
     {
-        barierAppliedBuff = new AppliedBuff(Parent,null,this)
+        barierAppliedBuff = new AppliedBuff(Parent, null, this)
             { EventHandlerProc = MyBarrierEventHandler, Effects = new List<Effect> { new EffBarrier() } };
         //Elemenet
         Parent.Element = Unit.ElementEnm.Physical;
@@ -37,7 +38,13 @@ public class AutomatonBeetle : DefaultNPCFighter
         };
         //dmg events
         myAttackAbility.Events.Add(new DirectDamage(null, this, Parent)
-            { CalculateValue = CalcMyAttack });
+        {
+            CalculateValue = FighterUtils.DamageFormula(new Formula()
+            {
+                Expression =
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAttack)} * 3 "
+            })
+        });
         myAttackAbility.Events.Add(new EnergyGain(null, this, Parent) { Value = 15 });
         myAttackAbility.Events.Add(new ApplyBuff(null, this, Parent)
             { TargetUnit = Parent, AppliedBuffToApply = barierAppliedBuff });
@@ -46,10 +53,6 @@ public class AutomatonBeetle : DefaultNPCFighter
         Abilities.Add(myAttackAbility);
     }
 
-    public double? CalcMyAttack(Event ent)
-    {
-        return FighterUtils.CalculateDmgByBasicVal(Parent.GetAttack(ent) * 3, ent);
-    }
 
     public void MyBarrierEventHandler(Event ent)
     {

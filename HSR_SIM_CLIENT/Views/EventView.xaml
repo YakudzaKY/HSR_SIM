@@ -40,7 +40,7 @@
            
             
             <DataTemplate DataType="{x:Type unitStuff:Buff }">
-                <views:BuffView BuffToView="{Binding ., Mode=OneWay}" />
+                <views:BuffView  FormulaToView="{Binding  ElementName=Parent ,Path = EventToView.Formula, Mode=OneWay}" BuffToView="{Binding ., Mode=OneWay}"  />
             </DataTemplate>
             
             

@@ -60,7 +60,7 @@ public static class UnitFormulas
     /// <returns></returns>
     public static Formula GetAbilityTypeMultiplier(Formula.DynamicTargetEnm unitToCheck,Event ent)
     {
-        if (ent is DoTDamage)
+        if (ent is DamageEventTemplate)
             return new Formula
             {
                 EventRef = ent,
@@ -77,7 +77,7 @@ public static class UnitFormulas
 
     public static Formula DotBoost(Formula.DynamicTargetEnm unitToCheck,Event ent)
     {
-        if (ent is not DoTDamage)
+        if (ent is not DamageEventTemplate)
             return new Formula
             {
                 EventRef = ent,
@@ -211,7 +211,7 @@ public static class UnitFormulas
             Expression =
                 $" {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.BaseDef)} * ( 1 + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffDefPrc).FullName} " +
                 //def ignore
-                (ent!=null? $" - {OppositeTarget(unitToCheck)}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffDefPrc).FullName} ":string.Empty )+
+                (ent!=null? $" - {OppositeTarget(unitToCheck)}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffDefIgnore).FullName} ":string.Empty )+
                 $" +  {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.DefPrc)} ) + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffDef).FullName} "
         };  
       

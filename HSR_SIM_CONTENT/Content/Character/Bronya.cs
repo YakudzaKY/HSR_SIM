@@ -1,4 +1,5 @@
 ﻿using HSR_SIM_CONTENT.DefaultContent;
+using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
@@ -19,6 +20,7 @@ public class Bronya : DefaultFighter
 
     public Bronya(Unit? parent) : base(parent)
     {
+        
         Parent.Element = Unit.ElementEnm.Wind;
         Parent.Stats.BaseMaxEnergy = 120;
         wbSkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Windrider Bullet")!.Level;
@@ -45,7 +47,7 @@ public class Bronya : DefaultFighter
         ApplyBuff eventBuff = new(null, this, Parent)
         {
             OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
-            AppliedBuffToApply = new AppliedBuff(Parent,null,this)
+            AppliedBuffToApply = new AppliedBuff(Parent, null, this)
             {
                 Type = Buff.BuffType.Buff,
                 Effects = new List<Effect> { new EffAtkPrc { Value = 0.15 } },
@@ -71,7 +73,15 @@ public class Bronya : DefaultFighter
         windriderBullet.Events.Add(new MechanicValChg(null, this, Parent)
             { AbilityValue = windriderBullet, Value = 1 });
         windriderBullet.Events.Add(new DirectDamage(null, this, Parent)
-            { CalculateValue = CalculateBasicDmg });
+        {
+            CalculateValue = DamageFormula(new Formula()
+            {
+                Expression =
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAttack)}  * (0.4 + {wbSkillLvl} * 0.1) "
+            })
+        });
+
+
         windriderBullet.Events.Add(new ToughnessShred(null, this, Parent) { Value = 30 });
         windriderBullet.Events.Add(new EnergyGain(null, this, Parent)
             { Value = 20, TargetUnit = Parent });
@@ -95,7 +105,7 @@ public class Bronya : DefaultFighter
         //dmg events
         ability.Events.Add(new ApplyBuff(null, this, Parent)
         {
-            AppliedBuffToApply = new AppliedBuff(Parent,null,this)
+            AppliedBuffToApply = new AppliedBuff(Parent, null, this)
             {
                 BaseDuration = 1,
                 Effects = [new EffAllDamageBoost { Value = GetAbilityScaling(0.33, 0.66, abilitySkillLvl) }]
@@ -121,7 +131,7 @@ public class Bronya : DefaultFighter
         //buff apply
         ApplyBuff ultimateBuff = new(null, this, Parent)
         {
-            AppliedBuffToApply = new AppliedBuff(Parent,null,this)
+            AppliedBuffToApply = new AppliedBuff(Parent, null, this)
             {
                 CustomIconName = "The_Belobog_March",
                 Type = Buff.BuffType.Buff,
@@ -211,14 +221,5 @@ public class Bronya : DefaultFighter
             Parent.ParentTeam.GetRes(Resource.ResourceType.SP).ResVal >= Constant.MaxSp - 1)
             return true;
         return false;
-    }
-
-
-    //50-110%
-    private double? CalculateBasicDmg(Event ent)
-    {
-        return CalculateDmgByBasicVal(
-            Parent.GetAttack(ent) * (0.4 + wbSkillLvl * 0.1),
-            ent);
     }
 }

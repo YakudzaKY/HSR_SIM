@@ -56,7 +56,7 @@ public class SilverWolf : DefaultFighter
         //weakness duration depend on A4 traits
         var weaknessDuration = ATraces.HasFlag(ATracesEnm.A4) ? 3 : 2;
 
-        allowChangesDebuff = new AppliedBuff(Parent,null,this)
+        allowChangesDebuff = new AppliedBuff(Parent, null, this)
         {
             Type = Buff.BuffType.Debuff,
             BaseDuration = weaknessDuration,
@@ -65,14 +65,14 @@ public class SilverWolf : DefaultFighter
             EffectStackingType = AppliedBuff.EffectStackingTypeEnm.FullReplace
         };
 
-        var allowChangesDebuffAllDmgRes = new AppliedBuff(Parent,null,this)
+        var allowChangesDebuffAllDmgRes = new AppliedBuff(Parent, null, this)
         {
             Type = Buff.BuffType.Debuff,
             BaseDuration = 2,
             Effects = [new EffAllDamageResist { CalculateValue = CalcSkillAllDmgRes }]
         };
 
-        var ultDefDebuff = new AppliedBuff(Parent,null,this)
+        var ultDefDebuff = new AppliedBuff(Parent, null, this)
         {
             Type = Buff.BuffType.Debuff,
             BaseDuration = 3,
@@ -80,19 +80,19 @@ public class SilverWolf : DefaultFighter
         };
 
         bugDuration = ATraces.HasFlag(ATracesEnm.A2) ? 4 : 3;
-        var talentAtkDebuff = new AppliedBuff(Parent,null,this)
+        var talentAtkDebuff = new AppliedBuff(Parent, null, this)
         {
             Type = Buff.BuffType.Debuff,
             BaseDuration = bugDuration,
             Effects = [new EffAtkPrc { Value = -FighterUtils.GetAbilityScaling(0.05, 0.1, talentLvl) }]
         };
-        var talentDefDebuff = new AppliedBuff(Parent,null,this)
+        var talentDefDebuff = new AppliedBuff(Parent, null, this)
         {
             Type = Buff.BuffType.Debuff,
             BaseDuration = bugDuration,
             Effects = [new EffDefPrc { Value = -FighterUtils.GetAbilityScaling(0.04, 0.08, talentLvl) }]
         };
-        var talentSpdDebuff = new AppliedBuff(Parent,null,this)
+        var talentSpdDebuff = new AppliedBuff(Parent, null, this)
         {
             Type = Buff.BuffType.Debuff,
             BaseDuration = bugDuration,
@@ -118,7 +118,11 @@ public class SilverWolf : DefaultFighter
         ability.Events.Add(new DirectDamage(null, this, Parent)
         {
             OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
-            CalculateValue = CalculateFqpDmg
+            CalculateValue = FighterUtils.DamageFormula(new Formula()
+            {
+                Expression =
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAttack)} * 0.8"
+            })
         });
         ability.Events.Add(trgEnt);
         //shield break in this case going after skill dmg
@@ -144,12 +148,17 @@ public class SilverWolf : DefaultFighter
         foreach (var proportion in new[] { 0.25, 0.25, 0.5 })
         {
             systemWarning.Events.Add(new DirectDamage(null, this, Parent)
-                { CalculateValue = CalculateBasicDmg, CalculateProportion = proportion });
-
+            {
+                CalculateValue = FighterUtils.DamageFormula(new Formula()
+                {
+                    Expression =
+                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAttack)} * (0.4 + {swSkillLvl} * 0.1) * {proportion}"
+                })
+            });
             systemWarning.Events.Add(new ToughnessShred(null, this, Parent)
-                { Value = 30, CalculateProportion = proportion });
+                { Value = 30 * proportion });
             systemWarning.Events.Add(new EnergyGain(null, this, Parent)
-                { Value = 20, TargetUnit = Parent, CalculateProportion = proportion });
+                { Value = 20 * proportion, TargetUnit = Parent });
         }
 
         systemWarning.Events.Add(trgEnt);
@@ -170,7 +179,14 @@ public class SilverWolf : DefaultFighter
             { BaseChance = 1, AppliedBuffToApply = allowChangesDebuffAllDmgRes });
         //dmg events
         allowChanges.Events.Add(new DirectDamage(null, this, Parent)
-            { CalculateValue = CalculateAbilityDmg });
+        {
+            CalculateValue = FighterUtils.DamageFormula(new Formula()
+            {
+                Expression =
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAttack)} * {alwChgAtk}"
+            })
+        });
+
         allowChanges.Events.Add(new ToughnessShred(null, this, Parent) { Value = 60 });
         allowChanges.Events.Add(trgEnt);
         allowChanges.Events.Add(new EnergyGain(null, this, Parent)
@@ -190,7 +206,13 @@ public class SilverWolf : DefaultFighter
             { BaseChance = ultChance, AppliedBuffToApply = ultDefDebuff });
         //dmg events
         userBanned.Events.Add(new DirectDamage(null, this, Parent)
-            { CalculateValue = CalculateUltimateDmg });
+        {
+            CalculateValue = FighterUtils.DamageFormula(new Formula()
+            {
+                Expression =
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAttack)} * {ultDmg}"
+            })
+        });
         userBanned.Events.Add(new ToughnessShred(null, this, Parent) { Value = 90 });
         userBanned.Events.Add(trgEnt);
         ultimateHitLastEvent = new EnergyGain(null, this, Parent)
@@ -210,25 +232,6 @@ public class SilverWolf : DefaultFighter
 
     public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Nihility;
 
-    private double? CalculateAbilityDmg(Event ent)
-    {
-        var attackPart = Parent.GetAttack(ent) * alwChgAtk;
-
-        return FighterUtils.CalculateDmgByBasicVal(attackPart, ent);
-    }
-
-    private double? CalculateUltimateDmg(Event ent)
-    {
-        var attackPart = Parent.GetAttack(ent) * ultDmg;
-
-        return FighterUtils.CalculateDmgByBasicVal(attackPart, ent);
-    }
-
-    private double? CalculateE4Dmg(Event ent)
-    {
-        var attackPart = Parent.GetAttack(ent) * 0.2;
-        return FighterUtils.CalculateDmgByBasicVal(attackPart, ent);
-    }
 
     private double? CalcSkillAllDmgRes(Event ent)
     {
@@ -254,7 +257,7 @@ public class SilverWolf : DefaultFighter
                 ApplyBuff newEvent = new(ent.ParentStep, this, Parent)
                 {
                     TargetUnit = ent.TargetUnit,
-                    AppliedBuffToApply = new AppliedBuff(Parent,null,this)
+                    AppliedBuffToApply = new AppliedBuff(Parent, null, this)
                     {
                         Dispellable = false,
                         Type = Buff.BuffType.Debuff,
@@ -279,7 +282,13 @@ public class SilverWolf : DefaultFighter
             if (Parent.Rank >= 4)
                 for (var i = 0; i < debuffs; i++)
                     ent.ChildEvents.Add(new DirectDamage(ent.ParentStep, this, Parent)
-                        { TargetUnit = ent.ParentStep.Target, CalculateValue = CalculateE4Dmg });
+                    {
+                        TargetUnit = ent.ParentStep.Target, CalculateValue = FighterUtils.DamageFormula(new Formula()
+                        {
+                            Expression =
+                                $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAttack)} * 0.2"
+                        })
+                    });
         }
 
         else if (ent is ApplyBuff ab && ent.SourceUnit == Parent)
@@ -362,19 +371,6 @@ public class SilverWolf : DefaultFighter
         }
     }
 
-
-    private double? CalculateFqpDmg(Event ent)
-    {
-        return FighterUtils.CalculateDmgByBasicVal(Parent.GetAttack(ent) * 0.8, ent);
-    }
-
-    //50-110
-    private double? CalculateBasicDmg(Event ent)
-    {
-        return FighterUtils.CalculateDmgByBasicVal(
-            Parent.GetAttack(ent) * (0.4 + swSkillLvl * 0.1),
-            ent);
-    }
 
     //get 0.2 AllDmg per debuff  on target
     private static double? CalculateE6(Event ent)

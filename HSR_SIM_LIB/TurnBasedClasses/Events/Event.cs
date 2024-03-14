@@ -24,7 +24,6 @@ public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit)
 
     private int procRatioCounter = 1; //counter
     private double? value; //Theoretical value
-    public double CalculateProportion { get; set; } //todo:delete
 
     public object CalculateValue { get; set; }
     public CalculateTargetPrc CalculateTargets { get; init; }

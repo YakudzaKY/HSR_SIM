@@ -56,10 +56,7 @@ public interface IFighter : ICloneable
 
 
 
-    /// <summary>
-    ///     flag that unit is NPC
-    /// </summary>
-    public bool IsNpcUnit { get; }
+
 
     /// <summary>
     ///     Get best target for selected ability

@@ -7,63 +7,51 @@ using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using HSR_SIM_LIB.Utils;
 using static HSR_SIM_LIB.Skills.Ability;
+using static HSR_SIM_LIB.Content.FighterUtils;
 
 
 namespace HSR_SIM_CONTENT.Content.Character;
 
 public class Blade : DefaultFighter
 {
-    private readonly Ability? deathSentence; //ultimate
+    private readonly Ability deathSentence; //ultimate
 
     //some modifiers
-    private readonly double dsAdjAtk;
-    private readonly double dsAdjHp;
-    private readonly double dsMainAtk;
-    private readonly double dsMainHp;
-
-    private readonly int dsSkillLvl;
-    private readonly double forestAdjAtk;
 
 
     private readonly Event forestMainTrgtHit; //last hit in main target by this ability(for event handlers)
-    private readonly Ability? forestOfSwords; //enchanced basic
-    private readonly int fsSkillLvl;
     private readonly AppliedBuff hellscapeAppliedBuff; //E buff
-    private readonly double sgAtk;
-    private readonly double sgHp;
-    private readonly int sgSkillLvl;
 
 
     private readonly Ability? shuhuGift; //passive ability
 
     private readonly double shuHuMaxCnt; // passive max counter
 
-    private readonly int ssSkillLvl;
     private Step lastDamageStep;
 
     public Blade(Unit? parent) : base(parent)
     {
         Parent.Stats.BaseMaxEnergy = 130;
-        Parent.Element=Unit.ElementEnm.Wind;
+        Parent.Element = Unit.ElementEnm.Wind;
         //load lvl
-        dsSkillLvl = Parent.Skills.First(x => x.Name == "Death Sentence").Level;
-        fsSkillLvl = Parent.Skills.First(x => x.Name == "Forest of Swords").Level;
-        sgSkillLvl = Parent.Skills.First(x => x.Name == "Shuhu's Gift").Level;
-        ssSkillLvl = Parent.Skills.First(x => x.Name == "Shard Sword").Level;
+        var dsSkillLvl = Parent.Skills.First(x => x.Name == "Death Sentence").Level;
+        var fsSkillLvl = Parent.Skills.First(x => x.Name == "Forest of Swords").Level;
+        var sgSkillLvl = Parent.Skills.First(x => x.Name == "Shuhu's Gift").Level;
+        var ssSkillLvl = Parent.Skills.First(x => x.Name == "Shard Sword").Level;
 
         //get modifier by level
-        dsMainAtk = FighterUtils.GetAbilityScaling(0.24, 0.4, dsSkillLvl);
-        dsMainHp = FighterUtils.GetAbilityScaling(0.60, 1, dsSkillLvl);
+        var dsMainAtk = FighterUtils.GetAbilityScaling(0.24, 0.4, dsSkillLvl);
+        var dsMainHp = FighterUtils.GetAbilityScaling(0.60, 1, dsSkillLvl);
 
-        dsAdjAtk = FighterUtils.GetAbilityScaling(0.096, 0.16, dsSkillLvl);
-        dsAdjHp = FighterUtils.GetAbilityScaling(0.24, 0.4, dsSkillLvl);
+        var dsAdjAtk = FighterUtils.GetAbilityScaling(0.096, 0.16, dsSkillLvl);
+        var dsAdjHp = FighterUtils.GetAbilityScaling(0.24, 0.4, dsSkillLvl);
 
-        forestAdjAtk = FighterUtils.GetBasicScaling(0.20, 0.40, fsSkillLvl);
+        var forestAdjAtk = FighterUtils.GetBasicScaling(0.20, 0.40, fsSkillLvl);
 
-        sgAtk = FighterUtils.GetAbilityScaling(0.22, 0.44, sgSkillLvl);
-        sgHp = FighterUtils.GetAbilityScaling(0.55, 0.110, sgSkillLvl);
+        var sgAtk = FighterUtils.GetAbilityScaling(0.22, 0.44, sgSkillLvl);
+        var sgHp = FighterUtils.GetAbilityScaling(0.55, 0.110, sgSkillLvl);
 
-        hellscapeAppliedBuff = new AppliedBuff(Parent,null,this)
+        hellscapeAppliedBuff = new AppliedBuff(Parent, null, this)
         {
             Type = Buff.BuffType.Buff,
             BaseDuration = 3,
@@ -90,19 +78,25 @@ public class Blade : DefaultFighter
             FollowUpPriority = PriorityEnm.Medium
         };
         shuHuMaxCnt = parent.Rank >= 6 ? 4 : 5; //4 stacks on 6 eidolon 
+        var e6Mod = Parent.Rank >= 6
+            ? $"+ (0.5 * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetMaxHp)})"
+            : "";
         foreach (var proportion in new[] { 0.33000000030733645, 0.33000000030733645, 0.3400000003166497 })
-
         {
             shuhuGift.Events.Add(new DirectDamage(null, this, Parent)
             {
-                CalculateValue = CalculateSGDmg,
-                CalculateProportion = proportion
+                CalculateValue = DamageFormula(new Formula()
+                {
+                    Expression =
+                        $"(({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAttack)} * {sgAtk}) " +
+                        $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetMaxHp)} * {sgHp} {e6Mod})) * {proportion} "
+                })
             });
             shuhuGift.Events.Add(new ToughnessShred(null, this, Parent)
-                { Value = 30, CalculateProportion = proportion });
+                { Value = 30 * proportion });
 
             shuhuGift.Events.Add(new EnergyGain(null, this, Parent)
-                { Value = 10, TargetUnit = Parent, CalculateProportion = proportion });
+                { Value = 10 * proportion, TargetUnit = Parent });
         }
 
         shuhuGift.Events.Add(new Healing(null, this, Parent)
@@ -128,7 +122,13 @@ public class Blade : DefaultFighter
         foreach (var proportion in new[] { 0.5, 0.5 })
         {
             shardSword.Events.Add(new DirectDamage(null, this, Parent)
-                { CalculateValue = CalculateBasicDmg, CalculateProportion = proportion });
+            {
+                CalculateValue = DamageFormula(new Formula()
+                {
+                    Expression =
+                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAttack)} * ({ssSkillLvl} * 0.1 + 0.4) * {proportion}"
+                })
+            });
             shardSword.Events.Add(new ToughnessShred(null, this, Parent)
                 { Value = 30 * proportion });
             shardSword.Events.Add(new EnergyGain(null, this, Parent)
@@ -138,7 +138,7 @@ public class Blade : DefaultFighter
         Abilities.Add(shardSword);
 
         //Forest of swords
-        forestOfSwords = new Ability(this)
+        var forestOfSwords = new Ability(this)
         {
             AbilityType = AbilityTypeEnm.Basic,
             Name = "Forest of Swords",
@@ -161,9 +161,14 @@ public class Blade : DefaultFighter
             //main target dmg
             forestOfSwords.Events.Add(new DirectDamage(null, this, Parent)
             {
-                CalculateValue = CalculateForestDmg,
-                CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain,
-                CalculateProportion = proportion
+                CalculateValue = DamageFormula(new Formula()
+                {
+                    Expression =
+                        $"(({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAttack)} * ({fsSkillLvl} * 0.04 + 0.16 ) ) " +
+                        $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetMaxHp)} * ({fsSkillLvl} * 0.1 + 0.4 )  ) ) * {proportion} "
+                }),
+
+                CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain
             });
             //main target thg
             forestMainTrgtHit = new ToughnessShred(null, this, Parent)
@@ -177,7 +182,12 @@ public class Blade : DefaultFighter
         //adjacent
         forestOfSwords.Events.Add(new DirectDamage(null, this, Parent)
         {
-            CalculateValue = CalculateForestDmgAdj,
+            CalculateValue = DamageFormula(new Formula()
+            {
+                Expression =
+                    $"({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAttack)} * {forestAdjAtk} ) " +
+                    $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetMaxHp)} * ({fsSkillLvl} *  0.04 + 0.16 )  )  "
+            }),
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent
         });
         forestOfSwords.Events.Add(new ToughnessShred(null, this, Parent)
@@ -213,7 +223,19 @@ public class Blade : DefaultFighter
         });
         deathSentence.Events.Add(new DirectDamage(null, this, Parent)
         {
-            CalculateValue = CalculateDsDmg,
+            CalculateValue = DamageFormula(new Formula()
+            {
+                Expression =
+                    $"({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAttack)} * {dsMainAtk}  ) " +
+                    $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetMaxHp)} * {dsMainHp}  ) " +
+                    $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(GetDsMechanic)} min  getDsMaxLostHp * {dsMainHp}  ) " +
+                    ((Parent.Rank >= 1)
+                        ? $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(GetDsMechanic)} min  getDsMaxLostHp * 1.5 ) "
+                        : ""),
+                Variables = new Dictionary<string, Formula.VarVal>()
+                    { { nameof(getDsMaxLostHp), new Formula.VarVal() { ResFormula = getDsMaxLostHp() } } }
+            }),
+
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain
         });
         deathSentence.Events.Add(new ToughnessShred(null, this, Parent)
@@ -222,7 +244,15 @@ public class Blade : DefaultFighter
             { Value = 5, TargetUnit = Parent });
         deathSentence.Events.Add(new DirectDamage(null, this, Parent)
         {
-            CalculateValue = CalculateDstDmgAdj,
+            CalculateValue = DamageFormula(new Formula()
+            {
+                Expression =
+                    $"({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAttack)} * {dsAdjAtk}  ) " +
+                    $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetMaxHp)} * {dsAdjHp}  ) " +
+                    $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(GetDsMechanic)} min  getDsMaxLostHp * {dsAdjHp}  ) ",
+                Variables = new Dictionary<string, Formula.VarVal>()
+                    { { nameof(getDsMaxLostHp), new Formula.VarVal() { ResFormula = getDsMaxLostHp() } } }
+            }),
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent
         });
         deathSentence.Events.Add(new ToughnessShred(null, this, Parent)
@@ -325,12 +355,15 @@ public class Blade : DefaultFighter
                 CustomIconName = "Traces\\A2",
 
                 Target = Parent,
-                ApplyConditions = [new Condition
-                {
-                    ConditionParam = Condition.ConditionCheckParam.HpPrc,
-                    ConditionExpression = Condition.ConditionCheckExpression.EqualOrLess,
-                    Value = 0.5
-                }]
+                ApplyConditions =
+                [
+                    new Condition
+                    {
+                        ConditionParam = Condition.ConditionCheckParam.HpPrc,
+                        ConditionExpression = Condition.ConditionCheckExpression.EqualOrLess,
+                        Value = 0.5
+                    }
+                ]
             });
         if (ATraces.HasFlag(ATracesEnm.A6))
             Parent.PassiveBuffs.Add(new PassiveBuff(Parent, this)
@@ -342,7 +375,7 @@ public class Blade : DefaultFighter
                 Target = Parent
             });
 
-        E4AppliedBuff = new AppliedBuff(Parent,null,this)
+        E4AppliedBuff = new AppliedBuff(Parent, null, this)
         {
             MaxStack = 2,
             Dispellable = false,
@@ -358,7 +391,14 @@ public class Blade : DefaultFighter
 
     public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Destruction;
 
-
+    /// <summary>
+    /// forumla will use this
+    /// </summary>
+    /// <returns></returns>
+    public double GetDsMechanic()
+    {
+        return Mechanics.Values[deathSentence];
+    }
     private AppliedBuff E4AppliedBuff { get; }
 //Blade constructor
 
@@ -419,7 +459,7 @@ public class Blade : DefaultFighter
     }
 
 
-    public double? CalculateKarmaSelfDmg(Event ent)
+    private double? CalculateKarmaSelfDmg(Event ent)
     {
         return Parent.GetMaxHp(ent) * 0.2;
     }
@@ -430,20 +470,7 @@ public class Blade : DefaultFighter
     }
 
 
-    private double getSgBasicDmg(Event ent)
-    {
-        var attackPart = Parent.GetAttack(ent) * sgAtk;
-        var maxHpPart = Parent.GetMaxHp(ent) * sgHp + (Parent.Rank >= 6 ? 0.5 * Parent.GetMaxHp(ent) : 0);
-        return attackPart + maxHpPart;
-    }
-
-    public double? CalculateSGDmg(Event ent)
-    {
-        return FighterUtils.CalculateDmgByBasicVal(getSgBasicDmg(ent), ent);
-    }
-
-
-    public double? CalculateHellscapeSelfDmg(Event ent)
+    private double? CalculateHellscapeSelfDmg(Event ent)
     {
         return Parent.GetMaxHp(ent) * 0.3;
     }
@@ -451,74 +478,37 @@ public class Blade : DefaultFighter
     public override string GetSpecialText()
     {
         return
-            $"SG: {(int)Mechanics.Values[shuhuGift]:d}\\{(int)shuHuMaxCnt:d}  DS: {(int)Mechanics.Values[deathSentence]:d}\\{(int)getDsMaxLostHp(null):d}";
+            $"SG: {(int)Mechanics.Values[shuhuGift]:d}\\{(int)shuHuMaxCnt:d}  DS: {(int)Mechanics.Values[deathSentence]:d}\\{(int)getDsMaxLostHpForText():d}";
     }
 
 
-    public bool SGAvailable()
+    private bool SGAvailable()
     {
         return Mechanics.Values[shuhuGift] == shuHuMaxCnt;
     }
 
-//50-110
-    public double? CalculateBasicDmg(Event ent)
+
+    private Formula getDsMaxLostHp()
     {
-        return FighterUtils.CalculateDmgByBasicVal(
-            Parent.GetAttack(null) * (0.4 + ssSkillLvl * 0.1),
-            ent);
+        return new Formula()
+        {
+            Expression =
+                $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetMaxHp)} * 0.9"
+        };
     }
 
-    public double getDsMaxLostHp(Event ent)
+    private double getDsMaxLostHpForText()
     {
-        return Parent.GetMaxHp(ent) * 0.9;
-    }
-
-//damage for ULTI main target
-    public double? CalculateDsDmg(Event ent)
-    {
-        var attackPart = Parent.GetAttack(ent) * dsMainAtk;
-        var maxHpPart = Parent.GetMaxHp(ent) * dsMainHp;
-        var hpLossPart = Math.Min(Mechanics.Values[deathSentence], getDsMaxLostHp(ent)) * dsMainHp;
-        //E1 ultimate buff
-        if (Parent.Rank >= 1)
-            hpLossPart += Math.Min(Mechanics.Values[deathSentence], getDsMaxLostHp(ent)) * 1.5;
-        return FighterUtils.CalculateDmgByBasicVal(attackPart + maxHpPart + hpLossPart, ent);
-    }
-
-//damage for ULTI adjacent target
-    public double? CalculateDstDmgAdj(Event ent)
-    {
-        var attackPart = Parent.GetAttack(ent) * dsAdjAtk;
-        var maxHpPart = Parent.GetMaxHp(ent) * dsAdjHp;
-        var hpLossPart = Math.Min(Mechanics.Values[deathSentence], getDsMaxLostHp(ent)) * dsAdjHp;
-        return FighterUtils.CalculateDmgByBasicVal(attackPart + maxHpPart + hpLossPart, ent);
-    }
-
-
-//damage for main target
-    public double? CalculateForestDmg(Event ent)
-    {
-        var attackPart = Parent.GetAttack(ent) * (0.16 +
-                                                  fsSkillLvl * 0.04);
-        var maxHpPart = Parent.GetMaxHp(ent) * (0.4 + fsSkillLvl * 0.1);
-        return FighterUtils.CalculateDmgByBasicVal(attackPart + maxHpPart, ent);
-    }
-
-//damage for adjacent target
-    public double? CalculateForestDmgAdj(Event ent)
-    {
-        var attackPart = Parent.GetAttack(ent) * forestAdjAtk;
-        var maxHpPart = Parent.GetMaxHp(ent) * (0.16 + fsSkillLvl * 0.04);
-        return FighterUtils.CalculateDmgByBasicVal(attackPart + maxHpPart, ent);
+        return Parent.GetMaxHp(null) * 0.9;
     }
 
 //a4 if main target have 0 toughness then heal
-    public double? CalculateForestHeal(Event ent)
+    private double? CalculateForestHeal(Event ent)
     {
-        return FighterUtils.CalculateHealByBasicVal(Parent.GetMaxHp(ent) * 0.05 + 100, ent);
+        return CalculateHealByBasicVal(Parent.GetMaxHp(ent) * 0.05 + 100, ent);
     }
 
-    public double? CalculateDsSelfDmg(Event ent)
+    private double? CalculateDsSelfDmg(Event ent)
     {
         double setValue = 0;
         if (Parent.GetHpPrc(ent) > 0.5)
@@ -526,7 +516,7 @@ public class Blade : DefaultFighter
         return setValue;
     }
 
-    public double? CalculateDsSelfHeal(Event ent)
+    private double? CalculateDsSelfHeal(Event ent)
     {
         double setValue = 0;
         if (Parent.GetHpPrc(ent) < 0.5)
@@ -534,17 +524,17 @@ public class Blade : DefaultFighter
         return setValue;
     }
 
-    public bool HellscapeActive()
+    private bool HellscapeActive()
     {
         return Parent.AppliedBuffs.Any(x => x.Reference == hellscapeAppliedBuff);
     }
 
-    public bool HellscapeNotActive()
+    private bool HellscapeNotActive()
     {
         return Parent.AppliedBuffs.All(x => x.Reference != hellscapeAppliedBuff);
     }
 
-    public double? CalculateSgHeal(Event ent)
+    private double? CalculateSgHeal(Event ent)
     {
         return FighterUtils.CalculateHealByBasicVal(Parent.GetMaxHp(ent) * 0.25, ent);
     }

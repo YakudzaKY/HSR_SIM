@@ -4,12 +4,13 @@ using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
+using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_CONTENT.Content.NPC;
 
 public class Vagrant : DefaultNPCFighter
 {
-    private static readonly AppliedBuff AtkAppliedBuff = new(null,null,typeof(Vagrant))
+    private static readonly AppliedBuff AtkAppliedBuff = new(null, null, typeof(Vagrant))
     {
         BaseDuration = 2, Effects = new List<Effect> { new EffAtkPrc { Value = 0.3 } }
     };
@@ -54,13 +55,14 @@ public class Vagrant : DefaultNPCFighter
         };
         //dmg events
         myAttackAbility.Events.Add(new DirectDamage(null, this, Parent)
-            { CalculateValue = CalcMyAttack });
+        {
+            CalculateValue = FighterUtils.DamageFormula(new Formula()
+            {
+                Expression =
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAttack)} * 2.5"
+            })
+        });
         myAttackAbility.Events.Add(new EnergyGain(null, this, Parent) { Value = 10 });
         Abilities.Add(myAttackAbility);
-    }
-
-    public double? CalcMyAttack(Event ent)
-    {
-        return FighterUtils.CalculateDmgByBasicVal(Parent.GetAttack(ent) * 2.5, ent);
     }
 }

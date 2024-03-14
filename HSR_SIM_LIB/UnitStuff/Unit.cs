@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using HSR_SIM_LIB.Content;
+using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
@@ -20,6 +21,8 @@ namespace HSR_SIM_LIB.UnitStuff;
 /// </summary>
 public class Unit : CloneClass
 {
+    
+
     public enum ElementEnm
     {
         None,
@@ -55,6 +58,7 @@ public class Unit : CloneClass
     ///     native weaknesses defined by profile
     /// </summary>
     public List<ElementEnm> NativeWeaknesses { get; } = [];
+    
 
     /// <summary>
     ///     native resists defined by profile
@@ -82,8 +86,8 @@ public class Unit : CloneClass
 
     public IFighter Fighter
     {
-        get => fighter;
-        private set => fighter = value;
+        get => fighter; 
+        set => fighter = value;
     }
 
     public Bitmap Portrait
@@ -117,8 +121,8 @@ public class Unit : CloneClass
         get => resources ??= new List<Resource>();
         set => resources = value;
     }
-
-
+    
+    
     private List<DamageBoostRec> BaseDamageBoost
     {
         get
@@ -202,7 +206,11 @@ public class Unit : CloneClass
         get => GetRes(ResourceType.Energy).ResVal;
         set => GetRes(ResourceType.Energy).ResVal = value;
     }
-
+    /// <summary>
+    ///     flag that unit is NPC
+    /// </summary>
+    public bool IsNpcUnit { get; set; }
+    
     public override object Clone()
     {
         var newClone = (Unit)MemberwiseClone();
@@ -251,7 +259,7 @@ public class Unit : CloneClass
     {
         GetRes(ResourceType.HP).ResVal = GetMaxHp(null);
         GetRes(ResourceType.Toughness).ResVal = Stats.MaxToughness;
-        Fighter = (IFighter)Activator.CreateInstance(Type.GetType(FighterClassName, true)!, this);
+
     }
 
     //call when unit enter battle
@@ -501,9 +509,9 @@ public class Unit : CloneClass
             from passiveBuff in passiveBuffs
                 .Where(z => (z.Type == buffType || buffType is null) &&
                             z.Effects.Any(y => effTypeToSearch == null || y.GetType() == effTypeToSearch)
-                            && (excludeCondition == null || z.ApplyConditions.Any(cd=>!excludeCondition.Contains(cd)) ))
+                            && (excludeCondition == null || z.ApplyConditions is null ||z.ApplyConditions.Any(cd=>!excludeCondition.Contains(cd)) ))
             where passiveBuff.UnitIsAffected(this) &&
-                  (passiveBuff.Truly())
+                  (passiveBuff.Truly(passiveBuff,targetForBuff,excludeCondition,ent))
             select passiveBuff;
         return res;
     }
@@ -901,5 +909,10 @@ public class Unit : CloneClass
     {
         public ElementEnm ElemType;
         public double Value;
+    }
+
+    public void InitFighter()
+    {
+        Fighter ??= (IFighter)Activator.CreateInstance(Type.GetType(FighterClassName, true)!, this);
     }
 }

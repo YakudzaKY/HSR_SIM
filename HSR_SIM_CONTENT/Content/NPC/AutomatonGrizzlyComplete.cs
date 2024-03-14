@@ -4,6 +4,7 @@ using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
+using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_CONTENT.Content.NPC;
 
@@ -26,23 +27,24 @@ internal class AutomatonGrizzlyComplete : DefaultNPCBossFIghter
         Parent.DebuffResists.Add(new DebuffResist { Debuff = typeof(EffEntanglement), ResistVal = 0.5 });
 
         //TODO: need implement boss abilities
-        Ability? myAttackAbility;
-        //Deals minor Physical DMG (250% ATK) to a single target.
-        myAttackAbility = new Ability(this)
-        {
-            AbilityType = Ability.AbilityTypeEnm.Basic,
-            Name = "Shovel Attack",
-            Element = Parent.Element
-        };
+        var myAttackAbility =
+            //Deals minor Physical DMG (250% ATK) to a single target.
+            new Ability(this)
+            {
+                AbilityType = Ability.AbilityTypeEnm.Basic,
+                Name = "Shovel Attack",
+                Element = Parent.Element
+            };
         //dmg events
         myAttackAbility.Events.Add(new DirectDamage(null, this, Parent)
-            { CalculateValue = CalcMyAttack });
+        {
+            CalculateValue = FighterUtils.DamageFormula(new Formula()
+            {
+                Expression =
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAttack)} * 2.5 "
+            })
+        });
         myAttackAbility.Events.Add(new EnergyGain(null, this, Parent) { Value = 10 });
         Abilities.Add(myAttackAbility);
-    }
-
-    public double? CalcMyAttack(Event ent)
-    {
-        return FighterUtils.CalculateDmgByBasicVal(Parent.GetAttack(ent) * 2.5, ent);
     }
 }

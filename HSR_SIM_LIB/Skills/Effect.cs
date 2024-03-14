@@ -70,7 +70,8 @@ public class Effect : CloneClass
 
     public string Explain()
     {
-        return $"{GetType().Name} ({Value}) ";
+        string val = (Value == null) ? "*" : Value.ToString();
+        return $"{GetType().Name} ({val}) ";
     }
 
 

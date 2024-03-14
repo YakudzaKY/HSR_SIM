@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using static HSR_SIM_LIB.Skills.Ability;
 
@@ -17,12 +18,16 @@ public class PassiveBuff : Buff
     /// <summary>
     ///     Conditions are OK
     /// </summary>
+    /// <param name="parentBuff"></param>
     /// <param name="targetUnit"></param>
+    /// <param name="excludeCondition"></param>
+    /// <param name="ent"></param>
     /// <returns></returns>
-    public bool Truly(Unit targetUnit = null)
+    public bool Truly(PassiveBuff parentBuff, Unit targetUnit , List<Condition> excludeCondition ,
+        Event ent )
     {
         if (ApplyConditions is null || ApplyConditions.Count == 0) return true;
-        return ApplyConditions.All(x => x.Truly(null, targetUnit, null, null));
+        return ApplyConditions.All(x => x.Truly(parentBuff, targetUnit, excludeCondition, ent));
     }
     public List<Condition> ApplyConditions;
     public bool IsTargetCheck { get; init; }

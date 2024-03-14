@@ -242,7 +242,7 @@ public class Formula : ICloneable
                         else if (prm.ParameterType == typeof(Ability.AbilityTypeEnm) || prm.ParameterType ==typeof(Ability.AbilityTypeEnm?))
                         {
                             //if Followup action and ability is not follow up type then add flag
-                            Ability.AbilityTypeEnm abilityTypeEnm = EventRef.ParentStep.ActorAbility.AbilityType;
+                            Ability.AbilityTypeEnm? abilityTypeEnm = EventRef.ParentStep.ActorAbility?.AbilityType??null;
                             if (EventRef.ParentStep.ActorAbility.AbilityType != Ability.AbilityTypeEnm.FollowUpAction &&
                                 EventRef.ParentStep.StepType == Step.StepTypeEnm.UnitFollowUpAction)
                                 abilityTypeEnm |= Ability.AbilityTypeEnm.FollowUpAction;
