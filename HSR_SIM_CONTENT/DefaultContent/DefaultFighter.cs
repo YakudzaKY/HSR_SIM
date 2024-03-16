@@ -84,22 +84,24 @@ public abstract class DefaultFighter : IFighter
     public bool IsNpcUnit => false;
 
     //we need this debuff to track and correctly apply debuff stacks
+    public Ability.ElementEnm Element { get; set; }
+
     public AppliedBuff WeaknessBreakDebuff
     {
         get
         {
-            return weaknessBreakDebuff ??= Parent.Element switch
+            return weaknessBreakDebuff ??= Element switch
             {
-                Unit.ElementEnm.Physical => new AppliedBuffBleedWb(Parent),
-                Unit.ElementEnm.Fire => new AppliedBuffBurnWb(Parent),
+                Ability.ElementEnm.Physical => new AppliedBuffBleedWb(Parent),
+                Ability.ElementEnm.Fire => new AppliedBuffBurnWb(Parent),
 
-                Unit.ElementEnm.Ice => new AppliedBuffFreezeWb(Parent),
+                Ability.ElementEnm.Ice => new AppliedBuffFreezeWb(Parent),
 
-                Unit.ElementEnm.Lightning => new AppliedBuffShockWb(Parent),
+                Ability.ElementEnm.Lightning => new AppliedBuffShockWb(Parent),
 
-                Unit.ElementEnm.Wind => new AppliedBuffWindShearWb(Parent) { CalculateStacks = CalcStacksByTarget },
-                Unit.ElementEnm.Quantum => new AppliedBuffEntanglementWb(Parent),
-                Unit.ElementEnm.Imaginary => new AppliedBuffImprisonmentWb(Parent),
+                Ability.ElementEnm.Wind => new AppliedBuffWindShearWb(Parent) { CalculateStacks = CalcStacksByTarget },
+                Ability.ElementEnm.Quantum => new AppliedBuffEntanglementWb(Parent),
+                Ability.ElementEnm.Imaginary => new AppliedBuffImprisonmentWb(Parent),
                 _ => throw new ArgumentOutOfRangeException()
             };
         }
@@ -108,10 +110,7 @@ public abstract class DefaultFighter : IFighter
 
 
     public abstract PathType? Path { get; }
-
-    public List<Unit.ElementEnm> NativeWeaknesses { get; set; } = [];
-    public List<DebuffResist> DebuffResists { get; set; } = [];
-    public List<Resist> Resists { get; set; } = [];
+    
     public Unit Parent { get; set; }
 
     /// <summary>
@@ -290,7 +289,7 @@ public abstract class DefaultFighter : IFighter
                 //Support,Healer focus on Shield shred. 
                 if (Role is UnitRole.Support or UnitRole.Healer or UnitRole.SecondDps)
                     return Parent.GetTargetsForUnit(ability.TargetType)
-                        .OrderByDescending(x => x.GetWeaknesses(null).Contains(Parent.Element))
+                        .OrderByDescending(x => x.GetWeaknesses(null).Contains(Element))
                         .ThenBy(x =>
                             x.GetRes(ResourceType.Toughness).ResVal *
                             (leader?.Fighter.Path is PathType.Destruction or PathType.Erudition ? -1 : 1)).ThenBy(
@@ -301,7 +300,7 @@ public abstract class DefaultFighter : IFighter
 
                 // focus on High hp if main dps Destruction,Erudition. Other- low hp
                 return Parent.GetTargetsForUnit(ability.TargetType)
-                    .OrderByDescending(x => x.GetWeaknesses(null).Contains(Parent.Element)).ThenBy(x =>
+                    .OrderByDescending(x => x.GetWeaknesses(null).Contains(Element)).ThenBy(x =>
                         x.GetRes(ResourceType.HP).ResVal *
                         (leader?.Fighter.Path is PathType.Destruction or PathType.Erudition ? -1 : 1))
                     .FirstOrDefault();
@@ -316,8 +315,8 @@ public abstract class DefaultFighter : IFighter
                     var targets = ability.GetAffectedTargets(unit);
                     double score = 10 * targets.Count;
                     score += 5 * targets.Count(x => x == unit && x.GetRes(ResourceType.Toughness).ResVal == 0);
-                    score += 3 * targets.Count(x => x == unit && x.GetWeaknesses(null).Any(z => z == Parent.Element));
-                    score += 2 * targets.Count(x => x.Fighter is DefaultNPCBossFIghter);
+                    score += 3 * targets.Count(x => x == unit && x.GetWeaknesses(null).Any(z => z == Element));
+                    score += 2 * targets.Count(x => x.Fighter is DefaultNpcBossFighter);
                     //if equal but hp diff go focus big target
                     if (score > bestScore ||
                         // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -365,7 +364,7 @@ public abstract class DefaultFighter : IFighter
     private IEnumerable<Unit> GetWeaknessTargets()
     {
         return Parent.Enemies.Where(x => x.IsAlive
-                                         && x.GetWeaknesses(null).Any(y => y == Parent.Element));
+                                         && x.GetWeaknesses(null).Any(y => y == Element));
     }
 
     //alive friends. select only who not defeated or waiting for rez

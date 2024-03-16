@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Globalization;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
+using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_LIB.Skills;
 
@@ -68,9 +70,11 @@ public class Effect : CloneClass
     {
     }
 
-    public string Explain()
+    public string Explain(double? calculatedValue=null)
     {
         string val = (Value == null) ? "*" : Value.ToString();
+        if (Value is null&&calculatedValue!=null)
+            val= "~"+calculatedValue;
         return $"{GetType().Name} ({val}) ";
     }
 

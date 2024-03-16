@@ -17,6 +17,8 @@ public interface IFighter : ICloneable
     public delegate void EventHandler(Event ent);
 
     public delegate void StepHandler(Step step);
+    
+    public Ability.ElementEnm Element { get; set; }
 
     /// <summary>
     ///     A debuff that is applied when a vulnerability is broken.

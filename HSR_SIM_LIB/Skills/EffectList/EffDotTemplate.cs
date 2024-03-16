@@ -10,5 +10,5 @@ namespace HSR_SIM_LIB.Skills.EffectList;
 public abstract class EffDotTemplate : Effect
 {
     public Formula DoTCalculateValue { get; init; }
-    public abstract Unit.ElementEnm Element { get; init; }
+    public abstract Ability.ElementEnm Element { get; init; }
 }

@@ -15,7 +15,7 @@ public class DefaultNPCFighter : IFighter
 {
     private UnitRole? role;
 
-    public DefaultNPCFighter(Unit? parent)
+    protected DefaultNPCFighter(Unit parent)
     {
         Parent = parent;
         Parent.IsNpcUnit = true;
@@ -24,10 +24,7 @@ public class DefaultNPCFighter : IFighter
         StepHandlerProc += DefaultFighter_HandleStep;
     }
 
-    public List<PassiveBuff> ConditionBuffs { get; set; } = new();
-
-    public List<PassiveBuff> PassiveBuffs { get; set; } = new();
-    public bool IsNpcUnit => true;
+    
 
     public Unit? GetBestTarget(Ability ability)
     {
@@ -70,6 +67,7 @@ public class DefaultNPCFighter : IFighter
         throw new Exception($"no enemy will be chosen by AGGRO counter={counter}");
     }
 
+    public Ability.ElementEnm Element { get; set; }
     public AppliedBuff WeaknessBreakDebuff { get; set; } = new(null,null,typeof(DefaultNPCFighter)) { Effects = [] };
     public PathType? Path { get; set; } = null;
 
@@ -124,7 +122,7 @@ public class DefaultNPCFighter : IFighter
         return chosenAbility;
     }
 
-    public MechDictionary Mechanics { get; set; }
+    public MechDictionary Mechanics { get; set; } = new MechDictionary();
 
 
     public IFighter.EventHandler EventHandlerProc { get; set; }

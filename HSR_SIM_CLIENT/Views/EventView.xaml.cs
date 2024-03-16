@@ -10,7 +10,7 @@ namespace HSR_SIM_CLIENT.Views;
 public partial class EventView : INotifyPropertyChanged
 {
     public static readonly DependencyProperty EventToViewProperty;
-    private Formula selectedFormula;
+    private Formula? selectedFormula;
 
     static EventView()
     {
@@ -22,6 +22,7 @@ public partial class EventView : INotifyPropertyChanged
     public EventView()
     {
         InitializeComponent();
+     
     }
 
 
@@ -33,7 +34,7 @@ public partial class EventView : INotifyPropertyChanged
 
     public Visibility ExplainVisible => EventToView?.CalculateValue is Formula ? Visibility.Visible : Visibility.Hidden;
 
-    public Formula SelectedFormula
+    public Formula? SelectedFormula
     {
         get => selectedFormula;
         set
@@ -56,6 +57,7 @@ public partial class EventView : INotifyPropertyChanged
 
     private void RefreshData()
     {
+        SelectedFormula = null;
         NotifyPropertyChanged(nameof(ExplainVisible));
     }
 

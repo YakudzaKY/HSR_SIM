@@ -2,11 +2,8 @@
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Windows;
 using System.Windows.Forms;
-using System.Windows.Interop;
 using System.Windows.Media.Imaging;
-using Ini;
 using Color = System.Drawing.Color;
 using PixelFormat = System.Drawing.Imaging.PixelFormat;
 
@@ -17,7 +14,7 @@ namespace HSR_SIM_CLIENT;
 /// </summary>
 internal static class GuiUtils
 {
-    private const int CURSOR_SHOWING = 0x00000001;
+    private const int CursorShowing = 0x00000001;
     public static IniFile IniF = new(AppDomain.CurrentDomain.BaseDirectory + "config.ini");
 
     public static BitmapImage ToBitmapImage(this Bitmap bitmap)
@@ -48,7 +45,7 @@ internal static class GuiUtils
     private static extern bool GetCursorInfo(out CURSORINFO pci);
 
     [DllImport("user32.dll")]
-    private static extern bool DrawIcon(IntPtr hDC, int X, int Y, IntPtr hIcon);
+    private static extern bool DrawIcon(IntPtr hDc, int X, int Y, IntPtr hIcon);
 
 
     /// <summary>
@@ -73,7 +70,7 @@ internal static class GuiUtils
                     pci.cbSize = Marshal.SizeOf(typeof(CURSORINFO));
 
                     if (GetCursorInfo(out pci))
-                        if (pci.flags == CURSOR_SHOWING)
+                        if (pci.flags == CursorShowing)
                         {
                             DrawIcon(g.GetHdc(), pci.ptScreenPos.x, pci.ptScreenPos.y, pci.hCursor);
                             g.ReleaseHdc();

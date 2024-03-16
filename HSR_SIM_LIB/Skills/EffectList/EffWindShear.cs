@@ -7,5 +7,5 @@ namespace HSR_SIM_LIB.Skills.EffectList;
 /// </summary>
 public class EffWindShear : EffDotTemplate
 {
-    public override Unit.ElementEnm Element { get; init; } = Unit.ElementEnm.Wind;
+    public override Ability.ElementEnm Element { get; init; } = Ability.ElementEnm.Wind;
 }

@@ -96,8 +96,8 @@ public class Team(SimCls parent) : CloneClass
     {
         unit.ParentTeam = this;
         Units.Insert(ndx, unit);
-        //activate the fighter
-        unit.InitFighter();
+        unit.Init();
+
     }
 
     /// <summary>

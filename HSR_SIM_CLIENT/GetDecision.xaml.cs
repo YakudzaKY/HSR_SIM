@@ -2,7 +2,7 @@
 
 namespace HSR_SIM_CLIENT;
 
-public partial class GetDecision : Window
+public partial class GetDecision
 {
     public GetDecision(string[] items, string description)
     {

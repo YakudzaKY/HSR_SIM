@@ -15,19 +15,19 @@ public class Vagrant : DefaultNPCFighter
         BaseDuration = 2, Effects = new List<Effect> { new EffAtkPrc { Value = 0.3 } }
     };
 
-    public Vagrant(Unit? parent) : base(parent)
+    public Vagrant(Unit parent) : base(parent)
     {
         //Elemenet
-        Parent.Element = Unit.ElementEnm.Physical;
+        Element = Ability.ElementEnm.Physical;
 
-        Parent.NativeWeaknesses.Add(Unit.ElementEnm.Fire);
-        Parent.NativeWeaknesses.Add(Unit.ElementEnm.Ice);
-        Parent.NativeWeaknesses.Add(Unit.ElementEnm.Imaginary);
+        Parent.NativeWeaknesses.Add(Ability.ElementEnm.Fire);
+        Parent.NativeWeaknesses.Add(Ability.ElementEnm.Ice);
+        Parent.NativeWeaknesses.Add(Ability.ElementEnm.Imaginary);
         //resist
-        Parent.Resists.Add(new Resist { ResistType = Unit.ElementEnm.Physical, ResistVal = 0.20 });
-        Parent.Resists.Add(new Resist { ResistType = Unit.ElementEnm.Lightning, ResistVal = 0.20 });
-        Parent.Resists.Add(new Resist { ResistType = Unit.ElementEnm.Wind, ResistVal = 0.20 });
-        Parent.Resists.Add(new Resist { ResistType = Unit.ElementEnm.Quantum, ResistVal = 0.20 });
+        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Physical, ResistVal = 0.20 });
+        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Lightning, ResistVal = 0.20 });
+        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Wind, ResistVal = 0.20 });
+        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Quantum, ResistVal = 0.20 });
 
         var ability = new Ability(this)
         {
@@ -50,7 +50,6 @@ public class Vagrant : DefaultNPCFighter
         {
             AbilityType = Ability.AbilityTypeEnm.Basic,
             Name = "Shovel Attack",
-            Element = Parent.Element,
             AdjacentTargets = Ability.AdjacentTargetsEnm.None
         };
         //dmg events

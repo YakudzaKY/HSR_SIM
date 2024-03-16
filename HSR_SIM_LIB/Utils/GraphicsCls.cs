@@ -105,7 +105,7 @@ public static class GraphicsCls
     private static void DrawNextHostile(Graphics gfx, List<Unit> hostileParty, Point point)
     {
         short i = 0;
-        List<ElementEnm> elemList = new();
+        List<Ability.ElementEnm> elemList = new();
         foreach (var unit in hostileParty)
         {
             //portrait
@@ -262,7 +262,7 @@ public static class GraphicsCls
                     $"aggro: {(int)Math.Round(unit.GetAggro(null)):d} ({(int)Math.Round(unit.GetAggro(null) / unit.ParentTeam.TeamAggro * 100):d}%)",
                     new SolidBrush(Color.Coral), new Font("Tahoma", BarFontSize, FontStyle.Bold), true);
             //elements
-            gfx.DrawImage(new Bitmap(Utl.LoadBitmap(unit.Element.ToString()), ElemSizeMini),
+            gfx.DrawImage(new Bitmap(Utl.LoadBitmap(unit.Fighter.Element.ToString()), ElemSizeMini),
                 new Point(portraitPoint.X + PortraitSize.Width - ElemSizeMini.Width, portraitPoint.Y));
             //weaknesses
             short j = 0;

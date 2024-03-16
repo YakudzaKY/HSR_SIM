@@ -53,8 +53,7 @@ public class AppliedBuff(Unit sourceUnit, Buff reference ,object sourceObject ) 
     public IFighter.StepHandler StepHandlerProc { get; set; }
     public int? BaseDuration { get; set; }
     public int? DurationLeft { get; set; }
-
-    public object SourceObject { get; set; }
+    
 
     public string UniqueStr { get; set; }
 

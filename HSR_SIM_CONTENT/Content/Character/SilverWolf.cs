@@ -34,7 +34,7 @@ public class SilverWolf : DefaultFighter
         //on this event we will place debuff
         trgEnt = new TriggerEvent(null, null, Parent);
         Parent.Stats.BaseMaxEnergy = 110;
-        Parent.Element = Unit.ElementEnm.Quantum;
+        Element = ElementEnm.Quantum;
 
         var allowChangeChance =
             FighterUtils.GetAbilityScaling(0.75, 0.85, Parent.Skills.First(x => x.Name == "Allow Changes?").Level);
@@ -298,16 +298,16 @@ public class SilverWolf : DefaultFighter
             {
                 //first find elements not in native weakness
                 var reduceResists = true;
-                var elemListToApply = GetAliveFriends().Select(x => x.Element)
+                var elemListToApply = GetAliveFriends().Select(x => x.Fighter.Element)
                     .Where(x => !ent.TargetUnit.NativeWeaknesses.Contains(x)).Distinct();
                 if (!elemListToApply.Any())
                 {
                     elemListToApply =
-                        GetAliveFriends().Select(x => x.Element).Distinct(); //else pick all elements
+                        GetAliveFriends().Select(x => x.Fighter.Element).Distinct(); //else pick all elements
                     reduceResists = false;
                 }
 
-                var elm = (Unit.ElementEnm)Utl.GetRandomObject(elemListToApply, Parent.ParentTeam.ParentSim.Parent);
+                var elm = (ElementEnm)Utl.GetRandomObject(elemListToApply, Parent.ParentTeam.ParentSim.Parent);
                 ent.ChildEvents.Add(new ApplyBuffEffect(ent.ParentStep, this, Parent)
                 {
                     TargetUnit = ent.TargetUnit,
@@ -352,7 +352,7 @@ public class SilverWolf : DefaultFighter
                 .ToArray();
             if (notExistsBugs.Length > 0 && notExistsBugs.Length < bugArray.Length)
             {
-                ent.ChildEvents.Add(new AttemptEffect(ent.ParentStep, this, ent.SourceUnit)
+                ent.ChildEvents.Add(new AttemptEffect(ent.ParentStep, this, Parent)
                 {
                     AppliedBuffToApply =
                         (AppliedBuff)Utl.GetRandomObject(notExistsBugs, Parent.ParentTeam.ParentSim.Parent),
@@ -363,7 +363,7 @@ public class SilverWolf : DefaultFighter
 
             //if no debuff founded  then get random from start array
             if (i == bugDuration)
-                ent.ChildEvents.Add(new AttemptEffect(ent.ParentStep, this, ent.SourceUnit)
+                ent.ChildEvents.Add(new AttemptEffect(ent.ParentStep, this, Parent)
                 {
                     AppliedBuffToApply = (AppliedBuff)Utl.GetRandomObject(bugArray, Parent.ParentTeam.ParentSim.Parent),
                     BaseChance = chance, TargetUnit = target

@@ -236,7 +236,6 @@ public sealed class SimCls : ICloneable
         {
             var newUnit = (Unit)unit.Clone();
             res.Add(newUnit);
-            newUnit.Init();
         }
 
         return res;

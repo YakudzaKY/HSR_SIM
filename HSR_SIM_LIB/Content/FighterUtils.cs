@@ -123,27 +123,31 @@ public static class FighterUtils
         return newFormula;
     }
 
-    
-
-
-    //debuff is resisted?
-    public static bool CalculateDebuffApplied(ApplyBuff ent, double baseChance)
+    /// <summary>
+    ///     Generate damage output formula
+    /// </summary>
+    /// <param name="baseChance"></param>
+    /// <returns></returns>
+    public static Formula DebuffAppliedFormula(double baseChance)
     {
-        if (ent.ParentStep.Parent.Parent.DevMode)
-            return DevModeUtils.IsDebuffed(ent);
-        var attacker = ent.SourceUnit;
-        var defender = ent.TargetUnit;
-        var mod = ent.AppliedBuffToApply.Effects.FirstOrDefault();
-        var isCC = ent.AppliedBuffToApply.CrowdControl;
-        var effectHitRate = attacker.GetEffectHit(ent);
-        var effectRes = defender.GetEffectRes(ent);
-        var debuffRes = defender.GetDebuffResists(mod?.GetType() ?? typeof(Effect), ent);
-        double ccRes = 0;
-        if (isCC) ccRes = defender.GetDebuffResists(typeof(EffCrowControl));
-        var realChance = baseChance * (1 + effectHitRate) * (1 - effectRes) * (1 - debuffRes) * (1 - ccRes);
-
-        return new MersenneTwister().NextDouble() <= realChance;
+        var expression = $"{baseChance} * " +
+                         //effect hit rate
+                         $" * (1 + {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.EffectHit)}) " +
+                         //effect res
+                         $" * (1 - {Formula.DynamicTargetEnm.Defender}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.EffectRes)}) " +
+                         //debuff res
+                         $" * (1 - {Formula.DynamicTargetEnm.Defender}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.DebuffResists)}) " +
+                         //cc res
+                         $" * (1 - {Formula.DynamicTargetEnm.Defender}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.CcResists)}) ";
+        
+                         
+                     
+        var newFormula = new Formula { Expression = expression };
+        //return new MersenneTwister().NextDouble() <= realChance;
+        return newFormula;
     }
+
+    
 
     /// <summary>
     /// </summary>

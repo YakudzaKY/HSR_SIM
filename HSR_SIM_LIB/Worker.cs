@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using HSR_SIM_LIB.Fighters;
+using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.Utils;
@@ -262,7 +263,7 @@ public class Worker
                 else if (mod.Stat.EndsWith("_dmg_prc"))
                 {
                     var elem = mod.Stat.Split("_").First();
-                    targetUnit.GetElemBoost((ElementEnm)Enum.Parse(typeof(ElementEnm), elem, true)).Value += mod.Val;
+                    targetUnit.GetElemBoost((Ability.ElementEnm)Enum.Parse(typeof(Ability.ElementEnm), elem, true)).Value += mod.Val;
                 }
             }
         }

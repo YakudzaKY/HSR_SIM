@@ -39,7 +39,7 @@ public class Condition
 
     public ConditionCheckExpression ConditionExpression { get; init; }
     public ConditionCheckParam ConditionParam { get; init; }
-    public Unit.ElementEnm? ElemValue { get; init; }
+    public Ability.ElementEnm? ElemValue { get; init; }
     public Resource.ResourceType? ResourceValue { get; init; }
 
     public double Value { get; init; }
@@ -82,7 +82,7 @@ public class Condition
                                              CheckExpression(untToCheck.GetHpPrc(ent, excludeCondition)),
                 ConditionCheckParam.Resource => ResourceValue!=null && CheckExpression(untToCheck.GetRes((Resource.ResourceType)ResourceValue).ResVal),
                 ConditionCheckParam.Weakness => untToCheck.GetWeaknesses(ent, excludeCondition)
-                                                    .Any(x => x == (ElemValue ?? ent?.SourceUnit.Element))
+                                                    .Any(x => x == (ElemValue ?? ent?.SourceUnit.Fighter.Element))
                                                 == (ConditionExpression ==
                                                     ConditionCheckExpression.Exists),
                 ConditionCheckParam.Buff => untToCheck.AppliedBuffs.Any(x =>

@@ -1,4 +1,5 @@
-﻿using HSR_SIM_LIB.Content;
+﻿using HSR_SIM_CONTENT.DefaultContent;
+using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
@@ -11,7 +12,7 @@ internal class LongevousDisciple : DefaultRelicSet
 {
     private readonly AppliedBuff uniqueAppliedBuff;
 
-    private Step lastDamageStep;
+    private Step? lastDamageStep;
 
     public LongevousDisciple(IFighter parent, int num) : base(parent, num)
     {

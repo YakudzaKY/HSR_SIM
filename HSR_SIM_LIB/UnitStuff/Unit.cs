@@ -23,19 +23,8 @@ public class Unit : CloneClass
 {
     
 
-    public enum ElementEnm
-    {
-        None,
-        Wind,
-        Physical,
-        Fire,
-        Ice,
-        Lightning,
-        Quantum,
-        Imaginary
-    }
 
-    public ElementEnm Element { get; set; }
+
     
     public enum LivingStatusEnm
     {
@@ -73,7 +62,6 @@ public class Unit : CloneClass
 
     private List<DamageBoostRec> baseDamageBoost; //Elemental damage boost list
 
-    private IFighter fighter;
     private Bitmap portrait;
     private List<Resource> resources;
     private UnitStats stats;
@@ -84,11 +72,7 @@ public class Unit : CloneClass
 
     public Team ParentTeam { get; set; }
 
-    public IFighter Fighter
-    {
-        get => fighter; 
-        set => fighter = value;
-    }
+    public IFighter Fighter { get; set; }
 
     public Bitmap Portrait
     {
@@ -157,12 +141,14 @@ public class Unit : CloneClass
             if (ParentTeam.ParentSim.CurrentFight == null)
             {
                 List<Unit> nextEnemies = [];
+                Team tmpTeam = new Team(ParentTeam.ParentSim);
                 //gather enemies from all waves
                 if (ParentTeam.ParentSim.NextFight != null)
                     foreach (var wave in ParentTeam.ParentSim.NextFight.Waves)
                         nextEnemies.AddRange(wave.Units);
-                foreach (var unit in nextEnemies)
-                    unit.Init();
+                tmpTeam.BindUnits(nextEnemies);
+               
+                    
                 return nextEnemies.DistinctBy(x => x.Name).ToList();
             }
 
@@ -214,11 +200,7 @@ public class Unit : CloneClass
     public override object Clone()
     {
         var newClone = (Unit)MemberwiseClone();
-        //clear fighter
-        newClone.fighter = null;
-        newClone.Resists.Clear();
-        newClone.DebuffResists.Clear();
-        newClone.NativeWeaknesses.Clear();
+
         //clone resources
         var oldRes = newClone.Resources;
         newClone.Resources = [];
@@ -259,6 +241,8 @@ public class Unit : CloneClass
     {
         GetRes(ResourceType.HP).ResVal = GetMaxHp(null);
         GetRes(ResourceType.Toughness).ResVal = Stats.MaxToughness;
+        //clear and init fighter
+        InitFighter();
 
     }
 
@@ -324,21 +308,18 @@ public class Unit : CloneClass
         return res;
     }
 
+
+    
     public double GetDebuffResists(Type debuff, Event ent = null)
     {
+ 
         double res = 0;
         if (DebuffResists.Any(x => x.Debuff == debuff))
             res += DebuffResists.First(x => x.Debuff == debuff).ResistVal;
-
-        res += GetBuffSumByType(ent, typeof(EffDebufResist));
+        
         return res;
     }
-
-    public double DotBoost(Event ent = null)
-    {
-        return GetBuffSumByType(ent, typeof(EffDoTBoost));
-    }
-
+    
     public double DefIgnore(Event ent = null)
     {
         return GetBuffSumByType(ent, typeof(EffDefIgnore));
@@ -566,10 +547,9 @@ public class Unit : CloneClass
     {
         int res;
         var foundBuff = AppliedBuffs.FirstOrDefault(x =>
-            ((x.Reference == (appliedBuff.Reference ?? appliedBuff) ||
-              (appliedBuff.SourceObject != null && appliedBuff.SourceObject == x.SourceObject))
-             && (appliedBuff.UniqueUnit == null || x.UniqueUnit == appliedBuff.UniqueUnit))
-            || (!string.IsNullOrEmpty(appliedBuff.UniqueStr) && string.Equals(x.UniqueStr, appliedBuff.UniqueStr)));
+            ((x.Reference == (appliedBuff.Reference ?? appliedBuff)
+
+              || (!string.IsNullOrEmpty(appliedBuff.UniqueStr) && string.Equals(x.UniqueStr, appliedBuff.UniqueStr)))));
 
 
         foreach (var effect in appliedBuff.Effects) effect.BeforeApply(ent, appliedBuff);
@@ -844,16 +824,12 @@ public class Unit : CloneClass
 
     public double GetEffectRes(Event ent)
     {
-        return GetBuffSumByType(ent, typeof(EffEffectResPrc)) + Stats.EffectResPrc +
-               Stats.BaseEffectRes +
-               GetBuffSumByType(ent, typeof(EffEffectRes));
+        return GetBuffSumByType(ent, typeof(EffEffectResPrc)) + Stats.EffectResPrc;
     }
 
     public double GetEffectHit(Event ent)
     {
-        return GetBuffSumByType(ent, typeof(EffEffectHitPrc)) + Stats.EffectHitPrc +
-               Stats.BaseEffectHit +
-               GetBuffSumByType(ent, typeof(EffEffectHit));
+        return GetBuffSumByType(ent, typeof(EffEffectHitPrc)) + Stats.EffectHitPrc;
     }
 
     public double EnergyRegenPrc(Event ent)
@@ -911,8 +887,12 @@ public class Unit : CloneClass
         public double Value;
     }
 
-    public void InitFighter()
+    private void InitFighter()
     {
-        Fighter ??= (IFighter)Activator.CreateInstance(Type.GetType(FighterClassName, true)!, this);
+
+        Resists.Clear();
+        DebuffResists.Clear();
+        NativeWeaknesses.Clear();
+        Fighter = (IFighter)Activator.CreateInstance(Type.GetType(FighterClassName, true)!, this);
     }
 }

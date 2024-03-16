@@ -1,4 +1,5 @@
-﻿using HSR_SIM_LIB.Content;
+﻿using HSR_SIM_CONTENT.DefaultContent;
+using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -47,7 +48,7 @@ internal class AcheronLcTst : DefaultLightCone
 
     public sealed override FighterUtils.PathType Path => FighterUtils.PathType.Nihility;
 
-    public override void DefaultLightCone_HandleEvent(Event ent)
+    protected override void DefaultLightCone_HandleEvent(Event ent)
     {
         if (ent is ExecuteAbilityFinish && aetherCodeDebuff != null && ent.SourceUnit == Parent.Parent &&
             ent.ParentStep.ActorAbility.Attack &&

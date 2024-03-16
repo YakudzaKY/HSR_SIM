@@ -1,4 +1,5 @@
-﻿using HSR_SIM_LIB.Content;
+﻿using HSR_SIM_CONTENT.DefaultContent;
+using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.UnitStuff;
@@ -26,7 +27,7 @@ internal class GeniusofBrilliantStars : DefaultRelicSet
                 {
                     ConditionParam = Condition.ConditionCheckParam.Weakness,
                     ConditionExpression = Condition.ConditionCheckExpression.Exists,
-                    ElemValue = Unit.ElementEnm.Quantum
+                    ElemValue = Ability.ElementEnm.Quantum
                 }]
             });
     }

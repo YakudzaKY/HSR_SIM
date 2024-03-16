@@ -225,14 +225,14 @@ public class Formula : ICloneable
                         {
                             objArr[^1] = dynVar;
                         }
-                        else if (prm.ParameterType == typeof(Unit.ElementEnm)||prm.ParameterType == typeof(Unit.ElementEnm?))
+                        else if (prm.ParameterType == typeof(Ability.ElementEnm)||prm.ParameterType == typeof(Ability.ElementEnm?))
                         {
                             if (EventRef is DoTDamage dt)
                                 objArr[^1] = dt.Element;
                             else
                                 objArr[^1] = EventRef.ParentStep.ActorAbility.Element;
                         }
-                        else if (prm.ParameterType == typeof(Unit.ElementEnm)||prm.ParameterType == typeof(Unit.ElementEnm?))
+                        else if (prm.ParameterType == typeof(Ability.ElementEnm)||prm.ParameterType == typeof(Ability.ElementEnm?))
                         {
                             if (EventRef is DoTDamage dt)
                                 objArr[^1] = dt.Element;
@@ -243,7 +243,7 @@ public class Formula : ICloneable
                         {
                             //if Followup action and ability is not follow up type then add flag
                             Ability.AbilityTypeEnm? abilityTypeEnm = EventRef.ParentStep.ActorAbility?.AbilityType??null;
-                            if (EventRef.ParentStep.ActorAbility.AbilityType != Ability.AbilityTypeEnm.FollowUpAction &&
+                            if (EventRef.ParentStep.ActorAbility?.AbilityType != Ability.AbilityTypeEnm.FollowUpAction &&
                                 EventRef.ParentStep.StepType == Step.StepTypeEnm.UnitFollowUpAction)
                                 abilityTypeEnm |= Ability.AbilityTypeEnm.FollowUpAction;
                             objArr[^1] = abilityTypeEnm;

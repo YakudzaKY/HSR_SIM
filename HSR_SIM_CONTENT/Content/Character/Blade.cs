@@ -32,7 +32,7 @@ public class Blade : DefaultFighter
     public Blade(Unit? parent) : base(parent)
     {
         Parent.Stats.BaseMaxEnergy = 130;
-        Parent.Element = Unit.ElementEnm.Wind;
+        Element = ElementEnm.Wind;
         //load lvl
         var dsSkillLvl = Parent.Skills.First(x => x.Name == "Death Sentence").Level;
         var fsSkillLvl = Parent.Skills.First(x => x.Name == "Forest of Swords").Level;

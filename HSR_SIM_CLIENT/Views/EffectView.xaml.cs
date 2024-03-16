@@ -11,14 +11,13 @@ namespace HSR_SIM_CLIENT.Views;
 public partial class EffectView : INotifyPropertyChanged
 {
     public static readonly DependencyProperty EffectToViewProperty;
-    public static readonly DependencyProperty FormulaToViewProperty;
+
 
     static EffectView()
     {
-        EffectToViewProperty = DependencyProperty.Register(nameof(EffectToView), typeof(Effect),
-            typeof(EffectView), new FrameworkPropertyMetadata(PropChangedCb));
-        FormulaToViewProperty = DependencyProperty.Register(nameof(FormulaToView), typeof(Formula),
-            typeof(EffectView), new FrameworkPropertyMetadata(PropChangedCb));
+        EffectToViewProperty = DependencyProperty.Register(nameof(EffectToView), typeof(EffectViewModel),
+            typeof(EffectView), new FrameworkPropertyMetadata());
+     
     }
     
     public EffectView()
@@ -26,33 +25,15 @@ public partial class EffectView : INotifyPropertyChanged
         InitializeComponent();
     }
     
-    private static void PropChangedCb(DependencyObject d, DependencyPropertyChangedEventArgs e)
-    {
-        if (d is EffectView ev)
-            ev.RefreshData();
-    }
 
-    public Effect EffectToView
+
+    public EffectViewModel EffectToView
     {
-        get => (Effect)GetValue(EffectToViewProperty);
+        get => (EffectViewModel)GetValue(EffectToViewProperty);
         set => SetValue(EffectToViewProperty, value);
     }
     
-    public Formula FormulaToView
-    {
-        get => (Formula)GetValue(FormulaToViewProperty);
-        set => SetValue(FormulaToViewProperty, value);
-    }
-
-    private EffectViewModel? viewModel;
-
-    public EffectViewModel ViewModel => viewModel ??= new EffectViewModel(EffectToView,FormulaToView);
-
-    private void RefreshData()
-    {
-        viewModel = null;
-        NotifyPropertyChanged(nameof(ViewModel));
-    }
+    
     
     public event PropertyChangedEventHandler? PropertyChanged;
 

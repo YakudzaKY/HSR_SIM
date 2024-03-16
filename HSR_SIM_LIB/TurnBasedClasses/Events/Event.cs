@@ -5,6 +5,7 @@ using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.UnitStuff;
 using HSR_SIM_LIB.Utils;
+using HSR_SIM_LIB.Utils.Utils;
 using static HSR_SIM_LIB.TurnBasedClasses.Step;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -181,10 +182,14 @@ public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit)
         ApplyBuff applyBuff = new(ParentStep, Source, SourceUnit)
         {
             TargetUnit = TargetUnit,
-            AppliedBuffToApply = mod
+            AppliedBuffToApply = mod,
+            CalculateValue = FighterUtils.DebuffAppliedFormula(baseChance), 
+            RealValue = new MersenneTwister().NextDouble()
+            
         };
-
-        if (FighterUtils.CalculateDebuffApplied(applyBuff, baseChance))
+        this.Value = applyBuff.Value;
+        this.RealValue = applyBuff.RealValue;
+        if (applyBuff.Value>=applyBuff.RealValue )
         {
             ChildEvents.Add(applyBuff);
         }
@@ -194,7 +199,9 @@ public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit)
             DebuffResisted failEvent = new(ParentStep, Source, SourceUnit)
             {
                 TargetUnit = TargetUnit,
-                AppliedBuffToApply = applyBuff.AppliedBuffToApply
+                AppliedBuffToApply = applyBuff.AppliedBuffToApply,
+                Value = applyBuff.Value,
+                RealValue = applyBuff.RealValue
             };
             ChildEvents.Add(failEvent);
         }

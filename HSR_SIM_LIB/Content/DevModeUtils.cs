@@ -88,7 +88,7 @@ public static class DevModeUtils
             var unitStrings = arr.Select(a =>
                 a is Unit nt ? nt.Name :
                 a is AppliedBuff ba ? ba.Effects.Select(x => x.GetType().Name).First() :
-                a is Unit.ElementEnm em ? em.ToString() : a.GetType().Name).ToArray();
+                a is Ability.ElementEnm em ? em.ToString() : a.GetType().Name).ToArray();
             var devLogVal = wrk.DevModeLog.ReadNext(unitStrings, "Need pick some of objects to execute");
             return arr.ElementAt(devLogVal);
         }

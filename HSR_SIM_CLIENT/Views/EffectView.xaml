@@ -13,11 +13,11 @@
         </Grid.RowDefinitions>
         <StackPanel  Grid.Row="0" Orientation="Horizontal">
           
-            <Label Content="{Binding  ViewModel.Name}" />
+            <Label Content="{Binding  EffectToView.Name}" />
             <Label Content="Value=" />
-            <Label Content="{Binding  ViewModel.Value}" />
+            <Label Content="{Binding  EffectToView.Value}" />
             <Label Content="DynamicValue=" />
-            <Label Content="{Binding  ViewModel.DynamicValue}" />
+            <Label Content="{Binding  EffectToView.DynamicValue}" />
         </StackPanel>
     </Grid>
 </UserControl>

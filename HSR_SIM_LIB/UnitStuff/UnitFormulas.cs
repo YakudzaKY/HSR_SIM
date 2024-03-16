@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using HSR_SIM_LIB.Fighters;
+using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.Utils;
@@ -32,7 +33,7 @@ public static class UnitFormulas
         };
     }
 
-    public static Formula GetCritDamage(Formula.DynamicTargetEnm unitToCheck,Event ent)
+    public static Formula GetCritDamage(Formula.DynamicTargetEnm unitToCheck, Event ent)
     {
         return new Formula
         {
@@ -42,13 +43,12 @@ public static class UnitFormulas
         };
     }
 
-    public static Formula GetElemBoostValue(Formula.DynamicTargetEnm unitToCheck,Event ent = null)
+    public static Formula GetElemBoostValue(Formula.DynamicTargetEnm unitToCheck, Event ent = null)
     {
         return new Formula
         {
             EventRef = ent,
             Expression = $"{unitToCheck}#{nameof(Unit.GetElemBoostVal)} " +
-                         
                          $"  + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffElementalBoost).FullName}  "
         };
     }
@@ -58,7 +58,7 @@ public static class UnitFormulas
     /// </summary>
     /// <param name="ent">reference to event</param>
     /// <returns></returns>
-    public static Formula GetAbilityTypeMultiplier(Formula.DynamicTargetEnm unitToCheck,Event ent)
+    public static Formula GetAbilityTypeMultiplier(Formula.DynamicTargetEnm unitToCheck, Event ent)
     {
         if (ent is DamageEventTemplate)
             return new Formula
@@ -75,7 +75,59 @@ public static class UnitFormulas
         };
     }
 
-    public static Formula DotBoost(Formula.DynamicTargetEnm unitToCheck,Event ent)
+    public static Formula EffectHit(Formula.DynamicTargetEnm unitToCheck, Event ent)
+    {
+        return new Formula
+        {
+            EventRef = ent,
+            Expression =
+                $"{unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffEffectHitPrc).FullName} + {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.EffectHitPrc)} "
+        };
+    }
+
+    public static Formula DebuffResists(Formula.DynamicTargetEnm unitToCheck, Event ent = null)
+    {
+        var mod = (((ApplyBuff)ent)!).AppliedBuffToApply.Effects.FirstOrDefault();
+        var resExpr = "";
+        if (mod != null)
+            resExpr = $" + {unitToCheck}#{nameof(Unit.GetDebuffResists)}#{mod.GetType().FullName}";
+        return new Formula
+        {
+            EventRef = ent,
+            Expression =
+                $"{unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffDebufResist).FullName} {resExpr} "
+        };
+    }
+
+    public static Formula CcResists(Formula.DynamicTargetEnm unitToCheck, Event ent = null)
+    {
+        bool isCc = (((ApplyBuff)ent)!).AppliedBuffToApply.CrowdControl;
+        if (isCc)
+            return new Formula
+            {
+                EventRef = ent,
+                Expression =
+                    $"{unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffCrowControl).FullName} + {unitToCheck}#{nameof(Unit.GetDebuffResists)}#{typeof(EffCrowControl).FullName}"
+            };
+
+        return new Formula
+        {
+            EventRef = ent,
+            Expression = $" 0 "
+        };
+    }
+
+    public static Formula EffectRes(Formula.DynamicTargetEnm unitToCheck, Event ent)
+    {
+        return new Formula
+        {
+            EventRef = ent,
+            Expression =
+                $"{unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffEffectResPrc).FullName} + {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.EffectResPrc)} "
+        };
+    }
+
+    public static Formula DotBoost(Formula.DynamicTargetEnm unitToCheck, Event ent)
     {
         if (ent is not DamageEventTemplate)
             return new Formula
@@ -89,10 +141,10 @@ public static class UnitFormulas
             EventRef = ent,
             Expression =
                 $"{unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffDoTBoost).FullName}  "
-        };  
+        };
     }
-        
-    public static Formula DotVulnerability(Formula.DynamicTargetEnm unitToCheck,Event ent)
+
+    public static Formula DotVulnerability(Formula.DynamicTargetEnm unitToCheck, Event ent)
     {
         if (ent is not DoTDamage)
             return new Formula
@@ -106,10 +158,10 @@ public static class UnitFormulas
             EventRef = ent,
             Expression =
                 $"{unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffDoTVulnerability).FullName}  "
-        };  
+        };
     }
-    
-    public static Formula WeaknessMaxToughnessMultiplier(Formula.DynamicTargetEnm unitToCheck,Event ent = null)
+
+    public static Formula WeaknessMaxToughnessMultiplier(Formula.DynamicTargetEnm unitToCheck, Event ent = null)
     {
         return new Formula
         {
@@ -117,48 +169,50 @@ public static class UnitFormulas
             Expression = $"{unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.MaxToughness)} / 120 + 0.5"
         };
     }
-    
-    public static Formula WeaknessBreakBaseDamage(Formula.DynamicTargetEnm unitToCheck,Event ent,Unit.ElementEnm elem)
-    {
 
+    public static Formula WeaknessBreakBaseDamage(Formula.DynamicTargetEnm unitToCheck, Event ent,
+        Ability.ElementEnm elem)
+    {
         //if DoT proceed
         if (ent is ToughnessBreakDoTDamage modEnt)
         {
             string baseDmgExpr =
                 $"{unitToCheck}#{nameof(Unit.UnitLvlMultiplier)} * {OppositeTarget(unitToCheck)}#{nameof(UnitFormulas)}#{nameof(WeaknessMaxToughnessMultiplier)}";
-        if (modEnt.BuffThatDamage.Effects.Any(x => x is EffBleed))
-        {
-            baseDmgExpr = $"({OppositeTarget(unitToCheck)}#{nameof(Unit.BleedEliteMultiplier)} * {OppositeTarget(unitToCheck)}#{nameof(UnitFormulas)}#{nameof(GetMaxHp)}) min (2 * {baseDmgExpr}))";
-        }
-        else if (modEnt.BuffThatDamage.Effects.Any(x =>
-                     x is EffBurn or EffFreeze))
-        {
-            baseDmgExpr = "1 * "+baseDmgExpr;
-        }
-        else if (modEnt.BuffThatDamage.Effects.Any(x =>
-                     x is EffShock))
-        {
-            baseDmgExpr = "2 * "+baseDmgExpr;
-        }
-        else if (modEnt.BuffThatDamage.Effects.Any(x =>
-                     x is EffWindShear))
-        {
-            baseDmgExpr = $"1 * {modEnt.BuffThatDamage.Stack} * "+baseDmgExpr;
-        }
-        else if (modEnt.BuffThatDamage.Effects.Any(x =>
-                     x is EffEntanglement))
-        {
-            baseDmgExpr = $"0.6 * {modEnt.BuffThatDamage.Stack} * "+baseDmgExpr;
-        }
-        else
-        {
-            throw new Exception($"{nameof(ToughnessBreakDoTDamage)} contains unknown effect");
-        }
+            if (modEnt.BuffThatDamage.Effects.Any(x => x is EffBleed))
+            {
+                baseDmgExpr =
+                    $"({OppositeTarget(unitToCheck)}#{nameof(Unit.BleedEliteMultiplier)} * {OppositeTarget(unitToCheck)}#{nameof(UnitFormulas)}#{nameof(GetMaxHp)}) min (2 * {baseDmgExpr}))";
+            }
+            else if (modEnt.BuffThatDamage.Effects.Any(x =>
+                         x is EffBurn or EffFreeze))
+            {
+                baseDmgExpr = "1 * " + baseDmgExpr;
+            }
+            else if (modEnt.BuffThatDamage.Effects.Any(x =>
+                         x is EffShock))
+            {
+                baseDmgExpr = "2 * " + baseDmgExpr;
+            }
+            else if (modEnt.BuffThatDamage.Effects.Any(x =>
+                         x is EffWindShear))
+            {
+                baseDmgExpr = $"1 * {modEnt.BuffThatDamage.Stack} * " + baseDmgExpr;
+            }
+            else if (modEnt.BuffThatDamage.Effects.Any(x =>
+                         x is EffEntanglement))
+            {
+                baseDmgExpr = $"0.6 * {modEnt.BuffThatDamage.Stack} * " + baseDmgExpr;
+            }
+            else
+            {
+                throw new Exception($"{nameof(ToughnessBreakDoTDamage)} contains unknown effect");
+            }
+
             return new Formula
             {
                 EventRef = ent,
-                Expression =baseDmgExpr
-            };  
+                Expression = baseDmgExpr
+            };
         }
 
         else
@@ -166,13 +220,13 @@ public static class UnitFormulas
             //immediate weakness break
             var baseDmg = elem switch
             {
-                Unit.ElementEnm.Physical => 2 ,
-                Unit.ElementEnm.Fire => 2 ,
-                Unit.ElementEnm.Ice => 1 ,
-                Unit.ElementEnm.Lightning => 1,
-                Unit.ElementEnm.Wind => 1.5 ,
-                Unit.ElementEnm.Quantum => 0.5 ,
-                Unit.ElementEnm.Imaginary => 0.5 ,
+                Ability.ElementEnm.Physical => 2,
+                Ability.ElementEnm.Fire => 2,
+                Ability.ElementEnm.Ice => 1,
+                Ability.ElementEnm.Lightning => 1,
+                Ability.ElementEnm.Wind => 1.5,
+                Ability.ElementEnm.Quantum => 0.5,
+                Ability.ElementEnm.Imaginary => 0.5,
                 _ => throw new NotImplementedException()
             };
             return new Formula
@@ -180,13 +234,11 @@ public static class UnitFormulas
                 EventRef = ent,
                 Expression =
                     $"  {baseDmg} * {unitToCheck}#{nameof(Unit.UnitLvlMultiplier)} * {OppositeTarget(unitToCheck)}#{nameof(UnitFormulas)}#{nameof(WeaknessMaxToughnessMultiplier)}"
-            };  
+            };
         }
-       
-        
     }
 
-    
+
     public static Formula CritHit(Event ent)
     {
         double critMod = ((DirectDamage)ent).IsCrit ? 1 : 0;
@@ -203,7 +255,8 @@ public static class UnitFormulas
             return Formula.DynamicTargetEnm.Defender;
         return Formula.DynamicTargetEnm.Attacker;
     }
-    public static Formula   GetDef(Formula.DynamicTargetEnm unitToCheck,Event ent)
+
+    public static Formula GetDef(Formula.DynamicTargetEnm unitToCheck, Event ent)
     {
         return new Formula
         {
@@ -211,13 +264,14 @@ public static class UnitFormulas
             Expression =
                 $" {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.BaseDef)} * ( 1 + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffDefPrc).FullName} " +
                 //def ignore
-                (ent!=null? $" - {OppositeTarget(unitToCheck)}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffDefIgnore).FullName} ":string.Empty )+
+                (ent != null
+                    ? $" - {OppositeTarget(unitToCheck)}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffDefIgnore).FullName} "
+                    : string.Empty) +
                 $" +  {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.DefPrc)} ) + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffDef).FullName} "
-        };  
-      
+        };
     }
-    
-    public static Formula   GetDefMultiplier(Formula.DynamicTargetEnm unitToCheck,Event ent)
+
+    public static Formula GetDefMultiplier(Formula.DynamicTargetEnm unitToCheck, Event ent)
     {
         return new Formula
         {
@@ -225,11 +279,10 @@ public static class UnitFormulas
             Expression =
                 $"  1 - ({unitToCheck}#{nameof(UnitFormulas)}#{nameof(GetDef)}  / ({unitToCheck}#{nameof(UnitFormulas)}#{nameof(GetDef)} " +
                 $" + 200 + (10 * {OppositeTarget(unitToCheck)}#{nameof(Unit.Level)})) ) "
-        };  
-      
+        };
     }
-    
-    public static Formula   ResPen(Formula.DynamicTargetEnm unitToCheck,Event ent)
+
+    public static Formula ResPen(Formula.DynamicTargetEnm unitToCheck, Event ent)
     {
         return new Formula
         {
@@ -239,12 +292,11 @@ public static class UnitFormulas
                 $"+  {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAllDamageResist).FullName}  )" +
                 $" -  {OppositeTarget(unitToCheck)}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffElementalPenetration).FullName} " +
                 $")  "
-        };  
-      
+        };
     }
 
-    
-    public static Formula   VulnerabilityMulti(Formula.DynamicTargetEnm unitToCheck,Event ent)
+
+    public static Formula VulnerabilityMulti(Formula.DynamicTargetEnm unitToCheck, Event ent)
     {
         return new Formula
         {
@@ -252,12 +304,11 @@ public static class UnitFormulas
             Expression =
                 $"1 - {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffElementalVulnerability).FullName} " +
                 $"+ {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAllDamageVulnerability).FullName} " +
-                $"+ {unitToCheck}#{nameof(UnitFormulas)}#{nameof(DotVulnerability)} " 
-        };  
-      
+                $"+ {unitToCheck}#{nameof(UnitFormulas)}#{nameof(DotVulnerability)} "
+        };
     }
 
-    private static Formula CritChance(Formula.DynamicTargetEnm unitToCheck,Event ent)
+    private static Formula CritChance(Formula.DynamicTargetEnm unitToCheck, Event ent)
     {
         return new Formula
         {
@@ -273,9 +324,9 @@ public static class UnitFormulas
     /// <param name="unitToCheck"></param>
     /// <param name="ent"></param>
     /// <returns></returns>
-    public static Formula GenerateCrit(Formula.DynamicTargetEnm unitToCheck,Event ent)
+    public static Formula GenerateCrit(Formula.DynamicTargetEnm unitToCheck, Event ent)
     {
-        var res = CritChance(unitToCheck,ent);
+        var res = CritChance(unitToCheck, ent);
         ((DirectDamage)ent).CritRate = res.Result;
         ((DirectDamage)ent).IsCrit = ent.ParentStep.Parent.Parent.DevMode
             ? DevModeUtils.IsCrit(ent)

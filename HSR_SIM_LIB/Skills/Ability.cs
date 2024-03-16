@@ -45,6 +45,19 @@ public class Ability : CloneClass
         All
     }
 
+    public enum ElementEnm
+    {
+        None,
+        Wind,
+        Physical,
+        Fire,
+        Ice,
+        Lightning,
+        Quantum,
+        Imaginary
+    }
+
+    
     public enum PriorityEnm
     {
         DefeatHandler, //top 1
@@ -66,7 +79,7 @@ public class Ability : CloneClass
     {
         Parent = parent;
         if (Element == ElementEnm.None)
-            Element = parent.Parent.Element;
+            Element = parent.Element;
         Available = DefaultAbilityAvailable; //add default then custom
         IWannaUseIt = DefaultAbilityWannaUse; //set default if no init val
         FollowUpQueueAvailable = DefaultAbilityQueueAvailable; //set default if no init val

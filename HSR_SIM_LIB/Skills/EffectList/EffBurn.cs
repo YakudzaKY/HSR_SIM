@@ -7,5 +7,5 @@ namespace HSR_SIM_LIB.Skills.EffectList;
 /// </summary>
 public class EffBurn : EffDotTemplate
 {
-    public override Unit.ElementEnm Element { get; init; } = Unit.ElementEnm.Fire;
+    public override Ability.ElementEnm Element { get; init; } = Ability.ElementEnm.Fire;
 }

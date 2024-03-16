@@ -1,4 +1,5 @@
-﻿using HSR_SIM_LIB.Content;
+﻿using HSR_SIM_CONTENT.DefaultContent;
+using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -16,19 +17,21 @@ internal class TheUnreachableSide : DefaultLightCone
     public TheUnreachableSide(IFighter parent, int rank) : base(parent, rank)
     {
         if (Path == Parent.Path)
-            uniqueAppliedBuff = new AppliedBuff(Parent.Parent,null,this)
+            uniqueAppliedBuff = new AppliedBuff(Parent.Parent, null, this)
             {
                 Type = Buff.BuffType.Buff,
                 BaseDuration = null,
                 MaxStack = 1,
                 Effects = new List<Effect> { new EffAllDamageBoost { Value = modifiers[rank - 1] } }
             };
+        else
+            uniqueAppliedBuff = new AppliedBuff(Parent.Parent, null, this);
     }
 
     public sealed override FighterUtils.PathType Path { get; } = FighterUtils.PathType.Destruction;
 
     //add buff when attacked or loose hp
-    public override void DefaultLightCone_HandleEvent(Event ent)
+    protected override void DefaultLightCone_HandleEvent(Event ent)
     {
         //if unit consume hp or got attack then apply buff
         if ((ent.ParentStep.ActorAbility?.Parent == Parent && ent.TargetUnit == Parent.Parent && ent is ResourceDrain &&

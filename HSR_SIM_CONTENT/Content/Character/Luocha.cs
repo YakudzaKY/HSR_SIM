@@ -33,7 +33,7 @@ public class Luocha : DefaultFighter
     public Luocha(Unit parent) : base(parent)
     {
         Parent.Stats.BaseMaxEnergy = 100;
-        Parent.Element = Unit.ElementEnm.Imaginary;
+        Element = ElementEnm.Imaginary;
         var coLLvl = Parent.Skills.First(x => x.Name == "Cycle of Life")!.Level;
         var dWLvl = Parent.Skills.First(x => x.Name == "Death Wish")!.Level;
         totALvl = Parent.Skills.First(x => x.Name == "Thorns of the Abyss")!.Level;
@@ -243,7 +243,7 @@ public class Luocha : DefaultFighter
 
         //A6
         if (ATraces.HasFlag(ATracesEnm.A6))
-            DebuffResists.Add(new DebuffResist { Debuff = typeof(EffCrowControl), ResistVal = 0.7 });
+            Parent.DebuffResists.Add(new DebuffResist { Debuff = typeof(EffCrowControl), ResistVal = 0.7 });
         //E2
         if (Parent.Rank >= 2)
             Parent.PassiveBuffs.Add(new PassiveBuff(Parent, this)
