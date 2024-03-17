@@ -69,7 +69,7 @@ public static class UnitFormulas
             UnitRef = unit,
             ConditionSkipList = excludeCondition,
             Expression = $"{unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.LoadedBaseActionValue)} ifzero 10000" +
-                         $" / {unitToCheck}#{nameof(UnitFormulas)}#{nameof(GetSpeed)} "
+                         $" / {unitToCheck}#{nameof(GetSpeed)} "
         };
     }
 
@@ -82,7 +82,7 @@ public static class UnitFormulas
             EventRef = ent,
             UnitRef = unit,
             ConditionSkipList = excludeCondition,
-            Expression = $"{unitToCheck}#{nameof(UnitFormulas)}#{nameof(GetInitialBaseActionValue)}" +
+            Expression = $"{unitToCheck}#{nameof(GetInitialBaseActionValue)}" +
                          $" - {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffReduceBAV).FullName} "
         };
     }
@@ -96,7 +96,7 @@ public static class UnitFormulas
             EventRef = ent,
             UnitRef = unit,
             ConditionSkipList = excludeCondition,
-            Expression = $"{unitToCheck}#{nameof(UnitFormulas)}#{nameof(GetBaseActionValue)}" +
+            Expression = $"{unitToCheck}#{nameof(GetBaseActionValue)}" +
                          $" * (1 - {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAdvance).FullName}) " +
                          $" + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffDelay).FullName}) "
         };
@@ -111,7 +111,7 @@ public static class UnitFormulas
             EventRef = ent,
             UnitRef = unit,
             ConditionSkipList = excludeCondition,
-            Expression = $"{unitToCheck}#{nameof(UnitFormulas)}#{nameof(GetActionValue)}" +
+            Expression = $"{unitToCheck}#{nameof(GetActionValue)}" +
                          $" -  {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.PerformedActionValue)} "
         };
     }
@@ -126,7 +126,7 @@ public static class UnitFormulas
             UnitRef = unit,
             ConditionSkipList = excludeCondition,
             Expression = $"{unitToCheck}#{nameof(Unit.GetResVal)}#{Resource.ResourceType.HP} " +
-                         $" / {unitToCheck}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetMaxHp)} "
+                         $" / {unitToCheck}#{nameof(GetMaxHp)} "
         };
     }
 
@@ -351,11 +351,11 @@ public static class UnitFormulas
         if (ent is ToughnessBreakDoTDamage modEnt)
         {
             string baseDmgExpr =
-                $"{unitToCheck}#{nameof(Unit.UnitLvlMultiplier)} * {OppositeTarget(unitToCheck)}#{nameof(UnitFormulas)}#{nameof(WeaknessMaxToughnessMultiplier)}";
+                $"{unitToCheck}#{nameof(Unit.UnitLvlMultiplier)} * {OppositeTarget(unitToCheck)}#{nameof(WeaknessMaxToughnessMultiplier)}";
             if (modEnt.BuffThatDamage.Effects.Any(x => x is EffBleed))
             {
                 baseDmgExpr =
-                    $"({OppositeTarget(unitToCheck)}#{nameof(Unit.BleedEliteMultiplier)} * {OppositeTarget(unitToCheck)}#{nameof(UnitFormulas)}#{nameof(GetMaxHp)}) min (2 * {baseDmgExpr}))";
+                    $"({OppositeTarget(unitToCheck)}#{nameof(Unit.BleedEliteMultiplier)} * {OppositeTarget(unitToCheck)}#{nameof(GetMaxHp)}) min (2 * {baseDmgExpr}))";
             }
             else if (modEnt.BuffThatDamage.Effects.Any(x =>
                          x is EffBurn or EffFreeze))
@@ -408,7 +408,7 @@ public static class UnitFormulas
                 EventRef = ent,
                 ConditionSkipList = excludeCondition,
                 Expression =
-                    $"  {baseDmg} * {unitToCheck}#{nameof(Unit.UnitLvlMultiplier)} * {OppositeTarget(unitToCheck)}#{nameof(UnitFormulas)}#{nameof(WeaknessMaxToughnessMultiplier)}"
+                    $"  {baseDmg} * {unitToCheck}#{nameof(Unit.UnitLvlMultiplier)} * {OppositeTarget(unitToCheck)}#{nameof(WeaknessMaxToughnessMultiplier)}"
             };
         
     }
@@ -458,7 +458,7 @@ public static class UnitFormulas
             EventRef = ent,
             ConditionSkipList = excludeCondition,
             Expression =
-                $"  1 - ({unitToCheck}#{nameof(UnitFormulas)}#{nameof(GetDef)}  / ({unitToCheck}#{nameof(UnitFormulas)}#{nameof(GetDef)} " +
+                $"  1 - ({unitToCheck}#{nameof(GetDef)}  / ({unitToCheck}#{nameof(GetDef)} " +
                 $" + 200 + (10 * {OppositeTarget(unitToCheck)}#{nameof(Unit.Level)})) ) "
         };
     }
@@ -489,7 +489,7 @@ public static class UnitFormulas
             Expression =
                 $"1 - {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffElementalVulnerability).FullName} " +
                 $"+ {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAllDamageVulnerability).FullName} " +
-                $"+ {unitToCheck}#{nameof(UnitFormulas)}#{nameof(DotVulnerability)} "
+                $"+ {unitToCheck}#{nameof(DotVulnerability)} "
         };
     }
 
