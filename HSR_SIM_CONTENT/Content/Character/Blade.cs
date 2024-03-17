@@ -100,7 +100,15 @@ public class Blade : DefaultFighter
         }
 
         shuhuGift.Events.Add(new Healing(null, this, Parent)
-            { TargetUnit = Parent, CalculateValue = CalculateSgHeal });
+        {
+            TargetUnit = Parent, CalculateValue = HealFormula(new Formula()
+            {
+                Expression =
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetMaxHp)} * 0.25"
+            })
+        });
+
+
         shuhuGift.Events.Add(new MechanicValChg(null, this, Parent)
             { AbilityValue = shuhuGift, Value = -shuHuMaxCnt });
         Abilities.Add(shuhuGift);
@@ -151,7 +159,11 @@ public class Blade : DefaultFighter
             ResType = Resource.ResourceType.HP,
             TargetType = TargetTypeEnm.Self,
             CanSetToZero = false,
-            CalculateValue = CalculateForestSelfDmg,
+            CalculateValue = DamageFormula(new Formula()
+            {
+                Expression =
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetMaxHp)} 0.1"
+            }),
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain
         });
 
@@ -211,14 +223,14 @@ public class Blade : DefaultFighter
             ResType = Resource.ResourceType.HP,
             TargetUnit = Parent,
             CanSetToZero = false,
-            CalculateValue = CalculateDsSelfDmg,
+            CalculateValue = new Formula() {Expression = $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(CalculateDsSelfDmg)}"},
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain
         });
         deathSentence.Events.Add(new ResourceGain(null, this, Parent)
         {
             ResType = Resource.ResourceType.HP,
             TargetUnit = Parent,
-            CalculateValue = CalculateDsSelfHeal,
+            CalculateValue =  new Formula() {Expression = $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(CalculateDsSelfHeal)}"},
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain
         });
         deathSentence.Events.Add(new DirectDamage(null, this, Parent)
@@ -258,7 +270,7 @@ public class Blade : DefaultFighter
         deathSentence.Events.Add(new ToughnessShred(null, this, Parent)
             { Value = 60, CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent });
         deathSentence.Events.Add(new MechanicValChg(null, this, Parent)
-            { AbilityValue = deathSentence, CalculateValue = CalcResetDsCharge });
+            { AbilityValue = deathSentence, CalculateValue = new Formula(){Expression = $"- {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(GetDsMechanic)}"} });
 
         Abilities.Add(deathSentence);
         Mechanics.AddVal(deathSentence);
@@ -283,13 +295,13 @@ public class Blade : DefaultFighter
             ResType = Resource.ResourceType.HP,
             TargetType = TargetTypeEnm.Self,
             CanSetToZero = false,
-            CalculateValue = CalculateKarmaSelfDmg,
+            CalculateValue = new Formula(){Expression = $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetMaxHp)} * 0.2"}     ,
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain
         });
         karmaWind.Events.Add(new DirectDamage(null, this, Parent)
         {
             OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
-            CalculateValue = FighterUtils.DamageFormula(new Formula
+            CalculateValue = DamageFormula(new Formula
             {
                 Expression = " BladeMaxHp * 0.4 ",
                 Variables = new Dictionary<string, Formula.VarVal>
@@ -330,7 +342,7 @@ public class Blade : DefaultFighter
             ResType = Resource.ResourceType.HP,
             TargetType = TargetTypeEnm.Self,
             CanSetToZero = false,
-            CalculateValue = CalculateHellscapeSelfDmg,
+            CalculateValue = new Formula(){Expression = $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetMaxHp)} * 0.3"} ,
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain
         });
 
@@ -399,6 +411,7 @@ public class Blade : DefaultFighter
     {
         return Mechanics.Values[deathSentence];
     }
+
     private AppliedBuff E4AppliedBuff { get; }
 //Blade constructor
 
@@ -431,7 +444,7 @@ public class Blade : DefaultFighter
                 ent.ChildEvents.Add(new MechanicValChg(ent.ParentStep, this, Parent)
                     { Value = 1, AbilityValue = shuhuGift });
 
-            var bladeHalfHp = Parent.GetMaxHp(ent) * 0.5;
+            var bladeHalfHp = Parent.GetMaxHp(ent:ent).Result * 0.5;
             //if hp<=50% but was 50%+ then apply hp buff
             if (Parent.Rank >= 4 && Parent.GetRes(Resource.ResourceType.HP).ResVal <= bladeHalfHp &&
                 Parent.GetRes(Resource.ResourceType.HP).ResVal + ent.RealValue > bladeHalfHp)
@@ -442,7 +455,7 @@ public class Blade : DefaultFighter
         if (ent.Reference == forestMainTrgtHit && ATraces.HasFlag(ATracesEnm.A4) &&
             ent.TargetUnit.GetRes(Resource.ResourceType.Toughness).ResVal == 0)
             ent.ChildEvents.Add(new Healing(ent.ParentStep, this, Parent)
-                { TargetUnit = Parent, CalculateValue = CalculateForestHeal });
+                { TargetUnit = Parent, CalculateValue = HealFormula(new Formula(){Expression = $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetMaxHp)} * 0.05 + 100"}) });
         //buffering Lost hp pull
         if (ent.TargetUnit == Parent
             && (
@@ -457,23 +470,7 @@ public class Blade : DefaultFighter
 
         base.DefaultFighter_HandleEvent(ent);
     }
-
-
-    private double? CalculateKarmaSelfDmg(Event ent)
-    {
-        return Parent.GetMaxHp(ent) * 0.2;
-    }
-
-    public double? CalculateForestSelfDmg(Event ent)
-    {
-        return Parent.GetMaxHp(ent) * 0.1;
-    }
-
-
-    private double? CalculateHellscapeSelfDmg(Event ent)
-    {
-        return Parent.GetMaxHp(ent) * 0.3;
-    }
+    
 
     public override string GetSpecialText()
     {
@@ -499,29 +496,27 @@ public class Blade : DefaultFighter
 
     private double getDsMaxLostHpForText()
     {
-        return Parent.GetMaxHp(null) * 0.9;
+        return Parent.GetMaxHp().Result * 0.9;
+    }
+    
+    private Formula CalculateDsSelfDmg(Event ent)
+    {
+
+        if (Parent.GetHpPrc(ent:ent).Result > 0.5)
+            return new Formula()
+                { Expression = $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetResVal)}#{Resource.ResourceType.HP} " +
+                               $" - ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetMaxHp)} / 2)" };
+        return new Formula() { Expression = "0" };
     }
 
-//a4 if main target have 0 toughness then heal
-    private double? CalculateForestHeal(Event ent)
+    private Formula CalculateDsSelfHeal(Event ent)
     {
-        return CalculateHealByBasicVal(Parent.GetMaxHp(ent) * 0.05 + 100, ent);
-    }
-
-    private double? CalculateDsSelfDmg(Event ent)
-    {
-        double setValue = 0;
-        if (Parent.GetHpPrc(ent) > 0.5)
-            setValue = Parent.GetRes(Resource.ResourceType.HP).ResVal - Parent.GetMaxHp(ent) / 2;
-        return setValue;
-    }
-
-    private double? CalculateDsSelfHeal(Event ent)
-    {
-        double setValue = 0;
-        if (Parent.GetHpPrc(ent) < 0.5)
-            setValue = Parent.GetMaxHp(ent) / 2 - Parent.GetRes(Resource.ResourceType.HP).ResVal;
-        return setValue;
+      
+        if (Parent.GetHpPrc(ent:ent).Result < 0.5)
+            return new Formula()
+            { Expression = $" ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetMaxHp)} / 2) - " +
+                           $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetResVal)}#{Resource.ResourceType.HP} " };
+        return new Formula() { Expression = "0" };
     }
 
     private bool HellscapeActive()
@@ -533,14 +528,5 @@ public class Blade : DefaultFighter
     {
         return Parent.AppliedBuffs.All(x => x.Reference != hellscapeAppliedBuff);
     }
-
-    private double? CalculateSgHeal(Event ent)
-    {
-        return FighterUtils.CalculateHealByBasicVal(Parent.GetMaxHp(ent) * 0.25, ent);
-    }
-
-    private double? CalcResetDsCharge(Event ent)
-    {
-        return -Mechanics.Values[deathSentence];
-    }
+    
 }

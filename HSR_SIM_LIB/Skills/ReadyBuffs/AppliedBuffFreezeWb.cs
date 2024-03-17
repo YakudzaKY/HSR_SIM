@@ -24,7 +24,7 @@ public class AppliedBuffFreezeWb : AppliedBuff
         if (ent is ResetAV && ent.TargetUnit == CarrierUnit) //50% reduce av if frosted
             ent.ChildEvents.Add(new ModActionValue(ent.ParentStep, CarrierUnit, CarrierUnit)
             {
-                TargetUnit = CarrierUnit, Value = CarrierUnit.GetActionValue(ent) * 0.5
+                TargetUnit = CarrierUnit, Value = CarrierUnit.GetActionValue(ent:ent).Result * 0.5
             });
     }
 }

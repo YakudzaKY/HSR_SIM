@@ -233,7 +233,7 @@ public class SilverWolf : DefaultFighter
     public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Nihility;
 
 
-    private double? CalcSkillAllDmgRes(Event ent)
+    private Formula CalcSkillAllDmgRes(Event ent)
     {
         //get default from table
         var res = allowChangesDebuffAllDmgVal;
@@ -243,7 +243,8 @@ public class SilverWolf : DefaultFighter
         //depend on debuffs add 3%
         if (debuffs >= 3) res += 0.03;
 
-        return -res;
+
+        return new Formula() { Expression = $"- {res}"};
     }
 
     protected override void DefaultFighter_HandleEvent(Event ent)
@@ -373,12 +374,12 @@ public class SilverWolf : DefaultFighter
 
 
     //get 0.2 AllDmg per debuff  on target
-    private static double? CalculateE6(Event ent)
+    private static Formula CalculateE6(Event ent)
     {
         const double maxDebuffs = 5;
         double debuffs = ent.TargetUnit.AppliedBuffs.Count(x =>
             x.Type == Buff.BuffType.Debuff || x.Type == Buff.BuffType.Dot);
         if (debuffs > maxDebuffs) debuffs = maxDebuffs;
-        return debuffs * 0.2;
+        return new Formula() { Expression = $"{debuffs} * 0.2"};
     }
 }

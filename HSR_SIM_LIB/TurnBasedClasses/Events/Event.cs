@@ -13,7 +13,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 /// <summary>
 ///     Events. Situation changed when event was pro-ceded
 /// </summary>
-public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit) : CloneClass
+public abstract class Event : CloneClass
 {
     public delegate IEnumerable<Unit> CalculateTargetPrc();
 
@@ -26,11 +26,31 @@ public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit)
     private int procRatioCounter = 1; //counter
     private double? value; //Theoretical value
 
-    public object CalculateValue { get; set; }
+    /// <summary>
+    ///     Events. Situation changed when event was pro-ceded
+    /// </summary>
+    protected Event(Step parentStep, ICloneable source, Unit sourceUnit)
+    {
+        Source = source;
+        SourceUnit = sourceUnit;
+        ParentStep = parentStep;
+    }
+
+    public object CalculateValue {
+        get => calculateValue;
+        set
+        {
+            if (value!=null&&value is not Formula && value is not Func<Event, Formula>)
+                throw new Exception("CalculateValue should be Formula or Func<Event, Formula>");
+            calculateValue = value;
+        }
+    }
+
+    private object calculateValue;
     public CalculateTargetPrc CalculateTargets { get; init; }
 
 
-    public ICloneable Source { get; } = source;
+    public ICloneable Source { get; }
     public Ability.TargetTypeEnm? TargetType { get; init; }
 
     public int ProcRatio
@@ -49,7 +69,7 @@ public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit)
     public bool IsReady => procRatioCounter == 1; //event is ready to be applied on target
 
     public Ability.AbilityCurrentTargetEnm? CurrentTargetType { get; init; }
-    public Unit SourceUnit { get; set; } = sourceUnit;
+    public Unit SourceUnit { get; set; }
     public Unit TargetUnit { get; set; }
     public StepTypeEnm? OnStepType { get; init; }
 
@@ -61,26 +81,21 @@ public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit)
             //calc value first
 
             if (value != null || CalculateValue == null) return value;
-            switch (CalculateValue)
+            if (CalculateValue is Formula fm)
             {
-                //if calculate is formula then set reference and calc formula
-                case Formula cFrm:
-                    CalculateValue = cFrm.Clone();
-                    var newFrm = (Formula)CalculateValue;
-                    newFrm.EventRef = this;
-                    value = newFrm.Result;
-                    break;
-                //else call function
-                case Func<Event, double?> cFnc:
-                    value = cFnc(this);
-                    break;
-                //else invoke delegate
-                case Delegate cDlg:
-                    value = (double?)cDlg.DynamicInvoke(this);
-                    break;
-                default:
-                    throw new NotImplementedException();
+                CalculateValue = (Formula)fm.Clone();
+                var newFrm = (Formula)CalculateValue;
+                newFrm.EventRef = this;
+                value = newFrm.Result;
             }
+            else if (CalculateValue is Func<Event, Formula> fnc)
+            {
+                CalculateValue = fnc.Invoke(this);
+                var newFrm = (Formula)CalculateValue;
+                newFrm.EventRef = this;
+                value = newFrm.Result;
+            }
+
 
             return value;
         }
@@ -92,7 +107,7 @@ public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit)
     public double? RealValue { get; protected set; }
 
 
-    public Step ParentStep { get; set; } = parentStep;
+    public Step ParentStep { get; set; }
     protected bool TriggersHandled { get; private set; }
 
     public bool IsDamageEvent => this is ToughnessBreak or DoTDamage or DirectDamage or ToughnessBreakDoTDamage;
@@ -183,13 +198,12 @@ public abstract class Event(Step parentStep, ICloneable source, Unit sourceUnit)
         {
             TargetUnit = TargetUnit,
             AppliedBuffToApply = mod,
-            CalculateValue = FighterUtils.DebuffAppliedFormula(baseChance), 
+            CalculateValue = FighterUtils.DebuffAppliedFormula(baseChance),
             RealValue = new MersenneTwister().NextDouble()
-            
         };
         this.Value = applyBuff.Value;
         this.RealValue = applyBuff.RealValue;
-        if (applyBuff.Value>=applyBuff.RealValue )
+        if (applyBuff.Value >= applyBuff.RealValue)
         {
             ChildEvents.Add(applyBuff);
         }

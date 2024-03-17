@@ -13,6 +13,7 @@ using static HSR_SIM_LIB.Utils.Constant;
 using static HSR_SIM_LIB.UnitStuff.Resource;
 using static HSR_SIM_LIB.Skills.Ability;
 using static HSR_SIM_LIB.Utils.Formula;
+using static HSR_SIM_LIB.UnitStuff.UnitFormulas;
 
 namespace HSR_SIM_LIB.UnitStuff;
 
@@ -21,11 +22,6 @@ namespace HSR_SIM_LIB.UnitStuff;
 /// </summary>
 public class Unit : CloneClass
 {
-    
-
-
-
-    
     public enum LivingStatusEnm
     {
         Alive,
@@ -39,25 +35,27 @@ public class Unit : CloneClass
         Npc,
         Character
     }
+
     /// <summary>
     ///     Is Elite flag. Need for some weakness break calculations
     /// </summary>
     public bool IsEliteUnit { get; set; }
+
     /// <summary>
     ///     native weaknesses defined by profile
     /// </summary>
     public List<ElementEnm> NativeWeaknesses { get; } = [];
-    
+
 
     /// <summary>
     ///     native resists defined by profile
     /// </summary>
-    public List<Resist> Resists { get;   }= [];
+    public List<Resist> Resists { get; } = [];
 
     /// <summary>
     ///     native debuff resists defined by profile
     /// </summary>
-    public List<DebuffResist> DebuffResists { get;  }= [];
+    public List<DebuffResist> DebuffResists { get; } = [];
 
 
     private List<DamageBoostRec> baseDamageBoost; //Elemental damage boost list
@@ -105,8 +103,8 @@ public class Unit : CloneClass
         get => resources ??= new List<Resource>();
         set => resources = value;
     }
-    
-    
+
+
     private List<DamageBoostRec> BaseDamageBoost
     {
         get
@@ -147,8 +145,8 @@ public class Unit : CloneClass
                     foreach (var wave in ParentTeam.ParentSim.NextFight.Waves)
                         nextEnemies.AddRange(wave.Units);
                 tmpTeam.BindUnits(nextEnemies);
-               
-                    
+
+
                 return nextEnemies.DistinctBy(x => x.Name).ToList();
             }
 
@@ -167,7 +165,7 @@ public class Unit : CloneClass
     public double UnitLvlMultiplier => FighterUtils.LvlMultiplier[Level];
 
     public double BleedEliteMultiplier => IsEliteUnit ? 0.07 : 0.16;
-    
+
     public int Rank { get; set; }
 
     /// <summary>
@@ -192,11 +190,12 @@ public class Unit : CloneClass
         get => GetRes(ResourceType.Energy).ResVal;
         set => GetRes(ResourceType.Energy).ResVal = value;
     }
+
     /// <summary>
     ///     flag that unit is NPC
     /// </summary>
     public bool IsNpcUnit { get; set; }
-    
+
     public override object Clone()
     {
         var newClone = (Unit)MemberwiseClone();
@@ -229,7 +228,7 @@ public class Unit : CloneClass
         //var oldStats = newClone.Stats;
         newClone.Stats = (UnitStats)newClone.Stats.Clone();
         newClone.Stats.Parent = newClone;
-        
+
 
         return newClone;
     }
@@ -239,11 +238,10 @@ public class Unit : CloneClass
     /// </summary>
     public void Init()
     {
-        GetRes(ResourceType.HP).ResVal = GetMaxHp(null);
+        GetRes(ResourceType.HP).ResVal = this.GetMaxHp().Result;
         GetRes(ResourceType.Toughness).ResVal = Stats.MaxToughness;
         //clear and init fighter
         InitFighter();
-
     }
 
     //call when unit enter battle
@@ -262,6 +260,10 @@ public class Unit : CloneClass
         return Resources.First(resource => resource.ResType == rt);
     }
 
+    public double GetResVal(ResourceType rt)
+    {
+        return GetRes(rt).ResVal;
+    }
     public double AllDmgBoost(Event ent = null)
     {
         return GetBuffSumByType(ent, typeof(EffAllDamageBoost));
@@ -298,7 +300,7 @@ public class Unit : CloneClass
         res += GetBuffSumByType(ent, typeof(EffAllDamageResist));
         return res;
     }
-    
+
     public double GetResists(ElementEnm elem, Event ent = null)
     {
         double res = 0;
@@ -309,17 +311,15 @@ public class Unit : CloneClass
     }
 
 
-    
     public double GetDebuffResists(Type debuff, Event ent = null)
     {
- 
         double res = 0;
         if (DebuffResists.Any(x => x.Debuff == debuff))
             res += DebuffResists.First(x => x.Debuff == debuff).ResistVal;
-        
+
         return res;
     }
-    
+
     public double DefIgnore(Event ent = null)
     {
         return GetBuffSumByType(ent, typeof(EffDefIgnore));
@@ -336,10 +336,9 @@ public class Unit : CloneClass
             BaseDamageBoost.Add(new DamageBoostRec { ElemType = elem, Value = 0 });
         return BaseDamageBoost.First(dmg => dmg.ElemType == elem);
     }
-    
+
     public double GetElemBoostVal(ElementEnm elem)
     {
-        
         return GetElemBoost(elem).Value;
     }
 
@@ -377,7 +376,8 @@ public class Unit : CloneClass
             effectList.AddRange(mod.Effects.Where(y => y.GetType() == effTypeToSearch
                                                        && (y is not EffElementalTemplate eft || eft.Element == elem)
                                                        && (y is not EffAbilityTypeBoost efa ||
-                                                           efa.AbilityType.HasFlag(abilityType ?? throw new ArgumentNullException(nameof(abilityType))) )
+                                                           efa.AbilityType.HasFlag(abilityType ??
+                                                               throw new ArgumentNullException(nameof(abilityType))))
             ));
             if (effectList.Count > 0) res.Add(new KeyValuePair<Buff, List<Effect>>(mod, effectList));
         }
@@ -409,10 +409,27 @@ public class Unit : CloneClass
         foreach (var kp in effList)
         foreach (var effect in kp.Value)
         {
-            double finalValue;
+            double finalValue=0;
             //if condition\passive buff is target check then recalculate value
             if (effect.CalculateValue != null && kp.Key is PassiveBuff { IsTargetCheck: true })
-                finalValue = (double)effect.CalculateValue(ent);
+            {
+                if (effect.CalculateValue is Formula fm)
+                {
+                    effect.CalculateValue = (Formula)fm.Clone();
+                    var newFrm = (Formula)effect.CalculateValue;
+                    newFrm.EventRef = ent;
+                    finalValue = newFrm.Result;
+                }
+
+                else if (effect.CalculateValue is Func<Event, Formula> fnc)
+                {
+                    effect.CalculateValue = fnc.Invoke(ent);
+                    var newFrm = (Formula)effect.CalculateValue;
+                    newFrm.EventRef = ent;
+                    finalValue = newFrm.Result;
+                }
+                
+            }
             else
                 finalValue = (double)effect.Value;
             //multiply by stack
@@ -452,17 +469,34 @@ public class Unit : CloneClass
         foreach (var kp in effList)
         foreach (var effect in kp.Value)
         {
-            double finalValue;
+            double finalValue=0;
             //if condition\passive buff is target check then recalculate value
             if (effect.CalculateValue != null && kp.Key is PassiveBuff { IsTargetCheck: true })
-                finalValue = (double)effect.CalculateValue(ent);
+            {
+                if (effect.CalculateValue is Formula fm)
+                {
+                    effect.CalculateValue = (Formula)fm.Clone();
+                    var newFrm = (Formula)effect.CalculateValue;
+                    newFrm.EventRef = ent;
+                    finalValue = newFrm.Result;
+                }
+
+                else if (effect.CalculateValue is Func<Event, Formula> fnc)
+                {
+                    effect.CalculateValue = fnc.Invoke(ent);
+                    var newFrm = (Formula)effect.CalculateValue;
+                    newFrm.EventRef = ent;
+                    finalValue = newFrm.Result;
+                }
+               
+            }
             else
                 finalValue = (double)effect.Value;
             //multiply by stack
 
             if (kp.Key is AppliedBuff appliedBuff && effect.StackAffectValue)
                 finalValue *= appliedBuff.Stack;
-            res *= (1-finalValue);
+            res *= (1 - finalValue);
             if (outputEffects != null && outputEffects.All(x => x.TraceEffect != effect))
                 outputEffects.Add(new EffectTraceRec(kp.Key, effect, finalValue));
         }
@@ -490,9 +524,10 @@ public class Unit : CloneClass
             from passiveBuff in passiveBuffs
                 .Where(z => (z.Type == buffType || buffType is null) &&
                             z.Effects.Any(y => effTypeToSearch == null || y.GetType() == effTypeToSearch)
-                            && (excludeCondition == null || z.ApplyConditions is null ||z.ApplyConditions.Any(cd=>!excludeCondition.Contains(cd)) ))
+                            && (excludeCondition == null || z.ApplyConditions is null ||
+                                z.ApplyConditions.Any(cd => !excludeCondition.Contains(cd))))
             where passiveBuff.UnitIsAffected(this) &&
-                  (passiveBuff.Truly(passiveBuff,targetForBuff,excludeCondition,ent))
+                  (passiveBuff.Truly(passiveBuff, targetForBuff, excludeCondition, ent))
             select passiveBuff;
         return res;
     }
@@ -548,7 +583,6 @@ public class Unit : CloneClass
         int res;
         var foundBuff = AppliedBuffs.FirstOrDefault(x =>
             ((x.Reference == (appliedBuff.Reference ?? appliedBuff)
-
               || (!string.IsNullOrEmpty(appliedBuff.UniqueStr) && string.Equals(x.UniqueStr, appliedBuff.UniqueStr)))));
 
 
@@ -683,39 +717,6 @@ public class Unit : CloneClass
         return GetBuffSumByType(ent, typeof(EffAllDamageVulnerability));
     }
 
-    /// <summary>
-    ///     https://honkai-star-rail.fandom.com/wiki/Vulnerability
-    ///     get target vulnerability to Damage over Time
-    /// </summary>
-    /// <param name="ent">reference to event where is calculation</param>
-    /// <returns>double value:vulnerability</returns>
-    public double GetDotVulnerability(Event ent = null)
-    {
-        return GetBuffSumByType(ent, typeof(EffDoTVulnerability));
-    }
-
-    /// <summary>
-    ///     https://honkai-star-rail.fandom.com/wiki/DMG_Reduction
-    /// </summary>
-    /// <param name="ent">reference to event where is calculation</param>
-    /// <returns></returns>
-    public double GetDamageReduction(Event ent = null)
-    {
-        double res = 1;
-
-        //MODS
-        if (AppliedBuffs != null)
-            foreach (var mod in AppliedBuffs)
-            foreach (var effect in mod.Effects.Where(x => x is EffDamageReduction))
-                for (var i = 0; i < mod.Stack; i++)
-                    res *= 1 - effect.Value ?? 0;
-        //Condition
-        foreach (var passiveBuff in GetPassivesForUnit(this, typeof(EffDamageReduction), null, ent, null))
-        foreach (var effect in passiveBuff.Effects.Where(x => x is EffDamageReduction))
-            for (var i = 0; i < passiveBuff.Stack; i++)
-                res *= 1 - effect.Value ?? 0;
-        return res;
-    }
 
     /// <summary>
     ///     https://honkai-star-rail.fandom.com/wiki/Toughness#Weakness_Break
@@ -728,110 +729,24 @@ public class Unit : CloneClass
         return 1;
     }
 
-    /// <summary>
-    ///     get  abilityDamage multiplier by ability type
-    /// </summary>
-    /// <param name="ent">reference to event</param>
-    /// <param name="ability">reference to ability</param>
-    /// <returns></returns>
-    public double GetAbilityTypeMultiplier(Event ent, Ability ability)
-    {
-        return GetBuffSumByType(ent, typeof(EffAbilityTypeBoost),
-                   abilityType: ability.AbilityType)
-               // plus follow up bonus for non follow up attacks in follow up step
-               + (ability.AbilityType != AbilityTypeEnm.FollowUpAction &&
-                  ent.ParentStep.StepType == Step.StepTypeEnm.UnitFollowUpAction
-                   ? GetBuffSumByType(ent, typeof(EffAbilityTypeBoost),
-                       abilityType: AbilityTypeEnm.FollowUpAction)
-                   : 0);
-    }
-
-    public double GetOutgoingHealMultiplier(Event ent)
-    {
-        return 1 + Stats.HealRate + GetBuffSumByType(ent, typeof(EffOutgoingHealingPrc));
-    }
-
-    public double GetIncomingHealMultiplier(Event ent)
-    {
-        return 1 + GetBuffSumByType(ent, typeof(EffIncomeHealingPrc));
-    }
 
 
-    public double GetCritRate(Event ent, List<Condition> excludeCondition = null)
-    {
-        return Stats.CritChance +
-               GetBuffSumByType(ent, typeof(EffCritPrc), excludeCondition: excludeCondition);
-    }
 
-    public double GetCritDamage(Event ent, List<Condition> excludeCondition = null)
-    {
-        return Stats.CritDmg +
-               GetBuffSumByType(ent, typeof(EffCritDmg), excludeCondition: excludeCondition);
-    }
 
-    public double GetMaxHp(Event ent, List<Condition> excludeCondition = null)
-    {
-        return Stats.BaseMaxHp *
-               (1 + GetBuffSumByType(ent, typeof(EffMaxHpPrc), excludeCondition: excludeCondition) +
-                Stats.MaxHpPrc) +
-               GetBuffSumByType(ent, typeof(EffMaxHp), excludeCondition: excludeCondition) +
-               Stats.MaxHpFix;
-    }
 
-    public double GetCurrentActionValue(Event ent)
-    {
-        return GetActionValue(ent) - Stats.PerformedActionValue;
-    }
 
-    public double GetActionValue(Event ent)
-    {
-        return GetBaseActionValue(ent) *
-               (1 - GetBuffSumByType(ent, typeof(EffAdvance)) +
-                GetBuffSumByType(ent, typeof(EffDelay)));
-    }
 
-    private double GetBaseActionValue(Event ent)
-    {
-        return GetInitialBaseActionValue(ent) - GetBuffSumByType(ent, typeof(EffReduceBAV));
-    }
-
-    public double GetHpPrc(Event ent, List<Condition> excludeCondition = null)
-    {
-        return GetRes(ResourceType.HP).ResVal / GetMaxHp(ent, excludeCondition);
-    }
-
-    public double GetSpeed(Event ent, List<Condition> excludeCondition = null)
-    {
-        return Stats.BaseSpeed *
-               (1 + GetBuffSumByType(ent, typeof(EffSpeedPrc), excludeCondition: excludeCondition) +
-                Stats.SpeedPrc) +
-               GetBuffSumByType(ent, typeof(EffSpeed), excludeCondition: excludeCondition) +
-               Stats.SpeedFix;
-    }
 
     public void ResetCondition(Condition.ConditionCheckParam chkPrm)
     {
-       
-        foreach (var cb in PassiveBuffs.Where(x=>x.ApplyConditions!=null).SelectMany(x=>x.ApplyConditions.Where(y=>y.ConditionParam==chkPrm)))
+        foreach (var cb in PassiveBuffs.Where(x => x.ApplyConditions != null)
+                     .SelectMany(x => x.ApplyConditions.Where(y => y.ConditionParam == chkPrm)))
             cb.NeedRecalculate = true;
     }
 
-    private double GetInitialBaseActionValue(Event ent)
-    {
-        return Stats.LoadedBaseActionValue ?? 10000 / GetSpeed(ent);
-    }
 
 
-    public double GetEffectRes(Event ent)
-    {
-        return GetBuffSumByType(ent, typeof(EffEffectResPrc)) + Stats.EffectResPrc;
-    }
-
-    public double GetEffectHit(Event ent)
-    {
-        return GetBuffSumByType(ent, typeof(EffEffectHitPrc)) + Stats.EffectHitPrc;
-    }
-
+    
     public double EnergyRegenPrc(Event ent)
     {
         return 1 + GetBuffSumByType(ent, typeof(EffEnergyRatePrc)) + Stats.BaseEnergyResPrc +
@@ -871,7 +786,7 @@ public class Unit : CloneClass
     {
         List<ElementEnm> res = new();
         //add native weakness to result
-        
+
         res.AddRange(NativeWeaknesses);
         //grab weakness from debuffs
         var elems = GetBuffEffectsByType(typeof(EffWeaknessImpair), ent: ent, excludeCondition: excludeCondition)
@@ -889,7 +804,6 @@ public class Unit : CloneClass
 
     private void InitFighter()
     {
-
         Resists.Clear();
         DebuffResists.Clear();
         NativeWeaknesses.Clear();

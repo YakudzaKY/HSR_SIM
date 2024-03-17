@@ -101,13 +101,13 @@ public static class FighterUtils
     {
         var expression = $"{abilityFormula.Expression} * " +
                          //crit
-                         $" ( ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GenerateCrit)} * 0) " +
-                         $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetCritDamage)} * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.CritHit)} )  + 1 ) " +
+                         $" ( ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GenerateCrit)} * 0) " +
+                         $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetCritDamage)} * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.CritHit)} )  + 1 ) " +
                          //damage boost
-                         $" * (1 + {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetElemBoostValue)} " +
-                         $" + {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAbilityTypeMultiplier)} " +
+                         $" * (1 + {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetElemBoostValue)} " +
+                         $" + {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetAbilityTypeMultiplier)} " +
                          $" + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAllDamageBoost).FullName} " +
-                         $" + {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.DotBoost)}  ) " +
+                         $" + {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.DotBoost)}  ) " +
                          //def
                          $" * ({Formula.DynamicTargetEnm.Defender}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetDefMultiplier)}) "  +
                          //resist and  penetration
@@ -130,7 +130,7 @@ public static class FighterUtils
     /// <returns></returns>
     public static Formula DebuffAppliedFormula(double baseChance)
     {
-        var expression = $"{baseChance} * " +
+        var expression = $"{baseChance} " +
                          //effect hit rate
                          $" * (1 + {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.EffectHit)}) " +
                          //effect res
@@ -143,46 +143,38 @@ public static class FighterUtils
                          
                      
         var newFormula = new Formula { Expression = expression };
-        //return new MersenneTwister().NextDouble() <= realChance;
+        return newFormula;
+    }
+
+
+    /// <summary>
+    ///     Generate shield output formula
+    /// </summary>
+    /// <param name="abilityFormula"></param>
+    /// <returns></returns>
+    public static Formula ShieldFormula(Formula abilityFormula)
+    {
+        var expression =
+
+            $"({abilityFormula.Expression} + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAdditiveShieldBonus).FullName}) " +
+            $" * (1 + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffPrcShieldBonus).FullName})";
+                     
+        var newFormula = new Formula { Expression = expression ,Variables = abilityFormula.Variables};
+        return newFormula;
+    }
+    
+    public static Formula HealFormula(Formula abilityFormula)
+    {
+        var expression =
+
+            $"{abilityFormula.Expression} * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetOutgoingHealMultiplier)}" +
+            $" * {Formula.DynamicTargetEnm.Defender}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetIncomingHealMultiplier)}";
+                     
+        var newFormula = new Formula { Expression = expression ,Variables = abilityFormula.Variables};
         return newFormula;
     }
 
     
-
-    /// <summary>
-    /// </summary>
-    /// <param name="baseDmg"></param>
-    /// <param name="ent"></param>
-    /// <returns></returns>
-    public static double CalculateShield(double baseVal, Event ent, Unit caster = null)
-    {
-        var attacker = caster ?? ent.SourceUnit;
-
-
-        var additiveShieldBonus = attacker.AdditiveShieldBonus(ent);
-        var prcShieldBonus = attacker.PrcShieldBonus(ent);
-        var shieldVal = (baseVal + additiveShieldBonus) * (1 + prcShieldBonus);
-
-
-        return shieldVal;
-    }
-
-    /// <summary>
-    ///     Calc healing numbers
-    /// </summary>
-    /// <param name="baseHeal"></param>
-    /// <param name="ent"></param>
-    /// <returns></returns>
-    public static double CalculateHealByBasicVal(double baseHeal, Event ent)
-    {
-        var healer = ent.SourceUnit;
-        var receiver = ent.TargetUnit;
-        var outMod = healer.GetOutgoingHealMultiplier(ent);
-        var inMod = receiver.GetIncomingHealMultiplier(ent);
-        var res = baseHeal * outMod * inMod;
-
-        return res;
-    }
 
     /// <summary>
     ///     Get Skill Modifier By min, max and level

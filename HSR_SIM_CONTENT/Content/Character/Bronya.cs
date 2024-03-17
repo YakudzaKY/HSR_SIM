@@ -16,11 +16,10 @@ public class Bronya : DefaultFighter
     private readonly int talentSkillLvl;
     private readonly int ultimateSkillLvl;
     private readonly int wbSkillLvl;
-    private readonly Ability? windriderBullet;
+    private readonly Ability windriderBullet;
 
     public Bronya(Unit parent) : base(parent)
     {
-        
         Element = Ability.ElementEnm.Wind;
         Parent.Stats.BaseMaxEnergy = 120;
         wbSkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Windrider Bullet")!.Level;
@@ -165,16 +164,24 @@ public class Bronya : DefaultFighter
     public override PathType? Path { get; } = PathType.Harmony;
 
 
-    private double? CalcUltCritDmg(Event ent)
+    private Formula CalcUltCritDmg(Event ent)
     {
-        return Parent.GetCritDamage(ent) * GetAbilityScaling(0.12, 0.16, ultimateSkillLvl) +
-               GetAbilityScaling(0.12, 0.20, ultimateSkillLvl);
+        return new Formula()
+        {
+            Expression =
+                $" {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetCritDamage)} * {GetAbilityScaling(0.12, 0.16, ultimateSkillLvl)} " +
+                $" +  {GetAbilityScaling(0.12, 0.20, ultimateSkillLvl)}"
+        };
     }
 
     //windrider bullet advance calc
-    private double? CalcTalentAV(Event ent)
+    private Formula CalcTalentAv(Event ent)
     {
-        return Parent.GetActionValue(ent) * GetAbilityScaling(0.15, 0.30, talentSkillLvl);
+        return new Formula()
+        {
+            Expression =
+                $" {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetActionValue)} * {GetAbilityScaling(0.15, 0.30, talentSkillLvl)}"
+        };
     }
 
     protected override void DefaultFighter_HandleStep(Step step)
@@ -184,7 +191,7 @@ public class Bronya : DefaultFighter
             Mechanics.Values[windriderBullet] > 0)
         {
             step.Events.Add(new ModActionValue(step, this, Parent)
-                { CalculateValue = CalcTalentAV, TargetUnit = Parent });
+                { CalculateValue = CalcTalentAv, TargetUnit = Parent });
             step.Events.Add(new MechanicValChg(step, this, Parent)
                 { AbilityValue = windriderBullet, Value = -Mechanics.Values[windriderBullet] });
         }
@@ -215,9 +222,9 @@ public class Bronya : DefaultFighter
     //mainDPS have >=50% action value or got CC or 5 sp
     private bool WillCastE()
     {
-        var mainDPS = GetFriendByRole(UnitRole.MainDps).Parent;
-        if ((mainDPS != Parent &&
-             (mainDPS.Controlled || mainDPS.Stats.PerformedActionValue < mainDPS.GetActionValue(null) * 0.5)) ||
+        var mainDps = GetFriendByRole(UnitRole.MainDps).Parent;
+        if ((mainDps != Parent &&
+             (mainDps.Controlled || mainDps.Stats.PerformedActionValue < mainDps.GetActionValue().Result * 0.5)) ||
             Parent.ParentTeam.GetRes(Resource.ResourceType.SP).ResVal >= Constant.MaxSp - 1)
             return true;
         return false;

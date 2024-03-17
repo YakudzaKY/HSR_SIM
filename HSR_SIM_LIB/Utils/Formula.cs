@@ -33,8 +33,8 @@ public class Formula : ICloneable
 
     //event where formula is used
     public Event EventRef { get; set; }
-
-    public Unit Attacker => EventRef.SourceUnit;
+    public Unit UnitRef { get; set; }//use when no EventRef
+    public Unit Attacker => UnitRef??EventRef.SourceUnit;
     public Unit Defender => EventRef.TargetUnit;
 
     /// <summary>
@@ -42,6 +42,8 @@ public class Formula : ICloneable
     ///     accordingly.
     /// </summary>
     public Dictionary<string, VarVal> Variables { get; set; } = new();
+
+    public List<Condition> ConditionSkipList { get; set; }=null;
 
     public IEnumerable<Formula> ChildFormulas
     {
@@ -151,7 +153,7 @@ public class Formula : ICloneable
             var newVal = new VarVal
             {
                 ResFormula = new Formula
-                    { Expression = varExpr, Variables = Variables.ToDictionary(), EventRef = EventRef }
+                    { Expression = varExpr, Variables = Variables.ToDictionary(), EventRef = EventRef ,UnitRef = UnitRef}
             };
             newVal.Result = newVal.ResFormula.Result;
             Variables.Add(newExp, newVal);
@@ -230,21 +232,14 @@ public class Formula : ICloneable
                             if (EventRef is DoTDamage dt)
                                 objArr[^1] = dt.Element;
                             else
-                                objArr[^1] = EventRef.ParentStep.ActorAbility.Element;
-                        }
-                        else if (prm.ParameterType == typeof(Ability.ElementEnm)||prm.ParameterType == typeof(Ability.ElementEnm?))
-                        {
-                            if (EventRef is DoTDamage dt)
-                                objArr[^1] = dt.Element;
-                            else
-                                objArr[^1] = EventRef.ParentStep.ActorAbility.Element;
+                                objArr[^1] = EventRef?.ParentStep.ActorAbility.Element;
                         }
                         else if (prm.ParameterType == typeof(Ability.AbilityTypeEnm) || prm.ParameterType ==typeof(Ability.AbilityTypeEnm?))
                         {
                             //if Followup action and ability is not follow up type then add flag
-                            Ability.AbilityTypeEnm? abilityTypeEnm = EventRef.ParentStep.ActorAbility?.AbilityType??null;
-                            if (EventRef.ParentStep.ActorAbility?.AbilityType != Ability.AbilityTypeEnm.FollowUpAction &&
-                                EventRef.ParentStep.StepType == Step.StepTypeEnm.UnitFollowUpAction)
+                            Ability.AbilityTypeEnm? abilityTypeEnm = EventRef?.ParentStep.ActorAbility?.AbilityType??null;
+                            if (EventRef?.ParentStep.ActorAbility?.AbilityType != Ability.AbilityTypeEnm.FollowUpAction &&
+                                EventRef?.ParentStep.StepType == Step.StepTypeEnm.UnitFollowUpAction)
                                 abilityTypeEnm |= Ability.AbilityTypeEnm.FollowUpAction;
                             objArr[^1] = abilityTypeEnm;
                         }
@@ -256,9 +251,15 @@ public class Formula : ICloneable
                         {
                             objArr[^1] = variable.Value.TraceEffects;
                         }
+                        else if (prm.ParameterType == typeof(List<Condition>))
+                        {
+                            if (ConditionSkipList == null)
+                                ConditionSkipList = new List<Condition>();
+                            objArr[^1] = ConditionSkipList;
+                        }
                         else if (prm.ParameterType == typeof(Type))
                         {
-                            objArr[^1] = EventRef.ParentStep.ActorAbility;
+                            
                             var nextPrm = GetNextMethod(expr, methodNdx, out methodNdx);
                             if (string.IsNullOrEmpty(nextPrm)) continue;
                             //first search Type
@@ -320,7 +321,7 @@ public class Formula : ICloneable
 
         foreach (var lexeme in Expression.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries))
             //If it is an operator
-            if (lexeme is "*" or "/" or "+" or "-"or "min"or "max")
+            if (lexeme is "*" or "/" or "+" or "-"or "min"or "max" or "ifzero")
             {
                 operation = lexeme;
             }
@@ -328,7 +329,7 @@ public class Formula : ICloneable
             {
                 double value;
                 if (Variables.TryGetValue(lexeme, out var variable)) //If it is a variable, let's get the variable value
-                    value = variable.Result ?? 0;
+                    value = variable.Result??0 ;
                 else //It is just a number, let's just parse
                     value = double.Parse(lexeme.Replace(",","."), NumberStyles.Any, CultureInfo.InvariantCulture);
 
@@ -354,6 +355,9 @@ public class Formula : ICloneable
                             break;
                         case "max":
                             calculationResult = Math.Max(calculationResult.Value , value);
+                            break;
+                        case "ifzero":
+                            calculationResult = (calculationResult.Value == 0) ? value : calculationResult.Value;
                             break;
                         default:
                             throw new Exception("The expression is not properly formatted.");

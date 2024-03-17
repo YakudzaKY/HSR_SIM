@@ -73,7 +73,7 @@ public class MaraStruckSoldier : DefaultNPCFighter
             TargetType = Ability.TargetTypeEnm.Self
         };
         // Rejuvenate.Events.Add(new RemoveBuff(null,this,Parent) {TargetUnit = Parent,BuffToApply = uniqueBuff});
-        Rejuvenate.Events.Add(new Healing(null, this, Parent) { CalculateValue = CalculateReHeal });
+        Rejuvenate.Events.Add(new Healing(null, this, Parent) { CalculateValue =   FighterUtils.HealFormula(new Formula(){Expression =$"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} * 0.5" }) });
         Rejuvenate.Events.Add(new ResourceGain(null, this, Parent)
             { ResType = Resource.ResourceType.Toughness, Value = Parent.Stats.MaxToughness });
         Abilities.Add(Rejuvenate);
@@ -109,11 +109,7 @@ public class MaraStruckSoldier : DefaultNPCFighter
     }
 
 
-    public double? CalculateReHeal(Event ent)
-    {
-        return FighterUtils.CalculateHealByBasicVal(ent.TargetUnit.GetMaxHp(ent) * 0.5, ent);
-    }
-
+ 
     protected override void DefaultFighter_HandleEvent(Event ent)
     {
         if (ent is UnitEnteringBattle && ent.TargetUnit == Parent)

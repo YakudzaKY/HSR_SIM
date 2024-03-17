@@ -20,7 +20,7 @@ public class Healing : Event
         var res = TargetUnit.GetRes(Resource.ResourceType.HP);
         if (RealValue == null)
             //cant overheal
-            RealValue = Math.Min(TargetUnit.GetMaxHp(null) - res.ResVal, (double)Value);
+            RealValue = Math.Min(TargetUnit.GetMaxHp().Result - res.ResVal, (double)Value);
 
 
         res.ResVal += (double)(revert ? -RealValue : RealValue);

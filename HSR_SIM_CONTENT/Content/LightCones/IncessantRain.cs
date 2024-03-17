@@ -37,14 +37,14 @@ internal class IncessantRain : DefaultLightCone
     public sealed override FighterUtils.PathType Path => FighterUtils.PathType.Nihility;
 
     //get 0.2 AllDmg per debuff  on target
-    private double? CalcCrit(Event ent)
+    private  Formula CalcCrit(Event ent)
     {
         double debuffs = 0;
         debuffs += ent.TargetUnit?.AppliedBuffs.Count(x =>
             x.Type is Buff.BuffType.Debuff or Buff.BuffType.Dot) ?? 0;
         if (debuffs >= 3)
-            return lcMods[Rank - 1];
-        return 0;
+            return new Formula(){Expression = $"{lcMods[Rank - 1]}"}; ;
+        return new Formula(){Expression = "0"};
     }
 
     protected override void DefaultLightCone_HandleEvent(Event ent)

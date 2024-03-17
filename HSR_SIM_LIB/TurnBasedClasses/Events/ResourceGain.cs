@@ -24,7 +24,7 @@ public class ResourceGain : Event
         RealValue ??= ResType switch
         {
             Resource.ResourceType.Toughness => Math.Min((double)Value, TargetUnit.Stats.MaxToughness - res.ResVal),
-            Resource.ResourceType.HP => Math.Min(TargetUnit.GetMaxHp(null) - res.ResVal, (double)Value),
+            Resource.ResourceType.HP => Math.Min(TargetUnit.GetMaxHp().Result - res.ResVal, (double)Value),
             Resource.ResourceType.Energy => Math.Min((double)Value, TargetUnit.Stats.BaseMaxEnergy - res.ResVal),
             _ => Value
         };
