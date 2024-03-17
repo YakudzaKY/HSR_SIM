@@ -208,7 +208,15 @@ public class Formula : ICloneable
                 if (nextMethod == nameof(UnitFormulas))
                     mInfo = typeof(UnitFormulas).GetMethod(GetNextMethod(expr, methodNdx, out methodNdx));
                 else
+                {
                     mInfo = finalMeth.GetType().GetMethod(nextMethod);
+                    //try search in extensions
+                    if (mInfo == null)
+                    {
+                        mInfo = finalMeth.GetType().GetExtensionMethod(Assembly.GetExecutingAssembly(),nextMethod);
+                    }
+                }
+
 
                 if (mInfo is not null)
                 {
@@ -232,7 +240,7 @@ public class Formula : ICloneable
                             if (EventRef is DoTDamage dt)
                                 objArr[^1] = dt.Element;
                             else
-                                objArr[^1] = EventRef?.ParentStep.ActorAbility.Element;
+                                objArr[^1] = EventRef?.ParentStep.ActorAbility?.Element;
                         }
                         else if (prm.ParameterType == typeof(Ability.AbilityTypeEnm) || prm.ParameterType ==typeof(Ability.AbilityTypeEnm?))
                         {
@@ -246,6 +254,10 @@ public class Formula : ICloneable
                         else if (prm.ParameterType == typeof(Ability))
                         {
                             objArr[^1] = EventRef.ParentStep.ActorAbility;
+                        }
+                        else if (prm.ParameterType == typeof(Unit))
+                        {
+                            objArr[^1] = UnitRef;
                         }
                         else if (prm.ParameterType == typeof(List<EffectTraceRec>))
                         {
@@ -268,6 +280,28 @@ public class Formula : ICloneable
                                 objArr[^1] = searchType;
                             else
                                 objArr[^1] = null;
+                        }
+                        else if (prm.ParameterType == typeof(Resource.ResourceType))
+                        {
+                            
+                            var nextPrm = GetNextMethod(expr, methodNdx, out methodNdx);
+                            objArr[^1]=(Resource.ResourceType)Enum.Parse(typeof(Resource.ResourceType),nextPrm, true);
+                        }
+                        else
+                        {
+                            switch (prm.ParameterType)
+                            {
+                                case var value when value == typeof(int) || value == typeof(int?) :
+                                    objArr[^1] = int.Parse(GetNextMethod(expr, methodNdx, out methodNdx));
+                                    break;
+                                case var value when value == typeof(double) || value == typeof(double?) :
+                                    objArr[^1] = double.Parse(GetNextMethod(expr, methodNdx, out methodNdx));
+                                    break;
+                                case var value when value == typeof(string) : 
+                                    objArr[^1] =GetNextMethod(expr, methodNdx, out methodNdx);
+                                    break;
+                            }
+                            
                         }
                        
                     }

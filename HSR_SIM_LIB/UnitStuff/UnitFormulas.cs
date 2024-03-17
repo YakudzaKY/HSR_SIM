@@ -22,8 +22,8 @@ public static class UnitFormulas
             UnitRef = unit,
             ConditionSkipList = excludeCondition,
             Expression =
-                $"1 + {unitToCheck}#{typeof(System.Type)}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAtkPrc).FullName} + ( {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.AttackPrc)} " +
-                $"* {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.BaseAttack)})"
+                $"{unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.BaseAttack)} * (1 + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAtkPrc).FullName} +  {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.AttackPrc)}) " +
+                $"+ {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAtk).FullName} + {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.AttackFix)}"
         };
     }
 
@@ -131,7 +131,8 @@ public static class UnitFormulas
     }
 
     public static Formula GetCritDamage(this Unit unit,
-        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null, List<Condition> excludeCondition = null)
+        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+        List<Condition> excludeCondition = null)
     {
         return new Formula
         {
@@ -144,7 +145,8 @@ public static class UnitFormulas
     }
 
     public static Formula GetElemBoostValue(this Unit unit,
-        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null, List<Condition> excludeCondition = null)
+        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+        List<Condition> excludeCondition = null)
     {
         return new Formula
         {
@@ -157,7 +159,8 @@ public static class UnitFormulas
     }
 
     public static Formula GetOutgoingHealMultiplier(this Unit unit,
-        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null, List<Condition> excludeCondition = null)
+        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+        List<Condition> excludeCondition = null)
     {
         return new Formula
         {
@@ -170,7 +173,8 @@ public static class UnitFormulas
     }
 
     public static Formula GetIncomingHealMultiplier(this Unit unit,
-        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null, List<Condition> excludeCondition = null)
+        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+        List<Condition> excludeCondition = null)
     {
         return new Formula
         {
@@ -182,7 +186,8 @@ public static class UnitFormulas
     }
 
     public static Formula GetBreakDmg(this Unit unit,
-        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null, List<Condition> excludeCondition = null)
+        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+        List<Condition> excludeCondition = null)
     {
         return new Formula
         {
@@ -201,7 +206,8 @@ public static class UnitFormulas
     /// <param name="ent">reference to event</param>
     /// <returns></returns>
     public static Formula GetAbilityTypeMultiplier(this Unit unit,
-        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null, List<Condition> excludeCondition = null)
+        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+        List<Condition> excludeCondition = null)
     {
         if (ent is DamageEventTemplate)
             return new Formula
@@ -223,7 +229,8 @@ public static class UnitFormulas
     }
 
     public static Formula EffectHit(this Unit unit,
-        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null, List<Condition> excludeCondition = null)
+        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+        List<Condition> excludeCondition = null)
     {
         return new Formula
         {
@@ -236,7 +243,8 @@ public static class UnitFormulas
     }
 
     public static Formula DebuffResists(this Unit unit,
-        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null, List<Condition> excludeCondition = null)
+        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+        List<Condition> excludeCondition = null)
     {
         var mod = (((ApplyBuff)ent)!).AppliedBuffToApply.Effects.FirstOrDefault();
         var resExpr = "";
@@ -253,7 +261,8 @@ public static class UnitFormulas
     }
 
     public static Formula CcResists(this Unit unit,
-        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null, List<Condition> excludeCondition = null)
+        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+        List<Condition> excludeCondition = null)
     {
         bool isCc = (((ApplyBuff)ent)!).AppliedBuffToApply.CrowdControl;
         if (isCc)
@@ -276,7 +285,8 @@ public static class UnitFormulas
     }
 
     public static Formula EffectRes(this Unit unit,
-        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null, List<Condition> excludeCondition = null)
+        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+        List<Condition> excludeCondition = null)
     {
         return new Formula
         {
@@ -289,7 +299,8 @@ public static class UnitFormulas
     }
 
     public static Formula DotBoost(this Unit unit,
-        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null, List<Condition> excludeCondition = null)
+        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+        List<Condition> excludeCondition = null)
     {
         if (ent is not DamageEventTemplate)
             return new Formula
@@ -311,7 +322,8 @@ public static class UnitFormulas
     }
 
     public static Formula DotVulnerability(this Unit unit,
-        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null, List<Condition> excludeCondition = null)
+        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+        List<Condition> excludeCondition = null)
     {
         if (ent is not DoTDamage)
             return new Formula
@@ -333,7 +345,8 @@ public static class UnitFormulas
     }
 
     public static Formula WeaknessMaxToughnessMultiplier(this Unit unit,
-        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null, List<Condition> excludeCondition = null)
+        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+        List<Condition> excludeCondition = null)
     {
         return new Formula
         {
@@ -390,27 +403,26 @@ public static class UnitFormulas
             };
         }
 
-      
-            //immediate weakness break
-            var baseDmg = elem switch
-            {
-                Ability.ElementEnm.Physical => 2,
-                Ability.ElementEnm.Fire => 2,
-                Ability.ElementEnm.Ice => 1,
-                Ability.ElementEnm.Lightning => 1,
-                Ability.ElementEnm.Wind => 1.5,
-                Ability.ElementEnm.Quantum => 0.5,
-                Ability.ElementEnm.Imaginary => 0.5,
-                _ => throw new NotImplementedException()
-            };
-            return new Formula
-            {
-                EventRef = ent,
-                ConditionSkipList = excludeCondition,
-                Expression =
-                    $"  {baseDmg} * {unitToCheck}#{nameof(Unit.UnitLvlMultiplier)} * {OppositeTarget(unitToCheck)}#{nameof(WeaknessMaxToughnessMultiplier)}"
-            };
-        
+
+        //immediate weakness break
+        var baseDmg = elem switch
+        {
+            Ability.ElementEnm.Physical => 2,
+            Ability.ElementEnm.Fire => 2,
+            Ability.ElementEnm.Ice => 1,
+            Ability.ElementEnm.Lightning => 1,
+            Ability.ElementEnm.Wind => 1.5,
+            Ability.ElementEnm.Quantum => 0.5,
+            Ability.ElementEnm.Imaginary => 0.5,
+            _ => throw new NotImplementedException()
+        };
+        return new Formula
+        {
+            EventRef = ent,
+            ConditionSkipList = excludeCondition,
+            Expression =
+                $"  {baseDmg} * {unitToCheck}#{nameof(Unit.UnitLvlMultiplier)} * {OppositeTarget(unitToCheck)}#{nameof(WeaknessMaxToughnessMultiplier)}"
+        };
     }
 
 
@@ -434,7 +446,8 @@ public static class UnitFormulas
     }
 
     public static Formula GetDef(this Unit unit,
-        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null, List<Condition> excludeCondition = null)
+        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+        List<Condition> excludeCondition = null)
     {
         return new Formula
         {
@@ -451,7 +464,8 @@ public static class UnitFormulas
         };
     }
 
-    public static Formula GetDefMultiplier(Formula.DynamicTargetEnm unitToCheck, Event ent = null, List<Condition> excludeCondition = null)
+    public static Formula GetDefMultiplier(Formula.DynamicTargetEnm unitToCheck, Event ent = null,
+        List<Condition> excludeCondition = null)
     {
         return new Formula
         {
@@ -463,7 +477,8 @@ public static class UnitFormulas
         };
     }
 
-    public static Formula ResPen(Formula.DynamicTargetEnm unitToCheck, Event ent = null, List<Condition> excludeCondition = null)
+    public static Formula ResPen(Formula.DynamicTargetEnm unitToCheck, Event ent = null,
+        List<Condition> excludeCondition = null)
     {
         return new Formula
         {
@@ -479,7 +494,8 @@ public static class UnitFormulas
 
 
     public static Formula VulnerabilityMulti(this Unit unit,
-        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null, List<Condition> excludeCondition = null)
+        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+        List<Condition> excludeCondition = null)
     {
         return new Formula
         {
@@ -494,7 +510,8 @@ public static class UnitFormulas
     }
 
     public static Formula CritChance(this Unit unit,
-        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null, List<Condition> excludeCondition = null)
+        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+        List<Condition> excludeCondition = null)
     {
         return new Formula
         {
@@ -515,9 +532,10 @@ public static class UnitFormulas
     /// <param name="excludeCondition"></param>
     /// <returns></returns>
     public static Formula GenerateCrit(this Unit unit,
-        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null, List<Condition> excludeCondition = null)
+        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+        List<Condition> excludeCondition = null)
     {
-        var res = CritChance(unit, unitToCheck, ent,excludeCondition);
+        var res = CritChance(unit, unitToCheck, ent, excludeCondition);
         (((DirectDamage)ent)!).CritRate = res.Result;
         ((DirectDamage)ent).IsCrit = ent.ParentStep.Parent.Parent.DevMode
             ? DevModeUtils.IsCrit(ent)

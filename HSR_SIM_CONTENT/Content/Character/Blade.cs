@@ -159,11 +159,11 @@ public class Blade : DefaultFighter
             ResType = Resource.ResourceType.HP,
             TargetType = TargetTypeEnm.Self,
             CanSetToZero = false,
-            CalculateValue = DamageFormula(new Formula()
+            CalculateValue = new Formula()
             {
                 Expression =
-                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetMaxHp)} 0.1"
-            }),
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetMaxHp)} * 0.1"
+            },
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain
         });
 
@@ -240,9 +240,9 @@ public class Blade : DefaultFighter
                 Expression =
                     $"({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAttack)} * {dsMainAtk}  ) " +
                     $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetMaxHp)} * {dsMainHp}  ) " +
-                    $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(GetDsMechanic)} min  getDsMaxLostHp * {dsMainHp}  ) " +
+                    $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(GetDsMechanic)} min getDsMaxLostHp * {dsMainHp}  ) " +
                     ((Parent.Rank >= 1)
-                        ? $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(GetDsMechanic)} min  getDsMaxLostHp * 1.5 ) "
+                        ? $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(GetDsMechanic)} min getDsMaxLostHp * 1.5 ) "
                         : ""),
                 Variables = new Dictionary<string, Formula.VarVal>()
                     { { nameof(getDsMaxLostHp), new Formula.VarVal() { ResFormula = getDsMaxLostHp() } } }
@@ -261,7 +261,7 @@ public class Blade : DefaultFighter
                 Expression =
                     $"({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAttack)} * {dsAdjAtk}  ) " +
                     $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetMaxHp)} * {dsAdjHp}  ) " +
-                    $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(GetDsMechanic)} min  getDsMaxLostHp * {dsAdjHp}  ) ",
+                    $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(GetDsMechanic)} min getDsMaxLostHp * {dsAdjHp}  ) ",
                 Variables = new Dictionary<string, Formula.VarVal>()
                     { { nameof(getDsMaxLostHp), new Formula.VarVal() { ResFormula = getDsMaxLostHp() } } }
             }),
