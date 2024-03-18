@@ -251,7 +251,7 @@ public class Blade : DefaultFighter
                         ? $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(GetDsMechanic)} min getDsMaxLostHp * 1.5 ) "
                         : ""),
                 Variables = new Dictionary<string, Formula.VarVal>()
-                    { { nameof(getDsMaxLostHp), new Formula.VarVal() { ResFormula = getDsMaxLostHp() } } }
+                    { { "getDsMaxLostHp", new Formula.VarVal() { ReplaceExpression =$"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} * 0.9"} } }
             }),
 
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain
@@ -269,7 +269,7 @@ public class Blade : DefaultFighter
                     $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} * {dsAdjHp}  ) " +
                     $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(GetDsMechanic)} min getDsMaxLostHp * {dsAdjHp}  ) ",
                 Variables = new Dictionary<string, Formula.VarVal>()
-                    { { nameof(getDsMaxLostHp), new Formula.VarVal() { ResFormula = getDsMaxLostHp() } } }
+                    { { "getDsMaxLostHp", new Formula.VarVal() { ReplaceExpression = $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} * 0.9" } } }
             }),
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent
         });
@@ -503,15 +503,7 @@ public class Blade : DefaultFighter
     }
 
 
-    private Formula getDsMaxLostHp()
-    {
-        return new Formula()
-        {
-
-            Expression =
-                $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} * 0.9"
-        };
-    }
+ 
 
     private double getDsMaxLostHpForText()
     {

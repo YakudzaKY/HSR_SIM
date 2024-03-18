@@ -124,6 +124,8 @@ public class Formula : ICloneable
 
             var methodEndNdx = pstr.IndexOf("#", ndx, StringComparison.Ordinal);
             if (methodEndNdx == -1)
+                 methodEndNdx = pstr.IndexOf(" ", ndx, StringComparison.Ordinal);
+            if (methodEndNdx == -1)
                 methodEndNdx = pstr.Length;
             nextPos = methodEndNdx + 1;
             return pstr.Substring(ndx, methodEndNdx - ndx);
