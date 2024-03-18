@@ -162,7 +162,7 @@ public class Luocha : DefaultFighter
                 CalculateValue = FighterUtils.DamageFormula(new Formula()
                 {
                     Expression =
-                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAttack)} * (0.4 + {totALvl} * 0.1) * {proportion} "
+                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetAttack)} * (0.4 + {totALvl} * 0.1) * {proportion} "
                 })
             });
 
@@ -205,7 +205,7 @@ public class Luocha : DefaultFighter
             CalculateValue = FighterUtils.DamageFormula(new Formula()
             {
                 Expression =
-                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAttack)} * {deathWish} "
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetAttack)} * {deathWish} "
             }),
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent
         });

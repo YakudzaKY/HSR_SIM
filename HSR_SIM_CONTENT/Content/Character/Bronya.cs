@@ -76,7 +76,7 @@ public class Bronya : DefaultFighter
             CalculateValue = DamageFormula(new Formula()
             {
                 Expression =
-                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAttack)}  * (0.4 + {wbSkillLvl} * 0.1) "
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetAttack)}  * (0.4 + {wbSkillLvl} * 0.1) "
             })
         });
 

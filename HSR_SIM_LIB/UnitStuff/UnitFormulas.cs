@@ -68,8 +68,8 @@ public static class UnitFormulas
             EventRef = ent,
             UnitRef = unit,
             ConditionSkipList = excludeCondition,
-            Expression = $"{unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.LoadedBaseActionValue)} ifzero 10000" +
-                         $" / {unitToCheck}#{nameof(GetSpeed)} "
+            Expression = $"{unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.LoadedBaseActionValue)} ifzero (10000" +
+                         $" / {unitToCheck}#{nameof(GetSpeed)}) "
         };
     }
 
@@ -97,7 +97,7 @@ public static class UnitFormulas
             UnitRef = unit,
             ConditionSkipList = excludeCondition,
             Expression = $"{unitToCheck}#{nameof(GetBaseActionValue)}" +
-                         $" * (1 - {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAdvance).FullName}) " +
+                         $" * (1 - {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAdvance).FullName} " +
                          $" + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffDelay).FullName}) "
         };
     }
@@ -203,7 +203,10 @@ public static class UnitFormulas
     /// <summary>
     ///     get  abilityDamage multiplier by ability type
     /// </summary>
+    /// <param name="unit"></param>
+    /// <param name="unitToCheck"></param>
     /// <param name="ent">reference to event</param>
+    /// <param name="excludeCondition"></param>
     /// <returns></returns>
     public static Formula GetAbilityTypeMultiplier(this Unit unit,
         Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
