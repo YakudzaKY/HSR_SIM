@@ -1,4 +1,5 @@
 ﻿using HSR_SIM_CONTENT.DefaultContent;
+using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
@@ -15,10 +16,11 @@ public class Bronya : DefaultFighter
     private readonly int talentSkillLvl;
     private readonly int ultimateSkillLvl;
     private readonly int wbSkillLvl;
-    private readonly Ability? windriderBullet;
+    private readonly Ability windriderBullet;
 
-    public Bronya(Unit? parent) : base(parent)
+    public Bronya(Unit parent) : base(parent)
     {
+        Element = Ability.ElementEnm.Wind;
         Parent.Stats.BaseMaxEnergy = 120;
         wbSkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Windrider Bullet")!.Level;
         var abilitySkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Combat Redeployment")!.Level;
@@ -44,7 +46,7 @@ public class Bronya : DefaultFighter
         ApplyBuff eventBuff = new(null, this, Parent)
         {
             OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
-            AppliedBuffToApply = new AppliedBuff(Parent)
+            AppliedBuffToApply = new AppliedBuff(Parent, null, this)
             {
                 Type = Buff.BuffType.Buff,
                 Effects = new List<Effect> { new EffAtkPrc { Value = 0.15 } },
@@ -68,12 +70,20 @@ public class Bronya : DefaultFighter
         };
         //dmg events
         windriderBullet.Events.Add(new MechanicValChg(null, this, Parent)
-            { AbilityValue = windriderBullet, Val = 1 });
+            { AbilityValue = windriderBullet, Value = 1 });
         windriderBullet.Events.Add(new DirectDamage(null, this, Parent)
-            { CalculateValue = CalculateBasicDmg });
-        windriderBullet.Events.Add(new ToughnessShred(null, this, Parent) { Val = 30 });
+        {
+            CalculateValue = DamageFormula(new Formula()
+            {
+                Expression =
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetAttack)}  * (0.4 + {wbSkillLvl} * 0.1) "
+            })
+        });
+
+
+        windriderBullet.Events.Add(new ToughnessShred(null, this, Parent) { Value = 30 });
         windriderBullet.Events.Add(new EnergyGain(null, this, Parent)
-            { Val = 20, TargetUnit = Parent });
+            { Value = 20, TargetUnit = Parent });
         Mechanics.AddVal(windriderBullet);
 
         Abilities.Add(windriderBullet);
@@ -94,14 +104,14 @@ public class Bronya : DefaultFighter
         //dmg events
         ability.Events.Add(new ApplyBuff(null, this, Parent)
         {
-            AppliedBuffToApply = new AppliedBuff(Parent)
+            AppliedBuffToApply = new AppliedBuff(Parent, null, this)
             {
                 BaseDuration = 1,
                 Effects = [new EffAllDamageBoost { Value = GetAbilityScaling(0.33, 0.66, abilitySkillLvl) }]
             }
         });
         ability.Events.Add(new EnergyGain(null, this, Parent)
-            { Val = 30, TargetUnit = Parent });
+            { Value = 30, TargetUnit = Parent });
         Abilities.Add(ability);
 
 
@@ -120,7 +130,7 @@ public class Bronya : DefaultFighter
         //buff apply
         ApplyBuff ultimateBuff = new(null, this, Parent)
         {
-            AppliedBuffToApply = new AppliedBuff(Parent)
+            AppliedBuffToApply = new AppliedBuff(Parent, null, this)
             {
                 CustomIconName = "The_Belobog_March",
                 Type = Buff.BuffType.Buff,
@@ -134,7 +144,7 @@ public class Bronya : DefaultFighter
         };
         ultimate.Events.Add(ultimateBuff);
         ultimate.Events.Add(new EnergyGain(null, this, Parent)
-            { Val = 5, TargetUnit = Parent });
+            { Value = 5, TargetUnit = Parent });
 
         Abilities.Add(ultimate);
 
@@ -144,7 +154,7 @@ public class Bronya : DefaultFighter
         //=====================
 
         if (ATraces.HasFlag(ATracesEnm.A6))
-            Parent.PassiveBuffs.Add(new PassiveBuff(Parent)
+            Parent.PassiveBuffs.Add(new PassiveBuff(Parent, this)
             {
                 Effects = [new EffAllDamageBoost { Value = 0.10 }],
                 Target = Parent.ParentTeam
@@ -152,19 +162,26 @@ public class Bronya : DefaultFighter
     }
 
     public override PathType? Path { get; } = PathType.Harmony;
-    public override Unit.ElementEnm Element { get; } = Unit.ElementEnm.Wind;
 
 
-    private double? CalcUltCritDmg(Event ent)
+    private Formula CalcUltCritDmg(Event ent)
     {
-        return Parent.GetCritDamage(ent) * GetAbilityScaling(0.12, 0.16, ultimateSkillLvl) +
-               GetAbilityScaling(0.12, 0.20, ultimateSkillLvl);
+        return new Formula()
+        {
+            Expression =
+                $" {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetCritDamage)} * {GetAbilityScaling(0.12, 0.16, ultimateSkillLvl)} " +
+                $" +  {GetAbilityScaling(0.12, 0.20, ultimateSkillLvl)}"
+        };
     }
 
     //windrider bullet advance calc
-    private double? CalcTalentAV(Event ent)
+    private Formula CalcTalentAv(Event ent)
     {
-        return Parent.GetActionValue(ent) * GetAbilityScaling(0.15, 0.30, talentSkillLvl);
+        return new Formula()
+        {
+            Expression =
+                $" {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetActionValue)} * {GetAbilityScaling(0.15, 0.30, talentSkillLvl)}"
+        };
     }
 
     protected override void DefaultFighter_HandleStep(Step step)
@@ -174,9 +191,9 @@ public class Bronya : DefaultFighter
             Mechanics.Values[windriderBullet] > 0)
         {
             step.Events.Add(new ModActionValue(step, this, Parent)
-                { CalculateValue = CalcTalentAV, TargetUnit = Parent });
+                { CalculateValue = CalcTalentAv, TargetUnit = Parent });
             step.Events.Add(new MechanicValChg(step, this, Parent)
-                { AbilityValue = windriderBullet, Val = -Mechanics.Values[windriderBullet] });
+                { AbilityValue = windriderBullet, Value = -Mechanics.Values[windriderBullet] });
         }
 
         base.DefaultFighter_HandleStep(step);
@@ -205,20 +222,11 @@ public class Bronya : DefaultFighter
     //mainDPS have >=50% action value or got CC or 5 sp
     private bool WillCastE()
     {
-        var mainDPS = GetFriendByRole(UnitRole.MainDps).Parent;
-        if ((mainDPS != Parent &&
-             (mainDPS.Controlled || mainDPS.Stats.PerformedActionValue < mainDPS.GetActionValue(null) * 0.5)) ||
+        var mainDps = GetFriendByRole(UnitRole.MainDps).Parent;
+        if ((mainDps != Parent &&
+             (mainDps.Controlled || mainDps.Stats.PerformedActionValue < mainDps.GetActionValue().Result * 0.5)) ||
             Parent.ParentTeam.GetRes(Resource.ResourceType.SP).ResVal >= Constant.MaxSp - 1)
             return true;
         return false;
-    }
-
-
-    //50-110%
-    private double? CalculateBasicDmg(Event ent)
-    {
-        return CalculateDmgByBasicVal(
-            Parent.GetAttack(ent) * (0.4 + wbSkillLvl * 0.1),
-            ent);
     }
 }

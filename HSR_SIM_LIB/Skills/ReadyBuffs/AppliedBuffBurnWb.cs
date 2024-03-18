@@ -10,10 +10,10 @@ namespace HSR_SIM_LIB.Skills.ReadyBuffs;
 /// </summary>
 public class AppliedBuffBurnWb : AppliedBuff
 {
-    public AppliedBuffBurnWb(Unit sourceUnit, AppliedBuff reference = null) : base(sourceUnit, reference)
+    public AppliedBuffBurnWb(Unit sourceUnit, AppliedBuff reference =null  ) : base(sourceUnit, reference,typeof(AppliedBuffBurnWb))
     {
         Type = BuffType.Dot;
         BaseDuration = 2;
-        Effects = new List<Effect> { new EffBurn { DoTCalculateValue = FighterUtils.CalculateShieldBrokeDmg } };
+        Effects = new List<Effect> { new EffBurn { DoTCalculateValue =FighterUtils.WeaknessBreakFormula()  } };
     }
 }

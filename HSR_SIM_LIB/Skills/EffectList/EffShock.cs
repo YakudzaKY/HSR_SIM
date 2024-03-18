@@ -7,5 +7,5 @@ namespace HSR_SIM_LIB.Skills.EffectList;
 /// </summary>
 public class EffShock : EffDotTemplate
 {
-    public override Unit.ElementEnm Element { get; init; } = Unit.ElementEnm.Lightning;
+    public override Ability.ElementEnm Element { get; init; } = Ability.ElementEnm.Lightning;
 }

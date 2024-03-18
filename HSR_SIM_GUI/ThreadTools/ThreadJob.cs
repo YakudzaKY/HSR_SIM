@@ -39,7 +39,7 @@ internal class ThreadJob(List<SimTask> pTaskList, int pIterations)
     /// </summary>
     /// <param name="taskProgress"></param>
     /// <param name="rCombatResult"></param>
-    public void Aggregate(AggregateThread.rTaskProgress taskProgress, Worker.RCombatResult rCombatResult)
+    public void Aggregate(AggregateThread.TaskProgress taskProgress, Worker.RCombatResult rCombatResult)
     {
         RAggregatedData Data;
         //load or add new

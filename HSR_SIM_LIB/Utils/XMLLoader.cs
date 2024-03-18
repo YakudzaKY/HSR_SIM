@@ -116,8 +116,6 @@ public static class XmlLoader
                 unitStats.BaseCritChance = SafeToDouble(node.Attributes.GetNamedItem("crit_rate")?.Value?.Trim());
                 unitStats.BaseCritDmg = SafeToDouble(node.Attributes.GetNamedItem("crit_dmg")?.Value?.Trim());
                 unitStats.BaseDef = SafeToDouble(node.Attributes.GetNamedItem("def")?.Value?.Trim());
-                unitStats.BaseEffectRes = SafeToDouble(node.Attributes.GetNamedItem("effect_res")?.Value?.Trim());
-                unitStats.BaseEffectHit = SafeToDouble(node.Attributes.GetNamedItem("effect_hit")?.Value?.Trim());
                 unitStats.BaseEnergyRes = SafeToDouble(node.Attributes.GetNamedItem("sp_rate")?.Value?.Trim());
                 unitStats.BaseHealRate = SafeToDouble(node.Attributes.GetNamedItem("heal_rate")?.Value?.Trim());
                 if (node.Attributes.GetNamedItem("baseActionValue") is not null)
@@ -144,7 +142,7 @@ public static class XmlLoader
                 unitStats.SpeedFix = SafeToDouble(node.Attributes.GetNamedItem("spd_fix")?.Value?.Trim());
 
                 //weapon damage by element???
-                foreach (var elm in (ElementEnm[])Enum.GetValues(typeof(ElementEnm)))
+                foreach (var elm in (Ability.ElementEnm[])Enum.GetValues(typeof(Ability.ElementEnm)))
                     unit.GetElemBoost(elm).Value = SafeToDouble(node.Attributes
                         .GetNamedItem(elm.ToString().ToLower() + "_dmg_prc")?.Value?.Trim());
             }
@@ -186,8 +184,6 @@ public static class XmlLoader
                 throw new Exception("Unit template value is null");
             var assemblyName = unitNode.Attributes.GetNamedItem("assembly")?.Value?.Trim() ?? "HSR_SIM_CONTENT";
             var words = unitCode.Split('\\');
-            unit.FighterClassName =
-                $"{assemblyName}.Content.{words[0]}.{EscapeReplaceString(words[1])}, {assemblyName}";
             unit.UnitType = (TypeEnm)Enum.Parse(typeof(TypeEnm), words[0], true);
             unit.Level =
                 int.Parse(unitNode.Attributes.GetNamedItem("level")?.Value?.Trim() ??
@@ -205,7 +201,8 @@ public static class XmlLoader
                 ExtractWargear(warGear ?? unitCode, unit);
             else
                 ExtractUnitSkillsAndGear(unitNode, unit);
-
+            unit.FighterClassName =
+                $"{assemblyName}.Content.{words[0]}.{EscapeReplaceString(words[1])}, {assemblyName}";
             units.Add(unit);
         }
 

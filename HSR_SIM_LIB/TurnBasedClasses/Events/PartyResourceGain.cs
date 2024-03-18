@@ -17,7 +17,7 @@ public class PartyResourceGain : Event
 
     public override string GetDescription()
     {
-        return $"Party res gain :  {Val:f} {ResType} by {TargetUnit?.Name ?? "system"}";
+        return $"Party res gain :  {Value:f} {ResType} by {TargetUnit?.Name ?? "system"}";
     }
 
     public override void ProcEvent(bool revert)
@@ -27,15 +27,15 @@ public class PartyResourceGain : Event
         {
             var currentResVal = tarTeam.GetRes(ResType).ResVal;
             if (ResType == Resource.ResourceType.SP)
-                if (currentResVal + Val > Constant.MaxSp)
-                    Val = Constant.MaxSp - currentResVal;
+                if (currentResVal + Value > Constant.MaxSp)
+                    Value = Constant.MaxSp - currentResVal;
 
             if (ResType == Resource.ResourceType.TP)
-                if (Val + currentResVal > Constant.MaxTp)
-                    Val = Constant.MaxTp - currentResVal;
+                if (Value + currentResVal > Constant.MaxTp)
+                    Value = Constant.MaxTp - currentResVal;
         }
 
-        tarTeam.GetRes(ResType).ResVal += (double)(revert ? -Val : Val);
+        tarTeam.GetRes(ResType).ResVal += (double)(revert ? -Value : Value);
 
 
         base.ProcEvent(revert);

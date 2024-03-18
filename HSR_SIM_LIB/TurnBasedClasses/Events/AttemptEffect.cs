@@ -19,7 +19,7 @@ public class AttemptEffect : BuffEventTemplate
 
     public override string GetDescription()
     {
-        return $"{SourceUnit.Name} try apply effect on {TargetUnit.Name}";
+        return $"{SourceUnit.Name} try apply effect on {TargetUnit.Name} chance: {Value} random val: {RealValue}";
     }
 
     public override void ProcEvent(bool revert)

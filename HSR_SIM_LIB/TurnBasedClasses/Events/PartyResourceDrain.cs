@@ -16,14 +16,14 @@ public class PartyResourceDrain : Event
 
     public override string GetDescription()
     {
-        return "Party res drain : " + Val + " " + ResType;
+        return "Party res drain : " + Value + " " + ResType;
     }
 
     public override void ProcEvent(bool revert)
     {
         var tarTeam = TargetTeam ?? SourceUnit.ParentTeam;
         //SP or technical points
-        tarTeam.GetRes(ResType).ResVal -= (double)(revert ? -Val : Val);
+        tarTeam.GetRes(ResType).ResVal -= (double)(revert ? -Value : Value);
         base.ProcEvent(revert);
     }
 }

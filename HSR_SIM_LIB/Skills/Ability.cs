@@ -23,11 +23,12 @@ public class Ability : CloneClass
     }
 
     /// <summary>
-    ///     Ability type. todo:rewrite into Flags
+    ///     Ability type. 
     /// </summary>
+    [Flags]
     public enum AbilityTypeEnm
     {
-        None = 0,
+      
         Basic = 1,
         Ability = 2,
         Ultimate = 4,
@@ -44,6 +45,19 @@ public class Ability : CloneClass
         All
     }
 
+    public enum ElementEnm
+    {
+        None,
+        Wind,
+        Physical,
+        Fire,
+        Ice,
+        Lightning,
+        Quantum,
+        Imaginary
+    }
+
+    
     public enum PriorityEnm
     {
         DefeatHandler, //top 1

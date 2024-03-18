@@ -1,14 +1,15 @@
 ﻿using System;
+using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 
-public class ToughnessBreakDoTDamage(Step parent, ICloneable source, Unit sourceUnit, Unit.ElementEnm element)
+public class ToughnessBreakDoTDamage(Step parent, ICloneable source, Unit sourceUnit, Ability.ElementEnm element)
     : DoTDamage(parent, source, sourceUnit, element)
 {
     public override string GetDescription()
     {
         return $"DoT(Shield Break) tick from {SourceUnit.Name}" +
-               $" overall={Val:f} to_barrier={RealBarrierVal:f} to_hp={RealVal:f}";
+               $" overall={Value:f} to_barrier={RealBarrierVal:f} to_hp={RealValue:f}";
     }
 }

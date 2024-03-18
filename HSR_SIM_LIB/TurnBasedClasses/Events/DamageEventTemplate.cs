@@ -14,19 +14,19 @@ public abstract class DamageEventTemplate(Step parent, ICloneable source, Unit s
 
     protected void DamageWorks(bool revert)
     {
-        if (RealVal == null)
+        if (RealValue == null)
         {
             //check for barrier 
             if (this is DirectDamage && TargetUnit.AppliedBuffs.Any(x => x.Effects.Any(y => y is EffBarrier)))
             {
-                Val = 0;
-                RealVal = 0;
+                Value = 0;
+                RealValue = 0;
                 if (this is DirectDamage dd)
                     dd.IsCrit = false;
             }
             else
             {
-                var skillVal = (double)Val;
+                var skillVal = (double)Value;
                 //find the all shields and max value
                 double maxShieldval = 0;
                 double srchVal;
@@ -43,7 +43,7 @@ public abstract class DamageEventTemplate(Step parent, ICloneable source, Unit s
                 //get current hp
                 var resVal = TargetUnit.GetRes(Resource.ResourceType.HP).ResVal;
                 //same shit here
-                RealVal = Math.Min(resVal,
+                RealValue = Math.Min(resVal,
                     skillVal - (double)RealBarrierVal);
             }
         }
@@ -53,6 +53,6 @@ public abstract class DamageEventTemplate(Step parent, ICloneable source, Unit s
         foreach (var eff in mod.Effects.Where(x => x is EffShield))
             eff.Value -= revert ? -RealBarrierVal : RealBarrierVal;
         var res = TargetUnit.GetRes(Resource.ResourceType.HP);
-        res.ResVal += (double)-(revert ? -RealVal : RealVal);
+        res.ResVal += (double)-(revert ? -RealValue : RealValue);
     }
 }

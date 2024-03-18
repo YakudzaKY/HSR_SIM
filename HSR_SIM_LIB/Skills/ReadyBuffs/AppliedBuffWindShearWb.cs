@@ -10,11 +10,11 @@ namespace HSR_SIM_LIB.Skills.ReadyBuffs;
 /// </summary>
 public class AppliedBuffWindShearWb : AppliedBuff
 {
-    public AppliedBuffWindShearWb(Unit sourceUnit, AppliedBuff reference = null) : base(sourceUnit, reference)
+    public AppliedBuffWindShearWb(Unit sourceUnit, AppliedBuff reference =null ) : base(sourceUnit, reference,typeof(AppliedBuffWindShearWb))
     {
         Type = BuffType.Dot;
         BaseDuration = 2;
         MaxStack = 5;
-        Effects = new List<Effect> { new EffWindShear { DoTCalculateValue = FighterUtils.CalculateShieldBrokeDmg } };
+        Effects = [new EffWindShear { DoTCalculateValue = FighterUtils.WeaknessBreakFormula() }];
     }
 }

@@ -4,29 +4,30 @@ using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
+using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_CONTENT.Content.NPC;
 
 public class Vagrant : DefaultNPCFighter
 {
-    private static readonly AppliedBuff AtkAppliedBuff = new(null)
+    private static readonly AppliedBuff AtkAppliedBuff = new(null, null, typeof(Vagrant))
     {
         BaseDuration = 2, Effects = new List<Effect> { new EffAtkPrc { Value = 0.3 } }
     };
 
-    public Vagrant(Unit? parent) : base(parent)
+    public Vagrant(Unit parent) : base(parent)
     {
         //Elemenet
-        Element = Unit.ElementEnm.Physical;
+        Element = Ability.ElementEnm.Physical;
 
-        NativeWeaknesses.Add(Unit.ElementEnm.Fire);
-        NativeWeaknesses.Add(Unit.ElementEnm.Ice);
-        NativeWeaknesses.Add(Unit.ElementEnm.Imaginary);
+        Parent.NativeWeaknesses.Add(Ability.ElementEnm.Fire);
+        Parent.NativeWeaknesses.Add(Ability.ElementEnm.Ice);
+        Parent.NativeWeaknesses.Add(Ability.ElementEnm.Imaginary);
         //resist
-        Resists.Add(new Resist { ResistType = Unit.ElementEnm.Physical, ResistVal = 0.20 });
-        Resists.Add(new Resist { ResistType = Unit.ElementEnm.Lightning, ResistVal = 0.20 });
-        Resists.Add(new Resist { ResistType = Unit.ElementEnm.Wind, ResistVal = 0.20 });
-        Resists.Add(new Resist { ResistType = Unit.ElementEnm.Quantum, ResistVal = 0.20 });
+        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Physical, ResistVal = 0.20 });
+        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Lightning, ResistVal = 0.20 });
+        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Wind, ResistVal = 0.20 });
+        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Quantum, ResistVal = 0.20 });
 
         var ability = new Ability(this)
         {
@@ -49,18 +50,18 @@ public class Vagrant : DefaultNPCFighter
         {
             AbilityType = Ability.AbilityTypeEnm.Basic,
             Name = "Shovel Attack",
-            Element = Element,
             AdjacentTargets = Ability.AdjacentTargetsEnm.None
         };
         //dmg events
         myAttackAbility.Events.Add(new DirectDamage(null, this, Parent)
-            { CalculateValue = CalcMyAttack });
-        myAttackAbility.Events.Add(new EnergyGain(null, this, Parent) { Val = 10 });
+        {
+            CalculateValue = FighterUtils.DamageFormula(new Formula()
+            {
+                Expression =
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAttack)} * 2.5"
+            })
+        });
+        myAttackAbility.Events.Add(new EnergyGain(null, this, Parent) { Value = 10 });
         Abilities.Add(myAttackAbility);
-    }
-
-    public double? CalcMyAttack(Event ent)
-    {
-        return FighterUtils.CalculateDmgByBasicVal(Parent.GetAttack(ent) * 2.5, ent);
     }
 }

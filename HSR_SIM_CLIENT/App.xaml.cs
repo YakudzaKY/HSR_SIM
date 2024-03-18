@@ -1,10 +1,6 @@
-﻿using System.Windows;
-
-namespace HSR_SIM_CLIENT;
+﻿namespace HSR_SIM_CLIENT;
 
 /// <summary>
 ///     Interaction logic for App.xaml
 /// </summary>
-public partial class App : Application
-{
-}
+public partial class App;

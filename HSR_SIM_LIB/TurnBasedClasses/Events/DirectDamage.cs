@@ -8,12 +8,13 @@ public class DirectDamage(Step parent, ICloneable source, Unit sourceUnit)
     : DamageEventTemplate(parent, source, sourceUnit)
 {
     public bool IsCrit { get; set; }
-   
+    public double CritRate { get; set; }
+
 
     public override string GetDescription()
     {
         return "Dealing damage" + (IsCrit ? " (CRITICAL)" : "") +
-               $" overall={Val:f} to_barrier={RealBarrierVal:f} to_hp={RealVal:f}";
+               $" overall={Value:f} to_barrier={RealBarrierVal:f} to_hp={RealValue:f}";
     }
 
     public override void ProcEvent(bool revert)

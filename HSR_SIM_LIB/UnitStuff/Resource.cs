@@ -28,7 +28,7 @@ public class Resource(CloneClass parent) : CloneClass
         set
         {
             resVal = value;
-            if (ResType == ResourceType.HP) ((Unit)Parent).ResetCondition(PassiveBuff.ConditionCheckParam.HpPrc);
+            if (ResType == ResourceType.HP) ((Unit)Parent).ResetCondition(Condition.ConditionCheckParam.HpPrc);
         }
     }
 }

@@ -10,13 +10,13 @@ public class EffCritPrc : Effect
 {
     public override void OnApply(Event ent, Buff buff, Unit target = null)
     {
-        (target ?? buff.CarrierUnit).ResetCondition(PassiveBuff.ConditionCheckParam.CritRate);
+        (target ?? buff.CarrierUnit).ResetCondition(Condition.ConditionCheckParam.CritRate);
         base.OnApply(ent, buff, target);
     }
 
     public override void OnRemove(Event ent, Buff buff, Unit target = null)
     {
-        (target ?? buff.CarrierUnit).ResetCondition(PassiveBuff.ConditionCheckParam.CritRate);
+        (target ?? buff.CarrierUnit).ResetCondition(Condition.ConditionCheckParam.CritRate);
         base.OnRemove(ent, buff, target);
     }
 }

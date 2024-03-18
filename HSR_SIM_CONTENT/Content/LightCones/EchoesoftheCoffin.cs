@@ -3,6 +3,7 @@ using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
+using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_CONTENT.Content.LightCones;
 
@@ -24,7 +25,7 @@ internal class EchoesoftheCoffin : DefaultLightCone
                 ApplyBuff eventBuff = new(null, this, Parent.Parent)
                 {
                     CalculateTargets = ((DefaultFighter)Parent).GetAliveFriends,
-                    AppliedBuffToApply = new AppliedBuff(Parent.Parent)
+                    AppliedBuffToApply = new AppliedBuff(Parent.Parent,null,this)
                     {
                         Type = Buff.BuffType.Buff,
                         Effects = new List<Effect> { new EffSpeed { Value = modifiersSpd[Rank - 1] } },
@@ -53,8 +54,8 @@ internal class EchoesoftheCoffin : DefaultLightCone
     public override FighterUtils.PathType Path { get; } = FighterUtils.PathType.Abundance;
 
 
-    private double? CalcEnergyRgn(Event ent)
+    private Formula CalcEnergyRgn(Event ent)
     {
-        return modifiersEnrg[Rank - 1] * Math.Min(ent.ParentStep.TargetsHit.Count(), 3);
+        return new Formula() { Expression = $"{modifiersEnrg[Rank - 1]} * ({ent.ParentStep.TargetsHit.Count()} min 3)" };
     }
 }

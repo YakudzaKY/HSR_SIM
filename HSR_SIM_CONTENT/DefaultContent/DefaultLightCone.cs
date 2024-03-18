@@ -1,30 +1,29 @@
-﻿using HSR_SIM_LIB.Skills;
+﻿using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 
-namespace HSR_SIM_LIB.Content;
+namespace HSR_SIM_CONTENT.DefaultContent;
 
 public abstract class DefaultLightCone : ILightCone
 {
-    public DefaultLightCone(IFighter parent, int rank)
+    protected DefaultLightCone(IFighter parent, int rank)
     {
         Parent = parent;
         Rank = rank;
+        // ReSharper disable once VirtualMemberCallInConstructor
         if (Path != Parent.Path) //prevent from wrong Path lc
             return;
-        EventHandlerProc += DefaultLightCone_HandleEvent;
+        EventHandlerProc +=DefaultLightCone_HandleEvent;
         StepHandlerProc += DefaultLightCone_HandleStep;
     }
 
 
-    public IFighter Parent { get; set; }
-    public List<PassiveBuff> ConditionMods { get; set; } = new();
-    public List<PassiveBuff> PassiveMods { get; set; } = new();
+    protected IFighter Parent { get; set; }
+
     public int Rank { get; set; }
     public abstract FighterUtils.PathType Path { get; }
-    public ILightCone.EventHandler EventHandlerProc { get; set; }
-    public ILightCone.StepHandler StepHandlerProc { get; set; }
-    public List<Ability> Abilities { get; set; }
+    public ILightCone.EventHandler? EventHandlerProc { get; set; } 
+    public ILightCone.StepHandler? StepHandlerProc { get; set; }
 
     public void Reset()
     {
@@ -35,11 +34,11 @@ public abstract class DefaultLightCone : ILightCone
         throw new NotImplementedException();
     }
 
-    public virtual void DefaultLightCone_HandleEvent(Event ent)
+    protected virtual void DefaultLightCone_HandleEvent(Event ent)
     {
     }
 
-    public virtual void DefaultLightCone_HandleStep(Step step)
+    protected virtual void DefaultLightCone_HandleStep(Step step)
     {
     }
 }

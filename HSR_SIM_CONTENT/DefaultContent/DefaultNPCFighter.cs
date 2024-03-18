@@ -15,19 +15,16 @@ public class DefaultNPCFighter : IFighter
 {
     private UnitRole? role;
 
-    public DefaultNPCFighter(Unit? parent)
+    protected DefaultNPCFighter(Unit parent)
     {
         Parent = parent;
+        Parent.IsNpcUnit = true;
 
         EventHandlerProc += DefaultFighter_HandleEvent;
         StepHandlerProc += DefaultFighter_HandleStep;
     }
 
-    public List<PassiveBuff> ConditionBuffs { get; set; } = new();
-
-    public List<PassiveBuff> PassiveBuffs { get; set; } = new();
-    public virtual bool IsEliteUnit => false;
-    public bool IsNpcUnit => true;
+    
 
     public Unit? GetBestTarget(Ability ability)
     {
@@ -70,17 +67,16 @@ public class DefaultNPCFighter : IFighter
         throw new Exception($"no enemy will be chosen by AGGRO counter={counter}");
     }
 
-    public AppliedBuff WeaknessBreakDebuff { get; set; } = new(null) { Effects = [] };
+    public Ability.ElementEnm Element { get; set; }
+    public AppliedBuff WeaknessBreakDebuff { get; set; } = new(null,null,typeof(DefaultNPCFighter)) { Effects = [] };
     public PathType? Path { get; set; } = null;
-    public Unit.ElementEnm Element { get; set; }
-    public List<Unit.ElementEnm> NativeWeaknesses { get; set; } = new();
-    public List<Resist> Resists { get; set; } = new();
-    public List<DebuffResist> DebuffResists { get; set; } = new();
-    public Unit? Parent { get; set; }
+
+
+    public Unit Parent { get; set; }
 
     public string GetSpecialText()
     {
-        return null;
+        return string.Empty;
     }
 
     public virtual double Cost => (Parent.Stats.BaseAttack * (1 + Parent.Stats.AttackPrc) + Parent.Stats.AttackFix) /
@@ -117,18 +113,16 @@ public class DefaultNPCFighter : IFighter
     public Ability? ChoseAbilityToCast(Step step)
     {
         Ability? chosenAbility = null;
-        Parent.ParentTeam.ParentSim?.Parent.LogDebug("========What i can cast=====");
         var abilities = Abilities
             .Where(x => x.Available() && x.CooldownTimer == 0 &&
                         x.AbilityType is Ability.AbilityTypeEnm.Basic or Ability.AbilityTypeEnm.Ability);
         chosenAbility = step.Parent.Parent.DevMode
             ? DevModeUtils.ChooseAbilityToCast(this, abilities)
             : abilities.MaxBy(x => x.AbilityType);
-        Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Choose  {chosenAbility?.Name}");
         return chosenAbility;
     }
 
-    public MechDictionary Mechanics { get; set; }
+    public MechDictionary Mechanics { get; set; } = new MechDictionary();
 
 
     public IFighter.EventHandler EventHandlerProc { get; set; }
@@ -150,11 +144,11 @@ public class DefaultNPCFighter : IFighter
         return Parent.Friends.Where(x => x.IsAlive);
     }
 
-    public virtual void DefaultFighter_HandleEvent(Event ent)
+    protected virtual void DefaultFighter_HandleEvent(Event ent)
     {
     }
 
-    public virtual void DefaultFighter_HandleStep(Step step)
+    protected virtual void DefaultFighter_HandleStep(Step step)
     {
     }
 }

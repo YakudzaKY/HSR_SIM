@@ -1,4 +1,5 @@
-﻿using HSR_SIM_LIB.Content;
+﻿using HSR_SIM_CONTENT.DefaultContent;
+using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -15,7 +16,7 @@ internal class AcheronLcTst : DefaultLightCone
     public AcheronLcTst(IFighter parent, int rank) : base(parent, rank)
     {
         if (Path != Parent.Path) return;
-        aetherCodeDebuff = new AppliedBuff(Parent.Parent)
+        aetherCodeDebuff = new AppliedBuff(Parent.Parent,null,this)
         {
             CustomIconName = "defeat",
             Type = Buff.BuffType.Debuff,
@@ -24,7 +25,7 @@ internal class AcheronLcTst : DefaultLightCone
         };
 
 
-        Parent.Parent.PassiveBuffs.Add(new PassiveBuff(Parent.Parent)
+        Parent.Parent.PassiveBuffs.Add(new PassiveBuff(Parent.Parent, this)
         {
             Effects =
             [
@@ -34,12 +35,12 @@ internal class AcheronLcTst : DefaultLightCone
             ],
 
             Target = Parent.Parent,
-            Condition = new PassiveBuff.ConditionRec
+            ApplyConditions = [new Condition
             {
                 AppliedBuffValue = aetherCodeDebuff,
-                ConditionExpression = PassiveBuff.ConditionCheckExpression.Exists,
-                ConditionParam = PassiveBuff.ConditionCheckParam.Buff
-            },
+                ConditionExpression = Condition.ConditionCheckExpression.Exists,
+                ConditionParam = Condition.ConditionCheckParam.Buff
+            }],
             IsTargetCheck = true
         });
     }
@@ -47,7 +48,7 @@ internal class AcheronLcTst : DefaultLightCone
 
     public sealed override FighterUtils.PathType Path => FighterUtils.PathType.Nihility;
 
-    public override void DefaultLightCone_HandleEvent(Event ent)
+    protected override void DefaultLightCone_HandleEvent(Event ent)
     {
         if (ent is ExecuteAbilityFinish && aetherCodeDebuff != null && ent.SourceUnit == Parent.Parent &&
             ent.ParentStep.ActorAbility.Attack &&

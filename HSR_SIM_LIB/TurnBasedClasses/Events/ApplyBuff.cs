@@ -2,6 +2,7 @@
 using System.Linq;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.UnitStuff;
+using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 
@@ -34,7 +35,25 @@ public class ApplyBuff : BuffEventTemplate
 
             foreach (var modEffect in AppliedBuffToApply.Effects.Where(modEffect =>
                          modEffect.CalculateValue != null && modEffect.Value == null))
-                modEffect.Value = modEffect.CalculateValue(this);
+            {
+                if (modEffect.CalculateValue is Formula fm)
+                {
+                    modEffect.CalculateValue = (Formula)fm.Clone();
+                    var newFrm = (Formula)modEffect.CalculateValue;
+                    newFrm.EventRef = this;
+                    modEffect.Value = newFrm.Result;
+                }
+
+                else if (modEffect.CalculateValue is Func<Event, Formula> fnc)
+                {
+                    modEffect.CalculateValue = fnc.Invoke(this);
+                    var newFrm = (Formula)modEffect.CalculateValue;
+                    newFrm.EventRef = this;
+                    modEffect.Value = newFrm.Result;
+                }
+               
+              
+            }
 
             if (!revert)
             {

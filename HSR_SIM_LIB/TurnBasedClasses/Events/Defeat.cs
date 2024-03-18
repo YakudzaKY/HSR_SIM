@@ -17,7 +17,7 @@ public class Defeat(Step parent, ICloneable source, Unit sourceUnit) : Event(par
         {
             //attacker got 10 energy
             ChildEvents.Add(new EnergyGain(ParentStep, TargetUnit, SourceUnit)
-                { Val = 10, TargetUnit = SourceUnit });
+                { Value = 10, TargetUnit = SourceUnit });
             ChildEvents.Add(new SetLiveStatus(ParentStep, SourceUnit, SourceUnit)
                 { ToState = Unit.LivingStatusEnm.Defeated, TargetUnit = TargetUnit });
         }

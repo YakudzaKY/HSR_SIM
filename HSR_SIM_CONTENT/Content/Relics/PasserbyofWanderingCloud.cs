@@ -1,4 +1,5 @@
-﻿using HSR_SIM_LIB.Content;
+﻿using HSR_SIM_CONTENT.DefaultContent;
+using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
@@ -19,7 +20,7 @@ public class PasserbyofWanderingCloud : DefaultRelicSet
                 PartyResourceGain newEvent = new(step, this, Parent.Parent)
                 {
                     ResType = Resource.ResourceType.SP,
-                    Val = 1,
+                    Value = 1,
                     TargetUnit = Parent.Parent
                 };
 

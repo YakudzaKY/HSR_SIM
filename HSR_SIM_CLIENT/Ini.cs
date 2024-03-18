@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Ini;
+namespace HSR_SIM_CLIENT;
 
 /// <summary>
 ///     Create a New INI file to store or load data
@@ -52,7 +52,7 @@ public class IniFile
     public string IniReadValue(string section, string key)
     {
         var temp = new StringBuilder(255);
-        var i = GetPrivateProfileString(section, key, "", temp,
+        GetPrivateProfileString(section, key, "", temp,
             255, Path);
         return temp.ToString();
     }

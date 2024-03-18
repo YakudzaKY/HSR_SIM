@@ -129,7 +129,7 @@ public sealed class SimCls : ICloneable
     private void HandleZeroHp(Event ent)
     {
         //HP reduced to 0
-        if (ent.RealVal == 0 || ent.TargetUnit.GetRes(ResourceType.HP).ResVal != 0) return;
+        if (ent.RealValue == 0 || ent.TargetUnit.GetRes(ResourceType.HP).ResVal != 0) return;
         if (!UnitDefeatHandled(ent, ent.TargetUnit))
             ent.ChildEvents.Add(new Defeat(ent.ParentStep, ent.Source, ent.SourceUnit)
             {
@@ -183,21 +183,21 @@ public sealed class SimCls : ICloneable
                 HandleZeroHp(drain);
 
                 //THG reduced tp 0
-                if (drain.ResType == ResourceType.Toughness && drain.RealVal != 0 &&
+                if (drain.ResType == ResourceType.Toughness && drain.RealValue != 0 &&
                     drain.TargetUnit.GetRes(drain.ResType).ResVal == 0)
                 {
                     //temporary give back the THG for calculation break damage. will be reduce at the end
-                    drain.TargetUnit.GetRes(drain.ResType).ResVal += drain.RealVal ?? 0;
+                    drain.TargetUnit.GetRes(drain.ResType).ResVal += drain.RealValue ?? 0;
                     ToughnessBreak shieldBrkEvent = new(drain.ParentStep, drain.Source, drain.SourceUnit)
                     {
                         TargetUnit = drain.TargetUnit
                     };
-                    shieldBrkEvent.Val = FighterUtils.CalculateShieldBrokeDmg(shieldBrkEvent);
+                    shieldBrkEvent.CalculateValue = FighterUtils.WeaknessBreakFormula();
                     drain.ChildEvents.Add(shieldBrkEvent);
 
 
                     //reduce THG  again
-                    drain.TargetUnit.GetRes(drain.ResType).ResVal -= drain.RealVal ?? 0;
+                    drain.TargetUnit.GetRes(drain.ResType).ResVal -= drain.RealValue ?? 0;
                 }
 
                 break;
@@ -236,7 +236,6 @@ public sealed class SimCls : ICloneable
         {
             var newUnit = (Unit)unit.Clone();
             res.Add(newUnit);
-            newUnit.Init();
         }
 
         return res;
@@ -356,15 +355,15 @@ public sealed class SimCls : ICloneable
                 //get first by AV unit
                 CurrentFight.Turn = new TurnR
                 {
-                    Actor = CurrentFight.AllAliveUnits.OrderBy(x => x.GetCurrentActionValue(null)).First(),
+                    Actor = CurrentFight.AllAliveUnits.OrderBy(x => x.GetCurrentActionValue().Result).First(),
                     TurnStage = newStep.StepType
                 };
                 newStep.Actor = CurrentFight.Turn.Actor;
-                var reduceAv = CurrentFight.Turn.Actor.GetCurrentActionValue(null);
+                var reduceAv = CurrentFight.Turn.Actor.GetCurrentActionValue().Result;
                 if (reduceAv < 0)
                     reduceAv = 0;
                 newStep.Events.Add(new ModActionValue(newStep, this, null)
-                    { Val = reduceAv });
+                    { Value = reduceAv });
                 //set all Buffs are "old"
                 foreach (var mod in CurrentFight.Turn.Actor.AppliedBuffs) mod.IsOld = true;
                 //dot proc
@@ -394,7 +393,7 @@ public sealed class SimCls : ICloneable
                         {
                             TargetUnit = CurrentFight.Turn.Actor,
                             ResType = ResourceType.Toughness,
-                            Val = CurrentFight.Turn.Actor.Stats.MaxToughness
+                            Value = CurrentFight.Turn.Actor.Stats.MaxToughness
                         };
                         newStep.Events.Add(gainThg);
                     }
@@ -419,7 +418,7 @@ public sealed class SimCls : ICloneable
         {
             //try follow up actions before target do something.
             //follow up actions disabled at NPC turn end
-            if (CurrentFight.Turn.Actor.Fighter.IsNpcUnit || !newStep.FollowUpActions())
+            if (CurrentFight.Turn.Actor.IsNpcUnit || !newStep.FollowUpActions())
             {
                 newStep.StepType = StepTypeEnm.UnitTurnEnded;
                 newStep.Actor = CurrentFight.Turn.Actor;

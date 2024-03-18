@@ -1,4 +1,5 @@
-﻿using HSR_SIM_LIB.Content;
+﻿using HSR_SIM_CONTENT.DefaultContent;
+using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -17,14 +18,14 @@ internal class IncessantRain : DefaultLightCone
     public IncessantRain(IFighter parent, int rank) : base(parent, rank)
     {
         if (Path != Parent.Path) return;
-        aetherCodeDebuff = new AppliedBuff(Parent.Parent)
+        aetherCodeDebuff = new AppliedBuff(Parent.Parent,null,this)
         {
             Type = Buff.BuffType.Debuff, BaseDuration = 1,
             Effects = [new EffAllDamageVulnerability { Value = lcMods[Rank - 1] }]
         };
 
 
-        Parent.Parent.PassiveBuffs.Add(new PassiveBuff(Parent.Parent)
+        Parent.Parent.PassiveBuffs.Add(new PassiveBuff(Parent.Parent, this)
         {
             Effects = [new EffCritPrc { CalculateValue = CalcCrit }],
             Target = Parent.Parent,
@@ -36,17 +37,17 @@ internal class IncessantRain : DefaultLightCone
     public sealed override FighterUtils.PathType Path => FighterUtils.PathType.Nihility;
 
     //get 0.2 AllDmg per debuff  on target
-    private double? CalcCrit(Event ent)
+    private  Formula CalcCrit(Event ent)
     {
         double debuffs = 0;
         debuffs += ent.TargetUnit?.AppliedBuffs.Count(x =>
             x.Type is Buff.BuffType.Debuff or Buff.BuffType.Dot) ?? 0;
         if (debuffs >= 3)
-            return lcMods[Rank - 1];
-        return 0;
+            return new Formula(){Expression = $"{lcMods[Rank - 1]}"}; ;
+        return new Formula(){Expression = "0"};
     }
 
-    public override void DefaultLightCone_HandleEvent(Event ent)
+    protected override void DefaultLightCone_HandleEvent(Event ent)
     {
         if (ent is ExecuteAbilityFinish && aetherCodeDebuff != null && ent.SourceUnit == Parent.Parent &&
             ent.ParentStep.ActorAbility.Attack &&

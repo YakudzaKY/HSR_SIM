@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using HSR_SIM_LIB.Fighters;
+using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.Utils;
 using static HSR_SIM_LIB.Utils.CallBacks;
-using static HSR_SIM_LIB.Utils.Constant;
 using static HSR_SIM_LIB.TurnBasedClasses.Step;
 using static HSR_SIM_LIB.UnitStuff.Unit;
 
@@ -36,7 +36,6 @@ public class Worker
         Init();
         Sim = XmlLoader.LoadCombatFromXml(scenarioPath, profilePath);
         Sim.Parent = this;
-        LogText("Scenario  " + Sim.CurrentScenario.Name + " was loaded");
         if (DevMode)
             DevModeLog = new DevModeLogger(DevModeUtils.GetDevLogPath(scenarioPath, profilePath), this);
     }
@@ -47,7 +46,6 @@ public class Worker
         Init();
         Sim = (SimCls)sim.Clone();
         Sim.Parent = this;
-        LogText("Scenario  " + Sim.CurrentScenario.Name + " was loaded");
         if (DevMode)
             DevModeLog = new DevModeLogger(devLogPath, this);
     }
@@ -71,28 +69,28 @@ public class Worker
                         Sim.Steps.Sum(x =>
                             x.Events.Where(y =>
                                 y is DirectDamage && y.SourceUnit == unit &&
-                                unit.Friends.All(j => j != y.TargetUnit)).Sum(y => y.Val ?? 0))
+                                unit.Friends.All(j => j != y.TargetUnit)).Sum(y => y.Value ?? 0))
                     },
                     {
                         typeof(ToughnessBreak),
                         Sim.Steps.Sum(x =>
                             x.Events.Where(y =>
                                 y is ToughnessBreak && y.SourceUnit == unit &&
-                                unit.Friends.All(j => j != y.TargetUnit)).Sum(y => y.Val ?? 0))
+                                unit.Friends.All(j => j != y.TargetUnit)).Sum(y => y.Value ?? 0))
                     },
                     {
                         typeof(DoTDamage),
                         Sim.Steps.Sum(x =>
                             x.Events.Where(y =>
                                 y is DoTDamage and not ToughnessBreakDoTDamage && y.SourceUnit == unit &&
-                                unit.Friends.All(j => j != y.TargetUnit)).Sum(y => y.Val ?? 0))
+                                unit.Friends.All(j => j != y.TargetUnit)).Sum(y => y.Value ?? 0))
                     },
                     {
                         typeof(ToughnessBreakDoTDamage),
                         Sim.Steps.Sum(x =>
                             x.Events.Where(y =>
                                 y is ToughnessBreakDoTDamage && y.SourceUnit == unit &&
-                                unit.Friends.All(j => j != y.TargetUnit)).Sum(y => y.Val ?? 0))
+                                unit.Friends.All(j => j != y.TargetUnit)).Sum(y => y.Value ?? 0))
                     }
                 };
 
@@ -133,7 +131,6 @@ public class Worker
                 if (stepndx <= 0) break;
                 //revert first
                 replay = true;
-                LogStepDescription(Sim.CurrentStep, true);
                 Sim.CurrentStep.ProcEvents(true, true);
                 stepndx -= 1;
                 Sim.CurrentStep = Sim.Steps[stepndx];
@@ -147,29 +144,22 @@ public class Worker
                     replay = true;
                     Sim.CurrentStep = Sim.Steps[stepndx];
                     Sim.Steps[stepndx].ProcEvents(false, true);
-                    LogStepDescription(Sim.Steps[stepndx]);
                 }
                 else
                 {
                     if (!Completed)
                     {
                         replay = false;
-                        if (Sim == null)
-                        {
-                            LogText("Load scenario first!!!");
-                            return;
-                        }
+                        if (Sim == null) return;
 
                         var newStep = Sim.WorkIteration();
 
 
                         Sim.CurrentStep = newStep;
-                        LogStepDescription(newStep);
 
                         if (newStep.StepType == StepTypeEnm.Idle)
                         {
                             Completed = true;
-                            LogText("scenario complete.");
                             DevModeLog?.WriteToFile(); //write dev log 
                         }
 
@@ -189,43 +179,6 @@ public class Worker
 
 
     /// <summary>
-    ///     output text description of completed step
-    /// </summary>
-    /// <param name="step">completed step</param>
-    /// <param name="revert">we revert this step? </param>
-    /// <exception cref="NotImplementedException"></exception>
-    private void LogStepDescription(Step step, bool revert = false)
-    {
-        var OutText = "===================================\n";
-        OutText = OutText + " Step# " + Sim.Steps.IndexOf(Sim.CurrentStep) + " [" + step.StepType + "] " +
-                  step.GetDescription();
-        if (revert)
-            OutText = "reverted: " + OutText;
-        else if (replay)
-            OutText = "reproduced: " + OutText;
-        LogText(OutText);
-
-        foreach (var ent in step.Events)
-        {
-            if (string.IsNullOrEmpty(ent.GetDescription()))
-                continue;
-            OutText = " * " + ent.GetDescription();
-            if (revert)
-                OutText = "reverted: " + OutText;
-            else if (replay)
-                OutText = "reproduced: " + OutText;
-            LogText(OutText);
-            if (ent is BuffEventTemplate)
-                if (((BuffEventTemplate)ent).AppliedBuffToApply != null)
-                {
-                    OutText = " * " + ((BuffEventTemplate)ent).AppliedBuffToApply.GetDescription();
-                    LogText(OutText);
-                }
-        }
-    }
-
-
-    /// <summary>
     ///     Draw combat in client
     /// </summary>
     public void DrawCombat()
@@ -239,29 +192,9 @@ public class Worker
     }
 
 
-    /// <summary>
-    ///     wrapper for Text callback using for log output
-    /// </summary>
-    /// <param name="msg">message to print</param>
-    private void LogText(string msg)
-    {
-        CbLog?.Invoke(new KeyValuePair<string, string>(MsgLog, msg));
-    }
-
-    /// <summary>
-    ///     wrapper for Text callback using for log output
-    /// </summary>
-    /// <param name="msg">message to print</param>
-    public void LogDebug(string msg)
-    {
-        CbLog?.Invoke(new KeyValuePair<string, string>(MsgDebug, msg));
-    }
-
-
-    public void Init()
+    private void Init()
     {
         Completed = false;
-        LogText("lib loaded");
     }
 
     //Apply modes(stats??) to sim elements
@@ -330,7 +263,7 @@ public class Worker
                 else if (mod.Stat.EndsWith("_dmg_prc"))
                 {
                     var elem = mod.Stat.Split("_").First();
-                    targetUnit.GetElemBoost((ElementEnm)Enum.Parse(typeof(ElementEnm), elem, true)).Value += mod.Val;
+                    targetUnit.GetElemBoost((Ability.ElementEnm)Enum.Parse(typeof(Ability.ElementEnm), elem, true)).Value += mod.Val;
                 }
             }
         }

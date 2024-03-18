@@ -1,0 +1,71 @@
+﻿<UserControl x:Class="HSR_SIM_CLIENT.Views.BuffView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:HSR_SIM_CLIENT.Views"
+             xmlns:unitStuff="clr-namespace:HSR_SIM_LIB.Skills;assembly=HSR_SIM_LIB"
+             xmlns:viewModels="clr-namespace:HSR_SIM_CLIENT.ViewModels"
+             mc:Ignorable="d"
+             Name="Parent"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid DataContext="{Binding ElementName=Parent}">
+        <Grid.Resources>
+            <DataTemplate DataType="{x:Type viewModels:EffectViewModel }">
+                <local:EffectView EffectToView="{Binding ., Mode=OneWay}" />
+            </DataTemplate>
+        </Grid.Resources>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <StackPanel  Grid.Row="0"  Orientation="Horizontal">
+            <Image Source= "{Binding  BuffToView.Icon}" ></Image>
+            <Label Content="{Binding  BuffToView.EffectDescription}" />
+        </StackPanel>
+        
+        <TreeView
+            Grid.Row="1" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <TreeViewItem  Header="Details">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Row="0" Grid.Column="0" Content="Type"/>
+                    <TextBox  Grid.Row="0" Grid.Column="1" Text="{Binding BuffToView.Type ,Mode=OneWay}"/>
+                    <Label Grid.Row="1" Grid.Column="0" Content="Buff type"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding BuffToView.BuffType,Mode=OneWay}"/>
+                    <Label Grid.Row="2" Grid.Column="0" Content="Source object"/>
+                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding BuffToView.SourceObject,Mode=OneWay}"/>
+                    <Label Grid.Row="3" Grid.Column="0" Content="SourceUnit"/>
+                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding BuffToView.SourceUnit,Mode=OneWay}"/>
+                    <Label Grid.Row="4" Grid.Column="0" Content="Carrier Unit"/>
+                    <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding BuffToView.CarrierUnit,Mode=OneWay}"/>
+                    <Label Grid.Row="5" Grid.Column="0" Content="Stacks"/>
+                    <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding BuffToView.Stacks,Mode=OneWay}"/>
+                    <Label Grid.Row="6" Grid.Column="0" Content="Max stacks"/>
+                    <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding BuffToView.MaxStacks,Mode=OneWay}"/>
+                    <!-- todo: additional info for AppliedBuff,PassiveBuff-->
+                </Grid>
+            </TreeViewItem>
+        </TreeView>
+        <TreeView
+            Grid.Row="2" ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <TreeViewItem ItemsSource="{Binding Path=BuffToView.Effects,Mode=OneWay}" Header="Effects"/>
+        </TreeView>
+       
+
+    </Grid>
+</UserControl>

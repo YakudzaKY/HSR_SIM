@@ -49,10 +49,10 @@ public static class GraphicsCls
                     i++;
                     if (ent is PartyResourceGain)
                         DrawText(PartyResourceX, PartyResourceY + (int)Math.Round(DefaultFontSize * 1.3 * i), gfx,
-                            $"+{ent.Val}", new SolidBrush(Color.Green));
+                            $"+{ent.Value}", new SolidBrush(Color.Green));
                     else
                         DrawText(PartyResourceX, PartyResourceY + (int)Math.Round(DefaultFontSize * 1.3 * i), gfx,
-                            $"-{ent.Val}", new SolidBrush(Color.DarkRed));
+                            $"-{ent.Value}", new SolidBrush(Color.DarkRed));
                 }
             }
 
@@ -105,7 +105,7 @@ public static class GraphicsCls
     private static void DrawNextHostile(Graphics gfx, List<Unit> hostileParty, Point point)
     {
         short i = 0;
-        List<ElementEnm> elemList = new();
+        List<Ability.ElementEnm> elemList = new();
         foreach (var unit in hostileParty)
         {
             //portrait
@@ -276,7 +276,7 @@ public static class GraphicsCls
             }
 
             //healthbar
-            if (unit.GetMaxHp(null) > 0)
+            if (unit.GetMaxHp().Result > 0)
             {
                 using (SolidBrush brush = new(Color.FromArgb(170, 000, 000)))
                 {
@@ -288,14 +288,14 @@ public static class GraphicsCls
                 {
                     var greenWidth =
                         (int)Math.Ceiling(HealthBarSize.Width * unit.GetRes(ResourceType.HP).ResVal /
-                                          unit.GetMaxHp(null));
+                                          unit.GetMaxHp().Result);
                     gfx.FillRectangle(brush, portraitPoint.X, portraitPoint.Y + PortraitSize.Height, greenWidth,
                         HealthBarSize.Height);
                 }
 
                 DrawText(portraitPoint.X + 5, portraitPoint.Y + PortraitSize.Height, gfx,
                     string.Format("{0:d}/{1:d}", (int)Math.Floor(unit.GetRes(ResourceType.HP).ResVal),
-                        (int)Math.Floor(unit.GetMaxHp(null))), null,
+                        (int)Math.Floor(unit.GetMaxHp().Result)), null,
                     new Font("Tahoma", BarFontSize));
             }
 
@@ -371,10 +371,10 @@ public static class GraphicsCls
                 foreach (var ent in step.Events.Where(x => x.TargetUnit == unit &&
                                                            (x.IsDamageEvent
                                                             || x is Healing
-                                                            || (x is ResourceDrain && x.Val > 0 &&
+                                                            || (x is ResourceDrain && x.Value > 0 &&
                                                                 ((ResourceDrain)x).ResType is ResourceType.HP
                                                                 or ResourceType.Toughness)
-                                                            || (x is ResourceGain && x.Val > 0 &&
+                                                            || (x is ResourceGain && x.Value > 0 &&
                                                                 ((ResourceGain)x).ResType == ResourceType.HP)
                                                            )))
                 {
@@ -414,7 +414,7 @@ public static class GraphicsCls
                     DrawText(portraitPoint.X + DmgIconSize.Width
                         , pointY
                         , gfx
-                        , $"{(int)Math.Floor(ent.Val ?? 0):D}{(ent is DirectDamage damage && damage.IsCrit ? " crit" : "")}"
+                        , $"{(int)Math.Floor(ent.Value ?? 0):D}{(ent is DirectDamage damage && damage.IsCrit ? " crit" : "")}"
                         , new SolidBrush(nmbrColor)
                         , new Font("Tahoma", BarFontSize, FontStyle.Bold));
 
@@ -435,8 +435,7 @@ public static class GraphicsCls
                     portraitPoint.Y + j * ElemSizeMini.Height -
                     colModifier * maxIconsVerticalCnt * ElemSizeMini.Height);
                 gfx.DrawImage(
-                    new Bitmap(Utl.LoadBitmap(buff.CustomIconName ?? buff.Effects.First().GetType().Name),
-                        ElemSizeMini), buffPoint);
+                    buff.IconImage, buffPoint);
                 gfx.DrawRectangle(
                     new Pen(
                         buff.Type == Buff.BuffType.Buff ? Color.Aquamarine :
@@ -510,9 +509,9 @@ public static class GraphicsCls
             if (step.Parent.CurrentFight?.CurrentWave != null)
             {
                 Color fntColor;
-                if (step.Events.Any(x => x is ModActionValue && x.Val < 0 && x.TargetUnit == unit))
+                if (step.Events.Any(x => x is ModActionValue && x.Value < 0 && x.TargetUnit == unit))
                     fntColor = Color.Red;
-                else if (step.Events.Any(x => x is ModActionValue && x.Val > 0 && x.TargetUnit == unit))
+                else if (step.Events.Any(x => x is ModActionValue && x.Value > 0 && x.TargetUnit == unit))
                     fntColor = Color.GreenYellow;
                 else
                     fntColor = Color.Violet;
@@ -520,7 +519,7 @@ public static class GraphicsCls
 
                 //AV
                 DrawText(portraitPoint.X + 5, portraitPoint.Y + (int)(PortraitSize.Height * 0.4), gfx,
-                    Math.Ceiling(unit.GetCurrentActionValue(null)).ToString(), new SolidBrush(fntColor),
+                    Math.Ceiling(unit.GetCurrentActionValue().Result).ToString(), new SolidBrush(fntColor),
                     new Font("Tahoma", DefaultFontSize), true);
             }
 

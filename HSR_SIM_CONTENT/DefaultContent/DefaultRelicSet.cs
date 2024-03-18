@@ -1,8 +1,8 @@
-﻿using HSR_SIM_LIB.Skills;
+﻿using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 
-namespace HSR_SIM_LIB.Content;
+namespace HSR_SIM_CONTENT.DefaultContent;
 
 public class DefaultRelicSet : IRelicSet
 {
@@ -14,8 +14,7 @@ public class DefaultRelicSet : IRelicSet
         StepHandlerProc += DefaultRelicSet_HandleStep;
     }
 
-    public IFighter Parent { get; set; }
-    public List<Ability> Abilities { get; set; }
+    protected IFighter Parent { get; set; }
 
     public int Num { get; set; }
     public IRelicSet.EventHandler EventHandlerProc { get; set; }

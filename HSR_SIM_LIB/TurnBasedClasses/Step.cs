@@ -61,9 +61,7 @@ public class Step
     public List<Event> Events { get; set; } = new();
 
     public List<Event> ProceedEvents { get; set; } = new();
-
-    public List<Event> QueueEvents { get; set; }
-
+    
 
     public bool TriggersHandled { get; set; } = false;
 
@@ -182,7 +180,7 @@ public class Step
             {
                 ResType = ResourceType.SP,
                 TargetUnit = ability.Parent.Parent,
-                Val = ability.SpGain
+                Value = ability.SpGain
             });
 
         //res spending
@@ -191,7 +189,7 @@ public class Step
             //TP wasted before
             if (ability.CostType != ResourceType.TP)
                 Events.Add(new PartyResourceDrain(this, ability.Parent, ability.Parent.Parent)
-                    { ResType = (ResourceType)ability.CostType, Val = ability.Cost });
+                    { ResType = (ResourceType)ability.CostType, Value = ability.Cost });
         }
         else if (ability.CostType != null)
         {
@@ -199,7 +197,7 @@ public class Step
             {
                 TargetUnit = Actor,
                 ResType = (ResourceType)ability.CostType,
-                Val = ability.Cost
+                Value = ability.Cost
             });
         }
 
@@ -219,11 +217,14 @@ public class Step
                         ent.CalculateTargets != null
                             ? ent.CalculateTargets()
                             : ability.GetTargets(target, ent.TargetType, ent.CurrentTargetType);
-                    foreach (var unit in targetsUnits) CloneEvent(ability, ent, unit);
+                    foreach (var unit in targetsUnits)
+                        if (ent.Truly(unit))
+                            CloneEvent(ability, ent, unit);
                 }
                 else
                 {
-                    CloneEvent(ability, ent, null);
+                    if (ent.Truly(ent.TargetUnit))
+                        CloneEvent(ability, ent, null);
                 }
             }
 
@@ -289,10 +290,10 @@ public class Step
 
         if (ability.CostType == ResourceType.TP || ability.CostType == ResourceType.SP)
             Events.Add(new PartyResourceDrain(this, null, ability.Parent.Parent)
-                { ResType = (ResourceType)ability.CostType, Val = ability.Cost });
+                { ResType = (ResourceType)ability.CostType, Value = ability.Cost });
         else if (ability.CostType != null)
             Events.Add(new ResourceDrain(this, null, ability.Parent.Parent)
-                { ResType = (ResourceType)ability.CostType, Val = ability.Cost });
+                { ResType = (ResourceType)ability.CostType, Value = ability.Cost });
 
         Actor = ability.Parent
             .Parent; //WHO CAST THE ABILITY for some simple things save the parent( still can use ActorAbility.ParentStep but can change in future)

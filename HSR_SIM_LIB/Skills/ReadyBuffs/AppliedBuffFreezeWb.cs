@@ -11,11 +11,11 @@ namespace HSR_SIM_LIB.Skills.ReadyBuffs;
 /// </summary>
 public class AppliedBuffFreezeWb : AppliedBuff
 {
-    public AppliedBuffFreezeWb(Unit sourceUnit, AppliedBuff reference = null) : base(sourceUnit, reference)
+    public AppliedBuffFreezeWb(Unit sourceUnit, AppliedBuff reference =null ) : base(sourceUnit, reference,typeof(AppliedBuffFreezeWb))
     {
         Type = BuffType.Debuff;
         BaseDuration = 1;
-        Effects = new List<Effect> { new EffFreeze { DoTCalculateValue = FighterUtils.CalculateShieldBrokeDmg } };
+        Effects = new List<Effect> { new EffFreeze { DoTCalculateValue = FighterUtils.WeaknessBreakFormula()  } };
         EventHandlerProc += FreezeEventHandler;
     }
 
@@ -24,7 +24,7 @@ public class AppliedBuffFreezeWb : AppliedBuff
         if (ent is ResetAV && ent.TargetUnit == CarrierUnit) //50% reduce av if frosted
             ent.ChildEvents.Add(new ModActionValue(ent.ParentStep, CarrierUnit, CarrierUnit)
             {
-                TargetUnit = CarrierUnit, Val = CarrierUnit.GetActionValue(ent) * 0.5
+                TargetUnit = CarrierUnit, Value = CarrierUnit.GetActionValue(ent:ent).Result * 0.5
             });
     }
 }

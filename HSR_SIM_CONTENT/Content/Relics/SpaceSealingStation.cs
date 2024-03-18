@@ -1,4 +1,5 @@
-﻿using HSR_SIM_LIB.Content;
+﻿using HSR_SIM_CONTENT.DefaultContent;
+using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 
@@ -13,18 +14,17 @@ public class SpaceSealingStation : DefaultRelicSet
 
     private PassiveBuff GetMod()
     {
-        return new PassiveBuff(Parent.Parent)
+        return new PassiveBuff(Parent.Parent, this)
         {
             Effects = new List<Effect> { new EffAtkPrc { Value = 0.12 } },
             CustomIconName = "gear\\" + GetType().ToString().Split('.').Last(),
-
             Target = Parent.Parent,
-            Condition = new PassiveBuff.ConditionRec
+            ApplyConditions = [new Condition
             {
-                ConditionParam = PassiveBuff.ConditionCheckParam.Spd,
-                ConditionExpression = PassiveBuff.ConditionCheckExpression.EqualOrMore,
+                ConditionParam = Condition.ConditionCheckParam.Spd,
+                ConditionExpression = Condition.ConditionCheckExpression.EqualOrMore,
                 Value = 120
-            }
+            }]
         };
     }
 }

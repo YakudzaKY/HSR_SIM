@@ -10,13 +10,13 @@ public class EffSpeedPrc : Effect
 {
     public override void OnApply(Event ent, Buff buff, Unit target = null)
     {
-        (target ?? buff.CarrierUnit).ResetCondition(PassiveBuff.ConditionCheckParam.Spd);
+        (target ?? buff.CarrierUnit).ResetCondition(Condition.ConditionCheckParam.Spd);
         base.OnApply(ent, buff, target);
     }
 
     public override void OnRemove(Event ent, Buff buff, Unit target = null)
     {
-        (target ?? buff.CarrierUnit).ResetCondition(PassiveBuff.ConditionCheckParam.Spd);
+        (target ?? buff.CarrierUnit).ResetCondition(Condition.ConditionCheckParam.Spd);
         base.OnRemove(ent, buff, target);
     }
 }

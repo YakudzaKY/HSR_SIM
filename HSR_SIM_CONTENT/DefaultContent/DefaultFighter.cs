@@ -44,7 +44,7 @@ public abstract class DefaultFighter : IFighter
                 AdjacentTargets = Ability.AdjacentTargetsEnm.All
             };
         defOpener.Events.Add(new ToughnessShred(null, this, Parent)
-            { OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue, Val = 30 });
+            { OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue, Value = 30 });
         Abilities.Add(defOpener);
     }
 
@@ -61,6 +61,7 @@ public abstract class DefaultFighter : IFighter
             return relics;
         }
     }
+
 
     protected ATracesEnm ATraces { get; set; }
 
@@ -79,26 +80,28 @@ public abstract class DefaultFighter : IFighter
     }
 
     public MechDictionary Mechanics { get; set; } // dictionary for save mechanics value in combat
-    public bool IsEliteUnit => false;
+
     public bool IsNpcUnit => false;
 
     //we need this debuff to track and correctly apply debuff stacks
+    public Ability.ElementEnm Element { get; set; }
+
     public AppliedBuff WeaknessBreakDebuff
     {
         get
         {
             return weaknessBreakDebuff ??= Element switch
             {
-                Unit.ElementEnm.Physical => new AppliedBuffBleedWb(Parent),
-                Unit.ElementEnm.Fire => new AppliedBuffBurnWb(Parent),
+                Ability.ElementEnm.Physical => new AppliedBuffBleedWb(Parent),
+                Ability.ElementEnm.Fire => new AppliedBuffBurnWb(Parent),
 
-                Unit.ElementEnm.Ice => new AppliedBuffFreezeWb(Parent),
+                Ability.ElementEnm.Ice => new AppliedBuffFreezeWb(Parent),
 
-                Unit.ElementEnm.Lightning => new AppliedBuffShockWb(Parent),
+                Ability.ElementEnm.Lightning => new AppliedBuffShockWb(Parent),
 
-                Unit.ElementEnm.Wind => new AppliedBuffWindShearWb(Parent) { CalculateStacks = CalcStacksByTarget },
-                Unit.ElementEnm.Quantum => new AppliedBuffEntanglementWb(Parent),
-                Unit.ElementEnm.Imaginary => new AppliedBuffImprisonmentWb(Parent),
+                Ability.ElementEnm.Wind => new AppliedBuffWindShearWb(Parent) { CalculateStacks = CalcStacksByTarget },
+                Ability.ElementEnm.Quantum => new AppliedBuffEntanglementWb(Parent),
+                Ability.ElementEnm.Imaginary => new AppliedBuffImprisonmentWb(Parent),
                 _ => throw new ArgumentOutOfRangeException()
             };
         }
@@ -107,11 +110,7 @@ public abstract class DefaultFighter : IFighter
 
 
     public abstract PathType? Path { get; }
-    public abstract Unit.ElementEnm Element { get; }
-
-    public List<Unit.ElementEnm> NativeWeaknesses { get; set; } = [];
-    public List<DebuffResist> DebuffResists { get; set; } = [];
-    public List<Resist> Resists { get; set; } = [];
+    
     public Unit Parent { get; set; }
 
     /// <summary>
@@ -234,12 +233,10 @@ public abstract class DefaultFighter : IFighter
         }
         else
         {
-            Parent.ParentTeam.ParentSim?.Parent.LogDebug("========What i can cast=====");
             //if dev mode then give All available sp else get from function
             var freeSp = step.Parent.Parent.DevMode
                 ? Parent.ParentTeam.GetRes(ResourceType.SP).ResVal
                 : HowManySpICanSpend();
-            Parent.ParentTeam.ParentSim?.Parent.LogDebug($"I have {freeSp:f} SP");
             var abilities = Abilities
                 .Where(x => x.Available() && x.IWannaUseIt() && (x.Cost <= freeSp || x.CostType != ResourceType.SP) &&
                             (x.AbilityType == Ability.AbilityTypeEnm.Basic ||
@@ -247,7 +244,6 @@ public abstract class DefaultFighter : IFighter
             var chosenAbility = step.Parent.Parent.DevMode
                 ? DevModeUtils.ChooseAbilityToCast(this, abilities)
                 : abilities.MaxBy(x => x.AbilityType);
-            Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Choose  {chosenAbility?.Name}");
             return chosenAbility;
         }
 
@@ -320,11 +316,11 @@ public abstract class DefaultFighter : IFighter
                     double score = 10 * targets.Count;
                     score += 5 * targets.Count(x => x == unit && x.GetRes(ResourceType.Toughness).ResVal == 0);
                     score += 3 * targets.Count(x => x == unit && x.GetWeaknesses(null).Any(z => z == Element));
-                    score += 2 * targets.Count(x => x.Fighter is DefaultNPCBossFIghter);
+                    score += 2 * targets.Count(x => x.Fighter is DefaultNpcBossFighter);
                     //if equal but hp diff go focus big target
                     if (score > bestScore ||
                         // ReSharper disable once CompareOfFloatsByEqualityOperator
-                        (score == bestScore && unit.GetHpPrc(null) > bestTarget?.GetHpPrc(null)))
+                        (score == bestScore && unit.GetHpPrc().Result > bestTarget?.GetHpPrc().Result))
                     {
                         bestTarget = unit;
                         bestScore = score;
@@ -354,7 +350,7 @@ public abstract class DefaultFighter : IFighter
 
     private int CalcStacksByTarget(Event ent)
     {
-        return ent.TargetUnit.Fighter.IsEliteUnit ? 3 : 1;
+        return ent.TargetUnit.IsEliteUnit ? 3 : 1;
     }
 
 
@@ -368,7 +364,7 @@ public abstract class DefaultFighter : IFighter
     private IEnumerable<Unit> GetWeaknessTargets()
     {
         return Parent.Enemies.Where(x => x.IsAlive
-                                         && x.GetWeaknesses(null).Any(y => y == Parent.Fighter.Element));
+                                         && x.GetWeaknesses(null).Any(y => y == Element));
     }
 
     //alive friends. select only who not defeated or waiting for rez
@@ -411,21 +407,16 @@ public abstract class DefaultFighter : IFighter
     {
         var totalRes = Parent.ParentTeam.GetRes(ResourceType.SP).ResVal;
         var res = totalRes;
-        Parent.ParentTeam.ParentSim?.Parent.LogDebug("---search for free SP---");
         double reservedSp = 0;
         var myReserve = HowManySpIReserve();
         //get friends reserved SP
         foreach (var friend in GetAliveFriends().Where(x => x != Parent))
             reservedSp += ((DefaultFighter)friend.Fighter).HowManySpIReserve();
-        Parent.ParentTeam.ParentSim?.Parent.LogDebug(
-            $"Resource: {res} .My friends reserve {reservedSp:f} Sp. My reserve is {myReserve:f} Sp");
 
         if (Role is UnitRole.MainDps)
         {
             //Cut Free  res to total-reserve
             res = Math.Min(res, totalRes - reservedSp);
-            Parent.ParentTeam.ParentSim?.Parent.LogDebug(
-                $"Im {Role}, don't care about other spenders except RESERVE SP");
         }
         else if (Role is UnitRole.Support)
         {
@@ -433,8 +424,6 @@ public abstract class DefaultFighter : IFighter
             res -= addSpenders;
             //Cut Free  res to total-reserve
             res = Math.Min(res, totalRes - reservedSp);
-            Parent.ParentTeam.ParentSim?.Parent.LogDebug(
-                $"Im {Role},I care about (reserve+ MainDps spenders)={addSpenders}");
         }
         else if (Role is UnitRole.SecondDps or UnitRole.ThirdDps)
         {
@@ -442,24 +431,15 @@ public abstract class DefaultFighter : IFighter
             res -= addSpenders;
             //Cut Free  res to total-reserve
             res = Math.Min(res, totalRes - reservedSp);
-            Parent.ParentTeam.ParentSim?.Parent.LogDebug(
-                $"Im {Role},I care about (reserve+ MainDps+Support spenders)={addSpenders}");
         }
         else if (Role is UnitRole.Healer)
         {
-            Parent.ParentTeam.ParentSim?.Parent.LogDebug($"Im {Role},i don't care about SP");
             res = myReserve;
         }
 
 
         //retake SP if not enough by role but have reserved
-        if (res < myReserve)
-        {
-            Parent.ParentTeam.ParentSim?.Parent.LogDebug($"I will try use my reserve {myReserve} anyway ");
-            res = Math.Min(myReserve, totalRes);
-        }
-
-        Parent.ParentTeam.ParentSim?.Parent.LogDebug("----");
+        if (res < myReserve) res = Math.Min(myReserve, totalRes);
 
 
         return Math.Max(res, 0);
@@ -473,8 +453,8 @@ public abstract class DefaultFighter : IFighter
     {
         if (Role == UnitRole.Healer)
             //if hp <=50% or hp<=70% and <=2500(at 80 lvl)
-            if (GetAliveFriends().Any(x => x.GetHpPrc(null) <= 0.5 ||
-                                           (x.GetHpPrc(null) <= 0.7 &&
+            if (GetAliveFriends().Any(x => x.GetHpPrc().Result <= 0.5 ||
+                                           (x.GetHpPrc().Result <= 0.7 &&
                                             x.GetRes(ResourceType.HP).ResVal <= x.Level * 31.25)))
                 return 1;
         return 0;

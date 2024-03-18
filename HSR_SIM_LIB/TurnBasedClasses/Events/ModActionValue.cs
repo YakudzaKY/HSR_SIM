@@ -12,7 +12,7 @@ public class ModActionValue : Event
 
     public override string GetDescription()
     {
-        return $"Reduce {TargetUnit?.Name:s} action value on {Val:f}";
+        return $"Reduce {TargetUnit?.Name:s} action value on {Value:f}";
     }
 
     public override void ProcEvent(bool revert)
@@ -20,14 +20,14 @@ public class ModActionValue : Event
         //if no target - reduce all units
         if (TargetUnit != null)
         {
-            TargetUnit.Stats.PerformedActionValue += (double)(revert ? -Val : Val);
+            TargetUnit.Stats.PerformedActionValue += (double)(revert ? -Value : Value);
         }
         else
         {
             foreach (var unit in ParentStep.Parent.CurrentFight.AllAliveUnits)
-                unit.Stats.PerformedActionValue += (double)(revert ? -Val : Val);
+                unit.Stats.PerformedActionValue += (double)(revert ? -Value : Value);
             if (!TriggersHandled)
-                ParentStep.Parent.TotalAv += (double)Val;
+                ParentStep.Parent.TotalAv += (double)Value;
         }
 
         base.ProcEvent(revert);

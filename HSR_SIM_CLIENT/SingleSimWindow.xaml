@@ -5,56 +5,47 @@
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                  xmlns:unitStuff="clr-namespace:HSR_SIM_LIB.UnitStuff;assembly=HSR_SIM_LIB"
+                 xmlns:views="clr-namespace:HSR_SIM_CLIENT.Views"
+                 xmlns:singleSim="clr-namespace:HSR_SIM_CLIENT.ViewModels"
                  mc:Ignorable="d"
                  Title="Single simulation" Height="Auto" Width="Auto"
                  WindowStartupLocation="CenterScreen"
-                 SizeToContent="WidthAndHeight"
-                 DataContext="{Binding RelativeSource={RelativeSource Self}}"
+                 SizeToContent="Width"
+                 DataContext="{Binding RelativeSource={RelativeSource Self}}">
 
-            >
 
- 
     <Grid>
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="60" />
 
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*" />
-            <ColumnDefinition Width="2*" />
-            <ColumnDefinition Width="1*" />
-            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="600" />
         </Grid.ColumnDefinitions>
-        <Image Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="0" Height="600" Name="CombatImg" Stretch="None" />
-
-        <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Height="120" Name="LogTextBlock" MaxLines="400"
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 ScrollViewer.VerticalScrollBarVisibility="Auto" />
+        <Image Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="0" Width="1200" Height="600" Name="CombatImg"
+               Stretch="None" />
 
 
-        <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Height="120" Name="DebugTextBlock" MaxLines="400"
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 ScrollViewer.VerticalScrollBarVisibility="Auto" />
-
-        <Grid Grid.Row="1" Grid.RowSpan="2" Grid.Column="0">
+        <Grid Grid.Row="1" Grid.Column="0">
             <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="2*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="4*" />
                 <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="4*" />
             </Grid.ColumnDefinitions>
-            <Button Grid.Row="0" Grid.Column="2" Name="BtnNext" Click="BtnNext_OnClick">Next step</Button>
-            <Button Grid.Row="0" Grid.Column="0" Name="BtnPrev" Click="BtnPrev_OnClick">Prev step</Button>
-            <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding Path=DbgMode, Mode=TwoWay}">Debug output</CheckBox>
+            <mah:Pivot Grid.Row="0" Grid.ColumnSpan="3" />
+            <Button Grid.Row="1" Grid.Column="2" Click="BtnNext_OnClick">Next step</Button>
+            <Button Grid.Row="1" Grid.Column="0" Click="BtnPrev_OnClick">Prev step</Button>
         </Grid>
         <Grid Grid.Row="0" Grid.RowSpan="3" Grid.Column="3">
             <Grid.RowDefinitions>
@@ -66,25 +57,35 @@
                 <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
-      
-                <Grid.Resources>
-                    <HierarchicalDataTemplate DataType    = "{x:Type unitStuff:Team}"
-                                              ItemsSource = "{Binding Path=Units}">
-                        <TextBlock Text="{Binding Path=Name}"/>
-                    
-                    </HierarchicalDataTemplate>
-                    <DataTemplate DataType="{x:Type unitStuff:Unit}">
-                        <TextBlock Text="{Binding Path=PrintName}"/>
-                    </DataTemplate>
-                </Grid.Resources>
-                <TreeView Grid.Row="0" Grid.Column="0"  SelectedItemChanged ="TreeView_OnSelectedItemChanged" SelectedValuePath="{Binding Path=SelectedObject,Mode=TwoWay}">
+
+            <Grid.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type unitStuff:Team}"
+                                          ItemsSource="{Binding Path=Units}">
+                    <TextBlock Text="{Binding Path=Name}" />
+
+                </HierarchicalDataTemplate>
+                <DataTemplate DataType="{x:Type unitStuff:Unit}">
+                    <TextBlock Text="{Binding Path=PrintName}" />
+                </DataTemplate>
+
+
+                <DataTemplate DataType="{x:Type singleSim:EventViewModel }">
+                    <TextBlock Text="{Binding Path=Name}" />
+                </DataTemplate>
+
+            </Grid.Resources>
+            <Border BorderThickness="1" BorderBrush="Gray" Grid.Row="0" Grid.Column="0">
+
+                <TreeView SelectedItemChanged="TreeView_OnSelectedUnitChanged"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          SelectedValuePath="{Binding Path=SelectedObject,Mode=TwoWay}">
                     <TreeView.ItemContainerStyle>
                         <Style TargetType="{x:Type TreeViewItem}">
                             <Setter Property="IsExpanded" Value="True" />
                         </Style>
                     </TreeView.ItemContainerStyle>
 
-                    <TreeViewItem  ItemsSource="{Binding Path=Teams,Mode=OneWay}" Header="Teams and Units" >
+                    <TreeViewItem ItemsSource="{Binding Path=Teams,Mode=OneWay}" Header="Teams and Units">
                         <TreeViewItem.ItemContainerStyle>
                             <Style TargetType="{x:Type TreeViewItem}">
                                 <Setter Property="IsExpanded" Value="True" />
@@ -93,11 +94,36 @@
                     </TreeViewItem>
 
                 </TreeView>
-        
-            
-            <DataGrid Grid.Row="0" Grid.Column="1" />
-            <TreeView Grid.Row="1" Grid.Column="0" />
-            <DataGrid Grid.Row="1" Grid.Column="1" />
+            </Border>
+
+
+            <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="Gray">
+                <ScrollViewer>
+                    <ScrollViewer.HorizontalScrollBarVisibility>Disabled</ScrollViewer.HorizontalScrollBarVisibility>
+                    <DataGrid HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch" />
+                </ScrollViewer>
+            </Border>
+
+            <Border Grid.Row="1" Grid.Column="0" BorderThickness="1" BorderBrush="Gray">
+                <ScrollViewer>
+                    <ScrollViewer.HorizontalScrollBarVisibility>Disabled</ScrollViewer.HorizontalScrollBarVisibility>
+                    <mah:HamburgerMenuListBox HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Stretch"
+                                              SelectedItem="{Binding SelectedEvent,Mode=OneWayToSource}"
+                                              ItemsSource="{Binding Path=Events,Mode=OneWay}" />
+                </ScrollViewer>
+            </Border>
+
+            <Border Grid.Row="1" Grid.Column="1" BorderThickness="1" BorderBrush="Gray">
+                <ScrollViewer>
+                    <ScrollViewer.HorizontalScrollBarVisibility>Disabled</ScrollViewer.HorizontalScrollBarVisibility>
+                    <views:EventView HorizontalAlignment="Stretch"
+                                     VerticalAlignment="Stretch" EventToView="{Binding SelectedEvent , Mode=OneWay}" />
+                </ScrollViewer>
+            </Border>
+
+
         </Grid>
 
     </Grid>

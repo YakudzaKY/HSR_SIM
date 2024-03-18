@@ -1,15 +1,29 @@
-﻿using HSR_SIM_LIB.TurnBasedClasses.Events;
+﻿using System;
+using System.Globalization;
+using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
+using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_LIB.Skills;
 
 public class Effect : CloneClass
 {
     /// <summary>
+    /// can be Formula or ref to Formula func
     ///     func ref that Calculate effect value on buff apply.
     ///     if RealTimeRecalculateValue== true then recalc will be every time on buff parsing
     /// </summary>
-    public Event.CalculateValuePrc CalculateValue { get; init; }
+    public object CalculateValue {
+        get => calculateValue;
+        set
+        {
+            if (value!=null&&value is not Formula && value is not Func<Event, Formula>)
+                throw new Exception("CalculateValue should be Formula or Func<Event, Formula>");
+            calculateValue = value;
+        }
+    }
+
+    private object calculateValue;
 
     public double? Value { get; set; }
 
@@ -18,6 +32,9 @@ public class Effect : CloneClass
     /// </summary>
     public virtual bool DynamicValue => CalculateValue != null;
 
+   
+
+    
     public bool StackAffectValue { get; set; } = true; // do we multiply final value by stack count ?
 
     /// <summary>
@@ -66,4 +83,14 @@ public class Effect : CloneClass
     public virtual void BeforeRemove(Event ent, Buff buff, Unit target = null)
     {
     }
+
+    public string Explain(double? calculatedValue=null)
+    {
+        string val = (Value == null) ? "*" : Value.ToString();
+        if (Value is null&&calculatedValue!=null)
+            val= "~"+calculatedValue;
+        return $"{GetType().Name} ({val}) ";
+    }
+
+
 }

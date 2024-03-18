@@ -17,29 +17,15 @@ public interface IFighter : ICloneable
     public delegate void EventHandler(Event ent);
 
     public delegate void StepHandler(Step step);
+    
+    public Ability.ElementEnm Element { get; set; }
 
     /// <summary>
     ///     A debuff that is applied when a vulnerability is broken.
     /// </summary>
     public AppliedBuff WeaknessBreakDebuff { get; set; }
-
-    public Unit.ElementEnm Element { get; }
+    
     public PathType? Path { get; }
-
-    /// <summary>
-    ///     native weaknesses defined by profile
-    /// </summary>
-    public List<Unit.ElementEnm> NativeWeaknesses { get; set; }
-
-    /// <summary>
-    ///     native resists defined by profile
-    /// </summary>
-    public List<Resist> Resists { get; set; }
-
-    /// <summary>
-    ///     native debuff resists defined by profile
-    /// </summary>
-    public List<DebuffResist> DebuffResists { get; set; }
 
     public EventHandler EventHandlerProc { get; set; }
 
@@ -70,15 +56,9 @@ public interface IFighter : ICloneable
     /// </summary>
     public MechDictionary Mechanics { get; set; }
 
-    /// <summary>
-    ///     Is Elite flag. Need for some weakness break calculations
-    /// </summary>
-    public bool IsEliteUnit { get; }
 
-    /// <summary>
-    ///     flag that unit is NPC
-    /// </summary>
-    public bool IsNpcUnit { get; }
+
+
 
     /// <summary>
     ///     Get best target for selected ability

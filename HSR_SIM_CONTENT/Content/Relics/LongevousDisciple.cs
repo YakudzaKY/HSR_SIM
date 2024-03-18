@@ -1,4 +1,5 @@
-﻿using HSR_SIM_LIB.Content;
+﻿using HSR_SIM_CONTENT.DefaultContent;
+using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
@@ -11,11 +12,11 @@ internal class LongevousDisciple : DefaultRelicSet
 {
     private readonly AppliedBuff uniqueAppliedBuff;
 
-    private Step lastDamageStep;
+    private Step? lastDamageStep;
 
     public LongevousDisciple(IFighter parent, int num) : base(parent, num)
     {
-        uniqueAppliedBuff = new AppliedBuff(Parent.Parent)
+        uniqueAppliedBuff = new AppliedBuff(Parent.Parent,null,this)
         {
             Type = Buff.BuffType.Buff,
             BaseDuration = 2,
@@ -31,7 +32,7 @@ internal class LongevousDisciple : DefaultRelicSet
             if ((ent is ResourceDrain
                  && ent.ParentStep.ActorAbility?.Parent.Parent.ParentTeam == Parent.Parent.ParentTeam
                  && ent.TargetUnit == Parent.Parent
-                 && ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealVal != 0)
+                 && ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealValue != 0)
                 || (ent.TargetUnit == Parent.Parent && ent is DirectDamage && ent.ParentStep != lastDamageStep))
             {
                 //only one proc per action 

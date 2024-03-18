@@ -5,11 +5,12 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using HSR_SIM_CLIENT.ViewModels;
 using HSR_SIM_LIB;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.UnitStuff;
-using HSR_SIM_LIB.Utils;
 using Image = System.Drawing.Image;
 
 namespace HSR_SIM_CLIENT;
@@ -17,20 +18,22 @@ namespace HSR_SIM_CLIENT;
 public partial class SingleSimWindow : INotifyPropertyChanged
 {
     private readonly bool busy = false;
-    private ObservableCollection<Team> teams;
     private readonly Worker wrk;
+    private ObservableCollection<EventViewModel> events;
+    private EventViewModel selectedEvent;
+    private ObservableCollection<Team> teams;
+
 
     public SingleSimWindow(SimCls simCls, string? devModePath = null, bool chkDevMode = false)
     {
         InitializeComponent();
         wrk = new Worker();
-        wrk.CbLog += WorkerCallBackString;
         wrk.CbRend += WorkerCallBackImages;
         wrk.CbGetDecision = WorkerCallBackGetDecision;
         wrk.DevMode = chkDevMode;
         wrk.LoadScenarioFromSim(simCls, devModePath);
         teams = new ObservableCollection<Team>();
-       
+        events = new ObservableCollection<EventViewModel>();
     }
 
 
@@ -45,8 +48,31 @@ public partial class SingleSimWindow : INotifyPropertyChanged
         }
     }
 
-    public bool DbgMode { get; set; }
+    public ObservableCollection<EventViewModel> Events
+    {
+        get => events;
+        private set
+        {
+            if (Equals(value, events)) return;
+            events = value;
+            OnPropertyChanged();
+        }
+    }
+
     public ICloneable? SelectedObject { get; set; }
+
+    public EventViewModel SelectedEvent
+    {
+        get => selectedEvent;
+        set
+        {
+            if (Equals(value, selectedEvent)) return;
+            selectedEvent = value;
+
+            OnPropertyChanged();
+        }
+    }
+
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -59,32 +85,7 @@ public partial class SingleSimWindow : INotifyPropertyChanged
     {
         if (PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(name));
     }
-    
 
-    /// <summary>
-    ///     For text callback
-    /// </summary>
-    /// <param name="kv"></param>
-    private void WorkerCallBackString(KeyValuePair<string, string> kv)
-    {
-        if (string.Equals(kv.Key, Constant.MsgLog))
-        {
-            LogTextBlock.AppendText(kv.Value);
-            LogTextBlock.AppendText(Environment.NewLine);
-            if (!busy)
-                LogTextBlock.ScrollToEnd();
-        }
-        else if (string.Equals(kv.Key, Constant.MsgDebug))
-        {
-            if (DbgMode)
-            {
-                DebugTextBlock.AppendText(kv.Value);
-                DebugTextBlock.AppendText(Environment.NewLine);
-                if (!busy)
-                    DebugTextBlock.ScrollToEnd();
-            }
-        }
-    }
 
     /// <summary>
     ///     ask user what decision are pick from options(do we crit etc...)
@@ -98,7 +99,6 @@ public partial class SingleSimWindow : INotifyPropertyChanged
         getDecision.ShowDialog();
         return getDecision.ItemIndex;
     }
-
 
 
     private static BitmapImage BitmapToImageSource(Image bitmap)
@@ -137,12 +137,21 @@ public partial class SingleSimWindow : INotifyPropertyChanged
     {
         //save selected unit
         Teams.Clear();
-        foreach (Team team in wrk.Sim.Teams)
+        foreach (var team in wrk.Sim.Teams)
             Teams.Add(team);
 
         //render selected unit
-        
+
         NotifyPropertyChanged(nameof(Teams));
+
+        //save selected unit
+        Events.Clear();
+        foreach (var ent in wrk.Sim.CurrentStep.Events)
+            Events.Add(new EventViewModel(ent));
+
+        //render selected unit
+
+        NotifyPropertyChanged(nameof(Events));
     }
 
     private void BtnPrev_OnClick(object sender, RoutedEventArgs e)
@@ -151,9 +160,16 @@ public partial class SingleSimWindow : INotifyPropertyChanged
         GetTeamsAndEvents();
     }
 
-    
-    private void TreeView_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+
+    private void TreeView_OnSelectedEventChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
-        
+        // on event click
+        if (((TreeView)sender).SelectedItem is EventViewModel evm)
+
+            SelectedEvent = evm;
+    }
+
+    private void TreeView_OnSelectedUnitChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+    {
     }
 }

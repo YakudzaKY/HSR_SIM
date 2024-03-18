@@ -21,7 +21,7 @@ public class IncreaseLevel : Event
     {
         //IncreaseLevel
 
-        TargetUnit.Level += (int)(revert ? -Val : Val);
+        TargetUnit.Level += (int)(revert ? -Value : Value);
         base.ProcEvent(revert);
     }
 }

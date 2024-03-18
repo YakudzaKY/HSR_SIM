@@ -3,6 +3,7 @@ using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
+using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_LIB.Skills.ReadyBuffs;
 
@@ -11,28 +12,28 @@ namespace HSR_SIM_LIB.Skills.ReadyBuffs;
 /// </summary>
 public class AppliedBuffEntanglementWb : AppliedBuff
 {
-    public AppliedBuffEntanglementWb(Unit sourceUnit, AppliedBuff reference = null) : base(sourceUnit, reference)
+    public AppliedBuffEntanglementWb(Unit sourceUnit, AppliedBuff reference =null  ) : base(sourceUnit, reference,typeof(AppliedBuffEntanglementWb))
     {
         Type = BuffType.Debuff;
         BaseDuration = 1;
         MaxStack = 5;
         Effects = new List<Effect>
         {
-            new EffEntanglement { DoTCalculateValue = FighterUtils.CalculateShieldBrokeDmg },
+            new EffEntanglement { DoTCalculateValue = FighterUtils.WeaknessBreakFormula() },
             new EffDelay
             {
-                CalculateValue = CalcBrkDmg,
+                CalculateValue = new Formula()
+                {
+                    Expression =
+                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetBreakDmg)} * 0.20"
+                },
                 StackAffectValue = false
             }
         };
         EventHandlerProc += EntanglementEventHandler;
     }
 
-    private double? CalcBrkDmg(Event ent)
-    {
-        return 0.20 * (1 + ent.SourceUnit.GetBreakDmg(ent));
-    }
-
+  
     private bool UnitGotHitByAbility(List<Event> events)
     {
         foreach (var ent in events)

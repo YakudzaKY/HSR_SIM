@@ -23,11 +23,11 @@ public class ForgottenHall : DefaultNPCFighter
         };
         //dmg events
         IncreaseCycle.Events.Add(new IncreaseLevel(null, this, Parent)
-            { Val = 1, TargetType = TargetTypeEnm.Self });
+            { Value = 1, TargetType = TargetTypeEnm.Self });
 
         IncreaseCycle.Events.Add(new ApplyBuff(null, this, Parent)
         {
-            AppliedBuffToApply = new AppliedBuff(Parent)
+            AppliedBuffToApply = new AppliedBuff(Parent,null,this)
             {
                 Type = Buff.BuffType.Buff,
                 Effects = new List<Effect> { new EffReduceBAV { Value = 50 } },
@@ -38,7 +38,7 @@ public class ForgottenHall : DefaultNPCFighter
         Abilities.Add(IncreaseCycle);
     }
 
-    public override void DefaultFighter_HandleEvent(Event ent)
+    protected override void DefaultFighter_HandleEvent(Event ent)
     {
         // wipe party if 1000+cycles
         if (ent.TargetUnit == Parent && ent is IncreaseLevel && Parent.Level >= 1000)
@@ -49,7 +49,7 @@ public class ForgottenHall : DefaultNPCFighter
                     TargetUnit = unit,
                     CanSetToZero = true,
                     ResType = Resource.ResourceType.HP,
-                    Val = unit.GetRes(Resource.ResourceType.HP).ResVal
+                    Value = unit.GetRes(Resource.ResourceType.HP).ResVal
                 };
 
                 ent.ChildEvents.Add(newEvent);

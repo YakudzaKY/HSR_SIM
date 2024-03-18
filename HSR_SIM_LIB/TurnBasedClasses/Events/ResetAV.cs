@@ -19,11 +19,11 @@ public class ResetAV : Event
     {
         //reset av
         if (!TriggersHandled)
-            Val = TargetUnit.Stats.PerformedActionValue;
+            Value = TargetUnit.Stats.PerformedActionValue;
         if (!revert)
             TargetUnit.Stats.ResetAV();
         else
-            TargetUnit.Stats.PerformedActionValue = (double)Val;
+            TargetUnit.Stats.PerformedActionValue = (double)Value;
 
 
         base.ProcEvent(revert);

@@ -16,12 +16,12 @@ public interface ILightCone : ICloneable
 
     public delegate void StepHandler(Step step);
 
-    public List<PassiveBuff> PassiveMods { get; set; }
+
     public int Rank { get; set; }
     public PathType Path { get; }
 
     public EventHandler EventHandlerProc { get; set; }
     public StepHandler StepHandlerProc { get; set; }
-    public List<Ability> Abilities { get; set; }
+
     public void Reset();
 }

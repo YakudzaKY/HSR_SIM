@@ -9,14 +9,11 @@ namespace HSR_SIM_LIB.TurnBasedClasses.Events;
 /// <summary>
 ///     Add effect to existing buff
 /// </summary>
-public class ApplyBuffEffect : Event
+public class ApplyBuffEffect(Step parent, ICloneable source, Unit sourceUnit) : Event(parent, source, sourceUnit)
 {
     public Effect Eff;
 
-    public ApplyBuffEffect(Step parent, ICloneable source, Unit sourceUnit) : base(parent, source, sourceUnit)
-    {
-    }
-
+    // ReSharper disable once PropertyCanBeMadeInitOnly.Global
     public AppliedBuff AppliedBuffToApply { get; set; }
 
     public override string GetDescription()

@@ -66,12 +66,10 @@ public class UnitStats : ICloneable
     public double MaxHpFix { get; set; }
 
     public double MaxHpPrc { get; set; } = 0;
-
-    public double BaseEffectRes { get; set; } = 0; //always 0 ?
+    
     public double EffectResPrc { get; set; } = 0;
 
-
-    public double BaseEffectHit { get; set; } = 0; //always 0 ?
+    
     public double EffectHitPrc { get; set; } = 0;
 
     public double BaseEnergyResPrc { get; set; }

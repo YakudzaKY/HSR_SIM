@@ -1,4 +1,5 @@
-﻿using HSR_SIM_LIB.Content;
+﻿using HSR_SIM_CONTENT.DefaultContent;
+using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -21,7 +22,7 @@ internal class ButtheBattleIsntOver : DefaultLightCone
                 PartyResourceGain spEnt = new(null, this, Parent.Parent)
                 {
                     TargetUnit = Parent.Parent,
-                    Val = 1,
+                    Value = 1,
                     ProcRatio = 2,
                     ResType = Resource.ResourceType.SP
                 };
@@ -34,7 +35,7 @@ internal class ButtheBattleIsntOver : DefaultLightCone
             {
                 ApplyBuff allDmg = new(null, this, Parent.Parent)
                 {
-                    AppliedBuffToApply = new AppliedBuff(Parent.Parent)
+                    AppliedBuffToApply = new AppliedBuff(Parent.Parent,null,this)
                     {
                         Type = Buff.BuffType.Buff,
                         Effects = new List<Effect> { new EffAllDamageBoost { Value = modifiersDmg[Rank - 1] } },

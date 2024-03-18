@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
+using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_LIB.Skills;
 
-public class AppliedBuff(Unit sourceUnit, Buff reference = null) : Buff(sourceUnit, reference)
+public class AppliedBuff(Unit sourceUnit, Buff reference ,object sourceObject ) : Buff(sourceUnit, reference,sourceObject:sourceObject)
 {
     public delegate void EventHandler(Event ent);
 
@@ -51,13 +53,14 @@ public class AppliedBuff(Unit sourceUnit, Buff reference = null) : Buff(sourceUn
     public IFighter.StepHandler StepHandlerProc { get; set; }
     public int? BaseDuration { get; set; }
     public int? DurationLeft { get; set; }
-
-    public object SourceObject { get; set; }
+    
 
     public string UniqueStr { get; set; }
 
     public bool Dispellable { get; init; } = true;
     public Unit UniqueUnit { get; set; }
+
+
 
     //do buff/debuff work on turn start?(DoT always at start)
     public bool IsEarlyProc()

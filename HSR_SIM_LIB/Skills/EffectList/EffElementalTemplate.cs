@@ -7,5 +7,5 @@ namespace HSR_SIM_LIB.Skills.EffectList;
 /// </summary>
 public class EffElementalTemplate : Effect
 {
-    public Unit.ElementEnm Element { get; init; }
+    public Ability.ElementEnm Element { get; init; }
 }

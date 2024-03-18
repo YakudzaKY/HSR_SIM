@@ -14,23 +14,19 @@ namespace HSR_SIM_GUI.ThreadTools;
 /// </summary>
 internal class AggregateThread
 {
-    private readonly int childThdCount; //child thread count
-    private readonly ConcurrentQueue<SimTask> cq = new(); //Task queue. Child threads will grab task from here
-
-    private readonly ConcurrentQueue<KeyValuePair<SimTask, Worker.RCombatResult>>
-        cResq = new(); //Child thread will insert results into this queue. Main thread will consume it
-
-    private readonly ThreadJob job; // ref to job( job= SimTask+ Results
-    private readonly Thread mainThread; //ref to thread
-    private readonly List<rTaskProgress> taskProgress = new(); //task progression tracker
-
+    private const int QueueSlotMultiplier = 100;
+    private readonly int childThreadCount;
+    private readonly ThreadJob job;
+    private readonly Thread mainThread;
+    private readonly List<TaskProgress> taskProgress = new();
+    private readonly ConcurrentQueue<SimTask> taskQueue = new();
+    private readonly ConcurrentQueue<KeyValuePair<SimTask, Worker.RCombatResult>> taskResultQueue = new();
     private readonly List<SimThread> threads = new();
 
-
-    public AggregateThread(ThreadJob pJob, int pChildThdCount)
+    public AggregateThread(ThreadJob pJob, int pChildThreadCount)
     {
         job = pJob;
-        childThdCount = pChildThdCount;
+        childThreadCount = pChildThreadCount;
         mainThread = new Thread(DoWork);
     }
 
@@ -41,79 +37,75 @@ internal class AggregateThread
         return taskProgress.Any(x => x.EndCount < job.Iterations);
     }
 
-    /// <summary>
-    ///     Interrupt all child threads
-    /// </summary>
-    private void StopChild()
+    private void StopChildThreads()
     {
         foreach (var thread in threads) thread.Interrupt();
 
         threads.Clear();
     }
 
-    private void DoWork(object taskList)
+    private void CreateChildThreads()
     {
-        var haveTaskToRun = true; //flag that we have some task to queue
-        var thd = taskList as ThreadJob;
-        //fill progress tracker
-        foreach (var task in thd.TaskList) taskProgress.Add(new rTaskProgress { STask = task });
-
-        //create child threads
-        for (var i = 0; i < childThdCount; i++)
+        for (var i = 0; i < childThreadCount; i++)
         {
-            var sim = new SimThread(cq, cResq);
-            threads.Add(sim);
+            var newThread = new SimThread(taskQueue, taskResultQueue);
+            threads.Add(newThread);
+        }
+    }
+
+    private bool QueueTasks(bool hasTasksToRun)
+    {
+        var freeQueueSlots = childThreadCount * QueueSlotMultiplier - taskQueue.Count;
+        while (freeQueueSlots > 0)
+        {
+            var taskToQueue = taskProgress.FirstOrDefault(x => x.StartCount < job.Iterations);
+            if (taskToQueue == null) return false;
+
+            var insertCount = Math.Min(freeQueueSlots, job.Iterations - taskToQueue.StartCount);
+            freeQueueSlots -= insertCount;
+            for (var i = 0; i < insertCount; i++) taskQueue.Enqueue(taskToQueue.STask);
+
+            taskToQueue.StartCount += insertCount;
         }
 
-        //while we have tasks that are not running, or tasks that we are waiting for completion
-        while (haveTaskToRun || HaveTaskToWait())
+        return true;
+    }
+
+    private void ProcessTaskResults()
+    {
+        while (taskResultQueue.TryDequeue(out var result))
         {
-            //start child jobs
-            if (haveTaskToRun)
-            {
-                //have slots to insert queue
-                var freeQSlots = childThdCount * 100 - cq.Count;
-                while (freeQSlots > 0)
-                {
-                    //get first uncompleted task
-                    var taskToQ = taskProgress.FirstOrDefault(x => x.StartCount < job.Iterations);
-                    // if no task then break
-                    if (taskToQ == null)
-                    {
-                        haveTaskToRun = false; //nothing to run
-                        break;
-                    }
+            var sProgress = taskProgress.First(x => x.STask == result.Key);
+            job.Aggregate(sProgress, result.Value);
+            sProgress.EndCount++;
+        }
+    }
 
-                    //how much recs should be inserted into queue
-                    var insCnt = Math.Min(freeQSlots, job.Iterations - taskToQ.StartCount);
-                    freeQSlots -= insCnt;
-                    for (var i = 0; i < insCnt; i++) cq.Enqueue(taskToQ.STask);
+    private void DoWork(object taskList)
+    {
+        var hasTasksToRun = true;
+        var threadJob = taskList as ThreadJob;
 
-                    taskToQ.StartCount += insCnt;
-                }
-            }
+        foreach (var task in threadJob.TaskList) taskProgress.Add(new TaskProgress { STask = task });
 
-            //aggregate res
-            while (cResq.TryDequeue(out var result))
-            {
-                var sProgress = taskProgress.First(x => x.STask == result.Key);
-                job.Aggregate(sProgress, result.Value);
-                sProgress.EndCount++;
-            }
+        CreateChildThreads();
 
+        while (hasTasksToRun || HaveTaskToWait())
+        {
+            if (hasTasksToRun) hasTasksToRun = QueueTasks(hasTasksToRun);
+            ProcessTaskResults();
             try
             {
                 Thread.Sleep(10);
             }
             catch (ThreadInterruptedException e)
             {
-                StopChild();
-                Console.WriteLine("thread interrupted");
+                StopChildThreads();
                 break;
             }
         }
 
-        StopChild();
+        StopChildThreads();
     }
 
     public void Start()
@@ -126,13 +118,12 @@ internal class AggregateThread
         mainThread.Interrupt();
     }
 
-    //return number of completed sims. Can use it for progress bar or other visual control
     public int Progress()
     {
         return taskProgress.Sum(x => x.EndCount);
     }
 
-    public record rTaskProgress
+    internal record TaskProgress
     {
         public SimTask STask { get; init; }
         public int StartCount { get; set; }

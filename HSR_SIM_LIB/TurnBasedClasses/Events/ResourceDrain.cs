@@ -16,22 +16,22 @@ public class ResourceDrain : Event
 
     public override string GetDescription()
     {
-        return TargetUnit.Name + " res drain : " + Val + " " + ResType + "(by " + SourceUnit.Name + ")";
+        return TargetUnit.Name + " res drain : " + Value + " " + ResType + "(by " + SourceUnit.Name + ")";
     }
 
     public override void ProcEvent(bool revert)
     {
         //Resource drain
 
-        if (RealVal == null)
+        if (RealValue == null)
         {
-            RealVal = Math.Min(TargetUnit.GetRes(ResType).ResVal, (double)Val);
-            if (!CanSetToZero && RealVal >= TargetUnit.GetRes(ResType).ResVal) RealVal -= 1;
+            RealValue = Math.Min(TargetUnit.GetRes(ResType).ResVal, (double)Value);
+            if (!CanSetToZero && RealValue >= TargetUnit.GetRes(ResType).ResVal) RealValue -= 1;
             //Game mechanics depend on Val instead
-            Val = RealVal;
+            Value = RealValue;
         }
 
-        TargetUnit.GetRes(ResType).ResVal += (double)-(revert ? -RealVal : RealVal);
+        TargetUnit.GetRes(ResType).ResVal += (double)-(revert ? -RealValue : RealValue);
         base.ProcEvent(revert);
     }
 }

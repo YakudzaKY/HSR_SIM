@@ -1,7 +1,9 @@
-﻿using HSR_SIM_LIB.Content;
+﻿using HSR_SIM_CONTENT.DefaultContent;
+using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
+using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_CONTENT.Content.Relics;
 
@@ -14,32 +16,32 @@ internal class PioneerDiverofDeadWaters : DefaultRelicSet
 
     public PioneerDiverofDeadWaters(IFighter parent, int num) : base(parent, num)
     {
-        onDebuffHitAppliedBuff = new AppliedBuff(Parent.Parent)
+        onDebuffHitAppliedBuff = new AppliedBuff(Parent.Parent,null,this)
             { BaseDuration = 1, Dispellable = false, CustomIconName = "Sword", Effects = [] };
         if (num >= 2)
-            Parent.Parent.PassiveBuffs.Add(new PassiveBuff(parent.Parent)
+            Parent.Parent.PassiveBuffs.Add(new PassiveBuff(parent.Parent, this)
             {
                 Effects = new List<Effect> { new EffAllDamageBoost { Value = 0.12 } },
                 IsTargetCheck = true,
                 Target = Parent.Parent,
-                Condition = new PassiveBuff.ConditionRec
+                ApplyConditions = [new Condition
                 {
-                    ConditionParam = PassiveBuff.ConditionCheckParam.AnyDebuff,
-                    ConditionExpression = PassiveBuff.ConditionCheckExpression.Exists
-                }
+                    ConditionParam = Condition.ConditionCheckParam.AnyDebuff,
+                    ConditionExpression = Condition.ConditionCheckExpression.Exists
+                }]
             });
 
         if (num >= 4)
-            Parent.Parent.PassiveBuffs.Add(new PassiveBuff(parent.Parent)
+            Parent.Parent.PassiveBuffs.Add(new PassiveBuff(parent.Parent, this)
             {
                 Effects = new List<Effect> { new EffCritDmg { CalculateValue = Calc4Pieces } },
                 IsTargetCheck = true,
                 Target = Parent.Parent,
-                Condition = new PassiveBuff.ConditionRec
+                ApplyConditions = [new Condition
                 {
-                    ConditionParam = PassiveBuff.ConditionCheckParam.AnyDebuff,
-                    ConditionExpression = PassiveBuff.ConditionCheckExpression.Exists
-                }
+                    ConditionParam = Condition.ConditionCheckParam.AnyDebuff,
+                    ConditionExpression = Condition.ConditionCheckExpression.Exists
+                }]
             });
     }
 
@@ -66,7 +68,7 @@ internal class PioneerDiverofDeadWaters : DefaultRelicSet
         base.DefaultRelicSet_HandleEvent(ent);
     }
 
-    private double? Calc4Pieces(Event ent)
+    private Formula Calc4Pieces(Event ent)
     {
         var debuffs = ent.TargetUnit.AppliedBuffs.Count(x =>
             x.Type == Buff.BuffType.Debuff || x.Type == Buff.BuffType.Dot);
@@ -74,9 +76,9 @@ internal class PioneerDiverofDeadWaters : DefaultRelicSet
         var mod = ent.SourceUnit.AppliedBuffs.Any(x => x.Reference == onDebuffHitAppliedBuff) ? 2 : 1;
         return debuffs switch
         {
-            >= 3 => 0.12 * mod,
-            2 => 0.08 * mod,
-            _ => 0
+            >= 3 => new Formula() {Expression = $"0.12 * {mod}"},
+            2 => new Formula() {Expression = $"0.08 * {mod}"},
+            _ => new Formula() {Expression = $"0"},
         };
     }
 }

@@ -7,5 +7,5 @@ namespace HSR_SIM_LIB.Skills.EffectList;
 /// </summary>
 public class EffBleed : EffDotTemplate
 {
-    public override Unit.ElementEnm Element { get; init; } = Unit.ElementEnm.Physical;
+    public override Ability.ElementEnm Element { get; init; } = Ability.ElementEnm.Physical;
 }

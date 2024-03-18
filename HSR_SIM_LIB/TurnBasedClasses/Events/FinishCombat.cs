@@ -33,7 +33,7 @@ public class FinishCombat : Event
                 //set sp to 0
                 ChildEvents.Add(new PartyResourceDrain(ParentStep, this, null)
                 {
-                    Val = ParentStep.Parent.PartyTeam.GetRes(Resource.ResourceType.SP).ResVal,
+                    Value = ParentStep.Parent.PartyTeam.GetRes(Resource.ResourceType.SP).ResVal,
                     TargetTeam = ParentStep.Parent.PartyTeam, ResType = Resource.ResourceType.SP
                 });
             }

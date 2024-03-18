@@ -1,16 +1,18 @@
-﻿using HSR_SIM_LIB.Content;
+﻿using System.Runtime.CompilerServices;
+using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
+using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_CONTENT.Content.NPC;
 
 public class MaraStruckSoldier : DefaultNPCFighter
 {
     //static because max 5 stacks by all units this type
-    private static readonly AppliedBuff myDoTRef = new(null)
+    private static readonly AppliedBuff myDoTRef = new(null, null, typeof(MaraStruckSoldier))
     {
         Type = Buff.BuffType.Dot,
         Effects = []
@@ -20,19 +22,19 @@ public class MaraStruckSoldier : DefaultNPCFighter
     private readonly Ability? Rejuvenate;
     private readonly AppliedBuff uniqueAppliedBuff;
 
-    public MaraStruckSoldier(Unit? parent) : base(parent)
+    public MaraStruckSoldier(Unit parent) : base(parent)
     {
         //Elemenet
-        Element = Unit.ElementEnm.Wind;
+        Element = Ability.ElementEnm.Wind;
 
-        NativeWeaknesses.Add(Unit.ElementEnm.Fire);
-        NativeWeaknesses.Add(Unit.ElementEnm.Ice);
-        NativeWeaknesses.Add(Unit.ElementEnm.Quantum);
-        Resists.Add(new Resist { ResistType = Unit.ElementEnm.Physical, ResistVal = 0.20 });
-        Resists.Add(new Resist { ResistType = Unit.ElementEnm.Lightning, ResistVal = 0.20 });
-        Resists.Add(new Resist { ResistType = Unit.ElementEnm.Wind, ResistVal = 0.20 });
-        Resists.Add(new Resist { ResistType = Unit.ElementEnm.Imaginary, ResistVal = 0.20 });
-        myDotDeAppliedBuff = new AppliedBuff(Parent)
+        Parent.NativeWeaknesses.Add(Ability.ElementEnm.Fire);
+        Parent.NativeWeaknesses.Add(Ability.ElementEnm.Ice);
+        Parent.NativeWeaknesses.Add(Ability.ElementEnm.Quantum);
+        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Physical, ResistVal = 0.20 });
+        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Lightning, ResistVal = 0.20 });
+        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Wind, ResistVal = 0.20 });
+        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Imaginary, ResistVal = 0.20 });
+        myDotDeAppliedBuff = new AppliedBuff(Parent, null, this)
         {
             Reference = myDoTRef,
             Type = Buff.BuffType.Dot,
@@ -41,10 +43,17 @@ public class MaraStruckSoldier : DefaultNPCFighter
             MaxStack = 5,
             Effects = new List<Effect>
             {
-                new EffWindShear { DoTCalculateValue = CalcMyDoT }
+                new EffWindShear
+                {
+                    DoTCalculateValue = FighterUtils.DamageFormula(new Formula()
+                    {
+                        Expression =
+                            $"0.5 * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetMaxHp)}"
+                    })
+                }
             }
         };
-        uniqueAppliedBuff = new AppliedBuff(Parent)
+        uniqueAppliedBuff = new AppliedBuff(Parent, null, this)
         {
             Dispellable = true,
             Type = Buff.BuffType.Buff,
@@ -64,9 +73,9 @@ public class MaraStruckSoldier : DefaultNPCFighter
             TargetType = Ability.TargetTypeEnm.Self
         };
         // Rejuvenate.Events.Add(new RemoveBuff(null,this,Parent) {TargetUnit = Parent,BuffToApply = uniqueBuff});
-        Rejuvenate.Events.Add(new Healing(null, this, Parent) { CalculateValue = CalculateReHeal });
+        Rejuvenate.Events.Add(new Healing(null, this, Parent) { CalculateValue =   FighterUtils.HealFormula(new Formula(){Expression =$"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} * 0.5" }) });
         Rejuvenate.Events.Add(new ResourceGain(null, this, Parent)
-            { ResType = Resource.ResourceType.Toughness, Val = Parent.Stats.MaxToughness });
+            { ResType = Resource.ResourceType.Toughness, Value = Parent.Stats.MaxToughness });
         Abilities.Add(Rejuvenate);
 
         Ability? myAttackAbility;
@@ -75,7 +84,6 @@ public class MaraStruckSoldier : DefaultNPCFighter
         {
             AbilityType = Ability.AbilityTypeEnm.Basic,
             Name = "Callous Tailwind",
-            Element = Element,
             AdjacentTargets = Ability.AdjacentTargetsEnm.None
         };
         //dmg events
@@ -83,9 +91,15 @@ public class MaraStruckSoldier : DefaultNPCFighter
         foreach (var proportion in new[] { 0.25, 0.25, 0.5 })
         {
             myAttackAbility.Events.Add(new DirectDamage(null, this, Parent)
-                { CalculateValue = CalcMyAttack, CalculateProportion = proportion });
+            {
+                CalculateValue = FighterUtils.DamageFormula(new Formula()
+                {
+                    Expression =
+                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetAttack)} * 2 * {proportion}"
+                })
+            });
             myAttackAbility.Events.Add(
-                new EnergyGain(null, this, Parent) { Val = 15, CalculateProportion = proportion });
+                new EnergyGain(null, this, Parent) { Value = 15 * proportion });
         }
 
         myAttackAbility.Events.Add(new AttemptEffect(null, this, Parent)
@@ -94,17 +108,9 @@ public class MaraStruckSoldier : DefaultNPCFighter
         Abilities.Add(myAttackAbility);
     }
 
-    public static double? CalcMyDoT(Event ent)
-    {
-        return FighterUtils.CalculateDmgByBasicVal(ent.SourceUnit.GetAttack(ent) * 0.5, ent);
-    }
 
-    public double? CalculateReHeal(Event ent)
-    {
-        return FighterUtils.CalculateHealByBasicVal(ent.TargetUnit.GetMaxHp(ent) * 0.5, ent);
-    }
-
-    public override void DefaultFighter_HandleEvent(Event ent)
+ 
+    protected override void DefaultFighter_HandleEvent(Event ent)
     {
         if (ent is UnitEnteringBattle && ent.TargetUnit == Parent)
         {
@@ -123,10 +129,5 @@ public class MaraStruckSoldier : DefaultNPCFighter
     {
         return Parent.AppliedBuffs.Any(x => x.Reference == uniqueAppliedBuff) ||
                Parent.LivingStatus == Unit.LivingStatusEnm.WaitingForFollowUp;
-    }
-
-    public double? CalcMyAttack(Event ent)
-    {
-        return FighterUtils.CalculateDmgByBasicVal(Parent.GetAttack(ent) * 2, ent);
     }
 }

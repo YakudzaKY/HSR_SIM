@@ -18,19 +18,19 @@ public class EnergyGain : Event
 
     public override string GetDescription()
     {
-        return $"{TargetUnit.Name} Gain energy:{Val:f} * regenRate = {RealVal:f} source: {Source.GetType().Name}";
+        return $"{TargetUnit.Name} Gain energy:{Value:f} * regenRate = {RealValue:f} source: {Source.GetType().Name}";
     }
 
 
     public override void ProcEvent(bool revert)
     {
-        if (RealVal == null)
+        if (RealValue == null)
         {
-            RealVal = Val * (IsRawEnergy ? 1 : TargetUnit.EnergyRegenPrc(this));
-            RealVal = Math.Min((double)RealVal, TargetUnit.Stats.BaseMaxEnergy - TargetUnit.CurrentEnergy);
+            RealValue = Value * (IsRawEnergy ? 1 : TargetUnit.EnergyRegenPrc(this));
+            RealValue = Math.Min((double)RealValue, TargetUnit.Stats.BaseMaxEnergy - TargetUnit.CurrentEnergy);
         }
 
-        TargetUnit.CurrentEnergy += (double)(revert ? -RealVal : RealVal);
+        TargetUnit.CurrentEnergy += (double)(revert ? -RealValue : RealValue);
         base.ProcEvent(revert);
     }
 }

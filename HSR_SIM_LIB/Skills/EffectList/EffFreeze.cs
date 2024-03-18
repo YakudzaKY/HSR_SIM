@@ -8,7 +8,7 @@ namespace HSR_SIM_LIB.Skills.EffectList;
 /// </summary>
 public class EffFreeze : EffDotTemplate
 {
-    public override Unit.ElementEnm Element { get; init; } = Unit.ElementEnm.Ice;
+    public override Ability.ElementEnm Element { get; init; } = Ability.ElementEnm.Ice;
 
     public override void OnNaturalExpire(Event ent, Buff buff)
     {
