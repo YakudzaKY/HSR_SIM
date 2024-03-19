@@ -15,24 +15,22 @@ namespace HSR_SIM_CLIENT;
 internal static class GuiUtils
 {
     private const int CursorShowing = 0x00000001;
-    public static IniFile IniF = new(AppDomain.CurrentDomain.BaseDirectory + "config.ini");
+    public static readonly IniFile IniF = new(AppDomain.CurrentDomain.BaseDirectory + "config.ini");
 
     public static BitmapImage ToBitmapImage(this Bitmap bitmap)
     {
-        using (var memory = new MemoryStream())
-        {
-            bitmap.Save(memory, ImageFormat.Png);
-            memory.Position = 0;
+        using var memory = new MemoryStream();
+        bitmap.Save(memory, ImageFormat.Png);
+        memory.Position = 0;
 
-            var bitmapImage = new BitmapImage();
-            bitmapImage.BeginInit();
-            bitmapImage.StreamSource = memory;
-            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-            bitmapImage.EndInit();
-            bitmapImage.Freeze();
+        var bitmapImage = new BitmapImage();
+        bitmapImage.BeginInit();
+        bitmapImage.StreamSource = memory;
+        bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+        bitmapImage.EndInit();
+        bitmapImage.Freeze();
 
-            return bitmapImage;
-        }
+        return bitmapImage;
     }
 
     [DllImport("user32.dll")]
@@ -42,46 +40,39 @@ internal static class GuiUtils
     public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 
     [DllImport("user32.dll")]
-    private static extern bool GetCursorInfo(out CURSORINFO pci);
+    private static extern bool GetCursorInfo(out CursorInfo pci);
 
     [DllImport("user32.dll")]
-    private static extern bool DrawIcon(IntPtr hDc, int X, int Y, IntPtr hIcon);
+    private static extern bool DrawIcon(IntPtr hDc, int x, int y, IntPtr hIcon);
 
 
     /// <summary>
     ///     get screenshot
     /// </summary>
-    /// <param name="CaptureMouse"></param>
+    /// <param name="captureMouse"></param>
     /// <returns></returns>
-    public static Bitmap CaptureScreen(bool CaptureMouse)
+    public static Bitmap CaptureScreen(bool captureMouse)
     {
-        var result = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height,
+        var result = new Bitmap(Screen.PrimaryScreen!.Bounds.Width, Screen.PrimaryScreen.Bounds.Height,
             PixelFormat.Format24bppRgb);
 
-        try
-        {
-            using (var g = Graphics.FromImage(result))
+    
+            using var g = Graphics.FromImage(result);
+            g.CopyFromScreen(0, 0, 0, 0, Screen.PrimaryScreen.Bounds.Size, CopyPixelOperation.SourceCopy);
+
+            if (captureMouse)
             {
-                g.CopyFromScreen(0, 0, 0, 0, Screen.PrimaryScreen.Bounds.Size, CopyPixelOperation.SourceCopy);
+                CursorInfo pci;
+                pci.cbSize = Marshal.SizeOf(typeof(CursorInfo));
 
-                if (CaptureMouse)
-                {
-                    CURSORINFO pci;
-                    pci.cbSize = Marshal.SizeOf(typeof(CURSORINFO));
-
-                    if (GetCursorInfo(out pci))
-                        if (pci.flags == CursorShowing)
-                        {
-                            DrawIcon(g.GetHdc(), pci.ptScreenPos.x, pci.ptScreenPos.y, pci.hCursor);
-                            g.ReleaseHdc();
-                        }
-                }
+                if (GetCursorInfo(out pci))
+                    if (pci.flags == CursorShowing)
+                    {
+                        DrawIcon(g.GetHdc(), pci.ptScreenPos.x, pci.ptScreenPos.y, pci.hCursor);
+                        g.ReleaseHdc();
+                    }
             }
-        }
-        catch
-        {
-            result = null;
-        }
+        
 
         return result;
     }
@@ -91,13 +82,10 @@ internal static class GuiUtils
 
     public static int WaitForActiveWindow(nint windowHandle, int seconds)
     {
-        DateTime startTime;
+        var startTime = DateTime.Now;
+        var activeForegroundWindow = GetForegroundWindow();
 
-
-        startTime = DateTime.Now;
-        var activefForegroundWindow = GetForegroundWindow();
-
-        while (windowHandle != activefForegroundWindow)
+        while (windowHandle != activeForegroundWindow)
         {
             //Check for timeout
             if ((DateTime.Now - startTime).TotalSeconds > seconds) //greater than here
@@ -105,7 +93,7 @@ internal static class GuiUtils
 
             //Check every 0.2 seconds
             Thread.Sleep(200);
-            activefForegroundWindow = GetForegroundWindow();
+            activeForegroundWindow = GetForegroundWindow();
         }
 
         return 0;
@@ -128,16 +116,16 @@ internal static class GuiUtils
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    private struct CURSORINFO
+    private struct CursorInfo
     {
         public Int32 cbSize;
         public Int32 flags;
         public IntPtr hCursor;
-        public POINTAPI ptScreenPos;
+        public PointApi ptScreenPos;
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    private struct POINTAPI
+    private struct PointApi
     {
         public int x;
         public int y;

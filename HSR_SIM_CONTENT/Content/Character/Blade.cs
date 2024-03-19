@@ -1,5 +1,4 @@
 ﻿using HSR_SIM_CONTENT.DefaultContent;
-using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
@@ -19,17 +18,17 @@ public class Blade : DefaultFighter
     //some modifiers
 
 
-    private readonly Event forestMainTrgtHit; //last hit in main target by this ability(for event handlers)
+    private readonly Event forestMainTargetHit = null!; //last hit in main target by this ability(for event handlers)
     private readonly AppliedBuff hellscapeAppliedBuff; //E buff
 
 
     private readonly Ability? shuhuGift; //passive ability
 
-    private readonly double shuHuMaxCnt; // passive max counter
+    private readonly int shuHuMaxCnt; // passive max counter
 
-    private Step lastDamageStep;
+    private Step lastDamageStep = null!;
 
-    public Blade(Unit? parent) : base(parent)
+    public Blade(Unit parent) : base(parent)
     {
         Parent.Stats.BaseMaxEnergy = 130;
         Element = ElementEnm.Wind;
@@ -40,16 +39,16 @@ public class Blade : DefaultFighter
         var ssSkillLvl = Parent.Skills.First(x => x.Name == "Shard Sword").Level;
 
         //get modifier by level
-        var dsMainAtk = FighterUtils.GetAbilityScaling(0.24, 0.4, dsSkillLvl);
-        var dsMainHp = FighterUtils.GetAbilityScaling(0.60, 1, dsSkillLvl);
+        var dsMainAtk = GetAbilityScaling(0.24, 0.4, dsSkillLvl);
+        var dsMainHp = GetAbilityScaling(0.60, 1, dsSkillLvl);
 
-        var dsAdjAtk = FighterUtils.GetAbilityScaling(0.096, 0.16, dsSkillLvl);
-        var dsAdjHp = FighterUtils.GetAbilityScaling(0.24, 0.4, dsSkillLvl);
+        var dsAdjAtk = GetAbilityScaling(0.096, 0.16, dsSkillLvl);
+        var dsAdjHp = GetAbilityScaling(0.24, 0.4, dsSkillLvl);
 
-        var forestAdjAtk = FighterUtils.GetBasicScaling(0.20, 0.40, fsSkillLvl);
+        var forestAdjAtk = GetBasicScaling(0.20, 0.40, fsSkillLvl);
 
-        var sgAtk = FighterUtils.GetAbilityScaling(0.22, 0.44, sgSkillLvl);
-        var sgHp = FighterUtils.GetAbilityScaling(0.55, 0.110, sgSkillLvl);
+        var sgAtk = GetAbilityScaling(0.22, 0.44, sgSkillLvl);
+        var sgHp = GetAbilityScaling(0.55, 0.110, sgSkillLvl);
 
         hellscapeAppliedBuff = new AppliedBuff(Parent, null, this)
         {
@@ -58,7 +57,7 @@ public class Blade : DefaultFighter
             MaxStack = 1,
             CustomIconName = "Hellscape",
             Dispellable = false,
-            Effects = new List<Effect> { new EffAllDamageBoost { Value = 0.4 } }
+            Effects = [new EffAllDamageBoost { Value = 0.4 }]
         };
 
 
@@ -74,7 +73,7 @@ public class Blade : DefaultFighter
             Name = "Shuhu's Gift",
             TargetType = TargetTypeEnm.Enemy,
             AdjacentTargets = AdjacentTargetsEnm.All,
-            Available = SGAvailable,
+            Available = SgAvailable,
             FollowUpPriority = PriorityEnm.Medium
         };
         shuHuMaxCnt = parent.Rank >= 6 ? 4 : 5; //4 stacks on 6 eidolon 
@@ -109,16 +108,15 @@ public class Blade : DefaultFighter
         });
 
 
-        shuhuGift.Events.Add(new MechanicValChg(null, this, Parent)
-            { AbilityValue = shuhuGift, Value = -shuHuMaxCnt });
+        shuhuGift.Events.Add(new MechanicValReset(null, this, Parent)
+            { AbilityValue = shuhuGift});
         Abilities.Add(shuhuGift);
         //Passive counter
         Mechanics.AddVal(shuhuGift);
 
         //basic
 
-        Ability? shardSword;
-        shardSword = new Ability(this)
+        var shardSword = new Ability(this)
         {
             AbilityType = AbilityTypeEnm.Basic,
             Name = "Shard Sword",
@@ -183,9 +181,9 @@ public class Blade : DefaultFighter
                 CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain
             });
             //main target thg
-            forestMainTrgtHit = new ToughnessShred(null, this, Parent)
+            forestMainTargetHit = new ToughnessShred(null, this, Parent)
                 { Value = 60 * proportion, CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain };
-            forestOfSwords.Events.Add(forestMainTrgtHit);
+            forestOfSwords.Events.Add(forestMainTargetHit);
             //energy
             forestOfSwords.Events.Add(new EnergyGain(null, this, Parent)
                 { Value = 30 * proportion, TargetUnit = Parent });
@@ -251,7 +249,16 @@ public class Blade : DefaultFighter
                         ? $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(GetDsMechanic)} min getDsMaxLostHp * 1.5 ) "
                         : ""),
                 Variables = new Dictionary<string, Formula.VarVal>()
-                    { { "getDsMaxLostHp", new Formula.VarVal() { ReplaceExpression =$"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} * 0.9"} } }
+                {
+                    {
+                        "getDsMaxLostHp",
+                        new Formula.VarVal()
+                        {
+                            ReplaceExpression =
+                                $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} * 0.9"
+                        }
+                    }
+                }
             }),
 
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain
@@ -269,7 +276,16 @@ public class Blade : DefaultFighter
                     $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} * {dsAdjHp}  ) " +
                     $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(GetDsMechanic)} min getDsMaxLostHp * {dsAdjHp}  ) ",
                 Variables = new Dictionary<string, Formula.VarVal>()
-                    { { "getDsMaxLostHp", new Formula.VarVal() { ReplaceExpression = $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} * 0.9" } } }
+                {
+                    {
+                        "getDsMaxLostHp",
+                        new Formula.VarVal()
+                        {
+                            ReplaceExpression =
+                                $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} * 0.9"
+                        }
+                    }
+                }
             }),
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent
         });
@@ -279,7 +295,9 @@ public class Blade : DefaultFighter
         {
             AbilityValue = deathSentence,
             CalculateValue = new Formula()
-                { Expression = $"0 - {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(GetDsMechanic)}" }
+            {
+                Expression = $"0 - {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(GetDsMechanic)}"
+            }
         });
 
         Abilities.Add(deathSentence);
@@ -332,10 +350,9 @@ public class Blade : DefaultFighter
         Abilities.Add(karmaWind);
 
 
-        Ability? Hellscape;
-
-        //Hellscape
-        Hellscape = new Ability(this)
+        var hellscape =
+            //Hellscape
+            new Ability(this)
         {
             AbilityType = AbilityTypeEnm.Ability,
             Name = "Hellscape",
@@ -348,7 +365,7 @@ public class Blade : DefaultFighter
         };
 
         //dmg events
-        Hellscape.Events.Add(new ResourceDrain(null, this, Parent)
+        hellscape.Events.Add(new ResourceDrain(null, this, Parent)
         {
             ResType = Resource.ResourceType.HP,
             TargetType = TargetTypeEnm.Self,
@@ -358,13 +375,13 @@ public class Blade : DefaultFighter
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain
         });
 
-        Hellscape.Events.Add(new ApplyBuff(null, this, Parent)
+        hellscape.Events.Add(new ApplyBuff(null, this, Parent)
         {
             TargetUnit = Parent,
             AppliedBuffToApply = hellscapeAppliedBuff
         });
 
-        Abilities.Add(Hellscape);
+        Abilities.Add(hellscape);
 
 //=====================
 
@@ -375,7 +392,7 @@ public class Blade : DefaultFighter
         if (ATraces.HasFlag(ATracesEnm.A2))
             Parent.PassiveBuffs.Add(new PassiveBuff(Parent, this)
             {
-                Effects = new List<Effect> { new EffIncomeHealingPrc { Value = 0.20 } },
+                Effects = [new EffIncomeHealingPrc { Value = 0.20 }],
                 CustomIconName = "Traces\\A2",
 
                 Target = Parent,
@@ -392,10 +409,7 @@ public class Blade : DefaultFighter
         if (ATraces.HasFlag(ATracesEnm.A6))
             Parent.PassiveBuffs.Add(new PassiveBuff(Parent, this)
             {
-                Effects = new List<Effect>
-                {
-                    new EffAbilityTypeBoost { Value = 0.20, AbilityType = AbilityTypeEnm.FollowUpAction }
-                },
+                Effects = [new EffAbilityTypeBoost { Value = 0.20, AbilityType = AbilityTypeEnm.FollowUpAction }],
                 Target = Parent
             });
 
@@ -413,10 +427,10 @@ public class Blade : DefaultFighter
         };
     }
 
-    public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Destruction;
+    public override PathType? Path => PathType.Destruction;
 
     /// <summary>
-    /// forumla will use this
+    /// formula will use this
     /// </summary>
     /// <returns></returns>
     public double GetDsMechanic()
@@ -425,12 +439,12 @@ public class Blade : DefaultFighter
     }
 
     private AppliedBuff E4AppliedBuff { get; }
-//Blade constructor
 
-/*
- * if 2+ turns left we dont need SP.
- * duration 2= turn+ next from bronya turn or double turn between support turn
- */
+
+    /*
+     * if 2+ turns left we dont need SP.
+     * duration 2= turn+ next from bronya turn or double turn between support turn
+     */
     protected override double WillSpend()
     {
         return (Parent.AppliedBuffs.FirstOrDefault(x => x.Reference == hellscapeAppliedBuff)?.DurationLeft ?? 0) > 2
@@ -444,15 +458,14 @@ public class Blade : DefaultFighter
         //if unit consume hp or got attack 
         if (ent.TargetUnit == Parent
             && (
-                (ent is ResourceDrain && ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealValue > 0)
-                || (ent is DamageEventTemplate && ent.RealValue > 0)
+                ent is ResourceDrain { ResType: Resource.ResourceType.HP, RealValue: > 0 } || (ent is DamageEventTemplate && ent.RealValue > 0)
             ) && (ent is DoTDamage || ent.ParentStep != lastDamageStep)
            )
         {
             //once per attack
             if (ent is not DoTDamage)
                 lastDamageStep = ent.ParentStep;
-            if (Mechanics.Values[shuhuGift] < shuHuMaxCnt)
+            if (Utl.DoubleToIntRound(Mechanics.Values[shuhuGift!]) < shuHuMaxCnt)
                 ent.ChildEvents.Add(new MechanicValChg(ent.ParentStep, this, Parent)
                     { Value = 1, AbilityValue = shuhuGift });
 
@@ -464,7 +477,7 @@ public class Blade : DefaultFighter
                     { TargetUnit = Parent, AppliedBuffToApply = E4AppliedBuff });
         }
 
-        if (ent.Reference == forestMainTrgtHit && ATraces.HasFlag(ATracesEnm.A4) &&
+        if (ent.Reference == forestMainTargetHit && ATraces.HasFlag(ATracesEnm.A4) &&
             ent.TargetUnit.GetRes(Resource.ResourceType.Toughness).ResVal == 0)
             ent.ChildEvents.Add(new Healing(ent.ParentStep, this, Parent)
             {
@@ -477,8 +490,7 @@ public class Blade : DefaultFighter
         //buffering Lost hp pull
         if (ent.TargetUnit == Parent
             && (
-                (ent is ResourceDrain && ((ResourceDrain)ent).ResType == Resource.ResourceType.HP && ent.RealValue > 0)
-                || ent.IsDamageEvent
+                ent is ResourceDrain { ResType: Resource.ResourceType.HP, RealValue: > 0 } || ent.IsDamageEvent
             ))
         {
             var dsValCharge = new MechanicValChg(ent.ParentStep, this, Parent)
@@ -493,19 +505,17 @@ public class Blade : DefaultFighter
     public override string GetSpecialText()
     {
         return
-            $"SG: {(int)Mechanics.Values[shuhuGift]:d}\\{(int)shuHuMaxCnt:d}  DS: {(int)Mechanics.Values[deathSentence]:d}\\{(int)getDsMaxLostHpForText():d}";
+            $"SG: {(int)Mechanics.Values[shuhuGift!]:d}\\{(int)shuHuMaxCnt:d}  DS: {(int)Mechanics.Values[deathSentence]:d}\\{(int)GetDsMaxLostHpForText():d}";
     }
 
 
-    private bool SGAvailable()
+    private bool SgAvailable()
     {
-        return Mechanics.Values[shuhuGift] == shuHuMaxCnt;
+        return Utl.DoubleToIntRound(Mechanics.Values[shuhuGift!]) >= shuHuMaxCnt;
     }
 
 
- 
-
-    private double getDsMaxLostHpForText()
+    private double GetDsMaxLostHpForText()
     {
         return Parent.GetMaxHp().Result * 0.9;
     }

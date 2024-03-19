@@ -15,7 +15,7 @@ public class Luocha : DefaultFighter
     private readonly double coLfAtk;
     private readonly double coLfFix;
     private readonly Ability cycleOfLife;
-    private readonly double cycleOfLifeMaxCnt = 2;
+    private readonly int cycleOfLifeMaxCnt = 2;
     private readonly double deathWish;
     private readonly AppliedBuff e2ShieldAppliedBuff;
     private readonly double poAfAtk;
@@ -77,8 +77,8 @@ public class Luocha : DefaultFighter
             FollowUpPriority = PriorityEnm.Medium,
             TargetType = TargetTypeEnm.Self
         };
-        cycleOfLife.Events.Add(new MechanicValChg(null, this, Parent)
-            { AbilityValue = cycleOfLife, Value = -cycleOfLifeMaxCnt });
+        cycleOfLife.Events.Add(new MechanicValReset(null, this, Parent)
+            { AbilityValue = cycleOfLife });
         cycleOfLife.Events.Add(new ApplyBuff(null, this, Parent)
         {
             TargetUnit = Parent,
@@ -414,12 +414,12 @@ public class Luocha : DefaultFighter
 
     public override string GetSpecialText()
     {
-        return $"CoL: {(int)Mechanics.Values[cycleOfLife]:d}\\{(int)cycleOfLifeMaxCnt:d}";
+        return $"CoL: {Utl.DoubleToIntRound(Mechanics.Values[cycleOfLife]):d}\\{cycleOfLifeMaxCnt:d}";
     }
 
     private bool ColAvailable()
     {
-        return cycleOfLife.DefaultAbilityAvailable() && Mechanics.Values[cycleOfLife] >= cycleOfLifeMaxCnt;
+        return cycleOfLife.DefaultAbilityAvailable() && Utl.DoubleToIntRound(Mechanics.Values[cycleOfLife] )>= cycleOfLifeMaxCnt;
     }
 
     private bool PoAfAvailable()

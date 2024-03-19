@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using HSR_SIM_LIB.Skills;
 
 namespace HSR_SIM_LIB.Fighters;
@@ -23,11 +21,5 @@ public class MechDictionary
     public void AddVal(Ability ability)
     {
         Values.Add(ability, 0);
-    }
-
-
-    public IEnumerator GetEnumerator()
-    {
-        throw new NotImplementedException();
     }
 }
