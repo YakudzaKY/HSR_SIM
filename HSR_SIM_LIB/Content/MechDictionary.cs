@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using HSR_SIM_LIB.Skills;
 
-namespace HSR_SIM_LIB.Fighters;
+namespace HSR_SIM_LIB.Content;
 
 /// <summary>
 ///     dictionary with mechanics
