@@ -40,6 +40,15 @@ public class EventViewModel(Event ent)
                 res.Add(new BuffViewModel(be.AppliedBuffToApply,Formula,ent));
                 
             }
+            if (ent is SetLiveStatus se)
+            {
+                foreach (var buff in se.RemovedMods)
+                {
+                    res.Add(new BuffViewModel(buff,Formula,ent));
+                }
+               
+                
+            }
 
 
             return res;

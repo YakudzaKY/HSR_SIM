@@ -180,7 +180,8 @@ public sealed class SimCls : ICloneable
             }
             case ResourceDrain drain:
             {
-                HandleZeroHp(drain);
+                if (drain.ResType == ResourceType.HP)
+                    HandleZeroHp(drain);
 
                 //THG reduced tp 0
                 if (drain.ResType == ResourceType.Toughness && drain.RealValue != 0 &&

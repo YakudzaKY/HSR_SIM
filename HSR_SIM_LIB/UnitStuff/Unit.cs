@@ -721,18 +721,7 @@ public class Unit : CloneClass
             cb.NeedRecalculate = true;
     }
 
-
-
     
-    public double EnergyRegenPrc(Event ent)
-    {
-        return 1 + GetBuffSumByType(ent, typeof(EffEnergyRatePrc)) + Stats.BaseEnergyResPrc +
-               Stats.BaseEnergyRes;
-    }
-    
-
-
-
     public List<ElementEnm> GetWeaknesses(Event ent, List<Condition> excludeCondition = null)
     {
         List<ElementEnm> res = new();
