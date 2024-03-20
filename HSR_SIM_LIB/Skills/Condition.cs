@@ -36,13 +36,13 @@ public class Condition
 
     private bool truly;
     public bool NeedRecalculate { get; set; } = true;
-
+    
     public ConditionCheckExpression ConditionExpression { get; init; }
     public ConditionCheckParam ConditionParam { get; init; }
     public Ability.ElementEnm? ElemValue { get; init; }
     public Resource.ResourceType? ResourceValue { get; init; }
 
-    public double Value { get; init; }
+    public double? Value { get; init; }
     public AppliedBuff AppliedBuffValue { get; init; }
 
     /// <summary>

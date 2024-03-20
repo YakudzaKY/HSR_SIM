@@ -29,7 +29,7 @@ public class PassiveBuff : Buff
         if (ApplyConditions is null || ApplyConditions.Count == 0) return true;
         return ApplyConditions.All(x => x.Truly(parentBuff, targetUnit, excludeCondition, ent));
     }
-    public List<Condition> ApplyConditions;
+    public List<Condition> ApplyConditions { get; init; }
     public bool IsTargetCheck { get; init; }
 
 

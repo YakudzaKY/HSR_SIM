@@ -1,0 +1,77 @@
+﻿<UserControl x:Class="HSR_SIM_CLIENT.Views.ConditionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:HSR_SIM_CLIENT.Views"
+             xmlns:hsrSimClient="clr-namespace:HSR_SIM_CLIENT"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:singleSim="clr-namespace:HSR_SIM_CLIENT.ViewModels"
+             mc:Ignorable="d"
+             Name="Parent"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid DataContext="{Binding ElementName=Parent}">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.Resources>
+            <hsrSimClient:NullVisibilityConverter x:Key="NullToVisibilityConverter" />
+            <hsrSimClient:CountVisibilityConverter x:Key="CountVisibilityConverter" />  
+            <DataTemplate DataType="{x:Type singleSim:BuffViewModel }">
+                <local:BuffView BuffToView="{Binding ., Mode=OneWay}"  />
+            </DataTemplate>
+            
+        </Grid.Resources>
+        <Label Grid.Row="0" Grid.Column="0">Truly(active)?</Label>
+        <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding ConditionToView.Truly, Mode=OneWay}" />
+        <Label Grid.Row="1" Grid.Column="0">Parameter</Label>
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ConditionToView.ConditionParam, Mode=OneWay}" />
+        <Label Grid.Row="2" Grid.Column="0">ConditionExpression</Label>
+        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ConditionToView.ConditionExpression, Mode=OneWay}" />
+        <Label Grid.Row="3"
+               Visibility="{Binding ConditionToView.Value , Converter={StaticResource NullToVisibilityConverter}}"
+               Grid.Column="0">
+            Value
+        </Label>
+        <TextBox Grid.Row="3"
+                 Visibility="{Binding ConditionToView.Value , Converter={StaticResource NullToVisibilityConverter}}"
+                 Grid.Column="1" Text="{Binding ConditionToView.Value, Mode=OneWay}" />
+        <Label Grid.Row="3"
+               Visibility="{Binding ConditionToView.ElemValue , Converter={StaticResource NullToVisibilityConverter}}"
+               Grid.Column="0">
+            Elem value
+        </Label>
+        <TextBox Grid.Row="3"
+                 Visibility="{Binding ConditionToView.ElemValue , Converter={StaticResource NullToVisibilityConverter}}"
+                 Grid.Column="1" Text="{Binding ConditionToView.ElemValue, Mode=OneWay}" />
+        <Label Grid.Row="3"
+               Visibility="{Binding ConditionToView.ResourceValue , Converter={StaticResource NullToVisibilityConverter}}"
+               Grid.Column="0">
+            Resource value
+        </Label>
+        <TextBox Grid.Row="3"
+                 Visibility="{Binding ConditionToView.ResourceValue , Converter={StaticResource NullToVisibilityConverter}}"
+                 Grid.Column="1" Text="{Binding ConditionToView.ResourceValue, Mode=OneWay}" />
+           <Label Grid.Row="3"
+               Visibility="{Binding ConditionToView.Buffs , Converter={StaticResource CountVisibilityConverter}}"
+               Grid.Column="0">
+            Buff value
+        </Label>
+        <mah:HamburgerMenuListBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch"   Visibility="{Binding ConditionToView.Buffs , Converter={StaticResource CountVisibilityConverter}}"
+                                  ItemsSource="{Binding Path=ConditionToView.Buffs,Mode=OneWay}">
+        </mah:HamburgerMenuListBox>
+      
+
+    </Grid>
+</UserControl>

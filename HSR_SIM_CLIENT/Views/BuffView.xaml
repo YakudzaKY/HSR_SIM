@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:HSR_SIM_CLIENT.Views"
              xmlns:unitStuff="clr-namespace:HSR_SIM_LIB.Skills;assembly=HSR_SIM_LIB"
              xmlns:viewModels="clr-namespace:HSR_SIM_CLIENT.ViewModels"
+             xmlns:hsrSimClient="clr-namespace:HSR_SIM_CLIENT"
              mc:Ignorable="d"
              Name="Parent"
              d:DesignHeight="300" d:DesignWidth="300">
@@ -14,58 +15,129 @@
             <DataTemplate DataType="{x:Type viewModels:EffectViewModel }">
                 <local:EffectView EffectToView="{Binding ., Mode=OneWay}" />
             </DataTemplate>
+
+            <hsrSimClient:NullVisibilityConverter x:Key="NullToVisibilityConverter" />
+            <hsrSimClient:CountVisibilityConverter x:Key="CountVisibilityConverter" />
+            
+            <HierarchicalDataTemplate DataType="{x:Type viewModels:ConditionViewModel}"
+                                      >
+                <TextBlock Text="{Binding Path=.Description}" />
+            </HierarchicalDataTemplate>
+            
         </Grid.Resources>
-        
+
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <StackPanel  Grid.Row="0"  Orientation="Horizontal">
-            <Image Source= "{Binding  BuffToView.Icon}" ></Image>
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Image Source="{Binding  BuffToView.Icon}"></Image>
             <Label Content="{Binding  BuffToView.EffectDescription}" />
         </StackPanel>
-        
+
         <TreeView
-            Grid.Row="1" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-            <TreeViewItem  Header="Details">
+            Grid.Row="1" ScrollViewer.VerticalScrollBarVisibility="Auto"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <TreeViewItem Header="Details">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
                         <RowDefinition />
                         <RowDefinition />
                         <RowDefinition />
                         <RowDefinition />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <Label Grid.Row="0" Grid.Column="0" Content="Type"/>
-                    <TextBox  Grid.Row="0" Grid.Column="1" Text="{Binding BuffToView.Type ,Mode=OneWay}"/>
-                    <Label Grid.Row="1" Grid.Column="0" Content="Buff type"/>
-                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding BuffToView.BuffType,Mode=OneWay}"/>
-                    <Label Grid.Row="2" Grid.Column="0" Content="Source object"/>
-                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding BuffToView.SourceObject,Mode=OneWay}"/>
-                    <Label Grid.Row="3" Grid.Column="0" Content="SourceUnit"/>
-                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding BuffToView.SourceUnit,Mode=OneWay}"/>
-                    <Label Grid.Row="4" Grid.Column="0" Content="Carrier Unit"/>
-                    <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding BuffToView.CarrierUnit,Mode=OneWay}"/>
-                    <Label Grid.Row="5" Grid.Column="0" Content="Stacks"/>
-                    <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding BuffToView.Stacks,Mode=OneWay}"/>
-                    <Label Grid.Row="6" Grid.Column="0" Content="Max stacks"/>
-                    <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding BuffToView.MaxStacks,Mode=OneWay}"/>
-                    <!-- todo: additional info for AppliedBuff,PassiveBuff-->
+                    <Label Grid.Row="0" Grid.Column="0" Content="Type" />
+                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding BuffToView.Type ,Mode=OneWay}" />
+                    <Label Grid.Row="1" Grid.Column="0" Content="Buff type" />
+                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding BuffToView.BuffType,Mode=OneWay}" />
+                    <Label Grid.Row="2" Grid.Column="0" Content="Source object" />
+                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding BuffToView.SourceObject,Mode=OneWay}" />
+                    <Label Grid.Row="3" Grid.Column="0" Content="SourceUnit" />
+                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding BuffToView.SourceUnit,Mode=OneWay}" />
+                    <Label Grid.Row="4" Grid.Column="0" Content="Carrier Unit" />
+                    <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding BuffToView.CarrierUnit,Mode=OneWay}" />
+                    <Label Grid.Row="5" Grid.Column="0" Content="Stacks" />
+                    <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding BuffToView.Stacks,Mode=OneWay}" />
+                    <Label Grid.Row="6" Grid.Column="0" Content="Max stacks" />
+                    <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding BuffToView.MaxStacks,Mode=OneWay}" />
+                    <!-- additional info per buff type-->
+                    <!--Applied buff-->
+                    <Grid Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2"
+                          Visibility="{Binding . , Converter={StaticResource NullToVisibilityConverter}  ,Mode=OneWay}"
+                          DataContext="{Binding .BuffToView.AppliedBuffRef}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Row="0" Grid.Column="0" Content="Base duration" />
+                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding BaseDuration,Mode=OneWay}" />
+                        <Label Grid.Row="1" Grid.Column="0" Content="Duration left" />
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding BaseDuration,Mode=OneWay}" />
+                        <Label Grid.Row="2" Grid.Column="0" Content="Unique str" />
+                        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding UniqueStr,Mode=OneWay}" />
+                        <Label Grid.Row="3" Grid.Column="0" Content="Dispellable?" />
+                        <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Dispellable,Mode=OneWay}" />
+                    </Grid>
+                    <!--Passive buff-->
+                    <Grid Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2"
+                          Visibility="{Binding . , Converter={StaticResource NullToVisibilityConverter}  ,Mode=OneWay}"
+                          DataContext="{Binding .BuffToView.PassiveBuffRef}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Row="0" Grid.Column="0" Content="Target" />
+                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Target,Mode=OneWay}" />
+                        <Label Grid.Row="1" Grid.Column="0" Content="Calc when target determined?" />
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding IsTargetCheck,Mode=OneWay}" />
+                        <!--Conditions--> 
+                        <TreeView   Visibility="{Binding .ApplyConditions , Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
+                                    Grid.Row="2"  Grid.Column="0" ScrollViewer.VerticalScrollBarVisibility="Auto" SelectedItemChanged="TreeView_OnSelectedConditionChanged" >
+                            <TreeView.ItemContainerStyle>
+                                <Style TargetType="{x:Type TreeViewItem}">
+                                    <Setter Property="IsExpanded" Value="True" />
+                                </Style>
+                            </TreeView.ItemContainerStyle>
+                            <TreeViewItem  DataContext="{Binding ElementName=Parent}"  ItemsSource="{Binding  Path=BuffToView.ApplyConditions ,Mode=OneWay}" Header="Apply Conditions" />
+                        </TreeView>
+                        <local:ConditionView DataContext="{Binding ElementName=Parent}"  
+                                             ConditionToView="{Binding  .SelectedCondition }" 
+                                             Visibility="{Binding BuffToView.PassiveBuffRef.ApplyConditions 
+                                             , Converter={StaticResource CountVisibilityConverter}  
+                                             ,Mode=OneWay}"
+                                             Grid.Row="2" Grid.Column="1"></local:ConditionView>
+                    </Grid>
                 </Grid>
             </TreeViewItem>
         </TreeView>
         <TreeView
             Grid.Row="2" ScrollViewer.VerticalScrollBarVisibility="Auto">
-            <TreeViewItem ItemsSource="{Binding Path=BuffToView.Effects,Mode=OneWay}" Header="Effects"/>
+            
+            <TreeViewItem ItemsSource="{Binding Path=BuffToView.Effects,Mode=OneWay}" Header="Effects" />
         </TreeView>
-       
+
 
     </Grid>
 </UserControl>

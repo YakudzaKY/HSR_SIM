@@ -46,7 +46,7 @@ public class DefaultNPCFighter : IFighter
         {
             foreach (var unit in GetAliveEnemies())
             {
-                counter -= unit.GetAggro(null) / Parent.EnemyTeam.TeamAggro;
+                counter -= unit.GetAggro(ent:null).Result / Parent.EnemyTeam.TeamAggro;
                 if (counter <= aggroRandomed)
                     return unit;
             }

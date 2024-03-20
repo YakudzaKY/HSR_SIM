@@ -27,6 +27,28 @@ public static class UnitFormulas
         };
     }
 
+    public static Formula GetAggro(this Unit unit,  Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker,Event ent=null, List<Condition> excludeCondition = null)
+    {
+        if (unit.IsAlive)
+            return new Formula
+            {
+                EventRef = ent,
+                UnitRef = unit,
+                ConditionSkipList = excludeCondition,
+                Expression =  $"{unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.BaseAggro)} * (1 + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffBaseAgrroPrc).FullName} ) " +
+                              $"* (1 +  {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAgrroPrc).FullName})"
+            };
+        return new Formula
+        {
+            EventRef = ent,
+            UnitRef = unit,
+            ConditionSkipList = excludeCondition,
+            Expression = $"0"
+        };
+    }
+
+
+    
     public static Formula GetMaxHp(this Unit unit,
         Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
         List<Condition> excludeCondition = null)

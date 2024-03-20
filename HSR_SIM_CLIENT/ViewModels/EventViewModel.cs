@@ -31,13 +31,13 @@ public class EventViewModel(Event ent)
             {
                 foreach (var buff in fm.DescendantsAndSelfEffects().Select(y => y.TraceBuff).Distinct())
                 {
-                    res.Add(new BuffViewModel(buff,Formula));
+                    res.Add(new BuffViewModel(buff,Formula,ent));
                 }
            
             }
             if (ent is BuffEventTemplate be)
             {
-                res.Add(new BuffViewModel(be.AppliedBuffToApply,Formula));
+                res.Add(new BuffViewModel(be.AppliedBuffToApply,Formula,ent));
                 
             }
 

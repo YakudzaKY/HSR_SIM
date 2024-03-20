@@ -1,12 +1,14 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.Utils;
+using Condition = System.Windows.Condition;
 using Image = System.Drawing.Image;
 
 namespace HSR_SIM_CLIENT.ViewModels;
 
-public class BuffViewModel(Buff? buff, Formula? formula)
+public class BuffViewModel(Buff? buff, Formula? formula, Event? ent)
 {
     public string EffectDescription
     {
@@ -20,6 +22,22 @@ public class BuffViewModel(Buff? buff, Formula? formula)
         }
     }
 
+    private List<ConditionViewModel>? applyConditions;
+    public List<ConditionViewModel>? ApplyConditions
+    {
+        get
+        {
+            if (applyConditions == null&&PassiveBuffRef?.ApplyConditions!=null)
+            {
+                applyConditions = new List<ConditionViewModel>();
+                foreach (var condition in PassiveBuffRef.ApplyConditions)
+                    applyConditions.Add(new ConditionViewModel(condition,PassiveBuffRef,EventRef!=null?true:null));
+            }
+            return applyConditions;
+        }
+        
+    }
+    public Event? EventRef => ent;
     public IEnumerable<EffectViewModel>? Effects
     {
         get
@@ -44,4 +62,6 @@ public class BuffViewModel(Buff? buff, Formula? formula)
     public string? CarrierUnit => buff?.CarrierUnit?.PrintName;
     public string? Stacks => (buff != null) ? $"current: {buff.Stack} start: {buff.Reference?.Stack}" : "";
     public int? MaxStacks => buff?.MaxStack;
+    public AppliedBuff? AppliedBuffRef => buff is AppliedBuff ab ? ab : null;
+    public PassiveBuff? PassiveBuffRef => buff is PassiveBuff pb ? pb : null;
 }
