@@ -143,10 +143,9 @@ public class Step
     //Cast all techniques before fights starts
     public void TechniqueWork(Team whosTeam)
     {
-        Ability someThingToCast = null;
         foreach (var unit in whosTeam.Units.Where(partyMember => partyMember.IsAlive).OrderBy(x => x.Fighter.Role))
         {
-            someThingToCast = unit.Fighter.ChoseAbilityToCast(this);
+            var someThingToCast = unit.Fighter.ChoseAbilityToCast(this);
             if (someThingToCast != null)
             {
                 ExecuteTechniqueUse(someThingToCast);

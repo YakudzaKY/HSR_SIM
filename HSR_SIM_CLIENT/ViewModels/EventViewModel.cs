@@ -27,37 +27,32 @@ public class EventViewModel(Event ent)
             var res = new List<BuffViewModel>(){};
             
             
-            if (ent is DamageEventTemplate { CalculateValue: Formula fm })
+            switch (ent)
             {
-                foreach (var buff in fm.DescendantsAndSelfEffects().Select(y => y.TraceBuff).Distinct())
+                case DamageEventTemplate { CalculateValue: Formula fm }:
                 {
-                    res.Add(new BuffViewModel(buff,Formula,ent));
+                    res.AddRange(fm.DescendantsAndSelfEffects().Select(y => y.TraceBuff).Distinct().Select(buff => new BuffViewModel(buff, Formula, ent)));
+
+                    break;
                 }
-           
-            }
-            if (ent is BuffEventTemplate be)
-            {
-                res.Add(new BuffViewModel(be.AppliedBuffToApply,Formula,ent));
-                
-            }
-            if (ent is SetLiveStatus se)
-            {
-                foreach (var buff in se.RemovedMods)
+                case BuffEventTemplate be:
+                    res.Add(new BuffViewModel(be.AppliedBuffToApply,Formula,ent));
+                    break;
+                case SetLiveStatus se:
                 {
-                    res.Add(new BuffViewModel(buff,Formula,ent));
+                    res.AddRange(se.RemovedMods.Select(buff => new BuffViewModel(buff, Formula, ent)));
+
+                    break;
                 }
-               
-                
             }
-
-
             return res;
         }
     }
 
     /// <summary>
-    /// adoptation to TreeView
+    /// adaptation to TreeView
     /// </summary>
     public IEnumerable<Formula> Formulas => (ent.CalculateValue is Formula fm) ? new List<Formula>() { fm } : [];
-    public Formula? Formula => (ent.CalculateValue is Formula fm) ? fm : null;
+
+    private Formula? Formula => (ent.CalculateValue is Formula fm) ? fm : null;
 }
