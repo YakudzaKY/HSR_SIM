@@ -58,7 +58,7 @@ public class AppliedBuff(Unit sourceUnit, Buff reference ,object sourceObject ) 
     public string UniqueStr { get; set; }
 
     public bool Dispellable { get; init; } = true;
-    public Unit UniqueUnit { get; set; }
+
 
 
 
@@ -118,13 +118,5 @@ public class AppliedBuff(Unit sourceUnit, Buff reference ,object sourceObject ) 
         //delayed damage
         foreach (var x in Effects) x.OnNaturalExpire(ent, this);
     }
-
-    public string GetDescription()
-    {
-        var modsStr = "";
-        foreach (var eff in Effects) modsStr += $"{eff.GetType().Name:s} val= {eff.Value:f} ; ";
-
-        return
-            $">> {Type.ToString():s} for {modsStr:s} duration={BaseDuration.ToString():D} dispellable={Dispellable.ToString():s}";
-    }
+    
 }

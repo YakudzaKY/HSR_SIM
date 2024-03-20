@@ -694,29 +694,6 @@ public class Unit : CloneClass
         throw new NotImplementedException();
     }
 
-    /// <summary>
-    ///     https://honkai-star-rail.fandom.com/wiki/Vulnerability
-    ///     get target vulnerability by element
-    /// </summary>
-    /// <param name="attackElem">element of attack</param>
-    /// <param name="ent">reference to event where is calculation</param>
-    /// <returns>double value:vulnerability</returns>
-    public double GetElemVulnerability(ElementEnm attackElem, Event ent = null)
-    {
-        return GetBuffSumByType(ent, typeof(EffElementalVulnerability), elem: attackElem);
-    }
-
-    /// <summary>
-    ///     https://honkai-star-rail.fandom.com/wiki/Vulnerability
-    ///     get target vulnerability from all sources of damage
-    /// </summary>
-    /// <param name="ent">reference to event where is calculation</param>
-    /// <returns>double value:vulnerability</returns>
-    public double GetAllDamageVulnerability(Event ent = null)
-    {
-        return GetBuffSumByType(ent, typeof(EffAllDamageVulnerability));
-    }
-
 
     /// <summary>
     ///     https://honkai-star-rail.fandom.com/wiki/Toughness#Weakness_Break
@@ -744,44 +721,7 @@ public class Unit : CloneClass
             cb.NeedRecalculate = true;
     }
 
-
-
     
-    public double EnergyRegenPrc(Event ent)
-    {
-        return 1 + GetBuffSumByType(ent, typeof(EffEnergyRatePrc)) + Stats.BaseEnergyResPrc +
-               Stats.BaseEnergyRes;
-    }
-
-    public double GetDef(Event ent)
-    {
-        return Stats.BaseDef * (1 + GetBuffSumByType(ent, typeof(EffDefPrc)) -
-                                ent.SourceUnit?.DefIgnore(ent) ??
-                                0 + Stats.DefPrc) +
-               GetBuffSumByType(ent, typeof(EffDef));
-    }
-
-    public double GetAggro(Event ent)
-    {
-        if (IsAlive)
-            return Stats.BaseAggro * (1 + GetBuffSumByType(ent, typeof(EffBaseAgrroPrc))) *
-                   (1 + GetBuffSumByType(ent, typeof(EffAgrroPrc)));
-        return 0;
-    }
-
-    public double GetAttack(Event ent)
-    {
-        return Stats.BaseAttack *
-               (1 + GetBuffSumByType(ent, typeof(EffAtkPrc)) + Stats.AttackPrc) +
-               GetBuffSumByType(ent, typeof(EffAtk)) + Stats.AttackFix;
-    }
-
-
-    public double GetBreakDmg(Event ent)
-    {
-        return GetBuffSumByType(ent, typeof(EffBreakDmgPrc)) + Stats.BreakDmgPrc;
-    }
-
     public List<ElementEnm> GetWeaknesses(Event ent, List<Condition> excludeCondition = null)
     {
         List<ElementEnm> res = new();

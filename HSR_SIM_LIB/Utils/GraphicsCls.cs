@@ -257,9 +257,9 @@ public static class GraphicsCls
                 string.Format("{0:s}({1:d})", unit.Name, unit.Level), null,
                 new Font("Tahoma", txtNameSize, FontStyle.Bold), true);
             //aggro
-            if (unit.GetAggro(null) > 0)
+            if (unit.GetAggro(ent:null).Result > 0)
                 DrawText(portraitPoint.X + 3, portraitPoint.Y + txtNameSize * 2, gfx,
-                    $"aggro: {(int)Math.Round(unit.GetAggro(null)):d} ({(int)Math.Round(unit.GetAggro(null) / unit.ParentTeam.TeamAggro * 100):d}%)",
+                    $"aggro: {(int)Math.Round(unit.GetAggro(ent:null).Result):d} ({(int)Math.Round(unit.GetAggro(ent:null).Result / unit.ParentTeam.TeamAggro * 100):d}%)",
                     new SolidBrush(Color.Coral), new Font("Tahoma", BarFontSize, FontStyle.Bold), true);
             //elements
             gfx.DrawImage(new Bitmap(Utl.LoadBitmap(unit.Fighter.Element.ToString()), ElemSizeMini),

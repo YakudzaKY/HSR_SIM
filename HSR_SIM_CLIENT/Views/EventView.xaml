@@ -6,7 +6,6 @@
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:singleSim="clr-namespace:HSR_SIM_CLIENT.ViewModels"
              xmlns:views="clr-namespace:HSR_SIM_CLIENT.Views"
-             xmlns:unitStuff="clr-namespace:HSR_SIM_LIB.Skills;assembly=HSR_SIM_LIB"
              xmlns:utils="clr-namespace:HSR_SIM_LIB.Utils;assembly=HSR_SIM_LIB"
              mc:Ignorable="d"
 
