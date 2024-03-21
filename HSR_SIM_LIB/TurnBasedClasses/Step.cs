@@ -92,18 +92,18 @@ public class Step
         else if (StepType == StepTypeEnm.ExecuteAbilityFromQueue)
             res = "Executed " + Actor.Name + " " + ActorAbility.Name;
         else if (StepType == StepTypeEnm.UnitTurnSelected)
-            res = $"{Actor.Name:s} turn next";
+            res = $"{Actor.Name} turn next";
         else if (StepType == StepTypeEnm.UnitTurnStarted)
-            res = $"{Actor.Name:s} turn start" + (ActorAbility != null ? $" with {ActorAbility.Name}" : "");
+            res = $"{Actor.Name} turn start" + (ActorAbility != null ? $" with {ActorAbility.Name}" : "");
         else if (StepType == StepTypeEnm.UnitTurnEnded)
-            res = $"{Actor.Name:s} finish the turn";
+            res = $"{Actor.Name} finish the turn";
         else if (StepType == StepTypeEnm.UnitTurnContinued)
-            res = $"{Actor.Name:s} continue the turn" +
+            res = $"{Actor.Name} continue the turn" +
                   (ActorAbility != null ? $" with {ActorAbility.Name}" : "");
         else if (StepType == StepTypeEnm.UnitFollowUpAction)
-            res = $"{Actor.Name:s} FOLLOW UP" + (ActorAbility != null ? $" with {ActorAbility.Name}" : "");
+            res = $"{Actor.Name} FOLLOW UP" + (ActorAbility != null ? $" with {ActorAbility.Name}" : "");
         else if (StepType == StepTypeEnm.UnitUltimate)
-            res = $"{Actor.Name:s} ULTIMATE" + (ActorAbility != null ? $" with {ActorAbility.Name}" : "");
+            res = $"{Actor.Name} ULTIMATE" + (ActorAbility != null ? $" with {ActorAbility.Name}" : "");
         else
             throw new NotImplementedException();
         return res;

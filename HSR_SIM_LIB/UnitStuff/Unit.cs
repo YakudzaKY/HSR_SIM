@@ -44,24 +44,23 @@ public class Unit : CloneClass
     /// <summary>
     ///     native weaknesses defined by profile
     /// </summary>
-    public List<ElementEnm> NativeWeaknesses { get; } = [];
+    public List<ElementEnm> NativeWeaknesses { get; set; } = [];
 
 
     /// <summary>
     ///     native resists defined by profile
     /// </summary>
-    public List<Resist> Resists { get; } = [];
+    public List<Resist> Resists { get; set; } = [];
 
     /// <summary>
     ///     native debuff resists defined by profile
     /// </summary>
-    public List<DebuffResist> DebuffResists { get; } = [];
+    public List<DebuffResist> DebuffResists { get; set; } = [];
 
 
     private List<DamageBoostRec> baseDamageBoost; //Elemental damage boost list
 
     private Bitmap portrait;
-    private List<Resource> resources;
     private UnitStats stats;
 
     public bool IsAlive => LivingStatus != LivingStatusEnm.Defeated;
@@ -98,11 +97,7 @@ public class Unit : CloneClass
 
     public int Level { get; set; } = 1;
 
-    private List<Resource> Resources
-    {
-        get => resources ??= new List<Resource>();
-        set => resources = value;
-    }
+    private List<Resource> Resources { get; set; } = [];
 
 
     private List<DamageBoostRec> BaseDamageBoost
@@ -126,6 +121,7 @@ public class Unit : CloneClass
                 .FirstOrDefault(x => x != ParentTeam && x.TeamType != Team.TeamTypeEnm.Special);
         }
     }
+    
 
     /// <summary>
     ///     Enemies
@@ -143,7 +139,7 @@ public class Unit : CloneClass
                 //gather enemies from all waves
                 if (ParentTeam.ParentSim.NextFight != null)
                     foreach (var wave in ParentTeam.ParentSim.NextFight.Waves)
-                        nextEnemies.AddRange(wave.Units);
+                        nextEnemies.AddRange(wave.Units.Select(x=>(Unit)x.Clone()));
                 tmpTeam.BindUnits(nextEnemies);
 
 
@@ -199,11 +195,23 @@ public class Unit : CloneClass
     public override object Clone()
     {
         var newClone = (Unit)MemberwiseClone();
-
+        //clear fighter values
+        newClone.Fighter = null;
+        newClone.NativeWeaknesses = [];
+        newClone.Resists = [];
+        newClone.DebuffResists= [];
+      
+        
+        
         //clone resources
         var oldRes = newClone.Resources;
         newClone.Resources = [];
-        foreach (var res in oldRes) newClone.Resources.Add((Resource)res.Clone());
+        foreach (var res in oldRes)
+        {
+            Resource newRes =(Resource)res.Clone();
+            newRes.Parent = newClone;
+            newClone.Resources.Add(newRes);
+        }
 
         //clone Buffs
         var oldBuffs = newClone.AppliedBuffs;

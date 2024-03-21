@@ -65,6 +65,14 @@ public class Team(SimCls parent) : CloneClass
                 newUnit.ParentTeam = newClone;
             newClone.Units.Add(newUnit);
         }
+        var oldRes = newClone.Resources;
+        newClone.Resources = [];
+        foreach (var res in oldRes)
+        {
+            Resource newRes =(Resource)res.Clone();
+            newRes.Parent = newClone;
+            newClone.Resources.Add(newRes);
+        }
 
         return newClone;
     }
