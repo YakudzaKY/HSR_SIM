@@ -19,7 +19,7 @@ public class ConditionViewModel(Condition condition, PassiveBuff? buff, bool? ov
     public string ConditionExpression => condition.ConditionExpression.ToString();
     public Ability.ElementEnm? ElemValue => condition.ElemValue;
     public double? Value => condition.Value;
-    public Resource.ResourceType? ResourceValue => condition.ResourceValue;
+    public Resource.ResourceType? ResourceValue => condition?.ResourceValue;
 
 
     public IEnumerable<BuffViewModel>? Buffs

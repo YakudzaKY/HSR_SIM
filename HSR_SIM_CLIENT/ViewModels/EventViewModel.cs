@@ -49,6 +49,25 @@ public class EventViewModel(Event ent)
         }
     }
 
+    public IEnumerable<EffectViewModel>? Effects
+    {
+        get
+        {
+            var res = new List<EffectViewModel>(){};
+            
+            
+            switch (ent)
+            {
+              
+                case ApplyBuffEffect be:
+                    res.Add(new EffectViewModel(be.Eff));
+                    break;
+              
+            }
+            return res;
+        }
+    }
+
     /// <summary>
     /// adaptation to TreeView
     /// </summary>

@@ -8,7 +8,13 @@ using Image = System.Drawing.Image;
 
 namespace HSR_SIM_CLIENT.ViewModels;
 
-public class BuffViewModel(Buff? buff, Formula? formula, Event? ent)
+/// <summary>
+/// VM creation for buff
+/// </summary>
+/// <param name="buff">model</param>
+/// <param name="formula">used for effect info(calculated values) can be null</param>
+/// <param name="ent">if param exists all conditions will be marked as TRUE(becase conditions was pre calculated in event proc)</param>
+public class BuffViewModel(Buff? buff, Formula? formula = null, Event? ent = null)
 {
     public string EffectDescription
     {
@@ -38,6 +44,7 @@ public class BuffViewModel(Buff? buff, Formula? formula, Event? ent)
         
     }
     public Event? EventRef => ent;
+    public Buff BuffRef => buff;
     public IEnumerable<EffectViewModel>? Effects
     {
         get
@@ -62,6 +69,6 @@ public class BuffViewModel(Buff? buff, Formula? formula, Event? ent)
     public string? CarrierUnit => buff?.CarrierUnit?.PrintName;
     public string? Stacks => (buff != null) ? $"current: {buff.Stack} start: {buff.Reference?.Stack}" : "";
     public int? MaxStacks => buff?.MaxStack;
-    public AppliedBuff? AppliedBuffRef => buff is AppliedBuff ab ? ab : null;
-    public PassiveBuff? PassiveBuffRef => buff is PassiveBuff pb ? pb : null;
+    public AppliedBuff? AppliedBuffRef => buff as AppliedBuff;
+    public PassiveBuff? PassiveBuffRef => buff as PassiveBuff;
 }

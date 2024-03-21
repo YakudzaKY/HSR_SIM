@@ -7,6 +7,7 @@
              xmlns:unitStuff="clr-namespace:HSR_SIM_LIB.Skills;assembly=HSR_SIM_LIB"
              xmlns:viewModels="clr-namespace:HSR_SIM_CLIENT.ViewModels"
              xmlns:hsrSimClient="clr-namespace:HSR_SIM_CLIENT"
+             xmlns:converters="clr-namespace:HSR_SIM_CLIENT.Converters"
              mc:Ignorable="d"
              Name="Parent"
              d:DesignHeight="300" d:DesignWidth="300">
@@ -16,8 +17,8 @@
                 <local:EffectView EffectToView="{Binding ., Mode=OneWay}" />
             </DataTemplate>
 
-            <hsrSimClient:NullVisibilityConverter x:Key="NullToVisibilityConverter" />
-            <hsrSimClient:CountVisibilityConverter x:Key="CountVisibilityConverter" />
+            <converters:NullVisibilityConverter x:Key="NullToVisibilityConverter" />
+            <converters:CountVisibilityConverter x:Key="CountVisibilityConverter" />
             
             <HierarchicalDataTemplate DataType="{x:Type viewModels:ConditionViewModel}"
                                       >

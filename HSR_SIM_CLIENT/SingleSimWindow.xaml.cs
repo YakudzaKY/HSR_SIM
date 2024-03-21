@@ -5,6 +5,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using HSR_SIM_CLIENT.ViewModels;
 using HSR_SIM_LIB;
@@ -19,6 +20,7 @@ public partial class SingleSimWindow : INotifyPropertyChanged
     private readonly Worker wrk;
     private ObservableCollection<EventViewModel> events;
     private EventViewModel? selectedEvent;
+    private UnitViewModel? selectedUnit;
     private ObservableCollection<Team> teams;
 
 
@@ -57,7 +59,18 @@ public partial class SingleSimWindow : INotifyPropertyChanged
         }
     }
 
-    public ICloneable? SelectedObject { get; set; }
+    public UnitViewModel? SelectedUnit
+    {
+        get => selectedUnit;
+        set
+        {
+            if (Equals(value, selectedUnit)) return;
+            selectedUnit = value;
+
+            OnPropertyChanged();
+        }
+    }
+
 
     public EventViewModel? SelectedEvent
     {
@@ -150,6 +163,7 @@ public partial class SingleSimWindow : INotifyPropertyChanged
         //render selected unit
 
         NotifyPropertyChanged(nameof(Events));
+      
     }
 
     private void BtnPrev_OnClick(object sender, RoutedEventArgs e)
@@ -161,5 +175,11 @@ public partial class SingleSimWindow : INotifyPropertyChanged
 
     private void TreeView_OnSelectedUnitChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
+        // on unit click
+        if (((TreeView)sender).SelectedItem is Unit fm)
+
+            SelectedUnit = new UnitViewModel(fm);
+        else
+            SelectedUnit = null;
     }
 }
