@@ -3,6 +3,6 @@
 /// <summary>
 ///     buff to attack by fixed value
 /// </summary>
-public class EffAtk : Effect
+public class EffAtk() : Effect(Condition.ConditionCheckParam.Atk)
 {
 }

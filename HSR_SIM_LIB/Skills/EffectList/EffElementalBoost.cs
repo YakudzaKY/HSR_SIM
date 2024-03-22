@@ -3,6 +3,6 @@
 /// <summary>
 ///     elemental damage buff
 /// </summary>
-public class EffElementalBoost : EffElementalTemplate
+public class EffElementalBoost() : EffElementalTemplate(Condition.ConditionCheckParam.ElemDmgBoost)
 {
 }

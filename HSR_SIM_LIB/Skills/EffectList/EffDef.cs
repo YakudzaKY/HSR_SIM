@@ -3,6 +3,6 @@
 /// <summary>
 ///     def increase by x
 /// </summary>
-public class EffDef : Effect
+public class EffDef() : Effect(Condition.ConditionCheckParam.Def)
 {
 }

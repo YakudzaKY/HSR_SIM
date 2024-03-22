@@ -3,6 +3,6 @@
 /// <summary>
 ///     increase energy gain by x%
 /// </summary>
-public class EffEnergyRatePrc : Effect
+public class EffEnergyRatePrc() : Effect(Condition.ConditionCheckParam.EnergyRegen)
 {
 }

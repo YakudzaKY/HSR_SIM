@@ -1,4 +1,5 @@
 ﻿using System;
+using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -29,6 +30,12 @@ public class ResourceGain : Event
             _ => Value
         };
         res.ResVal += (double)(revert ? -RealValue : RealValue);
+        if (!TriggersHandled)
+        {
+            if (RealValue != 0 && ResType == Resource.ResourceType.HP)
+                TargetUnit.ResetCondition(Condition.ConditionCheckParam.Hp);
+            TargetUnit.ResetCondition(Condition.ConditionCheckParam.Resource);
+        }
         base.ProcEvent(revert);
     }
 }

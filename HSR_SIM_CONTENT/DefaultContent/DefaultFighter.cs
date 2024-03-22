@@ -28,7 +28,6 @@ public abstract class DefaultFighter : IFighter
     protected DefaultFighter(Unit parent)
     {
         Mechanics = new MechDictionary();
-        Mechanics.Reset();
         Parent = parent;
         EventHandlerProc += DefaultFighter_HandleEvent;
         StepHandlerProc += DefaultFighter_HandleStep;
@@ -262,6 +261,7 @@ public abstract class DefaultFighter : IFighter
 
     public virtual void Reset()
     {
+        Parent.ParentTeam.ParentSim.CalcBuffer.Reset(Parent,Condition.ConditionCheckParam.Mechanics);
         Mechanics.Reset();
         LightCone?.Reset();
         foreach (var relic in Relics) relic.Reset();

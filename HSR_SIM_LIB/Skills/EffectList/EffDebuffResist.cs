@@ -3,6 +3,6 @@
 /// <summary>
 ///     debuff resist buff
 /// </summary>
-public class EffDebufResist : Effect
+public class EffDebuffResist() : Effect(Condition.ConditionCheckParam.DebuffResist)
 {
 }

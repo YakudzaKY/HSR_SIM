@@ -3,6 +3,6 @@
 /// <summary>
 ///     increase incoming healing by x%
 /// </summary>
-public class EffIncomeHealingPrc : Effect
+public class EffIncomeHealingPrc() : Effect(Condition.ConditionCheckParam.IncomeHealing)
 {
 }

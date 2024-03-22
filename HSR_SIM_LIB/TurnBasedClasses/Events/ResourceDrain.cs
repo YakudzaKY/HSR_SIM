@@ -1,4 +1,5 @@
 ﻿using System;
+using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -32,6 +33,8 @@ public class ResourceDrain : Event
         }
 
         TargetUnit.GetRes(ResType).ResVal += (double)-(revert ? -RealValue : RealValue);
+
+
         base.ProcEvent(revert);
     }
 }

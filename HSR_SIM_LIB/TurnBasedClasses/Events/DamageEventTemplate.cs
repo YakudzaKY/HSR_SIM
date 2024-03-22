@@ -54,5 +54,6 @@ public abstract class DamageEventTemplate(Step parent, ICloneable source, Unit s
             eff.Value -= revert ? -RealBarrierVal : RealBarrierVal;
         var res = TargetUnit.GetRes(Resource.ResourceType.HP);
         res.ResVal += (double)-(revert ? -RealValue : RealValue);
+        
     }
 }

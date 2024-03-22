@@ -24,8 +24,9 @@ public class Formula : ICloneable
         Attacker,
         Defender
     }
-    
-    
+
+
+    public List<FormulaBuffer.DependencyRec> FoundedDependency { get; set; }
     private string expression;
 
 
@@ -33,9 +34,13 @@ public class Formula : ICloneable
 
     //event where formula is used
     public Event EventRef { get; set; }
-    public Unit UnitRef { get; set; }//use when no EventRef
-    public Unit Attacker => UnitRef??EventRef.SourceUnit;
-    public Unit Defender => EventRef.TargetUnit;
+
+    public Unit UnitRef { get; set; } //use when no EventRef
+
+    //link to formula buffer
+    public FormulaBuffer BufferRef => EventRef?.ParentStep.Parent.CalcBuffer ?? UnitRef.ParentTeam.ParentSim.CalcBuffer;
+    public Unit Attacker => UnitRef ?? EventRef.SourceUnit;
+    public Unit Defender => EventRef?.TargetUnit;
 
     /// <summary>
     ///     This simply stores a variable name and its value so when this key is found in a expression it gets the value
@@ -43,14 +48,11 @@ public class Formula : ICloneable
     /// </summary>
     public Dictionary<string, VarVal> Variables { get; set; } = new();
 
-    public List<Condition> ConditionSkipList { get; set; }=null;
+    public List<Condition> ConditionSkipList { get; set; } = null;
 
     public IEnumerable<Formula> ChildFormulas
     {
-        get
-        {
-            return Variables.Select(x => x.Value.ResFormula).Where(z => z != null);
-        }
+        get { return Variables.Select(x => x.Value.ResFormula).Where(z => z != null); }
     }
 
     /// <summary>
@@ -124,7 +126,7 @@ public class Formula : ICloneable
 
             var methodEndNdx = pstr.IndexOf("#", ndx, StringComparison.Ordinal);
             if (methodEndNdx == -1)
-                 methodEndNdx = pstr.IndexOf(" ", ndx, StringComparison.Ordinal);
+                methodEndNdx = pstr.IndexOf(" ", ndx, StringComparison.Ordinal);
             if (methodEndNdx == -1)
                 methodEndNdx = pstr.Length;
             nextPos = methodEndNdx + 1;
@@ -155,9 +157,12 @@ public class Formula : ICloneable
             var newVal = new VarVal
             {
                 ResFormula = new Formula
-                    { Expression = varExpr, Variables = Variables.ToDictionary(), EventRef = EventRef ,UnitRef = UnitRef}
+                {
+                    Expression = varExpr, Variables = Variables.ToDictionary(), EventRef = EventRef, UnitRef = UnitRef
+                }
             };
             newVal.Result = newVal.ResFormula.Result;
+            FormulaBuffer.MergeDependencies(FoundedDependency,newVal.ResFormula.FoundedDependency);
             Variables.Add(newExp, newVal);
             expNdx = GetNext("(",
                 endNdx - (varExpr.Length + 2 /*"(" and ")" deleted from string then add 2 to length*/ - newExp.Length));
@@ -215,7 +220,7 @@ public class Formula : ICloneable
                     //try search in extensions
                     if (mInfo == null)
                     {
-                        mInfo = finalMeth.GetType().GetExtensionMethod(Assembly.GetExecutingAssembly(),nextMethod);
+                        mInfo = finalMeth.GetType().GetExtensionMethod(Assembly.GetExecutingAssembly(), nextMethod);
                     }
                 }
 
@@ -237,18 +242,22 @@ public class Formula : ICloneable
                         {
                             objArr[^1] = dynVar;
                         }
-                        else if (prm.ParameterType == typeof(Ability.ElementEnm)||prm.ParameterType == typeof(Ability.ElementEnm?))
+                        else if (prm.ParameterType == typeof(Ability.ElementEnm) ||
+                                 prm.ParameterType == typeof(Ability.ElementEnm?))
                         {
                             if (EventRef is DoTDamage dt)
                                 objArr[^1] = dt.Element;
                             else
                                 objArr[^1] = EventRef?.ParentStep.ActorAbility?.Element;
                         }
-                        else if (prm.ParameterType == typeof(Ability.AbilityTypeEnm) || prm.ParameterType ==typeof(Ability.AbilityTypeEnm?))
+                        else if (prm.ParameterType == typeof(Ability.AbilityTypeEnm) ||
+                                 prm.ParameterType == typeof(Ability.AbilityTypeEnm?))
                         {
                             //if Followup action and ability is not follow up type then add flag
-                            Ability.AbilityTypeEnm? abilityTypeEnm = EventRef?.ParentStep.ActorAbility?.AbilityType??null;
-                            if (EventRef?.ParentStep.ActorAbility?.AbilityType != Ability.AbilityTypeEnm.FollowUpAction &&
+                            Ability.AbilityTypeEnm? abilityTypeEnm =
+                                EventRef?.ParentStep.ActorAbility?.AbilityType ?? null;
+                            if (EventRef?.ParentStep.ActorAbility?.AbilityType !=
+                                Ability.AbilityTypeEnm.FollowUpAction &&
                                 EventRef?.ParentStep.StepType == Step.StepTypeEnm.UnitFollowUpAction)
                                 abilityTypeEnm |= Ability.AbilityTypeEnm.FollowUpAction;
                             objArr[^1] = abilityTypeEnm;
@@ -265,6 +274,10 @@ public class Formula : ICloneable
                         {
                             objArr[^1] = variable.Value.TraceEffects;
                         }
+                        else if (prm.ParameterType == typeof(List<FormulaBuffer.DependencyRec>))
+                        {
+                            objArr[^1] = FoundedDependency;
+                        }
                         else if (prm.ParameterType == typeof(List<Condition>))
                         {
                             if (ConditionSkipList == null)
@@ -273,7 +286,6 @@ public class Formula : ICloneable
                         }
                         else if (prm.ParameterType == typeof(Type))
                         {
-                            
                             var nextPrm = GetNextMethod(expr, methodNdx, out methodNdx);
                             if (string.IsNullOrEmpty(nextPrm)) continue;
                             //first search Type
@@ -285,27 +297,25 @@ public class Formula : ICloneable
                         }
                         else if (prm.ParameterType == typeof(Resource.ResourceType))
                         {
-                            
                             var nextPrm = GetNextMethod(expr, methodNdx, out methodNdx);
-                            objArr[^1]=(Resource.ResourceType)Enum.Parse(typeof(Resource.ResourceType),nextPrm, true);
+                            objArr[^1] =
+                                (Resource.ResourceType)Enum.Parse(typeof(Resource.ResourceType), nextPrm, true);
                         }
                         else
                         {
                             switch (prm.ParameterType)
                             {
-                                case var value when value == typeof(int) || value == typeof(int?) :
+                                case var value when value == typeof(int) || value == typeof(int?):
                                     objArr[^1] = int.Parse(GetNextMethod(expr, methodNdx, out methodNdx));
                                     break;
-                                case var value when value == typeof(double) || value == typeof(double?) :
+                                case var value when value == typeof(double) || value == typeof(double?):
                                     objArr[^1] = double.Parse(GetNextMethod(expr, methodNdx, out methodNdx));
                                     break;
-                                case var value when value == typeof(string) : 
-                                    objArr[^1] =GetNextMethod(expr, methodNdx, out methodNdx);
+                                case var value when value == typeof(string):
+                                    objArr[^1] = GetNextMethod(expr, methodNdx, out methodNdx);
                                     break;
                             }
-                            
                         }
-                       
                     }
 
                     finalMeth = mInfo.Invoke(prevObject, objArr);
@@ -327,7 +337,7 @@ public class Formula : ICloneable
             switch (finalMeth)
             {
                 case int nt:
-                    variable.Value.Result = (double) nt;
+                    variable.Value.Result = (double)nt;
                     break;
                 case double ds:
                     variable.Value.Result = ds;
@@ -335,6 +345,7 @@ public class Formula : ICloneable
                 case Formula fs:
                     variable.Value.Result = fs.Result;
                     variable.Value.ResFormula = fs;
+                    FormulaBuffer.MergeDependencies(FoundedDependency,variable.Value.ResFormula.FoundedDependency);
                     break;
                 case PropertyInfo pf:
                     variable.Value.Result = (double)pf.GetValue(prevObject)!;
@@ -346,8 +357,22 @@ public class Formula : ICloneable
     }
 
 
+
+
     private double CalculateResult()
     {
+        //First check the buffer
+        Formula foundOld = BufferRef.SearchBuff(this.Expression, Attacker, Defender);
+        if (foundOld != null)
+        {
+            //load values from buffer
+            Result = foundOld.Result;
+            ConditionSkipList = foundOld.ConditionSkipList;
+            Variables = foundOld.Variables;
+            FoundedDependency = foundOld.FoundedDependency;
+            return Result;
+        }
+        FoundedDependency ??= new List<FormulaBuffer.DependencyRec>();
         ParseVariables();
         if (string.IsNullOrWhiteSpace(Expression))
             throw new Exception("An expression must be defined in the Expression property.");
@@ -357,7 +382,7 @@ public class Formula : ICloneable
 
         foreach (var lexeme in Expression.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries))
             //If it is an operator
-            if (lexeme is "*" or "/" or "+" or "-"or "min"or "max" or "ifzero")
+            if (lexeme is "*" or "/" or "+" or "-" or "min" or "max" or "ifzero")
             {
                 operation = lexeme;
             }
@@ -365,9 +390,9 @@ public class Formula : ICloneable
             {
                 double value;
                 if (Variables.TryGetValue(lexeme, out var variable)) //If it is a variable, let's get the variable value
-                    value = variable.Result??0 ;
+                    value = variable.Result ?? 0;
                 else //It is just a number, let's just parse
-                    value = double.Parse(lexeme.Replace(",","."), NumberStyles.Any, CultureInfo.InvariantCulture);
+                    value = double.Parse(lexeme.Replace(",", "."), NumberStyles.Any, CultureInfo.InvariantCulture);
 
                 if (!calculationResult.HasValue) //No value has been assigned yet
                     calculationResult = value;
@@ -390,7 +415,7 @@ public class Formula : ICloneable
                             calculationResult = Math.Min(calculationResult.Value, value);
                             break;
                         case "max":
-                            calculationResult = Math.Max(calculationResult.Value , value);
+                            calculationResult = Math.Max(calculationResult.Value, value);
                             break;
                         case "ifzero":
                             calculationResult = (calculationResult.Value == 0) ? value : calculationResult.Value;
@@ -400,9 +425,15 @@ public class Formula : ICloneable
                     }
             }
 
-        if (calculationResult.HasValue)
-            return calculationResult.Value;
-        throw new Exception("The operation could not be completed, a result was not obtained.");
+        if (!calculationResult.HasValue)
+            throw new Exception("The operation could not be completed, a result was not obtained.");
+        if (FoundedDependency.Count > 0 &&
+            FoundedDependency.All(x => x.Stat != Condition.ConditionCheckParam.DoNotSaveDependency))
+        {
+            BufferRef.AddToBuff(this, Attacker, Defender, FoundedDependency);
+        }
+
+        return calculationResult.Value;
     }
 
 

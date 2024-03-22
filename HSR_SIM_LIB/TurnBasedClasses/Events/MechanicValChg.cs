@@ -16,6 +16,8 @@ public class MechanicValChg(Step parent, ICloneable source, Unit sourceUnit) : E
 
     public override void ProcEvent(bool revert)
     {
+        if (!TriggersHandled)
+            ParentStep.Parent.CalcBuffer.Reset(SourceUnit,Condition.ConditionCheckParam.Mechanics);
         SourceUnit.Fighter.Mechanics.Values[AbilityValue] += (revert ? -Value??0 : Value??0);
         base.ProcEvent(revert);
     }
