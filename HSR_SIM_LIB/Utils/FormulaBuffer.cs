@@ -64,12 +64,10 @@ public class FormulaBuffer
         if (unit == null)
             BufferRecs.Clear();
         else
-            foreach (var buff in BufferRecs.Where(x => (x.TargetUnit == unit
-                                                        && (prm == null || x.DependencyRecs.Any(z =>
-                                                            z.Relation == Formula.DynamicTargetEnm.Defender &&
-                                                            z.Stat == prm))
-                         ) || (x.SourceUnit == unit && (prm == null || x.DependencyRecs.Any(z =>
-                             z.Relation == Formula.DynamicTargetEnm.Attacker && z.Stat == prm)))).ToList())
+            foreach (var buff in BufferRecs.Where( x=> (x.DependencyRecs.Any(z => z.Relation == Formula.DynamicTargetEnm.Attacker&&(prm==null||z.Stat==prm))&&x.SourceUnit==unit )
+                                                    //check defender relations. have no attacker relations or SourceUnit=attacker
+                                                    || (x.DependencyRecs.Any(z => z.Relation == Formula.DynamicTargetEnm.Defender  &&(prm==null||z.Stat==prm)) &&x.TargetUnit==unit )
+                                                    ).ToList())
                 BufferRecs.Remove(buff);
                 
             
@@ -89,8 +87,13 @@ public class FormulaBuffer
     /// <returns></returns>
     public Formula SearchBuff(string expression, Unit attacker, Unit defender)
     {
-        return BufferRecs.FirstOrDefault(x =>
-                x.SourceUnit == attacker && x.TargetUnit == defender && x.Hash == GenerateHash(expression))
+        return BufferRecs.FirstOrDefault(x => x.Hash == GenerateHash(expression)
+                                              //check attacker relations. have no attacker relations or SourceUnit=attacker
+                                              && (x.DependencyRecs.All(z => z.Relation != Formula.DynamicTargetEnm.Attacker) ||x.SourceUnit==attacker )
+                                              //check defender relations. have no attacker relations or SourceUnit=attacker
+                                              && (x.DependencyRecs.All(z => z.Relation != Formula.DynamicTargetEnm.Defender) ||x.TargetUnit==defender )
+                                              )
+            
             ?.BuffFormula;
     }
 

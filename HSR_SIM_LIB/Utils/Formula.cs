@@ -73,7 +73,7 @@ public class Formula : ICloneable
     public string Expression
     {
         get => expression;
-        init => expression = value;
+        set => expression = value;
     }
 
 
@@ -370,8 +370,12 @@ public class Formula : ICloneable
             ConditionSkipList = foundOld.ConditionSkipList;
             Variables = foundOld.Variables;
             FoundedDependency = foundOld.FoundedDependency;
+            LoadedFromBuffer = true;
+            Expression = foundOld.Expression;
+            
             return Result;
         }
+       
         FoundedDependency ??= new List<FormulaBuffer.DependencyRec>();
         ParseVariables();
         if (string.IsNullOrWhiteSpace(Expression))
@@ -436,6 +440,8 @@ public class Formula : ICloneable
         return calculationResult.Value;
     }
 
+    public bool LoadedFromBuffer { get; set; }
+
 
     public IEnumerable<EffectTraceRec> DescendantsAndSelfEffects()
     {
@@ -472,10 +478,10 @@ public class Formula : ICloneable
         bool IncompleteLevel(Dictionary<string, VarVal> sVals)
         {
             return nextRunAllowed && sVals.Any(
-                x => (x.Value.ReplaceExpression != null && !replacedVariables.ReplacedExpressions.Contains(x.Value))
-                     || (x.Value.ResFormula != null && !replacedVariables.ReplacedFormulas.Contains(x.Value))
-                     || !replacedVariables.ReplacedRaw.Contains(x.Value)
-                     || (x.Value.Result != null && !replacedResults.Contains(x.Value))
+                x => (x.Value.ReplaceExpression != null && replacedVariables.ReplacedExpressions.All(z => z.ReplaceExpression != x.Value.ReplaceExpression))
+                     || (x.Value.ResFormula != null &&replacedVariables.ReplacedFormulas.All(z => z.ResFormula.Expression != x.Value.ResFormula.Expression))
+                     || replacedVariables.ReplacedRaw.All(z => z.ReplaceExpression != x.Value.ReplaceExpression)
+                     || (x.Value.Result != null && replacedResults.All(z=>z.Result!= x.Value.Result))
             );
         }
 
@@ -510,36 +516,36 @@ public class Formula : ICloneable
                 {
                     //if expression exists and not handled
                     if (val.ReplaceExpression == lexeme)
-                        if (!replacedVariables.ReplacedRaw.Contains(val))
+                        if (replacedVariables.ReplacedRaw.All(z => z.ReplaceExpression != val.ReplaceExpression))
                             replacedVariables.ReplacedRaw.Add(val);
-                    if (!replacedVariables.ReplacedRaw.Contains(val))
+                    if (replacedVariables.ReplacedRaw.All(z => z.ReplaceExpression != val.ReplaceExpression))
                     {
-                        if (!newlyReplacedVariables.ReplacedRaw.Contains(val))
+                        if (newlyReplacedVariables.ReplacedRaw.All(z => z.ReplaceExpression != val.ReplaceExpression))
                             newlyReplacedVariables.ReplacedRaw.Add(val);
                         finalStr += lexeme + Strings.Space(1);
                     }
                     else if (!string.IsNullOrEmpty(val.ReplaceExpression) &&
-                             !replacedVariables.ReplacedExpressions.Contains(val))
+                             replacedVariables.ReplacedExpressions.All(z => z.ReplaceExpression != val.ReplaceExpression))
                     {
-                        if (!newlyReplacedVariables.ReplacedExpressions.Contains(val))
+                        if (newlyReplacedVariables.ReplacedExpressions.All(z => z.ReplaceExpression != val.ReplaceExpression))
                             newlyReplacedVariables.ReplacedExpressions.Add(val);
                         var valStr = val.ReplaceExpression;
                         finalStr += $"{valStr}" + Strings.Space(1);
                     }
-                    else if (val.ResFormula != null && !replacedVariables.ReplacedFormulas.Contains(val))
+                    else if (val.ResFormula != null && replacedVariables.ReplacedFormulas.All(z => z.ResFormula.Expression != val.ResFormula.Expression ))
                     {
                         var valStr = "(" + val.ResFormula.Explain(true, replacedResults, replacedVariables,
                                          newlyReplacedVariables) +
                                      ")";
                         if (!IncompleteLevel(val.ResFormula.Variables))
-                            if (!newlyReplacedVariables.ReplacedFormulas.Contains(val))
+                            if (newlyReplacedVariables.ReplacedFormulas.All(z => z.ResFormula.Expression != val.ResFormula.Expression))
                                 newlyReplacedVariables.ReplacedFormulas.Add(val);
                         finalStr += $"{valStr}" + Strings.Space(1);
                     }
-                    else if (val.Result != null && !replacedResults.Contains(val))
+                    else if (val.Result != null && replacedResults.All(z=>z.Result!= val.Result))
                     {
                         //add val to primary results array immediately
-                        if (!replacedResults.Contains(val))
+                        if (replacedResults.All(z=>z.Result!= val.Result))
                             replacedResults.Add(val);
                         //finalStr += val.Result + Strings.Space(1);
                         finalStr += (val.TraceEffects.Any()

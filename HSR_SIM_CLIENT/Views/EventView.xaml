@@ -45,7 +45,9 @@
             
             <HierarchicalDataTemplate DataType="{x:Type utils:Formula}"
                                       ItemsSource="{Binding Path=ChildFormulas}">
-                <TextBlock Text="{Binding Path=Expression}" />
+                <StackPanel Orientation="Horizontal">
+                <Label>IsBuff?</Label><CheckBox IsChecked="{Binding LoadedFromBuffer, Mode=OneWay}"></CheckBox><TextBlock Text="{Binding Path=Expression}" />
+                </StackPanel>
             </HierarchicalDataTemplate>
         </Grid.Resources>
         
