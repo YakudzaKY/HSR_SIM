@@ -162,7 +162,7 @@ public class Formula : ICloneable
                 }
             };
             newVal.Result = newVal.ResFormula.Result;
-            FormulaBuffer.MergeDependencies(FoundedDependency,newVal.ResFormula.FoundedDependency);
+            FormulaBuffer.MergeDependencies(FoundedDependency, newVal.ResFormula.FoundedDependency);
             Variables.Add(newExp, newVal);
             expNdx = GetNext("(",
                 endNdx - (varExpr.Length + 2 /*"(" and ")" deleted from string then add 2 to length*/ - newExp.Length));
@@ -345,7 +345,7 @@ public class Formula : ICloneable
                 case Formula fs:
                     variable.Value.Result = fs.Result;
                     variable.Value.ResFormula = fs;
-                    FormulaBuffer.MergeDependencies(FoundedDependency,variable.Value.ResFormula.FoundedDependency);
+                    FormulaBuffer.MergeDependencies(FoundedDependency, variable.Value.ResFormula.FoundedDependency);
                     break;
                 case PropertyInfo pf:
                     variable.Value.Result = (double)pf.GetValue(prevObject)!;
@@ -355,8 +355,6 @@ public class Formula : ICloneable
             break;
         }
     }
-
-
 
 
     private double CalculateResult()
@@ -372,10 +370,10 @@ public class Formula : ICloneable
             FoundedDependency = foundOld.FoundedDependency;
             LoadedFromBuffer = true;
             Expression = foundOld.Expression;
-            
+
             return Result;
         }
-       
+
         FoundedDependency ??= new List<FormulaBuffer.DependencyRec>();
         ParseVariables();
         if (string.IsNullOrWhiteSpace(Expression))
@@ -455,18 +453,22 @@ public class Formula : ICloneable
     /// <summary>
     ///     output formula
     /// </summary>
+    /// <param name="itemsReplaced">count of replaced items</param>
     /// <param name="shortExplain">is child explanation. will run 1 times</param>
     /// <param name="replacedResults">previously made replacements of variables with the result of calculations</param>
     /// <param name="replacedVariables">previously made replacements of variables with contents (formulas, etc.) </param>
     /// <param name="newlyReplacedVariables">replacements made in child calculations, but not yet added to the main array</param>
     /// <returns></returns>
     public string Explain(
+        out int itemsReplaced,
         bool shortExplain = false,
         List<VarVal> replacedResults = null,
         ReplacersRec replacedVariables = null,
-        ReplacersRec newlyReplacedVariables = null)
+        ReplacersRec newlyReplacedVariables = null
+    )
 
     {
+        itemsReplaced = 0;
         replacedResults ??= [];
         replacedVariables ??= new ReplacersRec();
         newlyReplacedVariables ??= new ReplacersRec();
@@ -478,10 +480,13 @@ public class Formula : ICloneable
         bool IncompleteLevel(Dictionary<string, VarVal> sVals)
         {
             return nextRunAllowed && sVals.Any(
-                x => (x.Value.ReplaceExpression != null && replacedVariables.ReplacedExpressions.All(z => z.ReplaceExpression != x.Value.ReplaceExpression))
-                     || (x.Value.ResFormula != null &&replacedVariables.ReplacedFormulas.All(z => z.ResFormula.Expression != x.Value.ResFormula.Expression))
+                x => (x.Value.ReplaceExpression != null &&
+                      replacedVariables.ReplacedExpressions.All(z => z.ReplaceExpression != x.Value.ReplaceExpression))
+                     || (x.Value.ResFormula != null &&
+                         replacedVariables.ReplacedFormulas.All(z =>
+                             z.ResFormula.Expression != x.Value.ResFormula.Expression))
                      || replacedVariables.ReplacedRaw.All(z => z.ReplaceExpression != x.Value.ReplaceExpression)
-                     || (x.Value.Result != null && replacedResults.All(z=>z.Result!= x.Value.Result))
+                     || (x.Value.Result != null && replacedResults.All(z => z.Result != x.Value.Result))
             );
         }
 
@@ -517,36 +522,67 @@ public class Formula : ICloneable
                     //if expression exists and not handled
                     if (val.ReplaceExpression == lexeme)
                         if (replacedVariables.ReplacedRaw.All(z => z.ReplaceExpression != val.ReplaceExpression))
+                        {
+                            itemsReplaced++;
                             replacedVariables.ReplacedRaw.Add(val);
+                        }
+
                     if (replacedVariables.ReplacedRaw.All(z => z.ReplaceExpression != val.ReplaceExpression))
                     {
                         if (newlyReplacedVariables.ReplacedRaw.All(z => z.ReplaceExpression != val.ReplaceExpression))
+                        {
+                            itemsReplaced++;
                             newlyReplacedVariables.ReplacedRaw.Add(val);
+                            
+                        }
+
                         finalStr += lexeme + Strings.Space(1);
                     }
                     else if (!string.IsNullOrEmpty(val.ReplaceExpression) &&
-                             replacedVariables.ReplacedExpressions.All(z => z.ReplaceExpression != val.ReplaceExpression))
+                             replacedVariables.ReplacedExpressions.All(
+                                 z => z.ReplaceExpression != val.ReplaceExpression))
                     {
-                        if (newlyReplacedVariables.ReplacedExpressions.All(z => z.ReplaceExpression != val.ReplaceExpression))
+                        if (newlyReplacedVariables.ReplacedExpressions.All(z =>
+                                z.ReplaceExpression != val.ReplaceExpression))
+                        {
+                            itemsReplaced++;
                             newlyReplacedVariables.ReplacedExpressions.Add(val);
+                        }
+
                         var valStr = val.ReplaceExpression;
                         finalStr += $"{valStr}" + Strings.Space(1);
                     }
-                    else if (val.ResFormula != null && replacedVariables.ReplacedFormulas.All(z => z.ResFormula.Expression != val.ResFormula.Expression ))
+                    else if (val.ResFormula != null &&
+                             replacedVariables.ReplacedFormulas.All(z =>
+                                 z.ResFormula.Expression != val.ResFormula.Expression))
                     {
-                        var valStr = "(" + val.ResFormula.Explain(true, replacedResults, replacedVariables,
+                        var valStr = "(" + val.ResFormula.Explain(out int childItemsReplaced, true, replacedResults,
+                                         replacedVariables,
                                          newlyReplacedVariables) +
                                      ")";
-                        if (!IncompleteLevel(val.ResFormula.Variables))
-                            if (newlyReplacedVariables.ReplacedFormulas.All(z => z.ResFormula.Expression != val.ResFormula.Expression))
+                        /*
+                         *
+                         */
+                        if (!IncompleteLevel(val.ResFormula.Variables) || childItemsReplaced == 0)
+                            if (newlyReplacedVariables.ReplacedFormulas.All(z =>
+                                    z.ResFormula.Expression != val.ResFormula.Expression))
+                            {
+                                itemsReplaced++;
                                 newlyReplacedVariables.ReplacedFormulas.Add(val);
-                        finalStr += $"{valStr}" + Strings.Space(1);
+                            }
+
+                        if (childItemsReplaced > 0)
+                            finalStr += $"{valStr}" + Strings.Space(1);
                     }
-                    else if (val.Result != null && replacedResults.All(z=>z.Result!= val.Result))
+                    else if (val.Result != null && replacedResults.All(z => z.Result != val.Result))
                     {
                         //add val to primary results array immediately
-                        if (replacedResults.All(z=>z.Result!= val.Result))
+                        if (replacedResults.All(z => z.Result != val.Result))
+                        {
+                            itemsReplaced++;
                             replacedResults.Add(val);
+                        }
+
                         //finalStr += val.Result + Strings.Space(1);
                         finalStr += (val.TraceEffects.Any()
                             ? "(" + string.Join("+", val.TraceEffects.Select(x => x.TraceTotalValue)) + ")"
