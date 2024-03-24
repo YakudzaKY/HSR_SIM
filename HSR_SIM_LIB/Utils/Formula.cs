@@ -38,7 +38,7 @@ public class Formula : ICloneable
     public Unit UnitRef { get; set; } //use when no EventRef
 
     //link to formula buffer
-    public FormulaBuffer BufferRef => EventRef?.ParentStep.Parent.CalcBuffer ?? UnitRef.ParentTeam.ParentSim.CalcBuffer;
+    public FormulaBuffer BufferRef => EventRef?.ParentStep.Parent.CalcBuffer ?? UnitRef.ParentTeam?.ParentSim.CalcBuffer;
     public Unit Attacker => UnitRef ?? EventRef.SourceUnit;
     public Unit Defender => EventRef?.TargetUnit;
 
@@ -359,8 +359,9 @@ public class Formula : ICloneable
 
     private double CalculateResult()
     {
+        Hash = FormulaBuffer.GenerateHash(Expression);
         //First check the buffer
-        Formula foundOld = BufferRef.SearchBuff(this.Expression, Attacker, Defender);
+        Formula foundOld = BufferRef?.SearchBuff(Hash, Attacker, Defender);
         if (foundOld != null)
         {
             //load values from buffer
@@ -429,16 +430,16 @@ public class Formula : ICloneable
 
         if (!calculationResult.HasValue)
             throw new Exception("The operation could not be completed, a result was not obtained.");
-        if (FoundedDependency.Count > 0 &&
-            FoundedDependency.All(x => x.Stat != Condition.ConditionCheckParam.DoNotSaveDependency))
+        if (FoundedDependency.All(x => x.Stat != Condition.ConditionCheckParam.DoNotSaveDependency))
         {
-            BufferRef.AddToBuff(this, Attacker, Defender, FoundedDependency);
+            BufferRef?.AddToBuff(this, Attacker, Defender, FoundedDependency);
         }
 
         return calculationResult.Value;
     }
 
     public bool LoadedFromBuffer { get; set; }
+    public string Hash { get; set; }
 
 
     public IEnumerable<EffectTraceRec> DescendantsAndSelfEffects()

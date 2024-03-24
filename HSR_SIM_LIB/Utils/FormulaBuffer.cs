@@ -29,7 +29,6 @@ public class FormulaBuffer
     {
         foreach (var dep in childDependencies)
             MergeDependency(parentDependencies, dep);
-           
     }
 
     public static void MergeDependency(List<DependencyRec> parentDependencies, DependencyRec childDependency)
@@ -64,42 +63,52 @@ public class FormulaBuffer
         if (unit == null)
             BufferRecs.Clear();
         else
-            foreach (var buff in BufferRecs.Where( x=> (x.DependencyRecs.Any(z => z.Relation == Formula.DynamicTargetEnm.Attacker&&(prm==null||z.Stat==prm))&&x.SourceUnit==unit )
-                                                    //check defender relations. have no attacker relations or SourceUnit=attacker
-                                                    || (x.DependencyRecs.Any(z => z.Relation == Formula.DynamicTargetEnm.Defender  &&(prm==null||z.Stat==prm)) &&x.TargetUnit==unit )
-                                                    ).ToList())
+            foreach (var buff in BufferRecs.Where(x =>
+                         ((x.DependencyRecs.Any(z =>
+                              z.Relation == Formula.DynamicTargetEnm.Attacker && z.Stat == prm) || prm == null) &&
+                          x.SourceUnit == unit)
+                         //check defender relations. have no attacker relations or SourceUnit=attacker
+                         || ((x.DependencyRecs.Any(
+                                  z => z.Relation == Formula.DynamicTargetEnm.Defender && z.Stat == prm) ||
+                              prm == null) &&
+                             x.TargetUnit == unit)
+                     ).ToList())
                 BufferRecs.Remove(buff);
-                
-            
     }
-    static string GenerateHash(string input)
+
+    public static string GenerateHash(string input)
     {
-        MD5 md5Hasher = MD5.Create();
+        using MD5 md5Hasher = MD5.Create();
         byte[] data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(input));
         return BitConverter.ToString(data);
     }
+
     /// <summary>
     /// search existing resolved formula
     /// </summary>
-    /// <param name="expression"></param>
+    /// <param name="hash"></param>
     /// <param name="attacker"></param>
     /// <param name="defender"></param>
     /// <returns></returns>
-    public Formula SearchBuff(string expression, Unit attacker, Unit defender)
+    public Formula SearchBuff(string hash, Unit attacker, Unit defender)
     {
-        return BufferRecs.FirstOrDefault(x => x.Hash == GenerateHash(expression)
-                                              //check attacker relations. have no attacker relations or SourceUnit=attacker
-                                              && (x.DependencyRecs.All(z => z.Relation != Formula.DynamicTargetEnm.Attacker) ||x.SourceUnit==attacker )
-                                              //check defender relations. have no attacker relations or SourceUnit=attacker
-                                              && (x.DependencyRecs.All(z => z.Relation != Formula.DynamicTargetEnm.Defender) ||x.TargetUnit==defender )
-                                              )
-            
+        return BufferRecs.FirstOrDefault(x => x.Hash == hash
+                                              && (x.SourceUnit == attacker )
+                                              //check defender relations. or have no defender relations or TargetUnit=defender
+                                              && (x.TargetUnit == defender || x.DependencyRecs.All(z => z.Relation != Formula.DynamicTargetEnm.Defender))
+            )
             ?.BuffFormula;
     }
 
     public void AddToBuff(Formula formula, Unit attacker, Unit defender, List<DependencyRec> dependencyRecs)
     {
+        //save buff only for registered units
+        if ( attacker is { ParentTeam: null } || defender is { ParentTeam: null })
+            return;
         BufferRecs.Add(new BufferRec()
-            {Hash =GenerateHash(formula.Expression), BuffFormula = formula, TargetUnit = defender, SourceUnit = attacker, DependencyRecs = dependencyRecs });
+        {
+            Hash = formula.Hash, BuffFormula = formula, TargetUnit = defender,
+            SourceUnit = attacker, DependencyRecs = dependencyRecs
+        });
     }
 }

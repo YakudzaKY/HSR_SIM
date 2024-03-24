@@ -473,7 +473,8 @@ public static class UnitFormulas
             EventRef = ent,
             UnitRef = unit,
             ConditionSkipList = excludeCondition,
-            Expression = $"{critMod}"
+            Expression = $"{critMod}",
+            FoundedDependency = [new FormulaBuffer.DependencyRec(){Relation= Formula.DynamicTargetEnm.Attacker,Stat=Condition.ConditionCheckParam.DoNotSaveDependency}]
         };
     }
 
