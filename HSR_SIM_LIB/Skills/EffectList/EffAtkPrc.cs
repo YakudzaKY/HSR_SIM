@@ -3,6 +3,6 @@
 /// <summary>
 ///     buff to attack by percent value. ( multiply base ATK by x%)
 /// </summary>
-public class EffAtkPrc : Effect
+public class EffAtkPrc() : Effect(Condition.ConditionCheckParam.Atk)
 {
 }

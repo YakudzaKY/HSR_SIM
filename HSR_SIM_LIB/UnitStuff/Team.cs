@@ -93,6 +93,7 @@ public class Team(SimCls parent) : CloneClass
         unit.ParentTeam = null;
         unit.Fighter = null;
         Units.RemoveAt(ndx);
+        ParentSim.CalcBuffer.Reset(unit);
         return ndx;
     }
 

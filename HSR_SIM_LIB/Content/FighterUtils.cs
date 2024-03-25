@@ -118,7 +118,7 @@ public static class FighterUtils
                          $" * {Formula.DynamicTargetEnm.Defender}#{nameof(Unit.GetBuffMultiplyByType)}#{typeof(EffDamageReduction).FullName} " +
                          //broken multiplier
                          $" *  {Formula.DynamicTargetEnm.Defender}#{nameof(Unit.GetBrokenMultiplier)}";
-        var newFormula = new Formula { Expression = expression, Variables = abilityFormula.Variables };
+        var newFormula = new Formula { Expression = expression, Variables = abilityFormula.Variables ,FoundedDependency = abilityFormula.FoundedDependency};
 
         return newFormula;
     }
@@ -159,7 +159,7 @@ public static class FighterUtils
             $"({abilityFormula.Expression} + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAdditiveShieldBonus).FullName}) " +
             $" * (1 + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffPrcShieldBonus).FullName})";
                      
-        var newFormula = new Formula { Expression = expression ,Variables = abilityFormula.Variables};
+        var newFormula = new Formula { Expression = expression ,Variables = abilityFormula.Variables ,FoundedDependency = abilityFormula.FoundedDependency};
         return newFormula;
     }
     
@@ -170,7 +170,7 @@ public static class FighterUtils
             $"{abilityFormula.Expression} * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetOutgoingHealMultiplier)}" +
             $" * {Formula.DynamicTargetEnm.Defender}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetIncomingHealMultiplier)}";
                      
-        var newFormula = new Formula { Expression = expression ,Variables = abilityFormula.Variables};
+        var newFormula = new Formula { Expression = expression ,Variables = abilityFormula.Variables ,FoundedDependency = abilityFormula.FoundedDependency};
         return newFormula;
     }
 

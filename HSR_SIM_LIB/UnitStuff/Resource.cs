@@ -28,7 +28,12 @@ public class Resource(CloneClass parent) : CloneClass
         set
         {
             resVal = value;
-            if (ResType == ResourceType.HP) ((Unit)Parent).ResetCondition(Condition.ConditionCheckParam.HpPrc);
+            if (Parent is Unit un)
+            {
+                if (ResType == ResourceType.HP) un.ResetCondition(Condition.ConditionCheckParam.Hp);
+                un.ResetCondition(Condition.ConditionCheckParam.Resource);
+            }
+            
         }
     }
 }

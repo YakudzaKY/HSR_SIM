@@ -3,6 +3,6 @@
 /// <summary>
 ///     delay debuff(increase basic AV)
 /// </summary>
-public class EffDelay : Effect
+public class EffDelay() : Effect(Condition.ConditionCheckParam.Delay)
 {
 }

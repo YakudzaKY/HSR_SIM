@@ -12,7 +12,7 @@ public class ResetAV : Event
 
     public override string GetDescription()
     {
-        return $"{TargetUnit?.Name:s} reset action value";
+        return $"{TargetUnit?.Name} reset action value";
     }
 
     public override void ProcEvent(bool revert)

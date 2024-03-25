@@ -6,7 +6,7 @@ namespace HSR_SIM_LIB.Skills.EffectList;
 /// <summary>
 ///     increase max hp by x%(from base stats ofc)
 /// </summary>
-public class EffMaxHpPrc : Effect
+public class EffMaxHpPrc() : Effect(Condition.ConditionCheckParam.Hp)
 {
     private double GetCorrectedHp(Event ent, Buff appliedBuff)
     {
@@ -33,13 +33,13 @@ public class EffMaxHpPrc : Effect
 
     public override void OnApply(Event ent, Buff buff, Unit target = null)
     {
-        (target ?? buff.CarrierUnit).ResetCondition(Condition.ConditionCheckParam.HpPrc);
+        (target ?? buff.CarrierUnit).ResetCondition(Condition.ConditionCheckParam.Hp);
         base.OnApply(ent, buff, target);
     }
 
     public override void OnRemove(Event ent, Buff buff, Unit target = null)
     {
-        (target ?? buff.CarrierUnit).ResetCondition(Condition.ConditionCheckParam.HpPrc);
+        (target ?? buff.CarrierUnit).ResetCondition(Condition.ConditionCheckParam.Hp);
         base.OnRemove(ent, buff, target);
     }
 }

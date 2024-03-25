@@ -3,6 +3,6 @@
 /// <summary>
 ///     element res penetration
 /// </summary>
-public class EffElementalPenetration : EffElementalTemplate
+public class EffElementalPenetration() : EffElementalTemplate(null)
 {
 }

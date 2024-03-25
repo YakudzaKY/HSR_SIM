@@ -12,7 +12,7 @@ public class AdvanceAV : Event
 
     public override string GetDescription()
     {
-        return $"{TargetUnit?.Name:s} advance forward";
+        return $"{TargetUnit?.Name} advance forward";
     }
 
     public override void ProcEvent(bool revert)

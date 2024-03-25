@@ -3,6 +3,6 @@
 /// <summary>
 ///     increase aggro value by x%
 /// </summary>
-public class EffAgrroPrc : Effect
+public class EffAggroPrc() : Effect(Condition.ConditionCheckParam.Aggro)
 {
 }

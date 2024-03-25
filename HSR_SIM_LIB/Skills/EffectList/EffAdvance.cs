@@ -3,6 +3,6 @@
 /// <summary>
 ///     buff to reduce basic action value
 /// </summary>
-public class EffAdvance : Effect
+public class EffAdvance() : Effect(Condition.ConditionCheckParam.Advance)
 {
 }

@@ -19,7 +19,12 @@ public class MechanicValReset(Step parent, ICloneable source, Unit sourceUnit) :
         if (!revert)
         {
             if (!TriggersHandled)
+            {
+                if (!TriggersHandled)
+                    ParentStep.Parent.CalcBuffer.Reset(SourceUnit, Condition.ConditionCheckParam.Mechanics);
                 Value = SourceUnit.Fighter.Mechanics.Values[AbilityValue];
+            }
+
             SourceUnit.Fighter.Mechanics.Values[AbilityValue] = 0;
         }
         else
@@ -27,7 +32,7 @@ public class MechanicValReset(Step parent, ICloneable source, Unit sourceUnit) :
             SourceUnit.Fighter.Mechanics.Values[AbilityValue] = Value ?? 0;
         }
 
-        
+
         base.ProcEvent(revert);
     }
 }
