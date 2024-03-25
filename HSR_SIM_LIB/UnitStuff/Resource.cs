@@ -19,7 +19,7 @@ public class Resource(CloneClass parent) : CloneClass
     private double resVal;
 
     public ResourceType? ResType { get; set; }
-    private CloneClass Parent { get; } = parent;
+    public CloneClass Parent { get; set; } = parent;
 
     public double ResVal
     {
