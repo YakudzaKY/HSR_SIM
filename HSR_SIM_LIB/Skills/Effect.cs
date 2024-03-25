@@ -5,7 +5,7 @@ using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_LIB.Skills;
 
-public class Effect(Condition.ConditionCheckParam? resetDependency) : CloneClass
+public class Effect : CloneClass
 {
     /// <summary>
     /// can be Formula or ref to Formula func
@@ -23,8 +23,13 @@ public class Effect(Condition.ConditionCheckParam? resetDependency) : CloneClass
         }
     }
 
-    public Condition.ConditionCheckParam? ResetDependency { get; } = resetDependency;
+    public object ResetDependency { get; }
     private object calculateValue;
+
+    protected Effect(Condition.ConditionCheckParam? resetDependency=null)
+    {
+        ResetDependency = resetDependency??(object)this.GetType();
+    }
 
     public double? Value { get; set; }
 
@@ -57,7 +62,7 @@ public class Effect(Condition.ConditionCheckParam? resetDependency) : CloneClass
     private void ResetDependencies(Buff buff, Unit target = null)
     {
         if (ResetDependency != null)
-            (target ?? buff.CarrierUnit).ResetCondition((Condition.ConditionCheckParam)ResetDependency);
+            (target ?? buff.CarrierUnit).ResetCondition(ResetDependency);
         (target ?? buff.CarrierUnit).ResetCondition(Condition.ConditionCheckParam.Buff);
         if (buff.Type is Buff.BuffType.Debuff or Buff.BuffType.Dot)
             (target ?? buff.CarrierUnit).ResetCondition(Condition.ConditionCheckParam.AnyDebuff);

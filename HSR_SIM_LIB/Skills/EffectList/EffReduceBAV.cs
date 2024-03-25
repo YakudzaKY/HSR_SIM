@@ -4,6 +4,6 @@
 ///     reduce Basic action value by x.
 ///     Used by forgotten hall on next cycles
 /// </summary>
-public class EffReduceBav() : Effect(null)
+public class EffReduceBav() : Effect()
 {
 }

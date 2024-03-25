@@ -255,7 +255,7 @@ public class Luocha : DefaultFighter
 
         //A6
         if (ATraces.HasFlag(ATracesEnm.A6))
-            Parent.DebuffResists.Add(new DebuffResist { Debuff = typeof(EffCrowControl), ResistVal = 0.7 });
+            Parent.DebuffResists.Add(new DebuffResist { Debuff = typeof(EffCrowdControl), ResistVal = 0.7 });
         //E2
         if (Parent.Rank >= 2)
             Parent.PassiveBuffs.Add(new PassiveBuff(Parent, this)

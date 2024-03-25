@@ -3,6 +3,6 @@
 /// <summary>
 ///     reduce damage by x%
 /// </summary>
-public class EffDamageReduction() : Effect(Condition.ConditionCheckParam.DmgReduction)
+public class EffDamageReduction() : Effect()
 {
 }

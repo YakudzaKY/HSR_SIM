@@ -3,6 +3,6 @@
 /// <summary>
 ///     element res penetration
 /// </summary>
-public class EffElementalPenetration() : EffElementalTemplate(Condition.ConditionCheckParam.ElemPenetration)
+public class EffElementalPenetration() : EffElementalTemplate(null)
 {
 }

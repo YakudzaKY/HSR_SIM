@@ -7,6 +7,7 @@ using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.Utils;
+using Microsoft.VisualBasic.CompilerServices;
 using static HSR_SIM_LIB.Utils.Constant;
 using static HSR_SIM_LIB.UnitStuff.Resource;
 using static HSR_SIM_LIB.Skills.Ability;
@@ -261,7 +262,7 @@ public class Unit : CloneClass
         return Resources.First(resource => resource.ResType == rt);
     }
 
-    public double GetResVal(ResourceType rt,List<FormulaBuffer.DependencyRec> dependencyRecs = null,
+    public double GetResVal(ResourceType rt, List<FormulaBuffer.DependencyRec> dependencyRecs = null,
         DynamicTargetEnm unitToCheck = DynamicTargetEnm.Attacker)
     {
         if (dependencyRecs != null)
@@ -272,7 +273,7 @@ public class Unit : CloneClass
     }
 
 
-    public double GetResists(ElementEnm elem, Event ent = null,List<FormulaBuffer.DependencyRec> dependencyRecs = null,
+    public double GetResists(ElementEnm elem, Event ent = null, List<FormulaBuffer.DependencyRec> dependencyRecs = null,
         DynamicTargetEnm unitToCheck = DynamicTargetEnm.Attacker)
     {
         if (dependencyRecs != null)
@@ -287,7 +288,8 @@ public class Unit : CloneClass
     }
 
 
-    public double GetDebuffResists(Type debuff, Event ent = null,List<FormulaBuffer.DependencyRec> dependencyRecs = null,
+    public double GetDebuffResists(Type debuff, Event ent = null,
+        List<FormulaBuffer.DependencyRec> dependencyRecs = null,
         DynamicTargetEnm unitToCheck = DynamicTargetEnm.Attacker)
     {
         if (dependencyRecs != null)
@@ -314,7 +316,7 @@ public class Unit : CloneClass
         return BaseDamageBoost.First(dmg => dmg.ElemType == elem);
     }
 
-    public double GetElemBoostVal(ElementEnm elem,List<FormulaBuffer.DependencyRec> dependencyRecs = null,
+    public double GetElemBoostVal(ElementEnm elem, List<FormulaBuffer.DependencyRec> dependencyRecs = null,
         DynamicTargetEnm unitToCheck = DynamicTargetEnm.Attacker)
     {
         if (dependencyRecs != null)
@@ -382,10 +384,19 @@ public class Unit : CloneClass
         AbilityTypeEnm? abilityType = null, List<FormulaBuffer.DependencyRec> dependencyRecs = null,
         Formula.DynamicTargetEnm unitToCheck = DynamicTargetEnm.Attacker)
     {
+        //save dependency from formula
+        if (dependencyRecs != null && effTypeToSearch != null)
+        {
+            Effect instance = (Effect)Activator.CreateInstance(effTypeToSearch);
+
+            FormulaBuffer.MergeDependency(dependencyRecs,
+                new FormulaBuffer.DependencyRec()
+                    { Relation = unitToCheck, Stat = instance!.ResetDependency });
+        }
+
         double res = 0;
         var effList =
             GetBuffEffectsByType(effTypeToSearch, elem, ent, excludeCondition, buffType, abilityType);
-
         foreach (var kp in effList)
         foreach (var effect in kp.Value)
         {
@@ -418,10 +429,6 @@ public class Unit : CloneClass
             res += finalValue;
             if (outputEffects != null && outputEffects.All(x => x.TraceEffect != effect))
                 outputEffects.Add(new EffectTraceRec(kp.Key, effect, finalValue));
-            if (dependencyRecs != null&& effect.ResetDependency!=null)
-                FormulaBuffer.MergeDependency(dependencyRecs,
-                    new FormulaBuffer.DependencyRec()
-                        { Relation = unitToCheck, Stat = (Condition.ConditionCheckParam)effect.ResetDependency });
         }
 
 
@@ -484,7 +491,7 @@ public class Unit : CloneClass
             res *= (1 - finalValue);
             if (outputEffects != null && outputEffects.All(x => x.TraceEffect != effect))
                 outputEffects.Add(new EffectTraceRec(kp.Key, effect, finalValue));
-            if (dependencyRecs != null&& effect.ResetDependency!=null)
+            if (dependencyRecs != null && effect.ResetDependency != null)
                 FormulaBuffer.MergeDependency(dependencyRecs,
                     new FormulaBuffer.DependencyRec()
                         { Relation = unitToCheck, Stat = (Condition.ConditionCheckParam)effect.ResetDependency });
@@ -695,7 +702,7 @@ public class Unit : CloneClass
             FormulaBuffer.MergeDependency(dependencyRecs,
                 new FormulaBuffer.DependencyRec()
                     { Relation = unitToCheck, Stat = Condition.ConditionCheckParam.Resource });
-        
+
         if (GetRes(ResourceType.Toughness).ResVal > 0)
             return 0.9;
         return 1;
@@ -706,16 +713,18 @@ public class Unit : CloneClass
     /// Reset Conditions that depends on stat
     /// </summary>
     /// <param name="chkPrm"></param>
-    public void ResetCondition(Condition.ConditionCheckParam chkPrm)
+    public void ResetCondition(object chkPrm)
     {
-        foreach (var cb in PassiveBuffs.Where(x => x.ApplyConditions != null)
-                     .SelectMany(x => x.ApplyConditions.Where(y => y.ConditionParam == chkPrm)))
-            cb.NeedRecalculate = true;
+        if (chkPrm is Condition.ConditionCheckParam cprm)
+            foreach (var cb in PassiveBuffs.Where(x => x.ApplyConditions != null)
+                         .SelectMany(x => x.ApplyConditions.Where(y => y.ConditionParam == cprm)))
+                cb.NeedRecalculate = true;
         ParentTeam?.ParentSim.CalcBuffer.Reset(this, chkPrm);
     }
 
 
-    public List<ElementEnm> GetWeaknesses(Event ent, List<Condition> excludeCondition = null,List<FormulaBuffer.DependencyRec> dependencyRecs = null,
+    public List<ElementEnm> GetWeaknesses(Event ent, List<Condition> excludeCondition = null,
+        List<FormulaBuffer.DependencyRec> dependencyRecs = null,
         DynamicTargetEnm unitToCheck = DynamicTargetEnm.Attacker)
     {
         if (dependencyRecs != null)

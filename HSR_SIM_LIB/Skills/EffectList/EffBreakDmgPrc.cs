@@ -3,6 +3,6 @@
 /// <summary>
 ///     buff to increase break damage
 /// </summary>
-public class EffBreakDmgPrc() : Effect(Condition.ConditionCheckParam.BrkDmg)
+public class EffBreakDmgPrc() : Effect()
 {
 }

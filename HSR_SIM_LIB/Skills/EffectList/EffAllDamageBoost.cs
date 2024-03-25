@@ -3,6 +3,6 @@
 /// <summary>
 ///     all type damage boosting
 /// </summary>
-public class EffAllDamageBoost() : Effect(Condition.ConditionCheckParam.AllDmgBoost)
+public class EffAllDamageBoost() : Effect()
 {
 }

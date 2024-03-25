@@ -3,6 +3,6 @@
 /// <summary>
 ///     def ignore buff. for example Genius of Brilliant Stars  passive buff
 /// </summary>
-public class EffDefIgnore() : Effect(Condition.ConditionCheckParam.DefIgnore)
+public class EffDefIgnore() : Effect()
 {
 }

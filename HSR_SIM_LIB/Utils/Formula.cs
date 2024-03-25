@@ -430,7 +430,7 @@ public class Formula : ICloneable
 
         if (!calculationResult.HasValue)
             throw new Exception("The operation could not be completed, a result was not obtained.");
-        if (FoundedDependency.All(x => x.Stat != Condition.ConditionCheckParam.DoNotSaveDependency))
+        if (FoundedDependency.All(x => x.Stat  is not  Condition.ConditionCheckParam.DoNotSaveDependency))
         {
             BufferRef?.AddToBuff(this, Attacker, Defender, FoundedDependency);
         }

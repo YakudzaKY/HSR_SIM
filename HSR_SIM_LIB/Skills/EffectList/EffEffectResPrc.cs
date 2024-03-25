@@ -3,6 +3,6 @@
 /// <summary>
 ///     effect res buff by x%
 /// </summary>
-public class EffEffectResPrc() : Effect(Condition.ConditionCheckParam.EffRes)
+public class EffEffectResPrc() : Effect()
 {
 }

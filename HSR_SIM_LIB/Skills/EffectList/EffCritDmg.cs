@@ -3,6 +3,6 @@
 /// <summary>
 ///     increase Crit dmg by x%
 /// </summary>
-public class EffCritDmg() : Effect(Condition.ConditionCheckParam.CritDmg)
+public class EffCritDmg() : Effect()
 {
 }

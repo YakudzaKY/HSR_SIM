@@ -49,8 +49,8 @@ public static class UnitFormulas
                 EventRef = ent,
                 UnitRef = unit,
                 ConditionSkipList = excludeCondition,
-                Expression =  $"{unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.BaseAggro)} * (1 + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffBaseAgrroPrc).FullName} ) " +
-                              $"* (1 +  {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAgrroPrc).FullName})"
+                Expression =  $"{unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.BaseAggro)} * (1 + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffBaseAggroPrc).FullName} ) " +
+                              $"* (1 +  {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAggroPrc).FullName})"
             };
         return new Formula
         {
@@ -147,6 +147,7 @@ public static class UnitFormulas
             EventRef = ent,
             UnitRef = unit,
             ConditionSkipList = excludeCondition,
+            FoundedDependency = [new FormulaBuffer.DependencyRec(){Relation= unitToCheck,Stat=Condition.ConditionCheckParam.PerformedActionValue}],
             Expression = $"{unitToCheck}#{nameof(GetActionValue)}" +
                          $" -  {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.PerformedActionValue)} "
         };
@@ -311,7 +312,7 @@ public static class UnitFormulas
                 UnitRef = unit,
                 ConditionSkipList = excludeCondition,
                 Expression =
-                    $"{unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffCrowControl).FullName} + {unitToCheck}#{nameof(Unit.GetDebuffResists)}#{typeof(EffCrowControl).FullName}"
+                    $"{unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffCrowdControl).FullName} + {unitToCheck}#{nameof(Unit.GetDebuffResists)}#{typeof(EffCrowdControl).FullName}"
             };
 
         return new Formula

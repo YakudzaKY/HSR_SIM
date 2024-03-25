@@ -3,6 +3,6 @@
 /// <summary>
 ///     battle respawn buff
 /// </summary>
-public class EffRebirth(): Effect(null)
+public class EffRebirth(): Effect()
 {
 }

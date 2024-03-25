@@ -3,6 +3,6 @@
 /// <summary>
 ///     increase DoT damage buff
 /// </summary>
-public class EffDoTBoost(): Effect(Condition.ConditionCheckParam.DoTBoost)
+public class EffDoTBoost(): Effect()
 {
 }

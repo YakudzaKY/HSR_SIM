@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Security.Cryptography;
 using System.Text;
 using HSR_SIM_LIB.Skills;
@@ -20,8 +19,8 @@ public class FormulaBuffer
     /// </summary>
     public record DependencyRec
     {
-        public required Formula.DynamicTargetEnm Relation { get; set; }
-        public required Condition.ConditionCheckParam Stat { get; set; }
+        public required Formula.DynamicTargetEnm Relation { get; init; }
+        public required Object Stat { get; init; }
     }
 
     //merge second into first
@@ -33,7 +32,7 @@ public class FormulaBuffer
 
     public static void MergeDependency(List<DependencyRec> parentDependencies, DependencyRec childDependency)
     {
-        if (!parentDependencies.Any(x => x.Stat == childDependency.Stat && x.Relation == childDependency.Relation))
+        if (!parentDependencies.Any(x =>  Equals(x.Stat , childDependency.Stat)   && x.Relation == childDependency.Relation))
         {
             parentDependencies.Add(childDependency);
         }
@@ -44,33 +43,33 @@ public class FormulaBuffer
     /// </summary>
     public record BufferRec
     {
-        public required Formula BuffFormula { get; set; }
-        public string Hash { get; set; }
-        public required Unit SourceUnit { get; set; }
-        public required Unit TargetUnit { get; set; }
-        public required List<DependencyRec> DependencyRecs { get; set; }
+        public required Formula BuffFormula { get; init; }
+        public string Hash { get; init; }
+        public required Unit SourceUnit { get; init; }
+        public required Unit TargetUnit { get; init; }
+        public required List<DependencyRec> DependencyRecs { get; init; }
     }
 
-    public List<BufferRec> BufferRecs { get; set; } = [];
+    private List<BufferRec> BufferRecs { get; } = [];
 
     /// <summary>
     /// Full reset, or reset by Unit
     /// </summary>
     /// <param name="unit">clear cache for this unit</param>
     /// <param name="prm">Parameter to find. If null then remove all unit entry</param>
-    public void Reset(Unit unit = null, Condition.ConditionCheckParam? prm = null)
+    public void Reset(Unit unit = null, object prm = null)
     {
         if (unit == null)
             BufferRecs.Clear();
         else
             foreach (var buff in BufferRecs.Where(x =>
                          ((x.DependencyRecs.Any(z =>
-                              z.Relation == Formula.DynamicTargetEnm.Attacker && z.Stat == prm) || prm == null) &&
+                              z.Relation == Formula.DynamicTargetEnm.Attacker && Equals(z.Stat , prm)) || prm == null) &&
                           x.SourceUnit == unit)
                          //check defender relations. have no attacker relations or SourceUnit=attacker
-                         || ((x.DependencyRecs.Any(
-                                  z => z.Relation == Formula.DynamicTargetEnm.Defender && z.Stat == prm) ||
-                              prm == null) &&
+                         || (x.DependencyRecs.Any(
+                                  z => z.Relation == Formula.DynamicTargetEnm.Defender && ( Equals(z.Stat , prm)||
+                                       prm == null))  &&
                              x.TargetUnit == unit)
                      ).ToList())
                 BufferRecs.Remove(buff);

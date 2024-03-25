@@ -3,6 +3,6 @@
 /// <summary>
 ///     generic EFF to CC calculation
 /// </summary>
-public class EffCrowControl() : Effect(null)
+public class EffCrowdControl() : Effect(null)
 {
 }
