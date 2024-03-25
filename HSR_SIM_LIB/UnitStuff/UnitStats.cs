@@ -1,5 +1,6 @@
 ﻿using System;
 using HSR_SIM_LIB.Content;
+using HSR_SIM_LIB.Skills;
 
 namespace HSR_SIM_LIB.UnitStuff;
 
@@ -9,6 +10,7 @@ namespace HSR_SIM_LIB.UnitStuff;
 public class UnitStats : ICloneable
 {
     private double? baseDef;
+    private double performedActionValue;
 
     public UnitStats(Unit unit)
     {
@@ -66,10 +68,10 @@ public class UnitStats : ICloneable
     public double MaxHpFix { get; set; }
 
     public double MaxHpPrc { get; set; } = 0;
-    
+
     public double EffectResPrc { get; set; } = 0;
 
-    
+
     public double EffectHitPrc { get; set; } = 0;
 
     public double BaseEnergyResPrc { get; set; }
@@ -83,7 +85,17 @@ public class UnitStats : ICloneable
     public double? LoadedBaseActionValue { get; set; }
 
 
-    public double PerformedActionValue { get; set; }
+    public double PerformedActionValue
+    {
+        get => performedActionValue;
+        set
+        {
+            if (!Equals(performedActionValue, value))
+                Parent.ResetCondition(Condition.ConditionCheckParam.PerformedActionValue);
+            
+            performedActionValue = value;
+        }
+    }
 
 
     public double BaseSpeed { get; internal set; }

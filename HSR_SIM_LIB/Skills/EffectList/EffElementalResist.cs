@@ -3,6 +3,6 @@
 /// <summary>
 ///     resist to element buff
 /// </summary>
-public class EffElementalResist : EffElementalTemplate
+public class EffElementalResist() : EffElementalTemplate(Condition.ConditionCheckParam.ElemDmgRes)
 {
 }

@@ -3,6 +3,6 @@
 /// <summary>
 ///     Imprisonment debuff
 /// </summary>
-public class EffImprisonment : Effect
+public class EffImprisonment (): Effect(null)
 {
 }

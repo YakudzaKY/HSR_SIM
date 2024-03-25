@@ -3,6 +3,6 @@
 /// <summary>
 ///     Kafka debuff ??
 /// </summary>
-public class EffDominated : Effect
+public class EffDominated() : Effect(null)
 {
 }

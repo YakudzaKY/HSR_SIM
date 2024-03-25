@@ -241,6 +241,7 @@ public class Blade : DefaultFighter
         {
             CalculateValue = DamageFormula(new Formula()
             {
+                FoundedDependency =[],
                 Expression =
                     $"({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetAttack)} * {dsMainAtk}  ) " +
                     $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} * {dsMainHp}  ) " +
@@ -400,7 +401,7 @@ public class Blade : DefaultFighter
                 [
                     new Condition
                     {
-                        ConditionParam = Condition.ConditionCheckParam.HpPrc,
+                        ConditionParam = Condition.ConditionCheckParam.Hp,
                         ConditionExpression = Condition.ConditionCheckExpression.EqualOrLess,
                         Value = 0.5
                     }
@@ -433,8 +434,13 @@ public class Blade : DefaultFighter
     /// formula will use this
     /// </summary>
     /// <returns></returns>
-    public double GetDsMechanic()
+    public double GetDsMechanic(List<FormulaBuffer.DependencyRec> dependencyRecs ,
+        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker)
     {
+        FormulaBuffer.MergeDependency(dependencyRecs,
+            new FormulaBuffer.DependencyRec()
+                { Relation = unitToCheck, Stat = Condition.ConditionCheckParam.Mechanics });
+        
         return Mechanics.Values[deathSentence];
     }
 
@@ -541,7 +547,7 @@ public class Blade : DefaultFighter
                     $" ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} / 2) - " +
                     $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetResVal)}#{Resource.ResourceType.HP} "
             };
-        return new Formula() { Expression = "0" };
+        return new Formula() { EventRef = ent, Expression = "0" };
     }
 
     private bool HellscapeActive()

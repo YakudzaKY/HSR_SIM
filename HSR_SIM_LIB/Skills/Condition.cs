@@ -28,10 +28,25 @@ public class Condition
         Spd,
         Weakness,
         CritRate,
-        HpPrc,
+        Hp,
         Buff,
         AnyDebuff,
-        Resource
+        Resource,
+        Atk,
+        AbilityTypeBoost,
+        Advance,
+        Delay,
+        Aggro,
+        ElemDmgBoost,
+        ElemDmgRes,
+        ElemDmgVulnerability,
+        DebuffResist,
+        Def,
+        ShieldBonus,
+        Mechanics,
+        PerformedActionValue,
+        DoNotSaveDependency//this param should be recalculated every time(crit proceed etc)
+        
     }
 
     private bool truly;
@@ -78,7 +93,7 @@ public class Condition
                 ConditionCheckParam.Spd => CheckExpression(untToCheck.GetSpeed(ent:ent, excludeCondition:excludeCondition).Result),
                 ConditionCheckParam.CritRate => CheckExpression(
                     untToCheck.CritChance(ent:ent, excludeCondition:excludeCondition).Result),
-                ConditionCheckParam.HpPrc => untToCheck.GetMaxHp(ent:ent, excludeCondition:excludeCondition).Result != 0 &&
+                ConditionCheckParam.Hp => untToCheck.GetMaxHp(ent:ent, excludeCondition:excludeCondition).Result != 0 &&
                                              CheckExpression(untToCheck.GetHpPrc(ent:ent, excludeCondition:excludeCondition).Result),
                 ConditionCheckParam.Resource => ResourceValue!=null && CheckExpression(untToCheck.GetRes((Resource.ResourceType)ResourceValue).ResVal),
                 ConditionCheckParam.Weakness => untToCheck.GetWeaknesses(ent, excludeCondition)

@@ -3,6 +3,6 @@
 /// <summary>
 ///     increase shield value on cast by x%
 /// </summary>
-public class EffPrcShieldBonus : Effect
+public class EffPrcShieldBonus() : Effect(Condition.ConditionCheckParam.ShieldBonus)
 {
 }

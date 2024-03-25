@@ -17,7 +17,7 @@ public class EventViewModel(Event ent)
     public string Value => ent.Value?.ToString() ?? string.Empty;
     public string RealValue => ent.RealValue?.ToString() ?? string.Empty;
     public string Description => ent.GetDescription();
-    public string Explain => ent.CalculateValue is Formula fm ? fm.Explain() : "";
+    public string Explain => ent.CalculateValue is Formula fm ? fm.Explain(out _) : "";
     public object CalculateValue => ent.CalculateValue;
 
     public IEnumerable<BuffViewModel>? Buffs

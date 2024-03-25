@@ -7,7 +7,7 @@ namespace HSR_SIM_LIB.Skills.EffectList;
 /// <summary>
 ///     generic class for DoT classes
 /// </summary>
-public abstract class EffDotTemplate : Effect
+public abstract class EffDotTemplate() : Effect()
 {
     public Formula DoTCalculateValue { get; init; }
     public abstract Ability.ElementEnm Element { get; init; }

@@ -6,6 +6,7 @@ using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
+using HSR_SIM_LIB.Utils;
 using static HSR_SIM_LIB.UnitStuff.Resource;
 using static HSR_SIM_LIB.TurnBasedClasses.Step;
 using static HSR_SIM_LIB.UnitStuff.Unit;
@@ -24,6 +25,7 @@ public sealed class SimCls : ICloneable
     public delegate void StepHandler(Step step);
 
     public List<PreLaunchOption> PreLaunch;
+    public FormulaBuffer CalcBuffer = new ();
 
 
     /// <summary>
@@ -122,6 +124,7 @@ public sealed class SimCls : ICloneable
         newClone.StepHandlerProc -= HandleStep;
         newClone.EventHandlerProc += newClone.HandleEvent;
         newClone.StepHandlerProc += newClone.HandleStep;
+        newClone.CalcBuffer = new FormulaBuffer();
 
         return newClone;
     }

@@ -49,8 +49,8 @@ public static class UnitFormulas
                 EventRef = ent,
                 UnitRef = unit,
                 ConditionSkipList = excludeCondition,
-                Expression =  $"{unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.BaseAggro)} * (1 + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffBaseAgrroPrc).FullName} ) " +
-                              $"* (1 +  {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAgrroPrc).FullName})"
+                Expression =  $"{unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.BaseAggro)} * (1 + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffBaseAggroPrc).FullName} ) " +
+                              $"* (1 +  {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAggroPrc).FullName})"
             };
         return new Formula
         {
@@ -119,7 +119,7 @@ public static class UnitFormulas
             UnitRef = unit,
             ConditionSkipList = excludeCondition,
             Expression = $"{unitToCheck}#{nameof(GetInitialBaseActionValue)}" +
-                         $" - {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffReduceBAV).FullName} "
+                         $" - {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffReduceBav).FullName} "
         };
     }
 
@@ -147,6 +147,7 @@ public static class UnitFormulas
             EventRef = ent,
             UnitRef = unit,
             ConditionSkipList = excludeCondition,
+            FoundedDependency = [new FormulaBuffer.DependencyRec(){Relation= unitToCheck,Stat=Condition.ConditionCheckParam.PerformedActionValue}],
             Expression = $"{unitToCheck}#{nameof(GetActionValue)}" +
                          $" -  {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.PerformedActionValue)} "
         };
@@ -295,7 +296,7 @@ public static class UnitFormulas
             UnitRef = unit,
             ConditionSkipList = excludeCondition,
             Expression =
-                $"{unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffDebufResist).FullName} {resExpr} "
+                $"{unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffDebuffResist).FullName} {resExpr} "
         };
     }
 
@@ -311,7 +312,7 @@ public static class UnitFormulas
                 UnitRef = unit,
                 ConditionSkipList = excludeCondition,
                 Expression =
-                    $"{unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffCrowControl).FullName} + {unitToCheck}#{nameof(Unit.GetDebuffResists)}#{typeof(EffCrowControl).FullName}"
+                    $"{unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffCrowdControl).FullName} + {unitToCheck}#{nameof(Unit.GetDebuffResists)}#{typeof(EffCrowdControl).FullName}"
             };
 
         return new Formula
@@ -370,7 +371,7 @@ public static class UnitFormulas
                 EventRef = ent,
                 UnitRef = unit,
                 ConditionSkipList = excludeCondition,
-                Expression = $" 0 "
+                Expression = $"0"
             };
 
         return new Formula
@@ -467,13 +468,14 @@ public static class UnitFormulas
 
     public static Formula CritHit(this Unit unit, Event ent, List<Condition> excludeCondition = null)
     {
-        double critMod = ((DirectDamage)ent).IsCrit ? 1 : 0;
+        double critMod = ent is DirectDamage dd ? dd.IsCrit ? 1 : 0 : 0;
         return new Formula
         {
             EventRef = ent,
             UnitRef = unit,
             ConditionSkipList = excludeCondition,
-            Expression = $"{critMod}"
+            Expression = $"{critMod}",
+            FoundedDependency = [new FormulaBuffer.DependencyRec(){Relation= Formula.DynamicTargetEnm.Attacker,Stat=Condition.ConditionCheckParam.DoNotSaveDependency}]
         };
     }
 
@@ -572,13 +574,17 @@ public static class UnitFormulas
     /// <returns></returns>
     public static Formula GenerateCrit(this Unit unit,
         Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
-        List<Condition> excludeCondition = null)
+        List<Condition> excludeCondition = null )
     {
         var res = CritChance(unit, unitToCheck, ent, excludeCondition);
-        (((DirectDamage)ent)!).CritRate = res.Result;
-        ((DirectDamage)ent).IsCrit = ent.ParentStep.Parent.Parent.DevMode
-            ? DevModeUtils.IsCrit(ent)
-            : new MersenneTwister().NextDouble() <= res.Result;
+        if (ent is DirectDamage dd)
+        {
+            dd.CritRate = res.Result;
+            dd.IsCrit = ent.ParentStep.Parent.Parent.DevMode
+                ? DevModeUtils.IsCrit(ent)
+                : new MersenneTwister().NextDouble() <= res.Result;
+            FormulaBuffer.MergeDependency(res.FoundedDependency, new FormulaBuffer.DependencyRec(){Stat = Condition.ConditionCheckParam.DoNotSaveDependency,Relation =unitToCheck });
+        }
 
         return res;
     }

@@ -3,17 +3,15 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using HSR_SIM_LIB.Content;
-using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
-using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.Utils;
+using Microsoft.VisualBasic.CompilerServices;
 using static HSR_SIM_LIB.Utils.Constant;
 using static HSR_SIM_LIB.UnitStuff.Resource;
 using static HSR_SIM_LIB.Skills.Ability;
 using static HSR_SIM_LIB.Utils.Formula;
-using static HSR_SIM_LIB.UnitStuff.UnitFormulas;
 
 namespace HSR_SIM_LIB.UnitStuff;
 
@@ -82,7 +80,7 @@ public class Unit : CloneClass
     public List<AppliedBuff> AppliedBuffs { get; set; } = [];
 
     //always active buffs
-    public List<PassiveBuff> PassiveBuffs { get; set; } = [];
+    public List<PassiveBuff> PassiveBuffs { get; private set; } = [];
 
     public string Name { get; set; } = string.Empty;
 
@@ -139,8 +137,14 @@ public class Unit : CloneClass
                 //gather enemies from all waves
                 if (ParentTeam.ParentSim.NextFight != null)
                     foreach (var wave in ParentTeam.ParentSim.NextFight.Waves)
-                        nextEnemies.AddRange(wave.Units.Select(x=>(Unit)x.Clone()));
-                tmpTeam.BindUnits(nextEnemies);
+                        nextEnemies.AddRange(wave.Units);
+                        
+                foreach (var unit in nextEnemies)
+                {
+                    unit.Init();
+                    unit.Fighter = null;
+                }
+
 
 
                 return nextEnemies.DistinctBy(x => x.Name).ToList();
@@ -268,49 +272,24 @@ public class Unit : CloneClass
         return Resources.First(resource => resource.ResType == rt);
     }
 
-    public double GetResVal(ResourceType rt)
+    public double GetResVal(ResourceType rt, List<FormulaBuffer.DependencyRec> dependencyRecs = null,
+        DynamicTargetEnm unitToCheck = DynamicTargetEnm.Attacker)
     {
+        if (dependencyRecs != null)
+            FormulaBuffer.MergeDependency(dependencyRecs,
+                new FormulaBuffer.DependencyRec()
+                    { Relation = unitToCheck, Stat = Condition.ConditionCheckParam.Resource });
         return GetRes(rt).ResVal;
     }
-    public double AllDmgBoost(Event ent = null)
-    {
-        return GetBuffSumByType(ent, typeof(EffAllDamageBoost));
-    }
 
-    public double AdditiveShieldBonus(Event ent = null)
-    {
-        return GetBuffSumByType(ent, typeof(EffAdditiveShieldBonus));
-    }
 
-    public double PrcShieldBonus(Event ent = null)
+    public double GetResists(ElementEnm elem, Event ent = null, List<FormulaBuffer.DependencyRec> dependencyRecs = null,
+        DynamicTargetEnm unitToCheck = DynamicTargetEnm.Attacker)
     {
-        return GetBuffSumByType(ent, typeof(EffPrcShieldBonus));
-    }
-
-    public double ResistsPenetration(ElementEnm elem, Event ent = null)
-    {
-        return GetBuffSumByType(ent, typeof(EffElementalPenetration), elem: elem);
-    }
-
-    /// <summary>
-    ///     https://honkai-star-rail.fandom.com/wiki/Damage_RES
-    /// </summary>
-    /// <param name="elem"></param>
-    /// <param name="ent"></param>
-    /// <returns>double value: sum of resists effects</returns>
-    public double GetResistsAndBuffResists(ElementEnm elem, Event ent = null)
-    {
-        double res = 0;
-        if (Resists.Any(x => x.ResistType == elem))
-            res += Resists.First(x => x.ResistType == elem).ResistVal;
-
-        res += GetBuffSumByType(ent, typeof(EffElementalResist), elem: elem);
-        res += GetBuffSumByType(ent, typeof(EffAllDamageResist));
-        return res;
-    }
-
-    public double GetResists(ElementEnm elem, Event ent = null)
-    {
+        if (dependencyRecs != null)
+            FormulaBuffer.MergeDependency(dependencyRecs,
+                new FormulaBuffer.DependencyRec()
+                    { Relation = unitToCheck, Stat = Condition.ConditionCheckParam.ElemDmgRes });
         double res = 0;
         if (Resists.Any(x => x.ResistType == elem))
             res += Resists.First(x => x.ResistType == elem).ResistVal;
@@ -319,8 +298,14 @@ public class Unit : CloneClass
     }
 
 
-    public double GetDebuffResists(Type debuff, Event ent = null)
+    public double GetDebuffResists(Type debuff, Event ent = null,
+        List<FormulaBuffer.DependencyRec> dependencyRecs = null,
+        DynamicTargetEnm unitToCheck = DynamicTargetEnm.Attacker)
     {
+        if (dependencyRecs != null)
+            FormulaBuffer.MergeDependency(dependencyRecs,
+                new FormulaBuffer.DependencyRec()
+                    { Relation = unitToCheck, Stat = Condition.ConditionCheckParam.DebuffResist });
         double res = 0;
         if (DebuffResists.Any(x => x.Debuff == debuff))
             res += DebuffResists.First(x => x.Debuff == debuff).ResistVal;
@@ -328,10 +313,6 @@ public class Unit : CloneClass
         return res;
     }
 
-    public double DefIgnore(Event ent = null)
-    {
-        return GetBuffSumByType(ent, typeof(EffDefIgnore));
-    }
 
     /// <summary>
     ///     Get elem  boost
@@ -345,14 +326,14 @@ public class Unit : CloneClass
         return BaseDamageBoost.First(dmg => dmg.ElemType == elem);
     }
 
-    public double GetElemBoostVal(ElementEnm elem)
+    public double GetElemBoostVal(ElementEnm elem, List<FormulaBuffer.DependencyRec> dependencyRecs = null,
+        DynamicTargetEnm unitToCheck = DynamicTargetEnm.Attacker)
     {
+        if (dependencyRecs != null)
+            FormulaBuffer.MergeDependency(dependencyRecs,
+                new FormulaBuffer.DependencyRec()
+                    { Relation = unitToCheck, Stat = Condition.ConditionCheckParam.ElemDmgBoost });
         return GetElemBoost(elem).Value;
-    }
-
-    public double GetElemBoostValue(ElementEnm elem, Event ent = null)
-    {
-        return GetElemBoostVal(elem) + GetBuffSumByType(ent, typeof(EffElementalBoost), elem: elem);
     }
 
 
@@ -404,20 +385,32 @@ public class Unit : CloneClass
     /// <param name="excludeCondition">Exclude passive buff for prevent recursion </param>
     /// <param name="buffType">Search by type: debuff,DoT,Buff</param>
     /// <param name="abilityType">search by ability type(for example Damage boost by ability)</param>
+    /// <param name="dependencyRecs">List of dependencies</param>
+    /// <param name="unitToCheck">unit for dependencyRecs param</param>
     /// <returns>double value(sum of effect values)</returns>
     public double GetBuffSumByType(Event ent = null,
         Type effTypeToSearch = null, List<EffectTraceRec> outputEffects = null, ElementEnm? elem = null,
         List<Condition> excludeCondition = null, Buff.BuffType? buffType = null,
-        AbilityTypeEnm? abilityType = null)
+        AbilityTypeEnm? abilityType = null, List<FormulaBuffer.DependencyRec> dependencyRecs = null,
+        Formula.DynamicTargetEnm unitToCheck = DynamicTargetEnm.Attacker)
     {
+        //save dependency from formula
+        if (dependencyRecs != null && effTypeToSearch != null)
+        {
+            Effect instance = (Effect)Activator.CreateInstance(effTypeToSearch);
+
+            FormulaBuffer.MergeDependency(dependencyRecs,
+                new FormulaBuffer.DependencyRec()
+                    { Relation = unitToCheck, Stat = instance!.ResetDependency });
+        }
+
         double res = 0;
         var effList =
             GetBuffEffectsByType(effTypeToSearch, elem, ent, excludeCondition, buffType, abilityType);
-
         foreach (var kp in effList)
         foreach (var effect in kp.Value)
         {
-            double finalValue=0;
+            double finalValue = 0;
             //if condition\passive buff is target check then recalculate value
             if (effect.CalculateValue != null && kp.Key is PassiveBuff { IsTargetCheck: true })
             {
@@ -436,7 +429,6 @@ public class Unit : CloneClass
                     newFrm.EventRef = ent;
                     finalValue = newFrm.Result;
                 }
-                
             }
             else
                 finalValue = (double)effect.Value;
@@ -464,11 +456,14 @@ public class Unit : CloneClass
     /// <param name="excludeCondition">Exclude passive buff for prevent recursion </param>
     /// <param name="buffType">Search by type: debuff,DoT,Buff</param>
     /// <param name="abilityType">search by ability type(for example Damage boost by ability)</param>
+    /// <param name="dependencyRecs">List of dependencies</param>
+    /// <param name="unitToCheck">unit for dependencyRecs param</param>
     /// <returns>double value(sum of effect values)</returns>
     public double GetBuffMultiplyByType(Event ent = null,
         Type effTypeToSearch = null, List<EffectTraceRec> outputEffects = null, ElementEnm? elem = null,
         List<Condition> excludeCondition = null, Buff.BuffType? buffType = null,
-        AbilityTypeEnm? abilityType = null)
+        AbilityTypeEnm? abilityType = null, List<FormulaBuffer.DependencyRec> dependencyRecs = null,
+        Formula.DynamicTargetEnm unitToCheck = DynamicTargetEnm.Attacker)
     {
         double res = 1;
         var effList =
@@ -477,7 +472,7 @@ public class Unit : CloneClass
         foreach (var kp in effList)
         foreach (var effect in kp.Value)
         {
-            double finalValue=0;
+            double finalValue = 0;
             //if condition\passive buff is target check then recalculate value
             if (effect.CalculateValue != null && kp.Key is PassiveBuff { IsTargetCheck: true })
             {
@@ -496,7 +491,6 @@ public class Unit : CloneClass
                     newFrm.EventRef = ent;
                     finalValue = newFrm.Result;
                 }
-               
             }
             else
                 finalValue = (double)effect.Value;
@@ -507,6 +501,10 @@ public class Unit : CloneClass
             res *= (1 - finalValue);
             if (outputEffects != null && outputEffects.All(x => x.TraceEffect != effect))
                 outputEffects.Add(new EffectTraceRec(kp.Key, effect, finalValue));
+            if (dependencyRecs != null && effect.ResetDependency != null)
+                FormulaBuffer.MergeDependency(dependencyRecs,
+                    new FormulaBuffer.DependencyRec()
+                        { Relation = unitToCheck, Stat = (Condition.ConditionCheckParam)effect.ResetDependency });
         }
 
 
@@ -707,40 +705,49 @@ public class Unit : CloneClass
     ///     https://honkai-star-rail.fandom.com/wiki/Toughness#Weakness_Break
     /// </summary>
     /// <returns></returns>
-    public double GetBrokenMultiplier()
+    public double GetBrokenMultiplier(List<FormulaBuffer.DependencyRec> dependencyRecs = null,
+        DynamicTargetEnm unitToCheck = DynamicTargetEnm.Attacker)
     {
+        if (dependencyRecs != null)
+            FormulaBuffer.MergeDependency(dependencyRecs,
+                new FormulaBuffer.DependencyRec()
+                    { Relation = unitToCheck, Stat = Condition.ConditionCheckParam.Resource });
+
         if (GetRes(ResourceType.Toughness).ResVal > 0)
             return 0.9;
         return 1;
     }
 
 
-
-
-
-
-
-
-
-    public void ResetCondition(Condition.ConditionCheckParam chkPrm)
+    /// <summary>
+    /// Reset Conditions that depends on stat
+    /// </summary>
+    /// <param name="chkPrm"></param>
+    public void ResetCondition(object chkPrm)
     {
-        foreach (var cb in PassiveBuffs.Where(x => x.ApplyConditions != null)
-                     .SelectMany(x => x.ApplyConditions.Where(y => y.ConditionParam == chkPrm)))
-            cb.NeedRecalculate = true;
+        if (chkPrm is Condition.ConditionCheckParam cprm)
+            foreach (var cb in PassiveBuffs.Where(x => x.ApplyConditions != null)
+                         .SelectMany(x => x.ApplyConditions.Where(y => y.ConditionParam == cprm)))
+                cb.NeedRecalculate = true;
+        ParentTeam?.ParentSim.CalcBuffer.Reset(this, chkPrm);
     }
 
-    
-    public List<ElementEnm> GetWeaknesses(Event ent, List<Condition> excludeCondition = null)
+
+    public List<ElementEnm> GetWeaknesses(Event ent, List<Condition> excludeCondition = null,
+        List<FormulaBuffer.DependencyRec> dependencyRecs = null,
+        DynamicTargetEnm unitToCheck = DynamicTargetEnm.Attacker)
     {
+        if (dependencyRecs != null)
+            FormulaBuffer.MergeDependency(dependencyRecs,
+                new FormulaBuffer.DependencyRec()
+                    { Relation = unitToCheck, Stat = Condition.ConditionCheckParam.Weakness });
         List<ElementEnm> res = new();
         //add native weakness to result
-
         res.AddRange(NativeWeaknesses);
         //grab weakness from debuffs
         var elems = GetBuffEffectsByType(typeof(EffWeaknessImpair), ent: ent, excludeCondition: excludeCondition)
             .Select(x => x.Value);
         foreach (var lst in elems) res.AddRange(lst.Select(x => ((EffWeaknessImpair)x).Element));
-
         return res;
     }
 
