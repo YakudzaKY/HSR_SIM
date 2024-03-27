@@ -1,4 +1,7 @@
 # Honkai Star Rail simulator
+> [!CAUTION]
+> At the moment, refactoring is underway, and there is a fairly significant change in the architecture. After fixing multithreading, formulas and autotests, SDK will be available for developers
+
 ## Description
 ### What is it?
 
@@ -19,12 +22,13 @@ This is combat simulator reproducing combat in the Honkai Star Rail game with 10
 ## Developers node
 ### Poject sctructure
 * HSR_SIM_CLIENT
-
-
+> [!TIP]
+> Start project use from here.
 Its Ui for SIM all functionality starts from here
 
 * HSR_SIM_CONTENT
-
+> [!TIP]
+> free developers are needed here
 content for the simulator. Characters, cones, opponents, equipment. Horizontal development takes place here
 * HSR_SIM_GUI
   
@@ -39,8 +43,10 @@ The filling of the whole project. All mechanics, simulations and calculations ar
 
 
 ## Plans/Features:
+- SDK documentation
 - transfer the entire application to WPF
 - repair multi threading simmulation
+- Need some content(more characters)
 - serious optimization of calculation of the result of formulas. Cause calculations moved from native c# methods into dynamic formulas(for better accuracy and debug). performance dropped by a factor of 20. A buffer was developed as an optimization measure, but further measures must be taken
 - assessment of the level of current equipment
 - Character research(find best relic set with average stats)
