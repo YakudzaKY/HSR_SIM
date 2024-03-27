@@ -51,7 +51,7 @@ The filling of the whole project. All mechanics, simulations and calculations ar
 - assessment of the level of current equipment
 - Character research(find best relic set with average stats)
 
-#License
+# License
 
 
 Copyright 2024 Baranov Mikhail (aka Yakudza_KY)
