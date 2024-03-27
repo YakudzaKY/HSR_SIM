@@ -1,6 +1,6 @@
 # Honkai Star Rail simulator
 > [!CAUTION]
-> At the moment, refactoring is underway, and there is a fairly significant change in the architecture. After fixing multithreading, formulas and autotests, SDK will be available for developers
+> At the moment, refactoring is underway, and there is a fairly significant change in the architecture. After fixing multithreading, formulas and autotests, SDK will be available for developers. JetBrains RIDER motivated me to switch from Windows Forms to WPF. And for one thing, I decided to redo all the calculations in the simulator... in general, I decided to redo everything
 
 ## Description
 ### What is it?
