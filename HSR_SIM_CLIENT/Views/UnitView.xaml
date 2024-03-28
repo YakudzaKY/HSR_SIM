@@ -1,0 +1,113 @@
+﻿<UserControl x:Class="HSR_SIM_CLIENT.Views.UnitView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:HSR_SIM_CLIENT.Views"
+             xmlns:singleSim="clr-namespace:HSR_SIM_CLIENT.ViewModels"
+             xmlns:utils="clr-namespace:HSR_SIM_LIB.Utils;assembly=HSR_SIM_LIB"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:converters="clr-namespace:HSR_SIM_CLIENT.Converters"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300"
+             Name="Parent">
+    <Grid DataContext="{Binding ElementName=Parent}">
+        <Grid.Resources>
+            <DataTemplate DataType="{x:Type singleSim:BuffViewModel }">
+                <local:BuffView BuffToView="{Binding ., Mode=OneWay}" />
+            </DataTemplate>
+            <converters:CountVisibilityConverter x:Key="CountVisibilityConverter" />
+
+
+            <DataTemplate DataType="{x:Type utils:Formula}">
+                <TextBlock Text="{Binding Path=Expression}" />
+            </DataTemplate>
+        </Grid.Resources>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Label Grid.Row="0" Grid.Column="0">Name</Label>
+        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding UnitToView.Name, Mode=OneWay}"></TextBox>
+        <!-- stats table -->
+        <DataGrid Grid.Row="1" AutoGenerateColumns="False" Grid.ColumnSpan="2" Grid.Column="0" GridLinesVisibility="All" IsReadOnly="True"
+                  ItemsSource="{Binding UnitToView.Stats , Mode=OneWay}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Name}" Header="Name" />
+                <DataGridTextColumn Binding="{Binding Value}" Header="Value" />
+                <DataGridTemplateColumn Header="Affected by buff">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <mah:HamburgerMenuListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                                      ItemsSource="{Binding Path=Buffs,Mode=OneWay}">
+                            </mah:HamburgerMenuListBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+
+        </DataGrid>
+        <!--Applied buffs-->
+        <Label HorizontalAlignment="Center"
+               Visibility="{Binding UnitToView.AppliedBuffs , Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
+               Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0">
+            Applied buffs on me
+        </Label>
+        <mah:HamburgerMenuListBox Grid.Row="3"
+                                  Visibility="{Binding UnitToView.AppliedBuffs , Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
+                                  Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch"
+                                  ItemsSource="{Binding Path=UnitToView.AppliedBuffs,Mode=OneWay}">
+        </mah:HamburgerMenuListBox>
+        <!--passive buffs-->
+        <Label HorizontalAlignment="Center"
+               Visibility="{Binding UnitToView.PassiveBuffs , Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
+               Grid.Row="4" Grid.ColumnSpan="2" Grid.Column="0">
+            I have working passive buffs
+        </Label>
+        <mah:HamburgerMenuListBox
+            Visibility="{Binding UnitToView.PassiveBuffs , Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
+            Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            ItemsSource="{Binding Path=UnitToView.PassiveBuffs,Mode=OneWay}">
+        </mah:HamburgerMenuListBox>
+        <!--inactive passive buffs-->
+        <Label HorizontalAlignment="Center"
+               Visibility="{Binding UnitToView.InactivePassiveBuffs , Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
+               Grid.Row="6" Grid.ColumnSpan="2" Grid.Column="0">
+            Inactive passive buffs
+        </Label>
+        <mah:HamburgerMenuListBox
+            Visibility="{Binding UnitToView.InactivePassiveBuffs , Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
+            Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            ItemsSource="{Binding Path=UnitToView.InactivePassiveBuffs,Mode=OneWay}">
+        </mah:HamburgerMenuListBox>
+        <!--TargetCheck buffs-->
+        <Label HorizontalAlignment="Center"
+               Visibility="{Binding UnitToView.TargetCheckBuffs, Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
+               Grid.Row="8" Grid.ColumnSpan="2" Grid.Column="0">
+            I have target check passives
+        </Label>
+        <mah:HamburgerMenuListBox
+            Visibility="{Binding UnitToView.TargetCheckBuffs, Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
+            Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            ItemsSource="{Binding Path=UnitToView.TargetCheckBuffs,Mode=OneWay}">
+        </mah:HamburgerMenuListBox>
+    </Grid>
+</UserControl>

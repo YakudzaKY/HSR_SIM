@@ -442,6 +442,13 @@ public class Formula : ICloneable
     public string Hash { get; set; }
 
 
+    //get all buffs used in formula(including child calculations)
+    public IEnumerable<Buff> TraceBuffs()
+    {
+        return DescendantsAndSelfEffects().Select(y => y.TraceBuff).Distinct();
+    }
+
+    //get all effects used in formula(including child calculations)
     public IEnumerable<EffectTraceRec> DescendantsAndSelfEffects()
     {
         foreach (var eff in Variables.Values.SelectMany(x => x.TraceEffects))

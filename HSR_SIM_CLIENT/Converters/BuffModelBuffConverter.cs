@@ -1,18 +1,21 @@
 ﻿using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+using HSR_SIM_CLIENT.ViewModels;
+using HSR_SIM_LIB.Skills;
 
-namespace HSR_SIM_CLIENT;
+namespace HSR_SIM_CLIENT.Converters;
 
-public class NullVisibilityConverter : IValueConverter
+
+public class BuffModelBuffConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        return value == null ? Visibility.Collapsed : Visibility.Visible;
+        return value == null ? null : new BuffViewModel((Buff)value);
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        throw new Exception("cant covert back");
+        return value == null ? null : ((BuffViewModel)value).BuffRef;
     }
 }

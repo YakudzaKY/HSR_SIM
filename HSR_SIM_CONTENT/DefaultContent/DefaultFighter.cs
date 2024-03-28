@@ -320,7 +320,7 @@ public abstract class DefaultFighter : IFighter
                     //if equal but hp diff go focus big target
                     if (score > bestScore ||
                         // ReSharper disable once CompareOfFloatsByEqualityOperator
-                        (score == bestScore && unit.GetHpPrc().Result > bestTarget?.GetHpPrc().Result))
+                        (score == bestScore && unit.HpPrc().Result > bestTarget?.HpPrc().Result))
                     {
                         bestTarget = unit;
                         bestScore = score;
@@ -453,8 +453,8 @@ public abstract class DefaultFighter : IFighter
     {
         if (Role == UnitRole.Healer)
             //if hp <=50% or hp<=70% and <=2500(at 80 lvl)
-            if (GetAliveFriends().Any(x => x.GetHpPrc().Result <= 0.5 ||
-                                           (x.GetHpPrc().Result <= 0.7 &&
+            if (GetAliveFriends().Any(x => x.HpPrc().Result <= 0.5 ||
+                                           (x.HpPrc().Result <= 0.7 &&
                                             x.GetRes(ResourceType.HP).ResVal <= x.Level * 31.25)))
                 return 1;
         return 0;

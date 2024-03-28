@@ -90,11 +90,11 @@ public class Condition
         {
             res = ConditionParam switch
             {
-                ConditionCheckParam.Spd => CheckExpression(untToCheck.GetSpeed(ent:ent, excludeCondition:excludeCondition).Result),
+                ConditionCheckParam.Spd => CheckExpression(untToCheck.Speed(ent:ent, excludeCondition:excludeCondition).Result),
                 ConditionCheckParam.CritRate => CheckExpression(
                     untToCheck.CritChance(ent:ent, excludeCondition:excludeCondition).Result),
-                ConditionCheckParam.Hp => untToCheck.GetMaxHp(ent:ent, excludeCondition:excludeCondition).Result != 0 &&
-                                             CheckExpression(untToCheck.GetHpPrc(ent:ent, excludeCondition:excludeCondition).Result),
+                ConditionCheckParam.Hp => untToCheck.MaxHp(ent:ent, excludeCondition:excludeCondition).Result != 0 &&
+                                             CheckExpression(untToCheck.HpPrc(ent:ent, excludeCondition:excludeCondition).Result),
                 ConditionCheckParam.Resource => ResourceValue!=null && CheckExpression(untToCheck.GetRes((Resource.ResourceType)ResourceValue).ResVal),
                 ConditionCheckParam.Weakness => untToCheck.GetWeaknesses(ent, excludeCondition)
                                                     .Any(x => x == (ElemValue ?? ent?.SourceUnit.Fighter.Element))

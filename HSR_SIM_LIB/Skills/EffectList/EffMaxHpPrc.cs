@@ -12,7 +12,7 @@ public class EffMaxHpPrc() : Effect(Condition.ConditionCheckParam.Hp)
     {
         var buffOwner = appliedBuff.CarrierUnit ?? ent.TargetUnit;
         var increasedHp = buffOwner.Stats.BaseMaxHp * Value ?? 0 * (StackAffectValue ? appliedBuff.Stack : 1);
-        return increasedHp * buffOwner.GetHpPrc(ent:ent).Result;
+        return increasedHp * buffOwner.HpPrc(ent:ent).Result;
     }
 
     public override void BeforeApply(Event ent, Buff buff, Unit target = null)

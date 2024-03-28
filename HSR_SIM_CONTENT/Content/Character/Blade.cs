@@ -78,7 +78,7 @@ public class Blade : DefaultFighter
         };
         shuHuMaxCnt = parent.Rank >= 6 ? 4 : 5; //4 stacks on 6 eidolon 
         var e6Mod = Parent.Rank >= 6
-            ? $"+ (0.5 * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)})"
+            ? $"+ (0.5 * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.MaxHp)})"
             : "";
         foreach (var proportion in new[] { 0.33000000030733645, 0.33000000030733645, 0.3400000003166497 })
         {
@@ -87,8 +87,8 @@ public class Blade : DefaultFighter
                 CalculateValue = DamageFormula(new Formula()
                 {
                     Expression =
-                        $"(({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetAttack)} * {sgAtk}) " +
-                        $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} * {sgHp} {e6Mod})) * {proportion} "
+                        $"(({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.Attack)} * {sgAtk}) " +
+                        $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.MaxHp)} * {sgHp} {e6Mod})) * {proportion} "
                 })
             });
             shuhuGift.Events.Add(new ToughnessShred(null, this, Parent)
@@ -103,7 +103,7 @@ public class Blade : DefaultFighter
             TargetUnit = Parent, CalculateValue = HealFormula(new Formula()
             {
                 Expression =
-                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} * 0.25"
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.MaxHp)} * 0.25"
             })
         });
 
@@ -132,7 +132,7 @@ public class Blade : DefaultFighter
                 CalculateValue = DamageFormula(new Formula()
                 {
                     Expression =
-                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetAttack)} * ({ssSkillLvl} * 0.1 + 0.4) * {proportion}"
+                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.Attack)} * ({ssSkillLvl} * 0.1 + 0.4) * {proportion}"
                 })
             });
             shardSword.Events.Add(new ToughnessShred(null, this, Parent)
@@ -160,7 +160,7 @@ public class Blade : DefaultFighter
             CalculateValue = new Formula()
             {
                 Expression =
-                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} * 0.1"
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.MaxHp)} * 0.1"
             },
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain
         });
@@ -174,8 +174,8 @@ public class Blade : DefaultFighter
                 CalculateValue = DamageFormula(new Formula()
                 {
                     Expression =
-                        $"(({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetAttack)} * ({fsSkillLvl} * 0.04 + 0.16 ) ) " +
-                        $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} * ({fsSkillLvl} * 0.1 + 0.4 )  ) ) * {proportion} "
+                        $"(({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.Attack)} * ({fsSkillLvl} * 0.04 + 0.16 ) ) " +
+                        $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.MaxHp)} * ({fsSkillLvl} * 0.1 + 0.4 )  ) ) * {proportion} "
                 }),
 
                 CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain
@@ -195,8 +195,8 @@ public class Blade : DefaultFighter
             CalculateValue = DamageFormula(new Formula()
             {
                 Expression =
-                    $"({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetAttack)} * {forestAdjAtk} ) " +
-                    $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} * ({fsSkillLvl} *  0.04 + 0.16 )  )  "
+                    $"({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.Attack)} * {forestAdjAtk} ) " +
+                    $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.MaxHp)} * ({fsSkillLvl} *  0.04 + 0.16 )  )  "
             }),
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent
         });
@@ -243,8 +243,8 @@ public class Blade : DefaultFighter
             {
                 FoundedDependency =[],
                 Expression =
-                    $"({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetAttack)} * {dsMainAtk}  ) " +
-                    $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} * {dsMainHp}  ) " +
+                    $"({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.Attack)} * {dsMainAtk}  ) " +
+                    $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.MaxHp)} * {dsMainHp}  ) " +
                     $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(GetDsMechanic)} min getDsMaxLostHp * {dsMainHp}  ) " +
                     ((Parent.Rank >= 1)
                         ? $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(GetDsMechanic)} min getDsMaxLostHp * 1.5 ) "
@@ -256,7 +256,7 @@ public class Blade : DefaultFighter
                         new Formula.VarVal()
                         {
                             ReplaceExpression =
-                                $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} * 0.9"
+                                $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.MaxHp)} * 0.9"
                         }
                     }
                 }
@@ -273,8 +273,8 @@ public class Blade : DefaultFighter
             CalculateValue = DamageFormula(new Formula()
             {
                 Expression =
-                    $"({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetAttack)} * {dsAdjAtk}  ) " +
-                    $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} * {dsAdjHp}  ) " +
+                    $"({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.Attack)} * {dsAdjAtk}  ) " +
+                    $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.MaxHp)} * {dsAdjHp}  ) " +
                     $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(GetDsMechanic)} min getDsMaxLostHp * {dsAdjHp}  ) ",
                 Variables = new Dictionary<string, Formula.VarVal>()
                 {
@@ -283,7 +283,7 @@ public class Blade : DefaultFighter
                         new Formula.VarVal()
                         {
                             ReplaceExpression =
-                                $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} * 0.9"
+                                $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.MaxHp)} * 0.9"
                         }
                     }
                 }
@@ -325,7 +325,7 @@ public class Blade : DefaultFighter
             TargetType = TargetTypeEnm.Self,
             CanSetToZero = false,
             CalculateValue = new Formula()
-                { Expression = $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} * 0.2" },
+                { Expression = $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.MaxHp)} * 0.2" },
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain
         });
         karmaWind.Events.Add(new DirectDamage(null, this, Parent)
@@ -341,7 +341,7 @@ public class Blade : DefaultFighter
                         new()
                         {
                             ReplaceExpression =
-                                $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)}"
+                                $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.MaxHp)}"
                         }
                     }
                 }
@@ -372,7 +372,7 @@ public class Blade : DefaultFighter
             TargetType = TargetTypeEnm.Self,
             CanSetToZero = false,
             CalculateValue = new Formula()
-                { Expression = $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} * 0.3" },
+                { Expression = $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.MaxHp)} * 0.3" },
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityMain
         });
 
@@ -475,7 +475,7 @@ public class Blade : DefaultFighter
                 ent.ChildEvents.Add(new MechanicValChg(ent.ParentStep, this, Parent)
                     { Value = 1, AbilityValue = shuhuGift });
 
-            var bladeHalfHp = Parent.GetMaxHp(ent: ent).Result * 0.5;
+            var bladeHalfHp = Parent.MaxHp(ent: ent).Result * 0.5;
             //if hp<=50% but was 50%+ then apply hp buff
             if (Parent.Rank >= 4 && Parent.GetRes(Resource.ResourceType.HP).ResVal <= bladeHalfHp &&
                 Parent.GetRes(Resource.ResourceType.HP).ResVal + ent.RealValue > bladeHalfHp)
@@ -490,7 +490,7 @@ public class Blade : DefaultFighter
                 TargetUnit = Parent,
                 CalculateValue = HealFormula(new Formula()
                 {
-                    Expression = $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} * 0.05 + 100"
+                    Expression = $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.MaxHp)} * 0.05 + 100"
                 })
             });
         //buffering Lost hp pull
@@ -523,28 +523,28 @@ public class Blade : DefaultFighter
 
     private double GetDsMaxLostHpForText()
     {
-        return Parent.GetMaxHp().Result * 0.9;
+        return Parent.MaxHp().Result * 0.9;
     }
 
     public Formula CalculateDsSelfDmg(Event ent)
     {
-        if (Parent.GetHpPrc(ent: ent).Result > 0.5)
+        if (Parent.HpPrc(ent: ent).Result > 0.5)
             return new Formula()
             {
                 EventRef = ent, Expression =
                     $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetResVal)}#{Resource.ResourceType.HP} " +
-                    $" - ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} / 2)"
+                    $" - ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.MaxHp)} / 2)"
             };
         return new Formula() { Expression = "0", EventRef = ent };
     }
 
     public Formula CalculateDsSelfHeal(Event ent)
     {
-        if (Parent.GetHpPrc(ent: ent).Result < 0.5)
+        if (Parent.HpPrc(ent: ent).Result < 0.5)
             return new Formula()
             {
                 EventRef = ent, Expression =
-                    $" ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetMaxHp)} / 2) - " +
+                    $" ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.MaxHp)} / 2) - " +
                     $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetResVal)}#{Resource.ResourceType.HP} "
             };
         return new Formula() { EventRef = ent, Expression = "0" };

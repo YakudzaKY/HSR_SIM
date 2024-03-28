@@ -257,9 +257,9 @@ public static class GraphicsCls
                 string.Format("{0:s}({1:d})", unit.Name, unit.Level), null,
                 new Font("Tahoma", txtNameSize, FontStyle.Bold), true);
             //aggro
-            if (unit.GetAggro(ent:null).Result > 0)
+            if (unit.Aggro(ent:null).Result > 0)
                 DrawText(portraitPoint.X + 3, portraitPoint.Y + txtNameSize * 2, gfx,
-                    $"aggro: {(int)Math.Round(unit.GetAggro(ent:null).Result):d} ({(int)Math.Round(unit.GetAggro(ent:null).Result / unit.ParentTeam.TeamAggro * 100):d}%)",
+                    $"aggro: {(int)Math.Round(unit.Aggro(ent:null).Result):d} ({(int)Math.Round(unit.Aggro(ent:null).Result / unit.ParentTeam.TeamAggro * 100):d}%)",
                     new SolidBrush(Color.Coral), new Font("Tahoma", BarFontSize, FontStyle.Bold), true);
             //elements
             gfx.DrawImage(new Bitmap(Utl.LoadBitmap(unit.Fighter.Element.ToString()), ElemSizeMini),
@@ -276,7 +276,7 @@ public static class GraphicsCls
             }
 
             //healthbar
-            if (unit.GetMaxHp().Result > 0)
+            if (unit.MaxHp().Result > 0)
             {
                 using (SolidBrush brush = new(Color.FromArgb(170, 000, 000)))
                 {
@@ -288,14 +288,14 @@ public static class GraphicsCls
                 {
                     var greenWidth =
                         (int)Math.Ceiling(HealthBarSize.Width * unit.GetRes(ResourceType.HP).ResVal /
-                                          unit.GetMaxHp().Result);
+                                          unit.MaxHp().Result);
                     gfx.FillRectangle(brush, portraitPoint.X, portraitPoint.Y + PortraitSize.Height, greenWidth,
                         HealthBarSize.Height);
                 }
 
                 DrawText(portraitPoint.X + 5, portraitPoint.Y + PortraitSize.Height, gfx,
                     string.Format("{0:d}/{1:d}", (int)Math.Floor(unit.GetRes(ResourceType.HP).ResVal),
-                        (int)Math.Floor(unit.GetMaxHp().Result)), null,
+                        (int)Math.Floor(unit.MaxHp().Result)), null,
                     new Font("Tahoma", BarFontSize));
             }
 
@@ -519,7 +519,7 @@ public static class GraphicsCls
 
                 //AV
                 DrawText(portraitPoint.X + 5, portraitPoint.Y + (int)(PortraitSize.Height * 0.4), gfx,
-                    Math.Ceiling(unit.GetCurrentActionValue().Result).ToString(), new SolidBrush(fntColor),
+                    Math.Ceiling(unit.CurrentActionValue().Result).ToString(), new SolidBrush(fntColor),
                     new Font("Tahoma", DefaultFontSize), true);
             }
 

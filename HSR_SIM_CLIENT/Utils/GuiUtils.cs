@@ -2,10 +2,12 @@
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
+using System.Windows;
 using System.Windows.Media.Imaging;
 using Color = System.Drawing.Color;
 using PixelFormat = System.Drawing.Imaging.PixelFormat;
+using Size = System.Drawing.Size;
+
 
 namespace HSR_SIM_CLIENT;
 
@@ -53,26 +55,26 @@ internal static class GuiUtils
     /// <returns></returns>
     public static Bitmap CaptureScreen(bool captureMouse)
     {
-        var result = new Bitmap(Screen.PrimaryScreen!.Bounds.Width, Screen.PrimaryScreen.Bounds.Height,
-            PixelFormat.Format24bppRgb);
+       
+        var result = new Bitmap((int)  SystemParameters.PrimaryScreenWidth,(int) SystemParameters.PrimaryScreenHeight, PixelFormat.Format24bppRgb);
 
-    
-            using var g = Graphics.FromImage(result);
-            g.CopyFromScreen(0, 0, 0, 0, Screen.PrimaryScreen.Bounds.Size, CopyPixelOperation.SourceCopy);
 
-            if (captureMouse)
-            {
-                CursorInfo pci;
-                pci.cbSize = Marshal.SizeOf(typeof(CursorInfo));
+        using var g = Graphics.FromImage(result);
+        g.CopyFromScreen(0, 0, 0, 0, new Size(){Width = (int) SystemParameters.FullPrimaryScreenWidth,Height = (int)SystemParameters.FullPrimaryScreenHeight}, CopyPixelOperation.SourceCopy);
 
-                if (GetCursorInfo(out pci))
-                    if (pci.flags == CursorShowing)
-                    {
-                        DrawIcon(g.GetHdc(), pci.ptScreenPos.x, pci.ptScreenPos.y, pci.hCursor);
-                        g.ReleaseHdc();
-                    }
-            }
-        
+        if (captureMouse)
+        {
+            CursorInfo pci;
+            pci.cbSize = Marshal.SizeOf(typeof(CursorInfo));
+
+            if (GetCursorInfo(out pci))
+                if (pci.flags == CursorShowing)
+                {
+                    DrawIcon(g.GetHdc(), pci.ptScreenPos.x, pci.ptScreenPos.y, pci.hCursor);
+                    g.ReleaseHdc();
+                }
+        }
+
 
         return result;
     }

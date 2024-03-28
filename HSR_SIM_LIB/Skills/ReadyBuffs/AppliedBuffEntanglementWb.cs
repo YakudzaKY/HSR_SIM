@@ -25,7 +25,7 @@ public class AppliedBuffEntanglementWb : AppliedBuff
                 CalculateValue = new Formula()
                 {
                     Expression =
-                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetBreakDmg)} * 0.20"
+                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.BreakDmg)} * 0.20"
                 },
                 StackAffectValue = false
             }

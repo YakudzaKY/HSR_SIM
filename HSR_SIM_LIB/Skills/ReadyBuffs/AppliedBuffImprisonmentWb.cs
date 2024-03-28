@@ -23,7 +23,7 @@ public class AppliedBuffImprisonmentWb : AppliedBuff
                 CalculateValue = new Formula()
                 {
                     Expression =
-                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetBreakDmg)} * 0.30"
+                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.BreakDmg)} * 0.30"
                 }
             },
             new EffSpeedPrc { Value = -0.1 }

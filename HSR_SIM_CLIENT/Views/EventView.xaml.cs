@@ -20,13 +20,13 @@ public partial class EventView : INotifyPropertyChanged
 
 
     public EventView()
-    {
-        InitializeComponent();
-     
+    {        InitializeComponent();
+
+       
     }
 
 
-    public EventViewModel EventToView
+    public EventViewModel? EventToView
     {
         get => (EventViewModel)GetValue(EventToViewProperty);
         set => SetValue(EventToViewProperty, value);
@@ -57,6 +57,7 @@ public partial class EventView : INotifyPropertyChanged
 
     private void RefreshData()
     {
+        
         SelectedFormula = null;
         NotifyPropertyChanged(nameof(ExplainVisible));
     }

@@ -7,6 +7,7 @@
              xmlns:singleSim="clr-namespace:HSR_SIM_CLIENT.ViewModels"
              xmlns:views="clr-namespace:HSR_SIM_CLIENT.Views"
              xmlns:utils="clr-namespace:HSR_SIM_LIB.Utils;assembly=HSR_SIM_LIB"
+             xmlns:converters="clr-namespace:HSR_SIM_CLIENT.Converters"
              mc:Ignorable="d"
 
 
@@ -35,14 +36,16 @@
             <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
         <Grid.Resources>
-
+            <DataTemplate DataType="{x:Type singleSim:EffectViewModel }">
+                <views:EffectView EffectToView="{Binding ., Mode=OneWay}" />
+            </DataTemplate>
            
             
             <DataTemplate DataType="{x:Type singleSim:BuffViewModel }">
                 <views:BuffView BuffToView="{Binding ., Mode=OneWay}"  />
             </DataTemplate>
             
-            
+            <converters:CountVisibilityConverter x:Key="CountVisibilityConverter" />
             <HierarchicalDataTemplate DataType="{x:Type utils:Formula}"
                                       ItemsSource="{Binding Path=ChildFormulas}">
                 <StackPanel Orientation="Horizontal">
@@ -65,10 +68,16 @@
         <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding EventToView.RealValue, Mode=OneWay}" />
         <Label Grid.Row="6" Grid.Column="0">Description</Label>
         <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding EventToView.Description, Mode=OneWay}" />
-        <Label Grid.Row="7" Grid.Column="0">Affecting buffs</Label>
-        <mah:HamburgerMenuListBox Grid.Row="8" Grid.Column="0"  Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
-                                  VerticalAlignment="Stretch" 
-                                  ItemsSource="{Binding Path=EventToView.Buffs,Mode=OneWay}">
+        <Label Grid.Row="7" Visibility="{Binding Path=EventToView.Buffs,Mode=OneWay , Converter={StaticResource CountVisibilityConverter}}" Grid.Column="0">Affecting buffs</Label>
+        <mah:HamburgerMenuListBox  Visibility="{Binding Path=EventToView.Buffs,Mode=OneWay , Converter={StaticResource CountVisibilityConverter}}"  Grid.Row="8" Grid.Column="0"  Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch" 
+                                   ItemsSource="{Binding Path=EventToView.Buffs,Mode=OneWay}">
+        </mah:HamburgerMenuListBox>
+        
+        <Label Grid.Row="7" Visibility="{Binding Path=EventToView.Effects,Mode=OneWay , Converter={StaticResource CountVisibilityConverter}}" Grid.Column="0">Affecting effects</Label>
+        <mah:HamburgerMenuListBox  Visibility="{Binding Path=EventToView.Effects,Mode=OneWay , Converter={StaticResource CountVisibilityConverter}}"  Grid.Row="8" Grid.Column="0"  Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch" 
+                                   ItemsSource="{Binding Path=EventToView.Effects,Mode=OneWay}">
         </mah:HamburgerMenuListBox>
       
         

@@ -27,7 +27,7 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="600" />
+            <ColumnDefinition Width="800" />
         </Grid.ColumnDefinitions>
         <Image Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="0" Width="1200" Height="600" Name="CombatImg"
                Stretch="None" />
@@ -55,7 +55,7 @@
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
-                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="3*" />
             </Grid.ColumnDefinitions>
 
             <Grid.Resources>
@@ -78,7 +78,7 @@
 
                 <TreeView SelectedItemChanged="TreeView_OnSelectedUnitChanged"
                           ScrollViewer.VerticalScrollBarVisibility="Auto"
-                          SelectedValuePath="{Binding Path=SelectedObject,Mode=TwoWay}">
+                       >
                     <TreeView.ItemContainerStyle>
                         <Style TargetType="{x:Type TreeViewItem}">
                             <Setter Property="IsExpanded" Value="True" />
@@ -100,8 +100,7 @@
             <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="Gray">
                 <ScrollViewer>
                     <ScrollViewer.HorizontalScrollBarVisibility>Disabled</ScrollViewer.HorizontalScrollBarVisibility>
-                    <DataGrid HorizontalAlignment="Stretch"
-                              VerticalAlignment="Stretch" />
+                    <views:UnitView UnitToView="{Binding SelectedUnit,Mode=OneWay}"></views:UnitView>
                 </ScrollViewer>
             </Border>
 

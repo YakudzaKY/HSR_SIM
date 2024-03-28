@@ -79,7 +79,7 @@ public static class FighterUtils
                          //breakEffect
                          $" * (1 + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffBreakDmgPrc).FullName} + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Stats)}#{nameof(UnitStats.BreakDmgPrc)} ) " +
                          //def
-                         $" * ({Formula.DynamicTargetEnm.Defender}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetDefMultiplier)}) "  +
+                         $" * ({Formula.DynamicTargetEnm.Defender}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.DefMultiplier)}) "  +
                          //resist and  penetration
                          $" *  {Formula.DynamicTargetEnm.Defender}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.ResPen)}  " +
                          //vulnerability 
@@ -102,14 +102,14 @@ public static class FighterUtils
         var expression = $"{abilityFormula.Expression} * " +
                          //crit
                          $" ( ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GenerateCrit)} * 0) " +
-                         $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetCritDamage)} * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.CritHit)} )  + 1 ) " +
+                         $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.CritDamage)} * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.CritHit)} )  + 1 ) " +
                          //damage boost
-                         $" * (1 + {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetElemBoostValue)} " +
-                         $" + {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.GetAbilityTypeMultiplier)} " +
+                         $" * (1 + {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.ElemBoostValue)} " +
+                         $" + {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.AbilityTypeMultiplier)} " +
                          $" + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAllDamageBoost).FullName} " +
                          $" + {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.DotBoost)}  ) " +
                          //def
-                         $" * ({Formula.DynamicTargetEnm.Defender}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetDefMultiplier)}) "  +
+                         $" * ({Formula.DynamicTargetEnm.Defender}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.DefMultiplier)}) "  +
                          //resist and  penetration
                          $" *  {Formula.DynamicTargetEnm.Defender}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.ResPen)}  " +
                          //vulnerability 
@@ -167,8 +167,8 @@ public static class FighterUtils
     {
         var expression =
 
-            $"{abilityFormula.Expression} * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetOutgoingHealMultiplier)}" +
-            $" * {Formula.DynamicTargetEnm.Defender}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.GetIncomingHealMultiplier)}";
+            $"{abilityFormula.Expression} * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.OutgoingHealMultiplier)}" +
+            $" * {Formula.DynamicTargetEnm.Defender}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.IncomingHealMultiplier)}";
                      
         var newFormula = new Formula { Expression = expression ,Variables = abilityFormula.Variables ,FoundedDependency = abilityFormula.FoundedDependency};
         return newFormula;

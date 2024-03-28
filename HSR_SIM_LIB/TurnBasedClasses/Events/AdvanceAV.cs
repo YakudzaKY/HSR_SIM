@@ -21,8 +21,8 @@ public class AdvanceAV : Event
         if (!TriggersHandled)
             Value = TargetUnit.Stats.PerformedActionValue;
         if (!revert)
-            TargetUnit.Stats.PerformedActionValue = TargetUnit.GetActionValue(ent:this).Result - ParentStep.Parent.CurrentFight
-                .AllAliveUnits.Select(x => x.GetCurrentActionValue(ent:this).Result).Min() + 1;
+            TargetUnit.Stats.PerformedActionValue = TargetUnit.ActionValue(ent:this).Result - ParentStep.Parent.CurrentFight
+                .AllAliveUnits.Select(x => x.CurrentActionValue(ent:this).Result).Min() + 1;
         else
             TargetUnit.Stats.PerformedActionValue = (double)Value;
 

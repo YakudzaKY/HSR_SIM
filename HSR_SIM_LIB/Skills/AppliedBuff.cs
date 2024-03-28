@@ -77,6 +77,7 @@ public class AppliedBuff(Unit sourceUnit, Buff reference ,object sourceObject ) 
     {
         //do some shit
         if (Type == BuffType.Dot)
+            // ReSharper disable once PossibleInvalidCastExceptionInForeachLoop
             foreach (EffDotTemplate effect in Effects.Where(x => x is EffDotTemplate))
                 if (Reference == SourceUnit.Fighter.WeaknessBreakDebuff)
                 {

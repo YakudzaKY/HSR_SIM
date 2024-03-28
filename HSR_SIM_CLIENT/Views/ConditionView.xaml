@@ -7,6 +7,7 @@
              xmlns:hsrSimClient="clr-namespace:HSR_SIM_CLIENT"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:singleSim="clr-namespace:HSR_SIM_CLIENT.ViewModels"
+             xmlns:converters="clr-namespace:HSR_SIM_CLIENT.Converters"
              mc:Ignorable="d"
              Name="Parent"
              d:DesignHeight="300" d:DesignWidth="300">
@@ -25,8 +26,8 @@
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <Grid.Resources>
-            <hsrSimClient:NullVisibilityConverter x:Key="NullToVisibilityConverter" />
-            <hsrSimClient:CountVisibilityConverter x:Key="CountVisibilityConverter" />  
+            <converters:NullVisibilityConverter x:Key="NullToVisibilityConverter" />
+            <converters:CountVisibilityConverter x:Key="CountVisibilityConverter" />  
             <DataTemplate DataType="{x:Type singleSim:BuffViewModel }">
                 <local:BuffView BuffToView="{Binding ., Mode=OneWay}"  />
             </DataTemplate>
