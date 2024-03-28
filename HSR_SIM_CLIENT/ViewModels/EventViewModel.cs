@@ -31,16 +31,16 @@ public class EventViewModel(Event ent)
             {
                 case DamageEventTemplate { CalculateValue: Formula fm }:
                 {
-                    res.AddRange(fm.DescendantsAndSelfEffects().Select(y => y.TraceBuff).Distinct().Select(buff => new BuffViewModel(buff, Formula, ent)));
+                    res.AddRange(fm.TraceBuffs().Select(buff => new BuffViewModel(buff, CalcFormula, ent)));
 
                     break;
                 }
                 case BuffEventTemplate be:
-                    res.Add(new BuffViewModel(be.AppliedBuffToApply,Formula,ent));
+                    res.Add(new BuffViewModel(be.AppliedBuffToApply,CalcFormula,ent));
                     break;
                 case SetLiveStatus se:
                 {
-                    res.AddRange(se.RemovedMods.Select(buff => new BuffViewModel(buff, Formula, ent)));
+                    res.AddRange(se.RemovedMods.Select(buff => new BuffViewModel(buff, CalcFormula, ent)));
 
                     break;
                 }
@@ -73,5 +73,5 @@ public class EventViewModel(Event ent)
     /// </summary>
     public IEnumerable<Formula> Formulas => (ent.CalculateValue is Formula fm) ? new List<Formula>() { fm } : [];
 
-    private Formula? Formula => (ent.CalculateValue is Formula fm) ? fm : null;
+    private Formula? CalcFormula => (ent.CalculateValue is Formula fm) ? fm : null;
 }

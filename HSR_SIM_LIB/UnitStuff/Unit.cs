@@ -133,20 +133,10 @@ public class Unit : CloneClass
             if (ParentTeam.ParentSim.CurrentFight == null)
             {
                 List<Unit> nextEnemies = [];
-                Team tmpTeam = new Team(ParentTeam.ParentSim);
                 //gather enemies from all waves
                 if (ParentTeam.ParentSim.NextFight != null)
                     foreach (var wave in ParentTeam.ParentSim.NextFight.Waves)
                         nextEnemies.AddRange(wave.Units);
-                        
-                foreach (var unit in nextEnemies)
-                {
-                    unit.Init();
-                    unit.Fighter = null;
-                }
-
-
-
                 return nextEnemies.DistinctBy(x => x.Name).ToList();
             }
 
@@ -250,7 +240,7 @@ public class Unit : CloneClass
     /// </summary>
     public void Init()
     {
-        GetRes(ResourceType.HP).ResVal = this.GetMaxHp().Result;
+        GetRes(ResourceType.HP).ResVal = this.MaxHp().Result;
         GetRes(ResourceType.Toughness).ResVal = Stats.MaxToughness;
         //clear and init fighter
         InitFighter();

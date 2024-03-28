@@ -18,10 +18,10 @@
             </DataTemplate>
             <converters:CountVisibilityConverter x:Key="CountVisibilityConverter" />
 
-            <HierarchicalDataTemplate DataType="{x:Type utils:Formula}"
-                                      ItemsSource="{Binding Path=ChildFormulas}">
+
+            <DataTemplate DataType="{x:Type utils:Formula}">
                 <TextBlock Text="{Binding Path=Expression}" />
-            </HierarchicalDataTemplate>
+            </DataTemplate>
         </Grid.Resources>
 
         <Grid.RowDefinitions>
@@ -42,7 +42,25 @@
         </Grid.ColumnDefinitions>
         <Label Grid.Row="0" Grid.Column="0">Name</Label>
         <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding UnitToView.Name, Mode=OneWay}"></TextBox>
-        <DataGrid Grid.Row="1" Grid.ColumnSpan="2"  Grid.Column="0" ItemsSource="{Binding UnitToView.Stats}"></DataGrid>
+        <!-- stats table -->
+        <DataGrid Grid.Row="1" AutoGenerateColumns="False" Grid.ColumnSpan="2" Grid.Column="0" GridLinesVisibility="All" IsReadOnly="True"
+                  ItemsSource="{Binding UnitToView.Stats , Mode=OneWay}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Name}" Header="Name" />
+                <DataGridTextColumn Binding="{Binding Value}" Header="Value" />
+                <DataGridTemplateColumn Header="Affected by buff">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <mah:HamburgerMenuListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                                      ItemsSource="{Binding Path=Buffs,Mode=OneWay}">
+                            </mah:HamburgerMenuListBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+
+        </DataGrid>
         <!--Applied buffs-->
         <Label HorizontalAlignment="Center"
                Visibility="{Binding UnitToView.AppliedBuffs , Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"

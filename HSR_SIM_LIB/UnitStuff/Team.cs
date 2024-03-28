@@ -27,7 +27,7 @@ public class Team(SimCls parent) : CloneClass
 
     public double TeamAggro
     {
-        get { return Units.Where(x => x.IsAlive).Sum(unit => unit.GetAggro(ent:null).Result); }
+        get { return Units.Where(x => x.IsAlive).Sum(unit => unit.Aggro(ent:null).Result); }
     }
 
     public List<Resource> Resources

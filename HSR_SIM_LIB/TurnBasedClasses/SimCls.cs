@@ -359,11 +359,11 @@ public sealed class SimCls : ICloneable
                 //get first by AV unit
                 CurrentFight.Turn = new TurnR
                 {
-                    Actor = CurrentFight.AllAliveUnits.OrderBy(x => x.GetCurrentActionValue().Result).First(),
+                    Actor = CurrentFight.AllAliveUnits.OrderBy(x => x.CurrentActionValue().Result).First(),
                     TurnStage = newStep.StepType
                 };
                 newStep.Actor = CurrentFight.Turn.Actor;
-                var reduceAv = CurrentFight.Turn.Actor.GetCurrentActionValue().Result;
+                var reduceAv = CurrentFight.Turn.Actor.CurrentActionValue().Result;
                 if (reduceAv < 0)
                     reduceAv = 0;
                 newStep.Events.Add(new ModActionValue(newStep, this, null)

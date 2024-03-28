@@ -20,7 +20,7 @@ public class ToughnessBreak(Step parent, ICloneable source, Unit sourceUnit)
             ModActionValue delayAv = new(ParentStep, Source, SourceUnit)
             {
                 TargetUnit = TargetUnit,
-                Value = -TargetUnit.GetActionValue().Result * 0.25
+                Value = -TargetUnit.ActionValue().Result * 0.25
             }; //default delay
             ChildEvents.Add(delayAv);
             // https://honkai-star-rail.fandom.com/wiki/Toughness

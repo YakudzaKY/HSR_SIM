@@ -11,6 +11,6 @@ internal class DefaultNpcBossFighter : DefaultNPCFighter
         parent.IsEliteUnit = true;
     }
 
-    public override double Cost => Parent.GetAttack(ent:null).Result * 1.5;
+    public override double Cost => Parent.Attack(ent:null).Result * 1.5;
 
 }
