@@ -16,15 +16,6 @@ public class AutomatonBeetle : DefaultNPCFighter
     {
         barierAppliedBuff = new AppliedBuff(Parent, null, this)
             { EventHandlerProc = MyBarrierEventHandler, Effects = new List<Effect> { new EffBarrier() } };
-
-        Parent.NativeWeaknesses.Add(Ability.ElementEnm.Wind);
-        Parent.NativeWeaknesses.Add(Ability.ElementEnm.Lightning);
-        Parent.NativeWeaknesses.Add(Ability.ElementEnm.Imaginary);
-        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Lightning, ResistVal = 0.20 });
-        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Physical, ResistVal = 0.20 });
-        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Ice, ResistVal = 0.20 });
-        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Quantum, ResistVal = 0.20 });
-
         Ability? myAttackAbility;
         //Deals Physical DMG (300% ATK) to a single target, and grants a Barrier to self. The Barrier nullifies all DMG received except for DoT until after being attacked.
         myAttackAbility = new Ability(this)

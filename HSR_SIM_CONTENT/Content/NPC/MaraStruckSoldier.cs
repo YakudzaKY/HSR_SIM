@@ -24,18 +24,10 @@ public class MaraStruckSoldier : DefaultNPCFighter
 
     public MaraStruckSoldier(Unit parent) : base(parent)
     {
-
-        Parent.NativeWeaknesses.Add(Ability.ElementEnm.Fire);
-        Parent.NativeWeaknesses.Add(Ability.ElementEnm.Ice);
-        Parent.NativeWeaknesses.Add(Ability.ElementEnm.Quantum);
-        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Physical, ResistVal = 0.20 });
-        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Lightning, ResistVal = 0.20 });
-        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Wind, ResistVal = 0.20 });
-        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Imaginary, ResistVal = 0.20 });
-        myDotDeAppliedBuff = new AppliedBuff(Parent, null, this)
+        
+        myDotDeAppliedBuff = new AppliedBuff(Parent, myDoTRef, this)
         {
-            Reference = myDoTRef,
-            Type = Buff.BuffType.Dot,
+            Type = myDoTRef.Type,
             BaseDuration = 3,
             Stack = 2,
             MaxStack = 5,
@@ -46,7 +38,7 @@ public class MaraStruckSoldier : DefaultNPCFighter
                     DoTCalculateValue = FighterUtils.DamageFormula(new Formula()
                     {
                         Expression =
-                            $"0.5 * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.MaxHp)}"
+                            $"0.5 * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.Attack)}"
                     })
                 }
             }

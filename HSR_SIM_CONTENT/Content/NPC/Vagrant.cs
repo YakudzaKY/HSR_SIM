@@ -10,23 +10,11 @@ namespace HSR_SIM_CONTENT.Content.NPC;
 
 public class Vagrant : DefaultNPCFighter
 {
-    private static readonly AppliedBuff AtkAppliedBuff = new(null, null, typeof(Vagrant))
-    {
-        BaseDuration = 2, Effects = new List<Effect> { new EffAtkPrc { Value = 0.3 } }
-    };
+    //reff for unique stacking
+    private  static readonly AppliedBuff AtkBuffReference = new(null, null, typeof(Vagrant));
 
     public Vagrant(Unit parent) : base(parent)
     {
-
-        Parent.NativeWeaknesses.Add(Ability.ElementEnm.Fire);
-        Parent.NativeWeaknesses.Add(Ability.ElementEnm.Ice);
-        Parent.NativeWeaknesses.Add(Ability.ElementEnm.Imaginary);
-        //resist
-        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Physical, ResistVal = 0.20 });
-        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Lightning, ResistVal = 0.20 });
-        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Wind, ResistVal = 0.20 });
-        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Quantum, ResistVal = 0.20 });
-
         var ability = new Ability(this)
         {
             AbilityType = Ability.AbilityTypeEnm.Ability,
@@ -37,7 +25,7 @@ public class Vagrant : DefaultNPCFighter
         //dmg events
         ability.Events.Add(new ApplyBuff(null, this, Parent)
         {
-            AppliedBuffToApply = AtkAppliedBuff
+            AppliedBuffToApply = new AppliedBuff(Parent,AtkBuffReference,this) {   BaseDuration = 2, Effects = new List<Effect> { new EffAtkPrc { Value = 0.3 } }}
         });
         ability.Events.Add(new AdvanceAV(null, this, Parent));
         Abilities.Add(ability);

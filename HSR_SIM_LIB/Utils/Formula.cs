@@ -38,7 +38,9 @@ public class Formula : ICloneable
     public Unit UnitRef { get; set; } //use when no EventRef
 
     //link to formula buffer
-    public FormulaBuffer BufferRef => EventRef?.ParentStep.Parent.CalcBuffer ?? UnitRef?.ParentTeam?.ParentSim.CalcBuffer;
+    public FormulaBuffer BufferRef =>
+        EventRef?.ParentStep.Parent.CalcBuffer ?? UnitRef?.ParentTeam?.ParentSim.CalcBuffer;
+
     public Unit Attacker => UnitRef ?? EventRef.SourceUnit;
     public Unit Defender => EventRef?.TargetUnit;
 
@@ -430,7 +432,7 @@ public class Formula : ICloneable
 
         if (!calculationResult.HasValue)
             throw new Exception("The operation could not be completed, a result was not obtained.");
-        if (FoundedDependency.All(x => x.Stat  is not  Condition.ConditionCheckParam.DoNotSaveDependency))
+        if (FoundedDependency.All(x => x.Stat is not Condition.ConditionCheckParam.DoNotSaveDependency))
         {
             BufferRef?.AddToBuff(this, Attacker, Defender, FoundedDependency);
         }
@@ -527,21 +529,12 @@ public class Formula : ICloneable
                          StringSplitOptions.RemoveEmptyEntries))
                 if (Variables.TryGetValue(lexeme, out var val))
                 {
-                    //if expression exists and not handled
-                    if (val.ReplaceExpression == lexeme)
-                        if (replacedVariables.ReplacedRaw.All(z => z.ReplaceExpression != val.ReplaceExpression))
-                        {
-                            itemsReplaced++;
-                            replacedVariables.ReplacedRaw.Add(val);
-                        }
-
                     if (replacedVariables.ReplacedRaw.All(z => z.ReplaceExpression != val.ReplaceExpression))
                     {
                         if (newlyReplacedVariables.ReplacedRaw.All(z => z.ReplaceExpression != val.ReplaceExpression))
                         {
                             itemsReplaced++;
                             newlyReplacedVariables.ReplacedRaw.Add(val);
-                            
                         }
 
                         finalStr += lexeme + Strings.Space(1);
@@ -578,9 +571,7 @@ public class Formula : ICloneable
                                 itemsReplaced++;
                                 newlyReplacedVariables.ReplacedFormulas.Add(val);
                             }
-
-                        if (childItemsReplaced > 0)
-                            finalStr += $"{valStr}" + Strings.Space(1);
+                        finalStr += $"{valStr}" + Strings.Space(1);
                     }
                     else if (val.Result != null && replacedResults.All(z => z.Result != val.Result))
                     {

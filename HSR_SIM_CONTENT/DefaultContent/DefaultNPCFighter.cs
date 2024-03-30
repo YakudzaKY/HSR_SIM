@@ -36,7 +36,7 @@ public class DefaultNPCFighter : IFighter
         if (ability.TargetType == Ability.TargetTypeEnm.Friend)
             //Pick friend in order that have no buff by ability then order by role
             return GetAliveFriends().OrderByDescending(x => x.AppliedBuffs.All(y =>
-                    ability.Events.Count(z => z is ApplyBuff ab && ab.AppliedBuffToApply == y.Reference) == 0))
+                    ability.Events.Count(z => z is ApplyBuff ab &&  (ab.AppliedBuffToApply.Reference??ab.AppliedBuffToApply) == y.Reference) == 0))
                 .ThenBy(x => x.Fighter.Role).First();
 
         var totalEnemyAggro = Parent.EnemyTeam.TeamAggro;

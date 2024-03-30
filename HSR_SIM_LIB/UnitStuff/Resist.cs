@@ -4,6 +4,6 @@ namespace HSR_SIM_LIB.UnitStuff;
 
 public class Resist
 {
-    public Ability.ElementEnm ResistType { get; init; }
-    public double ResistVal { get; init; }
+    public required Ability.ElementEnm ResistType { get; init; }
+    public required double ResistVal { get; init; }
 }

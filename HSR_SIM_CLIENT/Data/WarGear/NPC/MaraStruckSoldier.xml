@@ -1,6 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 
 <Unit name="MaraStruckSoldier" element="Wind">
+	<Weakness value="Fire"/>
+	<Weakness value="Ice"/>
+	<Weakness value="Quantum"/>
+	<Resist value="Physical" byValue="0.20" />
+	<Resist value="Lightning" byValue="0.20" />
+	<Resist value="Wind" byValue="0.20" />
+	<Resist value="Imaginary" byValue="0.20" />
     <Stats level="1" hp="89" atk="12" spd="83" def="210" effect_hit="0.0" effect_res="0.10" tgh="60"/>
     <Stats level="2" hp="117" atk="14" spd="83" def="220" effect_hit="0.0" effect_res="0.10" tgh="60"/>
     <Stats level="3" hp="123" atk="15" spd="83" def="230" effect_hit="0.0" effect_res="0.10" tgh="60"/>

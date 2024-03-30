@@ -13,18 +13,6 @@ internal class AutomatonGrizzlyComplete : DefaultNpcBossFighter
 {
     public AutomatonGrizzlyComplete(Unit parent) : base(parent)
     {
-
-        Parent.NativeWeaknesses.Add(Ability.ElementEnm.Fire);
-        Parent.NativeWeaknesses.Add(Ability.ElementEnm.Lightning);
-        Parent.NativeWeaknesses.Add(Ability.ElementEnm.Ice);
-        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Physical, ResistVal = 0.20 });
-        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Wind, ResistVal = 0.20 });
-        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Quantum, ResistVal = 0.20 });
-        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Imaginary, ResistVal = 0.20 });
-        Parent.DebuffResists.Add(new DebuffResist { Debuff = typeof(EffFreeze), ResistVal = 0.5 });
-        Parent.DebuffResists.Add(new DebuffResist { Debuff = typeof(EffImprisonment), ResistVal = 0.5 });
-        Parent.DebuffResists.Add(new DebuffResist { Debuff = typeof(EffEntanglement), ResistVal = 0.5 });
-
         //TODO: need implement boss abilities
         var myAttackAbility =
             //Deals minor Physical DMG (250% ATK) to a single target.

@@ -42,25 +42,26 @@ public class Unit : CloneClass
     /// <summary>
     ///     native weaknesses defined by profile
     /// </summary>
-    public List<ElementEnm> NativeWeaknesses { get; set; } = [];
+    public List<ElementEnm> NativeWeaknesses { get; set; } 
     //we need this debuff to track and correctly apply debuff stacks
     public Ability.ElementEnm AttackElement { get; set; }
 
     /// <summary>
     ///     native resists defined by profile
     /// </summary>
-    public List<Resist> Resists { get; set; } = [];
+    public List<Resist> Resists { get; set; } 
 
     /// <summary>
     ///     native debuff resists defined by profile
     /// </summary>
-    public List<DebuffResist> DebuffResists { get; set; } = [];
+    public List<DebuffResist> DebuffResists { get; set; } 
 
 
     private List<DamageBoostRec> baseDamageBoost; //Elemental damage boost list
 
     private Bitmap portrait;
     private UnitStats stats;
+    private IFighter fighter;
 
     public bool IsAlive => LivingStatus != LivingStatusEnm.Defeated;
 
@@ -68,7 +69,14 @@ public class Unit : CloneClass
 
     public Team ParentTeam { get; set; }
 
-    public IFighter Fighter { get; set; }
+    public IFighter Fighter
+    {
+        get
+        {
+            return fighter ??= (IFighter)Activator.CreateInstance(Type.GetType(FighterClassName, true)!, this);
+        }
+        set => fighter = value;
+    }
 
     public Bitmap Portrait
     {
@@ -190,13 +198,7 @@ public class Unit : CloneClass
     public override object Clone()
     {
         var newClone = (Unit)MemberwiseClone();
-        //clear fighter values
         newClone.Fighter = null;
-        newClone.NativeWeaknesses = [];
-        newClone.Resists = [];
-        newClone.DebuffResists= [];
-      
-        
         
         //clone resources
         var oldRes = newClone.Resources;
@@ -236,16 +238,7 @@ public class Unit : CloneClass
         return newClone;
     }
 
-    /// <summary>
-    ///     Prepare to combat
-    /// </summary>
-    public void Init()
-    {
-        GetRes(ResourceType.HP).ResVal = this.MaxHp().Result;
-        GetRes(ResourceType.Toughness).ResVal = Stats.MaxToughness;
-        //clear and init fighter
-        InitFighter();
-    }
+
 
     //call when unit enter battle
     public void OnEnteringBattle()
@@ -259,8 +252,27 @@ public class Unit : CloneClass
     public Resource GetRes(ResourceType rt)
     {
         if (Resources.All(x => x.ResType != rt))
-            Resources.Add(new Resource(this) { ResType = rt, ResVal = 0 });
+            Resources.Add(new Resource(this) { ResType = rt, ResVal = GetDefaultRes(rt) });
         return Resources.First(resource => resource.ResType == rt);
+    }
+
+    /// <summary>
+    /// Set default value when resource got created
+    /// </summary>
+    /// <param name="rt">resource type</param>
+    /// <returns></returns>
+    private double GetDefaultRes(ResourceType rt)
+    {
+        switch (rt)
+        {
+            case ResourceType.HP:
+                return this.MaxHp().Result;
+            case ResourceType.Toughness:
+                return Stats.MaxToughness;
+            default:
+                return 0;
+            
+        }
     }
 
     public double GetResVal(ResourceType rt, List<FormulaBuffer.DependencyRec> dependencyRecs = null,
@@ -748,11 +760,4 @@ public class Unit : CloneClass
         public double Value;
     }
 
-    private void InitFighter()
-    {
-        Resists.Clear();
-        DebuffResists.Clear();
-        NativeWeaknesses.Clear();
-        Fighter = (IFighter)Activator.CreateInstance(Type.GetType(FighterClassName, true)!, this);
-    }
 }
