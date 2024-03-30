@@ -24,8 +24,6 @@ public class MaraStruckSoldier : DefaultNPCFighter
 
     public MaraStruckSoldier(Unit parent) : base(parent)
     {
-        //Elemenet
-        Element = Ability.ElementEnm.Wind;
 
         Parent.NativeWeaknesses.Add(Ability.ElementEnm.Fire);
         Parent.NativeWeaknesses.Add(Ability.ElementEnm.Ice);

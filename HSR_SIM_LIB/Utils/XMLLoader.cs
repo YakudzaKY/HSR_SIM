@@ -191,6 +191,10 @@ public static class XmlLoader
             unit.Rank = int.Parse(unitNode.Attributes.GetNamedItem("rank")?.Value?.Trim() ??
                                   "0"); //will be overwritten by wargear if possible
             unit.Name = words[1];
+            XmlNode unitElement = unitNode.Attributes.GetNamedItem("element");
+            if (unitElement is { Value: not null })
+                unit.AttackElement = (Ability.ElementEnm)Enum.Parse(typeof(Ability.ElementEnm),
+                    unitElement.Value.Trim(), true);
             //override by wargear
             var warGear = unitNode.Attributes.GetNamedItem("wargear")?.Value?.Trim();
             //if wargear filled but no file 
@@ -283,6 +287,10 @@ public static class XmlLoader
         var xRoot = unitDoc.DocumentElement;
         if (xRoot == null) return;
         var unitCode = xRoot.Attributes.GetNamedItem("name")!.Value!.Trim();
+        XmlNode unitElement = xRoot.Attributes.GetNamedItem("element");
+        if (unitElement is { Value: not null })
+            unit.AttackElement = (Ability.ElementEnm)Enum.Parse(typeof(Ability.ElementEnm),
+                unitElement.Value.Trim(), true);
         ExtractUnitSkillsAndGear(xRoot, unit);
         if (unitCode != unit.Name)
             throw new Exception($"Looking wargear for {unit.Name} but loaded for {unitCode}");

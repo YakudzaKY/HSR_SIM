@@ -43,7 +43,8 @@ public class Unit : CloneClass
     ///     native weaknesses defined by profile
     /// </summary>
     public List<ElementEnm> NativeWeaknesses { get; set; } = [];
-
+    //we need this debuff to track and correctly apply debuff stacks
+    public Ability.ElementEnm AttackElement { get; set; }
 
     /// <summary>
     ///     native resists defined by profile

@@ -13,8 +13,6 @@ internal class AutomatonGrizzlyComplete : DefaultNpcBossFighter
 {
     public AutomatonGrizzlyComplete(Unit parent) : base(parent)
     {
-        //Elemenet
-        Element = Ability.ElementEnm.Physical;
 
         Parent.NativeWeaknesses.Add(Ability.ElementEnm.Fire);
         Parent.NativeWeaknesses.Add(Ability.ElementEnm.Lightning);

@@ -33,7 +33,6 @@ public class Luocha : DefaultFighter
     public Luocha(Unit parent) : base(parent)
     {
         Parent.Stats.BaseMaxEnergy = 100;
-        Element = ElementEnm.Imaginary;
         var coLLvl = Parent.Skills.First(x => x.Name == "Cycle of Life")!.Level;
         var dWLvl = Parent.Skills.First(x => x.Name == "Death Wish")!.Level;
         totALvl = Parent.Skills.First(x => x.Name == "Thorns of the Abyss")!.Level;

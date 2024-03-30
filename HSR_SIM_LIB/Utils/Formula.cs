@@ -38,7 +38,7 @@ public class Formula : ICloneable
     public Unit UnitRef { get; set; } //use when no EventRef
 
     //link to formula buffer
-    public FormulaBuffer BufferRef => EventRef?.ParentStep.Parent.CalcBuffer ?? UnitRef.ParentTeam?.ParentSim.CalcBuffer;
+    public FormulaBuffer BufferRef => EventRef?.ParentStep.Parent.CalcBuffer ?? UnitRef?.ParentTeam?.ParentSim.CalcBuffer;
     public Unit Attacker => UnitRef ?? EventRef.SourceUnit;
     public Unit Defender => EventRef?.TargetUnit;
 

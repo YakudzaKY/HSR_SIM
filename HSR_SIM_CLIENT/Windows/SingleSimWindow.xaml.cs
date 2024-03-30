@@ -13,7 +13,7 @@ using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.UnitStuff;
 using Image = System.Drawing.Image;
 
-namespace HSR_SIM_CLIENT;
+namespace HSR_SIM_CLIENT.Windows;
 
 public partial class SingleSimWindow : INotifyPropertyChanged
 {

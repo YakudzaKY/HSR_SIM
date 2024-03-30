@@ -16,8 +16,6 @@ public class AutomatonBeetle : DefaultNPCFighter
     {
         barierAppliedBuff = new AppliedBuff(Parent, null, this)
             { EventHandlerProc = MyBarrierEventHandler, Effects = new List<Effect> { new EffBarrier() } };
-        //Elemenet
-        Element = Ability.ElementEnm.Physical;
 
         Parent.NativeWeaknesses.Add(Ability.ElementEnm.Wind);
         Parent.NativeWeaknesses.Add(Ability.ElementEnm.Lightning);
@@ -33,7 +31,6 @@ public class AutomatonBeetle : DefaultNPCFighter
         {
             AbilityType = Ability.AbilityTypeEnm.Basic,
             Name = "Unstable Forcefield",
-            Element = Element,
             AdjacentTargets = Ability.AdjacentTargetsEnm.None
         };
         //dmg events
@@ -54,7 +51,7 @@ public class AutomatonBeetle : DefaultNPCFighter
     }
 
 
-    public void MyBarrierEventHandler(Event ent)
+    private void MyBarrierEventHandler(Event ent)
     {
         if (ent is DirectDamage && ent.TargetUnit == Parent &&
             ent.TargetUnit.AppliedBuffs.Any(x => x.Effects.Any(y => y is EffBarrier)))

@@ -40,7 +40,7 @@ internal class IncessantRain : DefaultLightCone
     private  Formula CalcCrit(Event ent)
     {
         double debuffs = 0;
-        debuffs += ent.TargetUnit?.AppliedBuffs.Count(x =>
+        debuffs += ent?.TargetUnit?.AppliedBuffs.Count(x =>
             x.Type is Buff.BuffType.Debuff or Buff.BuffType.Dot) ?? 0;
         if (debuffs >= 3)
             return new Formula(){Expression = $"{lcMods[Rank - 1]}"}; ;

@@ -6,10 +6,10 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
 using HSR_SIM_LIB.Utils;
-using static HSR_SIM_CLIENT.GuiUtils;
+using static HSR_SIM_CLIENT.Utils.GuiUtils;
 using static HSR_SIM_CLIENT.StatData;
 
-namespace HSR_SIM_CLIENT;
+namespace HSR_SIM_CLIENT.Windows;
 
 /// <summary>
 ///     Stat calc back

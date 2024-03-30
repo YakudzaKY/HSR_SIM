@@ -34,7 +34,7 @@ public class SilverWolf : DefaultFighter
         //on this event we will place debuff
         trgEnt = new TriggerEvent(null, null, Parent);
         Parent.Stats.BaseMaxEnergy = 110;
-        Element = ElementEnm.Quantum;
+      
 
         var allowChangeChance =
             FighterUtils.GetAbilityScaling(0.75, 0.85, Parent.Skills.First(x => x.Name == "Allow Changes?").Level);
@@ -299,12 +299,12 @@ public class SilverWolf : DefaultFighter
             {
                 //first find elements not in native weakness
                 var reduceResists = true;
-                var elemListToApply = GetAliveFriends().Select(x => x.Fighter.Element)
+                var elemListToApply = GetAliveFriends().Select(x => x.AttackElement)
                     .Where(x => !ent.TargetUnit.NativeWeaknesses.Contains(x)).Distinct();
                 if (!elemListToApply.Any())
                 {
                     elemListToApply =
-                        GetAliveFriends().Select(x => x.Fighter.Element).Distinct(); //else pick all elements
+                        GetAliveFriends().Select(x => x.AttackElement).Distinct(); //else pick all elements
                     reduceResists = false;
                 }
 

@@ -17,8 +17,6 @@ public class Vagrant : DefaultNPCFighter
 
     public Vagrant(Unit parent) : base(parent)
     {
-        //Elemenet
-        Element = Ability.ElementEnm.Physical;
 
         Parent.NativeWeaknesses.Add(Ability.ElementEnm.Fire);
         Parent.NativeWeaknesses.Add(Ability.ElementEnm.Ice);

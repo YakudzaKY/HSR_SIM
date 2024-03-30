@@ -1,5 +1,6 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using HSR_SIM_CLIENT.Utils;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.Utils;
