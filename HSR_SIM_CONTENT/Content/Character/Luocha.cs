@@ -254,7 +254,7 @@ public class Luocha : DefaultFighter
 
         //A6
         if (ATraces.HasFlag(ATracesEnm.A6))
-            Parent.DebuffResists.Add(new DebuffResist { Debuff = typeof(EffCrowdControl), ResistVal = 0.7 });
+            Parent.NativeDebuffResists.Add(new DebuffResist { Debuff = typeof(EffCrowdControl), ResistVal = 0.7 });
         //E2
         if (Parent.Rank >= 2)
             Parent.PassiveBuffs.Add(new PassiveBuff(Parent, this)
@@ -301,12 +301,12 @@ public class Luocha : DefaultFighter
                                                             0);
     }
 
-    private Formula CalculateE2(Event ent)
+    private Formula CalculateE2(Event? ent)
     {
         double res = 0;
 
-        if ((ent.ParentStep.ActorAbility == prayerOfAbyssFlowerAuto ||
-             ent.ParentStep.ActorAbility == prayerOfAbyssFlower) && ent.TargetUnit.HpPrc(ent:ent).Result < 0.5) res = 0.3;
+        if (ent!=null&&(ent.ParentStep.ActorAbility == prayerOfAbyssFlowerAuto ||
+                ent.ParentStep.ActorAbility == prayerOfAbyssFlower) && ent.TargetUnit.HpPrc(ent:ent).Result < 0.5) res = 0.3;
         return new Formula() { Expression = $"{res}" };
     }
 

@@ -49,12 +49,12 @@ public class Unit : CloneClass
     /// <summary>
     ///     native resists defined by profile
     /// </summary>
-    public List<Resist> Resists { get; set; } 
+    public List<Resist> NativeResists { get; set; } 
 
     /// <summary>
     ///     native debuff resists defined by profile
     /// </summary>
-    public List<DebuffResist> DebuffResists { get; set; } 
+    public List<DebuffResist> NativeDebuffResists { get; set; } 
 
 
     private List<DamageBoostRec> baseDamageBoost; //Elemental damage boost list
@@ -286,32 +286,22 @@ public class Unit : CloneClass
     }
 
 
-    public double GetResists(ElementEnm elem, Event ent = null, List<FormulaBuffer.DependencyRec> dependencyRecs = null,
-        DynamicTargetEnm unitToCheck = DynamicTargetEnm.Attacker)
+    public double GetNativeResists(ElementEnm elem)
     {
-        if (dependencyRecs != null)
-            FormulaBuffer.MergeDependency(dependencyRecs,
-                new FormulaBuffer.DependencyRec()
-                    { Relation = unitToCheck, Stat = Condition.ConditionCheckParam.ElemDmgRes });
+        
         double res = 0;
-        if (Resists.Any(x => x.ResistType == elem))
-            res += Resists.First(x => x.ResistType == elem).ResistVal;
+        if (NativeResists.Any(x => x.ResistType == elem))
+            res += NativeResists.First(x => x.ResistType == elem).ResistVal;
 
         return res;
     }
 
 
-    public double GetDebuffResists(Type debuff, Event ent = null,
-        List<FormulaBuffer.DependencyRec> dependencyRecs = null,
-        DynamicTargetEnm unitToCheck = DynamicTargetEnm.Attacker)
+    public double GetNativeDebuffResists(Type debuff)
     {
-        if (dependencyRecs != null)
-            FormulaBuffer.MergeDependency(dependencyRecs,
-                new FormulaBuffer.DependencyRec()
-                    { Relation = unitToCheck, Stat = Condition.ConditionCheckParam.DebuffResist });
         double res = 0;
-        if (DebuffResists.Any(x => x.Debuff == debuff))
-            res += DebuffResists.First(x => x.Debuff == debuff).ResistVal;
+        if (NativeDebuffResists.Any(x => x.Debuff == debuff))
+            res += NativeDebuffResists.First(x => x.Debuff == debuff).ResistVal;
 
         return res;
     }
@@ -322,21 +312,16 @@ public class Unit : CloneClass
     /// </summary>
     /// <param name="elem"></param>
     /// <returns></returns>
-    public DamageBoostRec GetElemBoost(ElementEnm elem)
+    public DamageBoostRec GetBaseElemBoost(ElementEnm elem)
     {
         if (BaseDamageBoost.All(x => x.ElemType != elem))
             BaseDamageBoost.Add(new DamageBoostRec { ElemType = elem, Value = 0 });
         return BaseDamageBoost.First(dmg => dmg.ElemType == elem);
     }
 
-    public double GetElemBoostVal(ElementEnm elem, List<FormulaBuffer.DependencyRec> dependencyRecs = null,
-        DynamicTargetEnm unitToCheck = DynamicTargetEnm.Attacker)
+    public double GetBaseElemBoostVal(ElementEnm elem)
     {
-        if (dependencyRecs != null)
-            FormulaBuffer.MergeDependency(dependencyRecs,
-                new FormulaBuffer.DependencyRec()
-                    { Relation = unitToCheck, Stat = Condition.ConditionCheckParam.ElemDmgBoost });
-        return GetElemBoost(elem).Value;
+        return GetBaseElemBoost(elem).Value;
     }
 
 
@@ -350,7 +335,7 @@ public class Unit : CloneClass
     /// <param name="buffType">Search by type: debuff,DoT,Buff</param>
     /// <param name="abilityType">search by ability type(for example Damage boost by ability)</param>
     /// <returns>List of buffs that affect Unit</returns>
-    private List<KeyValuePair<Buff, List<Effect>>> GetBuffEffectsByType(Type effTypeToSearch,
+    public List<KeyValuePair<Buff, List<Effect>>> GetBuffEffectsByType(Type effTypeToSearch,
         ElementEnm? elem = null, Event ent = null, List<Condition> excludeCondition = null,
         Buff.BuffType? buffType = null, AbilityTypeEnm? abilityType = null)
     {

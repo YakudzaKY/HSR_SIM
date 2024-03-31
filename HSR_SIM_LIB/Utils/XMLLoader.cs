@@ -157,7 +157,7 @@ public static class XmlLoader
 
                 //weapon damage by element???
                 foreach (var elm in (Ability.ElementEnm[])Enum.GetValues(typeof(Ability.ElementEnm)))
-                    unit.GetElemBoost(elm).Value = SafeToDouble(node.Attributes
+                    unit.GetBaseElemBoost(elm).Value = SafeToDouble(node.Attributes
                         .GetNamedItem(elm.ToString().ToLower() + "_dmg_prc")?.Value?.Trim());
             }
         }
@@ -268,9 +268,9 @@ public static class XmlLoader
         //weakness
         unit.NativeWeaknesses = ExtractWeakness(xmlElement);
         //Resists
-        unit.Resists = ExtractResist(xmlElement);
+        unit.NativeResists = ExtractResist(xmlElement);
         //DebufRes
-        unit.DebuffResists = ExtractDebuffResist(xmlElement);
+        unit.NativeDebuffResists = ExtractDebuffResist(xmlElement);
         foreach (XmlElement xmlSkill in xmlElement.SelectNodes("Skill")!)
         {
             Skill skill = new()

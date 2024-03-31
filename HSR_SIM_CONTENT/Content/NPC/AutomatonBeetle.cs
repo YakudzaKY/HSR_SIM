@@ -1,4 +1,5 @@
-﻿using HSR_SIM_LIB.Content;
+﻿using HSR_SIM_CONTENT.DefaultContent;
+using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;

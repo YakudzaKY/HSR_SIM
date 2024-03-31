@@ -14,7 +14,7 @@ namespace HSR_SIM_CONTENT.DefaultContent;
 /// <summary>
 ///     abstract class for Playable characters
 /// </summary>
-public abstract class DefaultFighter : IFighter
+public abstract class DefaultFighter :  IFighter
 {
     private ILightCone? lightCone;
 
@@ -23,7 +23,7 @@ public abstract class DefaultFighter : IFighter
     private UnitRole? role;
     private AppliedBuff? weaknessBreakDebuff;
 
-
+    
     //Blade constructor
     protected DefaultFighter(Unit parent)
     {

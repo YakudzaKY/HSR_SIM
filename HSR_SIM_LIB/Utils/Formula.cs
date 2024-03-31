@@ -34,7 +34,6 @@ public class Formula : ICloneable
 
     //event where formula is used
     public Event EventRef { get; set; }
-
     public Unit UnitRef { get; set; } //use when no EventRef
 
     //link to formula buffer
@@ -247,17 +246,72 @@ public class Formula : ICloneable
                         else if (prm.ParameterType == typeof(Ability.ElementEnm) ||
                                  prm.ParameterType == typeof(Ability.ElementEnm?))
                         {
-                            if (EventRef is DoTDamage dt)
+                            //scan from next param
+                            var oldNdx = methodNdx;
+                            var nextPrm = GetNextMethod(expr, methodNdx, out methodNdx);
+                            if (!String.IsNullOrEmpty(nextPrm))
+                            {
+                                try
+                                {
+                                    var element=   (Ability.ElementEnm)Enum.Parse(typeof(Ability.ElementEnm), nextPrm);
+                                    objArr[^1] = element;
+                                }
+                                catch
+                                {
+                                    //revert index
+                                    methodNdx = oldNdx;
+                                }
+
+
+                            }
+                            else if (EventRef is DoTDamage dt)
                                 objArr[^1] = dt.Element;
                             else
                                 objArr[^1] = EventRef?.ParentStep.ActorAbility?.Element;
                         }
+                        else if (prm.ParameterType == typeof(Effect))
+                        {
+                            Effect effect = null;
+                            
+                            var nextPrm = GetNextMethod(expr, methodNdx, out methodNdx);
+                            if (!String.IsNullOrEmpty(nextPrm))
+                            {
+                                effect = (Effect)Activator.CreateInstance(Type.GetType(nextPrm));
+                            }
+                            else if (EventRef is ApplyBuff applyBuff)
+                                effect = applyBuff.AppliedBuffToApply.Effects.FirstOrDefault();
+
+
+                            objArr[^1] = effect;
+                        }
                         else if (prm.ParameterType == typeof(Ability.AbilityTypeEnm) ||
                                  prm.ParameterType == typeof(Ability.AbilityTypeEnm?))
                         {
+                            Ability.AbilityTypeEnm? abilityTypeEnm;
+                            var oldNdx = methodNdx;
+                            var nextPrm = GetNextMethod(expr, methodNdx, out methodNdx);
+                            //first try parse ability type from formula
+                            if (!String.IsNullOrEmpty(nextPrm))
+                            {
+                                try
+                                {
+                                    abilityTypeEnm =
+                                        (Ability.AbilityTypeEnm)Enum.Parse(typeof(Ability.AbilityTypeEnm), nextPrm);
+                                
+                                }
+                                catch
+                                {
+                                    //revert index
+                                    methodNdx = oldNdx;
+                                    abilityTypeEnm = null;
+                                }
+
+                            }
+                              
+                            else
+                                abilityTypeEnm =
+                                    EventRef?.ParentStep.ActorAbility?.AbilityType ?? null;
                             //if Followup action and ability is not follow up type then add flag
-                            Ability.AbilityTypeEnm? abilityTypeEnm =
-                                EventRef?.ParentStep.ActorAbility?.AbilityType ?? null;
                             if (EventRef?.ParentStep.ActorAbility?.AbilityType !=
                                 Ability.AbilityTypeEnm.FollowUpAction &&
                                 EventRef?.ParentStep.StepType == Step.StepTypeEnm.UnitFollowUpAction)
@@ -390,6 +444,7 @@ public class Formula : ICloneable
             if (lexeme is "*" or "/" or "+" or "-" or "min" or "max" or "ifzero")
             {
                 operation = lexeme;
+                calculationResult ??= 0;
             }
             else //It is a number or a variable
             {
@@ -571,6 +626,7 @@ public class Formula : ICloneable
                                 itemsReplaced++;
                                 newlyReplacedVariables.ReplacedFormulas.Add(val);
                             }
+
                         finalStr += $"{valStr}" + Strings.Space(1);
                     }
                     else if (val.Result != null && replacedResults.All(z => z.Result != val.Result))
