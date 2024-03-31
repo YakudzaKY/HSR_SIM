@@ -6,7 +6,9 @@ using HSR_SIM_LIB.Skills;
 
 namespace HSR_SIM_CLIENT.Converters;
 
-
+/// <summary>
+/// Convert Buff into Buff view model
+/// </summary>
 public class BuffModelBuffConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

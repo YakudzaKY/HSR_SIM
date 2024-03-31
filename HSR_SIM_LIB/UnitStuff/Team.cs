@@ -91,7 +91,6 @@ public class Team(SimCls parent) : CloneClass
         int ndx;
         ndx = Units.IndexOf(unit);
         unit.ParentTeam = null;
-        unit.Fighter = null;
         Units.RemoveAt(ndx);
         ParentSim.CalcBuffer.Reset(unit);
         return ndx;
@@ -105,7 +104,7 @@ public class Team(SimCls parent) : CloneClass
     {
         unit.ParentTeam = this;
         Units.Insert(ndx, unit);
-        unit.Init();
+
 
     }
 

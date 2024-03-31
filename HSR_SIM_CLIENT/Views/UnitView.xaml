@@ -35,6 +35,14 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition></ColumnDefinition>
@@ -43,7 +51,8 @@
         <Label Grid.Row="0" Grid.Column="0">Name</Label>
         <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding UnitToView.Name, Mode=OneWay}"></TextBox>
         <!-- stats table -->
-        <DataGrid Grid.Row="1" AutoGenerateColumns="False" Grid.ColumnSpan="2" Grid.Column="0" GridLinesVisibility="All" IsReadOnly="True"
+        <DataGrid Grid.Row="1" AutoGenerateColumns="False" Grid.ColumnSpan="2" Grid.Column="0"
+                  GridLinesVisibility="All" IsReadOnly="True"
                   ItemsSource="{Binding UnitToView.Stats , Mode=OneWay}">
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Name}" Header="Name" />
@@ -56,7 +65,6 @@
                             </mah:HamburgerMenuListBox>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
-
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
 
@@ -109,5 +117,107 @@
             VerticalAlignment="Stretch"
             ItemsSource="{Binding Path=UnitToView.TargetCheckBuffs,Mode=OneWay}">
         </mah:HamburgerMenuListBox>
+
+        <!-- weakness table -->
+        <Label HorizontalAlignment="Center"
+               Visibility="{Binding UnitToView.Weakness, Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
+               Grid.Row="10" Grid.ColumnSpan="2" Grid.Column="0">
+            Weakness list
+        </Label>
+        <DataGrid Grid.Row="11" Grid.ColumnSpan="2" Grid.Column="0" GridLinesVisibility="All" IsReadOnly="True"
+                  Visibility="{Binding UnitToView.Weakness, Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
+                  AutoGenerateColumns="False"
+                  ItemsSource="{Binding UnitToView.Weakness , Mode=OneWay}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Path=.Name}" Header="Element" />
+                <DataGridTemplateColumn Header="Affected by buff">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <mah:HamburgerMenuListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                                      ItemsSource="{Binding Path=Buffs,Mode=OneWay}">
+                            </mah:HamburgerMenuListBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        
+        <!-- resists table -->
+        <Label HorizontalAlignment="Center"
+               Visibility="{Binding UnitToView.Resists, Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
+               Grid.Row="12" Grid.ColumnSpan="2" Grid.Column="0">
+            Resists list
+        </Label>
+        <DataGrid Grid.Row="13" Grid.ColumnSpan="2" Grid.Column="0" GridLinesVisibility="All" IsReadOnly="True"
+                  AutoGenerateColumns="False"
+                  Visibility="{Binding UnitToView.Resists, Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
+                  ItemsSource="{Binding UnitToView.Resists , Mode=OneWay}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Path=Name}" Header="Element" />
+                <DataGridTextColumn Binding="{Binding Path=Value}" Header="Value" />
+                <DataGridTemplateColumn Header="Affected by buff">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <mah:HamburgerMenuListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                                      ItemsSource="{Binding Path=Buffs,Mode=OneWay}">
+                            </mah:HamburgerMenuListBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        
+        <!-- debuff resists table -->
+        <Label HorizontalAlignment="Center"
+               Visibility="{Binding UnitToView.DebuffResists, Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
+               Grid.Row="14" Grid.ColumnSpan="2" Grid.Column="0">
+            Debuff resists list
+        </Label>
+        <DataGrid Grid.Row="15" Grid.ColumnSpan="2" Grid.Column="0" GridLinesVisibility="All" IsReadOnly="True"
+                  AutoGenerateColumns="False"
+                  Visibility="{Binding UnitToView.DebuffResists, Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
+                  ItemsSource="{Binding UnitToView.DebuffResists , Mode=OneWay}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Path=Name}" Header="Debuff" />
+                <DataGridTextColumn Binding="{Binding Path=Value}" Header="Value" />
+                <DataGridTemplateColumn Header="Affected by buff">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <mah:HamburgerMenuListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                                      ItemsSource="{Binding Path=Buffs,Mode=OneWay}">
+                            </mah:HamburgerMenuListBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        
+        <!-- Ability type  table -->
+        <Label HorizontalAlignment="Center"
+               Visibility="{Binding UnitToView.AbilityTypeBoosters, Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
+               Grid.Row="16" Grid.ColumnSpan="2" Grid.Column="0">
+            Ability type booster list
+        </Label>
+        <DataGrid Grid.Row="17" Grid.ColumnSpan="2" Grid.Column="0" GridLinesVisibility="All" IsReadOnly="True"
+                  AutoGenerateColumns="False"
+                  Visibility="{Binding UnitToView.AbilityTypeBoosters, Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
+                  ItemsSource="{Binding UnitToView.AbilityTypeBoosters , Mode=OneWay}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Path=Name}" Header="Ability type" />
+                <DataGridTextColumn Binding="{Binding Path=Value}" Header="Value" />
+                <DataGridTemplateColumn Header="Affected by buff">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <mah:HamburgerMenuListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                                      ItemsSource="{Binding Path=Buffs,Mode=OneWay}">
+                            </mah:HamburgerMenuListBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
+            </DataGrid.Columns>
+        </DataGrid>
+
+
     </Grid>
 </UserControl>

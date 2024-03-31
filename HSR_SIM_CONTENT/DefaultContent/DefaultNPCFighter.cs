@@ -1,4 +1,5 @@
 ﻿using HSR_SIM_LIB.Content;
+using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -6,12 +7,12 @@ using HSR_SIM_LIB.UnitStuff;
 using HSR_SIM_LIB.Utils.Utils;
 using static HSR_SIM_LIB.Content.FighterUtils;
 
-namespace HSR_SIM_LIB.Fighters;
+namespace HSR_SIM_CONTENT.DefaultContent;
 
 /// <summary>
 ///     default npc fighter logics
 /// </summary>
-public class DefaultNPCFighter : IFighter
+public class DefaultNPCFighter :  IFighter
 {
     private UnitRole? role;
 
@@ -36,7 +37,7 @@ public class DefaultNPCFighter : IFighter
         if (ability.TargetType == Ability.TargetTypeEnm.Friend)
             //Pick friend in order that have no buff by ability then order by role
             return GetAliveFriends().OrderByDescending(x => x.AppliedBuffs.All(y =>
-                    ability.Events.Count(z => z is ApplyBuff ab && ab.AppliedBuffToApply == y.Reference) == 0))
+                    ability.Events.Count(z => z is ApplyBuff ab &&  (ab.AppliedBuffToApply.Reference??ab.AppliedBuffToApply) == y.Reference) == 0))
                 .ThenBy(x => x.Fighter.Role).First();
 
         var totalEnemyAggro = Parent.EnemyTeam.TeamAggro;
@@ -66,8 +67,7 @@ public class DefaultNPCFighter : IFighter
 
         throw new Exception($"no enemy will be chosen by AGGRO counter={counter}");
     }
-
-    public Ability.ElementEnm Element { get; set; }
+    
     public AppliedBuff WeaknessBreakDebuff { get; set; } = new(null,null,typeof(DefaultNPCFighter)) { Effects = [] };
     public PathType? Path { get; set; } = null;
 

@@ -9,7 +9,7 @@ using PixelFormat = System.Drawing.Imaging.PixelFormat;
 using Size = System.Drawing.Size;
 
 
-namespace HSR_SIM_CLIENT;
+namespace HSR_SIM_CLIENT.Utils;
 
 /// <summary>
 ///     Class with utils for graphical interface and forms

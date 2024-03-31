@@ -3,9 +3,9 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using HSR_SIM_LIB.Utils;
-using static HSR_SIM_CLIENT.GuiUtils;
+using static HSR_SIM_CLIENT.Utils.GuiUtils;
 
-namespace HSR_SIM_CLIENT;
+namespace HSR_SIM_CLIENT.Windows;
 
 /// <summary>
 ///     Interaction logic for MainWindow.xaml
@@ -104,5 +104,10 @@ public sealed partial class MainWindow : INotifyPropertyChanged
     {
         //open stat calc
         new StatCalc().Show();
+    }
+
+    private void ButtonApiImp_OnClick(object sender, RoutedEventArgs e)
+    {
+        new HoyoApiImport().Show();
     }
 }

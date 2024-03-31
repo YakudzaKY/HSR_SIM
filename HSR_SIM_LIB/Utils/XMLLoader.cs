@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using HSR_SIM_LIB.Skills;
+using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.UnitStuff;
 using static HSR_SIM_LIB.TurnBasedClasses.PreLaunchOption;
@@ -94,6 +95,19 @@ public static class XmlLoader
         return null;
     }
 
+    private static List<Ability.ElementEnm> ExtractWeakness(XmlElement xmlItems)
+    {
+        List<Ability.ElementEnm> res = new List<Ability.ElementEnm>();
+        //parse all items
+
+        foreach (XmlElement node in xmlItems.SelectNodes("Weakness")!)
+        {
+            res.Add((Ability.ElementEnm)Enum.Parse(typeof(Ability.ElementEnm),
+                node.Attributes.GetNamedItem("value")!.Value!.Trim(), true));
+        }
+
+        return res;
+    }
 
     /// <summary>
     ///     extract stats from xml part
@@ -143,7 +157,7 @@ public static class XmlLoader
 
                 //weapon damage by element???
                 foreach (var elm in (Ability.ElementEnm[])Enum.GetValues(typeof(Ability.ElementEnm)))
-                    unit.GetElemBoost(elm).Value = SafeToDouble(node.Attributes
+                    unit.GetBaseElemBoost(elm).Value = SafeToDouble(node.Attributes
                         .GetNamedItem(elm.ToString().ToLower() + "_dmg_prc")?.Value?.Trim());
             }
         }
@@ -244,9 +258,19 @@ public static class XmlLoader
             unit.Level = SafeToInt(newLevel);
         if (!string.IsNullOrEmpty(newRank))
             unit.Rank = SafeToInt(newRank);
-
+        //attack element
+        XmlNode unitElement = xmlElement.Attributes.GetNamedItem("element");
+        if (unitElement is { Value: not null })
+            unit.AttackElement = (Ability.ElementEnm)Enum.Parse(typeof(Ability.ElementEnm),
+                unitElement.Value.Trim(), true);
+        //stats
         unit.Stats = ExtractStats(xmlElement, unit.Level, unit);
-
+        //weakness
+        unit.NativeWeaknesses = ExtractWeakness(xmlElement);
+        //Resists
+        unit.NativeResists = ExtractResist(xmlElement);
+        //DebufRes
+        unit.NativeDebuffResists = ExtractDebuffResist(xmlElement);
         foreach (XmlElement xmlSkill in xmlElement.SelectNodes("Skill")!)
         {
             Skill skill = new()
@@ -275,6 +299,46 @@ public static class XmlLoader
             unit.RelicsClasses.Add(newRec);
         }
     }
+
+    private static List<Resist> ExtractResist(XmlElement xmlElement)
+    {
+        List<Resist> res = new List<Resist>();
+        //parse all items
+
+        foreach (XmlElement node in xmlElement.SelectNodes("Resist")!)
+        {
+            Resist newRes = new Resist()
+            {
+                ResistType = (Ability.ElementEnm)Enum.Parse(typeof(Ability.ElementEnm),
+                    node.Attributes.GetNamedItem("value")!.Value!.Trim(), true),
+                ResistVal = SafeToDouble(node.Attributes.GetNamedItem("byValue")!.Value!.Trim())
+            };
+            res.Add(newRes);
+        }
+
+        return res;
+    }
+    
+    private static List<DebuffResist> ExtractDebuffResist(XmlElement xmlElement)
+    {
+        List<DebuffResist> res = new List<DebuffResist>();
+        //parse all items
+
+        foreach (XmlElement node in xmlElement.SelectNodes("DebuffResist")!)
+        {
+            DebuffResist newRes = new DebuffResist()
+            {
+                //pick EffCrowdControl namespace
+                Debuff = Type.GetType( typeof(EffCrowdControl).Namespace  +"."+node.Attributes.GetNamedItem("value")!.Value!.Trim()),
+           
+                ResistVal = SafeToDouble(node.Attributes.GetNamedItem("byValue")!.Value!.Trim())
+            };
+            res.Add(newRes);
+        }
+
+        return res;
+    }
+
 
     private static void ExtractWargear(string wargear, Unit unit)
     {

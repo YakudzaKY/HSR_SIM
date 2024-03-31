@@ -1,4 +1,5 @@
-﻿using HSR_SIM_LIB.Content;
+﻿using HSR_SIM_CONTENT.DefaultContent;
+using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
@@ -16,24 +17,12 @@ public class AutomatonBeetle : DefaultNPCFighter
     {
         barierAppliedBuff = new AppliedBuff(Parent, null, this)
             { EventHandlerProc = MyBarrierEventHandler, Effects = new List<Effect> { new EffBarrier() } };
-        //Elemenet
-        Element = Ability.ElementEnm.Physical;
-
-        Parent.NativeWeaknesses.Add(Ability.ElementEnm.Wind);
-        Parent.NativeWeaknesses.Add(Ability.ElementEnm.Lightning);
-        Parent.NativeWeaknesses.Add(Ability.ElementEnm.Imaginary);
-        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Lightning, ResistVal = 0.20 });
-        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Physical, ResistVal = 0.20 });
-        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Ice, ResistVal = 0.20 });
-        Parent.Resists.Add(new Resist { ResistType = Ability.ElementEnm.Quantum, ResistVal = 0.20 });
-
         Ability? myAttackAbility;
         //Deals Physical DMG (300% ATK) to a single target, and grants a Barrier to self. The Barrier nullifies all DMG received except for DoT until after being attacked.
         myAttackAbility = new Ability(this)
         {
             AbilityType = Ability.AbilityTypeEnm.Basic,
             Name = "Unstable Forcefield",
-            Element = Element,
             AdjacentTargets = Ability.AdjacentTargetsEnm.None
         };
         //dmg events
@@ -54,7 +43,7 @@ public class AutomatonBeetle : DefaultNPCFighter
     }
 
 
-    public void MyBarrierEventHandler(Event ent)
+    private void MyBarrierEventHandler(Event ent)
     {
         if (ent is DirectDamage && ent.TargetUnit == Parent &&
             ent.TargetUnit.AppliedBuffs.Any(x => x.Effects.Any(y => y is EffBarrier)))

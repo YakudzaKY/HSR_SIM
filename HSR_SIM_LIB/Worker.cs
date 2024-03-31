@@ -263,7 +263,7 @@ public class Worker
                 else if (mod.Stat.EndsWith("_dmg_prc"))
                 {
                     var elem = mod.Stat.Split("_").First();
-                    targetUnit.GetElemBoost((Ability.ElementEnm)Enum.Parse(typeof(Ability.ElementEnm), elem, true)).Value += mod.Val;
+                    targetUnit.GetBaseElemBoost((Ability.ElementEnm)Enum.Parse(typeof(Ability.ElementEnm), elem, true)).Value += mod.Val;
                 }
             }
         }

@@ -34,11 +34,12 @@ public class Formula : ICloneable
 
     //event where formula is used
     public Event EventRef { get; set; }
-
     public Unit UnitRef { get; set; } //use when no EventRef
 
     //link to formula buffer
-    public FormulaBuffer BufferRef => EventRef?.ParentStep.Parent.CalcBuffer ?? UnitRef.ParentTeam?.ParentSim.CalcBuffer;
+    public FormulaBuffer BufferRef =>
+        EventRef?.ParentStep.Parent.CalcBuffer ?? UnitRef?.ParentTeam?.ParentSim.CalcBuffer;
+
     public Unit Attacker => UnitRef ?? EventRef.SourceUnit;
     public Unit Defender => EventRef?.TargetUnit;
 
@@ -245,17 +246,72 @@ public class Formula : ICloneable
                         else if (prm.ParameterType == typeof(Ability.ElementEnm) ||
                                  prm.ParameterType == typeof(Ability.ElementEnm?))
                         {
-                            if (EventRef is DoTDamage dt)
+                            //scan from next param
+                            var oldNdx = methodNdx;
+                            var nextPrm = GetNextMethod(expr, methodNdx, out methodNdx);
+                            if (!String.IsNullOrEmpty(nextPrm))
+                            {
+                                try
+                                {
+                                    var element=   (Ability.ElementEnm)Enum.Parse(typeof(Ability.ElementEnm), nextPrm);
+                                    objArr[^1] = element;
+                                }
+                                catch
+                                {
+                                    //revert index
+                                    methodNdx = oldNdx;
+                                }
+
+
+                            }
+                            else if (EventRef is DoTDamage dt)
                                 objArr[^1] = dt.Element;
                             else
                                 objArr[^1] = EventRef?.ParentStep.ActorAbility?.Element;
                         }
+                        else if (prm.ParameterType == typeof(Effect))
+                        {
+                            Effect effect = null;
+                            
+                            var nextPrm = GetNextMethod(expr, methodNdx, out methodNdx);
+                            if (!String.IsNullOrEmpty(nextPrm))
+                            {
+                                effect = (Effect)Activator.CreateInstance(Type.GetType(nextPrm));
+                            }
+                            else if (EventRef is ApplyBuff applyBuff)
+                                effect = applyBuff.AppliedBuffToApply.Effects.FirstOrDefault();
+
+
+                            objArr[^1] = effect;
+                        }
                         else if (prm.ParameterType == typeof(Ability.AbilityTypeEnm) ||
                                  prm.ParameterType == typeof(Ability.AbilityTypeEnm?))
                         {
+                            Ability.AbilityTypeEnm? abilityTypeEnm;
+                            var oldNdx = methodNdx;
+                            var nextPrm = GetNextMethod(expr, methodNdx, out methodNdx);
+                            //first try parse ability type from formula
+                            if (!String.IsNullOrEmpty(nextPrm))
+                            {
+                                try
+                                {
+                                    abilityTypeEnm =
+                                        (Ability.AbilityTypeEnm)Enum.Parse(typeof(Ability.AbilityTypeEnm), nextPrm);
+                                
+                                }
+                                catch
+                                {
+                                    //revert index
+                                    methodNdx = oldNdx;
+                                    abilityTypeEnm = null;
+                                }
+
+                            }
+                              
+                            else
+                                abilityTypeEnm =
+                                    EventRef?.ParentStep.ActorAbility?.AbilityType ?? null;
                             //if Followup action and ability is not follow up type then add flag
-                            Ability.AbilityTypeEnm? abilityTypeEnm =
-                                EventRef?.ParentStep.ActorAbility?.AbilityType ?? null;
                             if (EventRef?.ParentStep.ActorAbility?.AbilityType !=
                                 Ability.AbilityTypeEnm.FollowUpAction &&
                                 EventRef?.ParentStep.StepType == Step.StepTypeEnm.UnitFollowUpAction)
@@ -388,6 +444,7 @@ public class Formula : ICloneable
             if (lexeme is "*" or "/" or "+" or "-" or "min" or "max" or "ifzero")
             {
                 operation = lexeme;
+                calculationResult ??= 0;
             }
             else //It is a number or a variable
             {
@@ -430,7 +487,7 @@ public class Formula : ICloneable
 
         if (!calculationResult.HasValue)
             throw new Exception("The operation could not be completed, a result was not obtained.");
-        if (FoundedDependency.All(x => x.Stat  is not  Condition.ConditionCheckParam.DoNotSaveDependency))
+        if (FoundedDependency.All(x => x.Stat is not Condition.ConditionCheckParam.DoNotSaveDependency))
         {
             BufferRef?.AddToBuff(this, Attacker, Defender, FoundedDependency);
         }
@@ -527,21 +584,12 @@ public class Formula : ICloneable
                          StringSplitOptions.RemoveEmptyEntries))
                 if (Variables.TryGetValue(lexeme, out var val))
                 {
-                    //if expression exists and not handled
-                    if (val.ReplaceExpression == lexeme)
-                        if (replacedVariables.ReplacedRaw.All(z => z.ReplaceExpression != val.ReplaceExpression))
-                        {
-                            itemsReplaced++;
-                            replacedVariables.ReplacedRaw.Add(val);
-                        }
-
                     if (replacedVariables.ReplacedRaw.All(z => z.ReplaceExpression != val.ReplaceExpression))
                     {
                         if (newlyReplacedVariables.ReplacedRaw.All(z => z.ReplaceExpression != val.ReplaceExpression))
                         {
                             itemsReplaced++;
                             newlyReplacedVariables.ReplacedRaw.Add(val);
-                            
                         }
 
                         finalStr += lexeme + Strings.Space(1);
@@ -579,8 +627,7 @@ public class Formula : ICloneable
                                 newlyReplacedVariables.ReplacedFormulas.Add(val);
                             }
 
-                        if (childItemsReplaced > 0)
-                            finalStr += $"{valStr}" + Strings.Space(1);
+                        finalStr += $"{valStr}" + Strings.Space(1);
                     }
                     else if (val.Result != null && replacedResults.All(z => z.Result != val.Result))
                     {

@@ -4,6 +4,6 @@ namespace HSR_SIM_LIB.UnitStuff;
 
 public class DebuffResist
 {
-    public Type Debuff { get; init; }
-    public double ResistVal { get; init; }
+    public required Type Debuff { get; init; }
+    public required double ResistVal { get; init; }
 }

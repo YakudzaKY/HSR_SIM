@@ -181,7 +181,7 @@ public static class UnitFormulas
         };
     }
 
-    public static Formula ElemBoostValue(this Unit unit,
+    public static Formula ElemBoostValue(this Unit unit,Ability.ElementEnm elem,
         Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
         List<Condition> excludeCondition = null)
     {
@@ -190,8 +190,8 @@ public static class UnitFormulas
             EventRef = ent,
             UnitRef = unit,
             ConditionSkipList = excludeCondition,
-            Expression = $"{unitToCheck}#{nameof(Unit.GetElemBoostVal)} " +
-                         $"  + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffElementalBoost).FullName}  "
+            Expression = $"{unitToCheck}#{nameof(Unit.GetBaseElemBoostVal)}#{elem.ToString()}  " +
+                         $"  + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffElementalBoost).FullName}#{elem.ToString()}   "
         };
     }
 
@@ -241,11 +241,12 @@ public static class UnitFormulas
     ///     get  abilityDamage multiplier by ability type
     /// </summary>
     /// <param name="unit"></param>
+    /// <param name="abilityType"></param>
     /// <param name="unitToCheck"></param>
     /// <param name="ent">reference to event</param>
     /// <param name="excludeCondition"></param>
     /// <returns></returns>
-    public static Formula AbilityTypeMultiplier(this Unit unit,
+    public static Formula AbilityTypeMultiplier(this Unit unit,Ability.AbilityTypeEnm abilityType,
         Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
         List<Condition> excludeCondition = null)
     {
@@ -264,7 +265,7 @@ public static class UnitFormulas
             UnitRef = unit,
             ConditionSkipList = excludeCondition,
             Expression =
-                $"{unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAbilityTypeBoost).FullName}  "
+                $"{unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAbilityTypeBoost).FullName}#{abilityType.ToString()}  "
         };
     }
 
@@ -283,13 +284,13 @@ public static class UnitFormulas
     }
 
     public static Formula DebuffResists(this Unit unit,
-        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null, Effect effect=null,
         List<Condition> excludeCondition = null)
     {
-        var mod = (((ApplyBuff)ent)!).AppliedBuffToApply.Effects.FirstOrDefault();
+      
         var resExpr = "";
-        if (mod != null)
-            resExpr = $" + {unitToCheck}#{nameof(Unit.GetDebuffResists)}#{mod.GetType().FullName}";
+        if (effect != null)
+            resExpr = $" + {unitToCheck}#{nameof(Unit.GetNativeDebuffResists)}#{effect.GetType().FullName}";
         return new Formula
         {
             EventRef = ent,
@@ -312,7 +313,7 @@ public static class UnitFormulas
                 UnitRef = unit,
                 ConditionSkipList = excludeCondition,
                 Expression =
-                    $"{unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffCrowdControl).FullName} + {unitToCheck}#{nameof(Unit.GetDebuffResists)}#{typeof(EffCrowdControl).FullName}"
+                    $"{unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffCrowdControl).FullName} + {unitToCheck}#{nameof(Unit.GetNativeDebuffResists)}#{typeof(EffCrowdControl).FullName}"
             };
 
         return new Formula
@@ -518,7 +519,20 @@ public static class UnitFormulas
         };
     }
 
-    public static Formula ResPen(Formula.DynamicTargetEnm unitToCheck, Event ent = null,
+    public static Formula Resists(this Unit unit,Ability.ElementEnm elem,Formula.DynamicTargetEnm unitToCheck= Formula.DynamicTargetEnm.Attacker, Event ent = null,
+        List<Condition> excludeCondition = null)
+    {
+        return new Formula
+        {
+            EventRef = ent,
+            UnitRef = unit,
+            ConditionSkipList = excludeCondition,
+            Expression =
+                $" {unitToCheck}#{nameof(Unit.GetNativeResists)}#{elem.ToString()} +  {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffElementalResist).FullName}#{elem.ToString()}  " +
+                $" +  {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAllDamageResist).FullName} "
+        };
+    }
+    public static Formula ResPen(Formula.DynamicTargetEnm unitToCheck,Ability.ElementEnm elem, Event ent = null,
         List<Condition> excludeCondition = null)
     {
         return new Formula
@@ -526,15 +540,14 @@ public static class UnitFormulas
             EventRef = ent,
             ConditionSkipList = excludeCondition,
             Expression =
-                $"   1 - ( ({unitToCheck}#{nameof(Unit.GetResists)} +  {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffElementalResist).FullName} " +
-                $"+  {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAllDamageResist).FullName}  )" +
-                $" -  {OppositeTarget(unitToCheck)}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffElementalPenetration).FullName} " +
-                $")  "
+                $" 1 - ( {unitToCheck}#{nameof(Unit.NativeResists)}" +
+                $" - {OppositeTarget(unitToCheck)}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffElementalPenetration).FullName}#{elem.ToString()} " +
+                $") "
         };
     }
 
 
-    public static Formula VulnerabilityMulti(this Unit unit,
+    public static Formula VulnerabilityMulti(this Unit unit,Ability.ElementEnm elem,
         Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
         List<Condition> excludeCondition = null)
     {
@@ -544,7 +557,7 @@ public static class UnitFormulas
             UnitRef = unit,
             ConditionSkipList = excludeCondition,
             Expression =
-                $"1 - {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffElementalVulnerability).FullName} " +
+                $"1 - {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffElementalVulnerability).FullName}#{elem.ToString()}  " +
                 $"+ {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAllDamageVulnerability).FullName} " +
                 $"+ {unitToCheck}#{nameof(DotVulnerability)} "
         };

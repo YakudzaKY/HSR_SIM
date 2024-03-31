@@ -1,4 +1,4 @@
-﻿<mah:MetroWindow x:Class="HSR_SIM_CLIENT.MainWindow"
+﻿<mah:MetroWindow x:Class="HSR_SIM_CLIENT.Windows.MainWindow"
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -12,6 +12,7 @@
 
     <Grid ShowGridLines="True">
         <Grid.RowDefinitions>
+            <RowDefinition />
             <RowDefinition />
             <RowDefinition />
             <RowDefinition />
@@ -47,10 +48,13 @@
         </Grid>
         <!--Singe Loader-->
         <GridSplitter Grid.Row="1" />
-        <Grid Grid.Row="2">
-            <Button FontWeight="Black" Click="ButtonBase_OnClick" Grid.Row="0">
-                Open stat calc
-            </Button>
-        </Grid>
+
+        <Button FontWeight="Black" Grid.Row="2" Click="ButtonBase_OnClick">
+            Open stat calc
+        </Button>
+        <Button FontWeight="Black" Grid.Row="3" Click="ButtonApiImp_OnClick">
+            Open Hoyo api import
+        </Button>
+
     </Grid>
 </mah:MetroWindow>
