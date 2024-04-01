@@ -78,8 +78,6 @@ public class UnitStats : ICloneable
 
     public double BaseEnergyRes { get; set; }
 
-    public double BaseMaxEnergy { get; set; } = 0;
-
     public int MaxToughness { get; set; } = 0;
 
     public double? LoadedBaseActionValue { get; set; }

@@ -10,5 +10,6 @@ public class Kafka :DefaultFighter
     {
     }
 
+    public override double MaxEnergy { get; set; }
     public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Nihility;
 }

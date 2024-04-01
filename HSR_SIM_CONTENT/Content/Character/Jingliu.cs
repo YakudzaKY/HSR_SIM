@@ -9,10 +9,11 @@ public class Jingliu : DefaultFighter
 {
     public Jingliu(Unit parent) : base(parent)
     {
-        Parent.Stats.BaseMaxEnergy = 140;
+      
       
     }
 
+    public override double MaxEnergy { get; set; } = 140;
     public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Destruction;
 
 }

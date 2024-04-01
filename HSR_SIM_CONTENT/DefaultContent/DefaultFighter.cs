@@ -22,6 +22,7 @@ public abstract class DefaultFighter :  IFighter
 
     private UnitRole? role;
     private AppliedBuff? weaknessBreakDebuff;
+    public abstract double MaxEnergy { get; set; } 
 
     
     //Blade constructor

@@ -26,7 +26,7 @@ public class ResourceGain : Event
         {
             Resource.ResourceType.Toughness => Math.Min((double)Value, TargetUnit.Stats.MaxToughness - res.ResVal),
             Resource.ResourceType.HP => Math.Min(TargetUnit.MaxHp().Result - res.ResVal, (double)Value),
-            Resource.ResourceType.Energy => Math.Min((double)Value, TargetUnit.Stats.BaseMaxEnergy - res.ResVal),
+            Resource.ResourceType.Energy => Math.Min((double)Value, TargetUnit.Fighter.MaxEnergy - res.ResVal),
             _ => Value
         };
         res.ResVal += (double)(revert ? -RealValue : RealValue);

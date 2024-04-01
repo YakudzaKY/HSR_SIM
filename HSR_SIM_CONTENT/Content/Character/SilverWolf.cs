@@ -33,8 +33,6 @@ public class SilverWolf : DefaultFighter
     {
         //on this event we will place debuff
         trgEnt = new TriggerEvent(null, null, Parent);
-        Parent.Stats.BaseMaxEnergy = 110;
-      
 
         var allowChangeChance =
             FighterUtils.GetAbilityScaling(0.75, 0.85, Parent.Skills.First(x => x.Name == "Allow Changes?").Level);
@@ -200,7 +198,7 @@ public class SilverWolf : DefaultFighter
             Name = "User Banned",
             AdjacentTargets = AdjacentTargetsEnm.None,
             CostType = Resource.ResourceType.Energy,
-            Cost = Parent.Stats.BaseMaxEnergy
+            Cost =MaxEnergy
         };
         userBanned.Events.Add(new AttemptEffect(null, this, Parent)
             { BaseChance = ultChance, AppliedBuffToApply = ultDefDebuff });
@@ -230,6 +228,7 @@ public class SilverWolf : DefaultFighter
             });
     }
 
+    public sealed override double MaxEnergy { get; set; } = 110;
     public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Nihility;
 
 

@@ -37,7 +37,7 @@ public class EnergyGain(Step parent, ICloneable source, Unit sourceUnit) : Event
         if (RealValue == null)
         {
             RealValue = Value;//will trigger formula calculation
-            RealValue = Math.Min(Value??0, TargetUnit.Stats.BaseMaxEnergy - TargetUnit.CurrentEnergy);
+            RealValue = Math.Min(Value??0, TargetUnit.Fighter.MaxEnergy - TargetUnit.CurrentEnergy);
         }
 
         TargetUnit.CurrentEnergy += (double)(revert ? -RealValue : RealValue);

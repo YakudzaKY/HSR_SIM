@@ -30,7 +30,6 @@ public class Blade : DefaultFighter
 
     public Blade(Unit parent) : base(parent)
     {
-        Parent.Stats.BaseMaxEnergy = 130;
         //load lvl
         var dsSkillLvl = Parent.Skills.First(x => x.Name == "Death Sentence").Level;
         var fsSkillLvl = Parent.Skills.First(x => x.Name == "Forest of Swords").Level;
@@ -212,7 +211,7 @@ public class Blade : DefaultFighter
             Name = "Death Sentence",
             AdjacentTargets = AdjacentTargetsEnm.Blast,
             CostType = Resource.ResourceType.Energy,
-            Cost = Parent.Stats.BaseMaxEnergy
+            Cost = MaxEnergy
         };
         //dmg events
         deathSentence.Events.Add(new ResourceDrain(null, this, Parent)
@@ -427,6 +426,7 @@ public class Blade : DefaultFighter
         };
     }
 
+    public sealed override double MaxEnergy { get; set; } = 130;
     public override PathType? Path => PathType.Destruction;
 
     /// <summary>

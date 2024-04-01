@@ -12,5 +12,6 @@ public class Yanqing : DefaultFighter
   
     }
 
+    public override double MaxEnergy { get; set; }
     public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Hunt;
 }
