@@ -52,4 +52,9 @@ The filling of the whole project. All mechanics, simulations and calculations ar
 - Character research(find best relic set with average stats)
 
 # License
-This project is licensed under the terms of the MIT license."
+This project is licensed under the terms of the MIT license.
+
+## Developed in [JetBrains Rider](https://www.jetbrains.com/community/opensource/?utm_campaign=opensource&utm_content=approved&utm_medium=email&utm_source=newsletter&utm_term=jblogo#support)
+
+![JetBrains](https://github.com/YakudzaKY/HSR_SIM/assets/110550702/2a32b7fc-2df1-4284-a192-884599aac920)
+
