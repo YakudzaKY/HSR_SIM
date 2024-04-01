@@ -12,6 +12,7 @@ using HSR_SIM_LIB;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.UnitStuff;
 using Image = System.Drawing.Image;
+using TreeView = System.Windows.Controls.TreeView;
 
 namespace HSR_SIM_CLIENT.Windows;
 

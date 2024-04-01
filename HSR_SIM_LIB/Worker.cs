@@ -23,7 +23,7 @@ public class Worker
     public CallBackGetDecision CbGetDecision { get; set; } //Callback get decision
     public SimCls Sim { get; set; } //simulation class( combat ,fights etc in this shit)
     public bool Completed { get; set; }
-    public bool DevMode { get; set; } = false; //Developer mode TODO: write documentation about it
+    public bool DevMode { get; set; } = false; //Developer mode 
     public DevModeLogger DevModeLog { get; set; }
 
 

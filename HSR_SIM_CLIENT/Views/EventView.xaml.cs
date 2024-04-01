@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using HSR_SIM_CLIENT.ViewModels;
 using HSR_SIM_LIB.Utils;
+using TreeView = System.Windows.Controls.TreeView;
 
 namespace HSR_SIM_CLIENT.Views;
 

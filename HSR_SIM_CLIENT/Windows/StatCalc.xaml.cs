@@ -4,10 +4,16 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Forms.Integration;
 using System.Windows.Input;
+using HSR_SIM_CLIENT.ChartTools;
+using HSR_SIM_CLIENT.ThreadTools;
+using HSR_SIM_CLIENT.Utils;
+using HSR_SIM_LIB;
 using HSR_SIM_LIB.Utils;
 using static HSR_SIM_CLIENT.Utils.GuiUtils;
 using static HSR_SIM_CLIENT.StatData;
+
 
 namespace HSR_SIM_CLIENT.Windows;
 
@@ -22,6 +28,10 @@ public partial class StatCalc : INotifyPropertyChanged
     /// </summary>
     private const string Delimiter = "\\";
 
+    private bool interruptFlag;
+    private ThreadJob threadJob;
+    private AggregateThread aggThread;
+    private List<SimTask> myTaskList;
     private ObservableCollection<SelectedItem> profiles = [];
 
 
@@ -100,15 +110,70 @@ public partial class StatCalc : INotifyPropertyChanged
     /// </summary>
     public int UpgradesIterations { get; set; }
 
-    /// <summary>
-    ///     MaxHeight for render tables in form
-    /// </summary>
-    public double TblMaxHeight { get; set; }
 
     /// <summary>
     ///     calculating in progress flag
     /// </summary>
-    public bool WorkInProgress { get; set; } = false;
+    private bool workInProgress;
+
+    public bool WorkInProgress
+    {
+        get => workInProgress;
+        private set
+        {
+            if (Equals(value, workInProgress)) return;
+            workInProgress = value;
+
+            OnPropertyChanged();
+        }
+    }
+    
+
+    /// <summary>
+    ///     calculating in progress flag
+    /// </summary>
+    private string workProgressText;
+
+    public string WorkProgressText
+    {
+        get => workProgressText;
+        private set
+        {
+            if (Equals(value, workProgressText)) return;
+            workProgressText = value;
+
+            OnPropertyChanged();
+        }
+    }
+
+    private int simOperationsMax;
+
+    public int SimOperationsMax
+    {
+        get => simOperationsMax;
+        private set
+        {
+            if (Equals(value, simOperationsMax)) return;
+            simOperationsMax = value;
+
+            OnPropertyChanged();
+        }
+    }
+
+    private int simOperationsCurrent;
+
+    public int SimOperationsCurrent
+    {
+        get => simOperationsCurrent;
+        private set
+        {
+            if (Equals(value, simOperationsCurrent)) return;
+            simOperationsCurrent = value;
+
+            OnPropertyChanged();
+        }
+    }
+
 
     /// <summary>
     ///     Iterations per every job
@@ -181,6 +246,7 @@ public partial class StatCalc : INotifyPropertyChanged
             Scenarios.Where(x => x.IsSelected).Aggregate("", (current, item) => current + item.Name + Delimiter));
         IniF.IniWriteValue(GetType().Name, nameof(Profiles),
             Profiles.Where(x => x.IsSelected).Aggregate("", (current, item) => current + item.Name + Delimiter));
+       
     }
 
 
@@ -245,7 +311,183 @@ public partial class StatCalc : INotifyPropertyChanged
     private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
     {
         //also save ini before run sim(if got freeze or app crash cause out of memory) 
+        //generate task list
+        myTaskList = new List<SimTask>();
+
+        foreach (var scenario in Scenarios.Where(x => x.IsSelected))
+        foreach (var profile in Profiles.Where(x => x.IsSelected))
+        {
+            // first parent task
+            var prnt = new SimTask
+            {
+                SimScenario = XmlLoader.LoadCombatFromXml(GetScenarioPath() + scenario.Name,
+                    GetProfilePath() + profile.Name)
+            };
+            myTaskList.Add(prnt);
+            //childs
+            myTaskList.AddRange(GetStatsSubTasks(scenario.Name, profile.Name, prnt));
+        }
+
+        DoSomeJob();
         SaveIni();
+    }
+
+    private async Task DoSomeJob()
+    {
+   
+        foreach (var item in  StackCharts.Children)
+        {
+            ((WindowsFormsHost)item).Child.Dispose();
+            
+        }
+        StackCharts.Children.Clear();
+        await Task.Run(DoJob);
+        
+        foreach (var task in threadJob.CombatData.Where(x => x.Key.Parent is null))
+        {
+            var newChart = ChartUtils.GetChart(task, threadJob.CombatData.Where(x => x.Key.Parent == task.Key));
+            StackCharts.Children.Add(new WindowsFormsHost() { Child = newChart });
+        }
+
+    }
+
+    private void DoJob()
+    {
+        WorkInProgress = true;
+        threadJob = new ThreadJob(myTaskList, IterationsCnt);
+
+
+        interruptFlag = false;
+        //check four double call this proc
+        if (aggThread?.IsAlive ?? false)
+            return;
+
+
+        aggThread = new AggregateThread(threadJob, ThrCnt);
+
+
+        SimOperationsCurrent = 0;
+        SimOperationsMax = myTaskList.Count * threadJob.Iterations;
+
+
+        aggThread.Start();
+
+        int oldEta = 0;
+        do
+        {
+            var stDate = DateTime.Now;
+            if (interruptFlag)
+                aggThread.Interrupt();
+
+            var progressBefore = aggThread.Progress();
+
+            Thread.Sleep(1000);
+
+            SimOperationsCurrent = aggThread.Progress();
+            var crDate = DateTime.Now;
+            var diffInSeconds = (crDate - stDate).TotalSeconds;
+            var performance =
+                diffInSeconds > 0 ? (SimOperationsCurrent - progressBefore) / diffInSeconds : 0; //sims per sec
+            var eta = performance > 0
+                ? (int)((SimOperationsMax - SimOperationsCurrent) / performance)
+                : 0; //sec estimate 
+            //add prev result for smooth graph
+            var avgEta = (eta + oldEta) / 2;
+            oldEta = eta;
+            var etaM = (int)Math.Floor((double)avgEta / 60);
+            var etaFormated = $"{etaM}m {avgEta - etaM * 60}s";
+            WorkProgressText = $"{SimOperationsCurrent}\\{SimOperationsMax}  {performance:f}\\sec    ETA:{etaFormated}";
+            
+        } while (aggThread.IsAlive);
+        
+
+        WorkInProgress = false;
+    }
+
+    //get Stat mods by checked item(one mod atm)
+    private List<Worker.RStatMod> GetStatMods(string character, string item, int step, string minusItem = null)
+    {
+        var res = new List<Worker.RStatMod>();
+        res.Add(new Worker.RStatMod
+            { Character = character, Stat = item, Val = SearchStatDeltaByName(item) * step });
+        if (!string.IsNullOrEmpty(minusItem))
+            res.Add(new Worker.RStatMod
+            {
+                Character = character,
+                Stat = minusItem,
+                Val = -SearchStatDeltaByName(minusItem) * step
+            });
+        return res;
+    }
+
+    private double SearchStatDeltaByName(string item)
+    {
+        if (statValTable is null)
+            return 0;
+        return double.Parse(statValTable[item]);
+    }
+
+
+    private List<SimTask> GetStatsSubTasks(string scenario, string profile, SimTask simTask)
+    {
+        var res = new List<SimTask>();
+        if (tbiStatImpact.IsSelected)
+        {
+            if (!string.IsNullOrEmpty(SelectedCharacterToCalc))
+                foreach (var selectedStat in SelectedStats.Where(x => x.IsSelected))
+                    for (var i = 1; i <= UpgradesIterations; i++)
+                        res.Add(new SimTask
+                        {
+                            SimScenario = XmlLoader.LoadCombatFromXml(GetScenarioPath() + scenario,
+                                GetProfilePath() + profile),
+                            Parent = simTask,
+                            UpgradesCount = i * UpgradesPerIterations,
+                            StatMods = GetStatMods(SelectedCharacterToCalc, selectedStat.Name,
+                                i * UpgradesPerIterations, SelectedStatToReplace?.Name ?? string.Empty)
+                        });
+        }
+        /*else if (rbGearReplace.Checked)
+        {
+            if (!string.IsNullOrEmpty(cbCharacterGrp.Text))
+            {
+                var statModList = new List<RStatMod>();
+                foreach (var str in (RectModeEnm[])Enum.GetValues(typeof(RectModeEnm)))
+                    for (var i = 0; i < 5; i++)
+                    {
+                        var statName = Controls.Find($"cb{str}Stat{i}", true).First().Text;
+                        if (!string.IsNullOrEmpty(statName))
+                        {
+                            var statVal = i > 0
+                                ? Controls.Find($"txt{str}Stat{i}", true).First().Text
+                                : (SearchStatBaseByNameInMainStats(statName) +
+                                   15 * SearchStatDeltaByNameInMainStats(statName)).ToString();
+                            if (!string.IsNullOrEmpty(statName) && !string.IsNullOrEmpty(statVal))
+                                statModList.Add(new RStatMod
+                                {
+                                    Character = cbCharacterGrp.Text,
+                                    Stat = statName,
+                                    Val = (str == RectModeEnm.Minus ? -1 : 1) * ExctractDoubleVal(statVal)
+                                });
+                        }
+                    }
+
+
+                if (statModList.Count > 0)
+                {
+                    statModList.Insert(0, new RStatMod { Stat = "NEW GEAR" });
+                    res.Add(new SimTask
+                    {
+                        SimScenario = XmlLoader.LoadCombatFromXml(GetScenarioPath() + cbScenario.Text,
+                            GetProfilePath() + profile),
+                        StatMods = statModList,
+                        UpgradesCount = 1,
+                        Parent = simTask
+                    });
+                }
+            }
+        }*/
+
+        return res;
     }
 
     private void BtnSubStats_OnClick(object sender, RoutedEventArgs e)
@@ -270,9 +512,6 @@ public partial class StatCalc : INotifyPropertyChanged
 
     private void StatCalc_OnLoaded(object sender, RoutedEventArgs e)
     {
-        //determine max table height to render in form
-        TblMaxHeight = tbCalcType.ActualHeight - tbiStatImpact.ActualHeight - LblSelStats.ActualHeight;
-        NotifyPropertyChanged(nameof(TblMaxHeight));
     }
 
     /// <summary>
@@ -292,5 +531,10 @@ public partial class StatCalc : INotifyPropertyChanged
     public record SelectedItem(string Name)
     {
         public bool IsSelected { get; set; }
+    }
+
+    private void BtnCancel_OnClick(object sender, RoutedEventArgs e)
+    {
+        interruptFlag = true;
     }
 }

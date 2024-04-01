@@ -4,8 +4,10 @@
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                 xmlns:converters="clr-namespace:HSR_SIM_CLIENT.Converters"
                  mc:Ignorable="d"
                  Title="Stat Calc" Height="Auto" Width="Auto"
+                 SizeToContent="Width"
                  DataContext="{Binding RelativeSource={RelativeSource Self}}"
                  WindowStartupLocation="CenterScreen" Closing="StatCalc_OnClosing"
                  Loaded="StatCalc_OnLoaded">
@@ -15,16 +17,19 @@
         </Style>
     </mah:MetroWindow.Resources>
     <Grid>
+        <Grid.Resources>
+            <converters:ReverseBoolConverter x:Key="ReverseBoolConverter" />
+        </Grid.Resources>
         <Grid.RowDefinitions>
+            <RowDefinition Height="200" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="15" />
             <RowDefinition Height="25*" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="200" />
                 <ColumnDefinition Width="10" />
                 <ColumnDefinition Width="Auto" />
 
@@ -43,37 +48,50 @@
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <Button Grid.Column="0" Click="ButtonBase_OnClick"
-                            IsEnabled="{Binding Path=!WorkInProgress,Mode=OneWay}">
+                            IsEnabled="{Binding Path=WorkInProgress,Mode=OneWay ,Converter={StaticResource ReverseBoolConverter}}" >
                         Go
                     </Button>
-                    <Button Grid.Column="1" IsEnabled="{Binding Path=WorkInProgress,Mode=OneWay}">Cancel</Button>
+                    <Button Grid.Column="1" IsEnabled="{Binding Path=WorkInProgress,Mode=OneWay}" Name="BtnCancel" Click="BtnCancel_OnClick">Cancel</Button>
 
                 </Grid>
             </StackPanel>
-            <StackPanel Grid.Column="1" Orientation="Vertical">
-                <Label>Scenarios:</Label>
-                <ListBox ItemsSource="{Binding Scenarios}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <CheckBox Content="{Binding Name}"
-                                      IsChecked="{Binding IsSelected}" />
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </StackPanel>
-            <StackPanel Grid.Column="2" Orientation="Vertical">
-                <Label>Profiles:</Label>
-                <ListBox ItemsSource="{Binding Profiles}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <CheckBox Unchecked="ToggleProfileButton_OnChecked" Checked="ToggleProfileButton_OnChecked"
-                                      Content="{Binding Name}"
-                                      IsChecked="{Binding IsSelected}" />
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </StackPanel>
-            <GridSplitter Grid.Column="3" />
+            <ScrollViewer Grid.Column="1">
+                <ScrollViewer.HorizontalScrollBarVisibility>Visible</ScrollViewer.HorizontalScrollBarVisibility>
+                <ScrollViewer.VerticalScrollBarVisibility>Visible</ScrollViewer.VerticalScrollBarVisibility>
+
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch">
+                    <Label>Scenarios:</Label>
+                    <ListBox ItemsSource="{Binding Scenarios}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox Content="{Binding Name}"
+                                          IsChecked="{Binding IsSelected}" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+            </ScrollViewer>
+            <ScrollViewer Grid.Column="2">
+                <ScrollViewer.HorizontalScrollBarVisibility>Visible</ScrollViewer.HorizontalScrollBarVisibility>
+                <ScrollViewer.VerticalScrollBarVisibility>Visible</ScrollViewer.VerticalScrollBarVisibility>
+                <StackPanel Orientation="Vertical">
+
+                    <Label>Profiles:</Label>
+
+                    <ListBox ItemsSource="{Binding Profiles}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox Unchecked="ToggleProfileButton_OnChecked"
+                                          Checked="ToggleProfileButton_OnChecked"
+                                          Content="{Binding Name}"
+                                          IsChecked="{Binding IsSelected}" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                </StackPanel>
+            </ScrollViewer>
             <mah:MetroTabControl Grid.Column="4" Name="tbCalcType">
                 <mah:MetroTabItem x:Name="tbiStatImpact" Header="Stat impact calc">
                     <mah:MetroTabItem.Content>
@@ -90,12 +108,12 @@
                                     <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition />
-                                    <RowDefinition />
-                                    <RowDefinition />
-                                    <RowDefinition />
-                                    <RowDefinition />
-                                    <RowDefinition />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
                                 <Label Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="0">Character:</Label>
                                 <ComboBox ItemsSource="{Binding AvailableCharacters}"
@@ -117,19 +135,20 @@
                                 <Button Name="BtnSubStats" Click="BtnSubStats_OnClick">sub stats</Button>
                                 <Button Name="BtnMainStats" Click="BtnMainStats_OnClick">main stats</Button>
                             </StackPanel>
-                            <StackPanel Grid.Column="2"
-                                        Orientation="Vertical">
-                                <Label Name="LblSelStats">Chose stat to calc:</Label>
-                                <ListBox MaxHeight="{Binding TblMaxHeight,Mode=OneWay}"
-                                         ItemsSource="{Binding SelectedStats}">
-                                    <ListBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <CheckBox Content="{Binding Name}"
-                                                      IsChecked="{Binding IsSelected}" />
-                                        </DataTemplate>
-                                    </ListBox.ItemTemplate>
-                                </ListBox>
-                            </StackPanel>
+
+
+                            <ListBox Grid.Column="2" HorizontalAlignment="Stretch"
+                                     VerticalAlignment="Stretch"
+                                     ItemsSource="{Binding SelectedStats}" Width="200">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox Content="{Binding Name}"
+                                                  IsChecked="{Binding IsSelected}" />
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+
                         </Grid>
                     </mah:MetroTabItem.Content>
 
@@ -149,6 +168,19 @@
             </mah:MetroTabControl>
 
         </Grid>
-        <ProgressBar Grid.Row="1" />
+        
+        <StackPanel Orientation="Vertical" Grid.Row="1">
+            <Label  Content="{Binding WorkProgressText ,Mode=OneWay}"/>
+            <ProgressBar Maximum="{Binding SimOperationsMax, Mode=OneWay}" Value="{Binding SimOperationsCurrent,Mode=OneWay}"/>
+        </StackPanel>
+        
+        <ScrollViewer Grid.Row="2">
+            <ScrollViewer.VerticalScrollBarVisibility>Visible</ScrollViewer.VerticalScrollBarVisibility>
+           
+        <StackPanel Name="StackCharts" Orientation="Vertical" >
+   
+        </StackPanel>
+            </ScrollViewer>
+      
     </Grid>
 </mah:MetroWindow>
