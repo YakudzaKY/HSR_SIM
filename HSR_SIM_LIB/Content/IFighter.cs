@@ -17,6 +17,7 @@ public interface IFighter : ICloneable
     public delegate void EventHandler(Event ent);
 
     public delegate void StepHandler(Step step);
+    public double MaxEnergy { get; set; } 
     
 
     /// <summary>

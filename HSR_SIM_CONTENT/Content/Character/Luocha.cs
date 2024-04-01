@@ -32,7 +32,6 @@ public class Luocha : DefaultFighter
 
     public Luocha(Unit parent) : base(parent)
     {
-        Parent.Stats.BaseMaxEnergy = 100;
         var coLLvl = Parent.Skills.First(x => x.Name == "Cycle of Life")!.Level;
         var dWLvl = Parent.Skills.First(x => x.Name == "Death Wish")!.Level;
         totALvl = Parent.Skills.First(x => x.Name == "Thorns of the Abyss")!.Level;
@@ -182,7 +181,7 @@ public class Luocha : DefaultFighter
             Name = "Death Wish",
             AdjacentTargets = AdjacentTargetsEnm.All,
             CostType = Resource.ResourceType.Energy,
-            Cost = Parent.Stats.BaseMaxEnergy,
+            Cost = MaxEnergy,
             IWannaUseIt = WannaUseDw
         };
         //dmg events
@@ -286,6 +285,7 @@ public class Luocha : DefaultFighter
             });
     }
 
+    public sealed override double MaxEnergy { get; set; } = 100;
     public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Abundance;
 
 

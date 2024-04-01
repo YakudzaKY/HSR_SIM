@@ -268,7 +268,7 @@ public sealed class SimCls : ICloneable
             PreLaunch.FirstOrDefault(x => x.OptionType == PreLaunchOption.PreLaunchOptionEnm.SetTp)?.Value ?? 0;
         //load energy
         foreach (var unit in team.Units)
-            unit.CurrentEnergy = unit.Stats.BaseMaxEnergy * PreLaunch
+            unit.CurrentEnergy = unit.Fighter.MaxEnergy * PreLaunch
                 .FirstOrDefault(x => x.OptionType == PreLaunchOption.PreLaunchOptionEnm.SetEnergy)?.Value ?? 0;
 
 

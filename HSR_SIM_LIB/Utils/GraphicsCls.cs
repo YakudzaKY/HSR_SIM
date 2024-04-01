@@ -300,7 +300,7 @@ public static class GraphicsCls
             }
 
             //Energy bar
-            if (unit.Stats.BaseMaxEnergy > 0)
+            if (unit.Fighter.MaxEnergy > 0)
             {
                 using (SolidBrush brush = new(Color.FromArgb(13, 26, 43)))
                 {
@@ -312,7 +312,7 @@ public static class GraphicsCls
                 using (SolidBrush brush = new(Color.FromArgb(43, 83, 140)))
                 {
                     var blueWidth =
-                        (int)Math.Round(EnergyBarSize.Width * unit.CurrentEnergy / unit.Stats.BaseMaxEnergy);
+                        (int)Math.Round(EnergyBarSize.Width * unit.CurrentEnergy / unit.Fighter.MaxEnergy);
                     gfx.FillRectangle(brush, portraitPoint.X,
                         portraitPoint.Y + PortraitSize.Height + HealthBarSize.Height, blueWidth, EnergyBarSize.Height);
                 }
@@ -321,7 +321,7 @@ public static class GraphicsCls
                     , portraitPoint.Y + PortraitSize.Height + HealthBarSize.Height
                     , gfx
                     , string.Format("{0:d}/{1:d}", (int)Math.Floor(unit.CurrentEnergy),
-                        (int)Math.Floor(unit.Stats.BaseMaxEnergy))
+                        (int)Math.Floor(unit.Fighter.MaxEnergy))
                     , null
                     , new Font("Tahoma", BarFontSize));
             }

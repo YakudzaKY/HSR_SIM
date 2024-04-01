@@ -20,8 +20,7 @@ public class Bronya : DefaultFighter
 
     public Bronya(Unit parent) : base(parent)
     {
-   
-        Parent.Stats.BaseMaxEnergy = 120;
+        
         wbSkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Windrider Bullet")!.Level;
         var abilitySkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Combat Redeployment")!.Level;
         ultimateSkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "The Belobog March")!.Level;
@@ -122,7 +121,7 @@ public class Bronya : DefaultFighter
                 AbilityType = Ability.AbilityTypeEnm.Ultimate,
                 Name = "The Belobog March",
                 CostType = Resource.ResourceType.Energy,
-                Cost = Parent.Stats.BaseMaxEnergy,
+                Cost = MaxEnergy,
                 AdjacentTargets = Ability.AdjacentTargetsEnm.All,
                 TargetType = Ability.TargetTypeEnm.Friend
             };
@@ -161,6 +160,7 @@ public class Bronya : DefaultFighter
             });
     }
 
+    public sealed override double MaxEnergy { get; set; } = 120;
     public override PathType? Path { get; } = PathType.Harmony;
 
 
