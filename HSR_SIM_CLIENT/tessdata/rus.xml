@@ -1,0 +1,25 @@
+<replacers>
+    <replacer from="Сила атаки" to="atk"/>
+    <replacer from="Скорость" to="spd"/>
+    <replacer from="НР" to="hp"/>
+    <replacer from="Защита" to="def"/>
+    <replacer from="Эффект пробития" to="break_dmg"/>
+    <replacer from="Шанс попадания эффектов" to="effect_hit"/>
+    <replacer from="Сопротивление эффектам" to="effect_res"/>
+    <replacer from="Крит. шанс" to="crit_rate"/>
+    <replacer from="Крит. урон" to="crit_dmg"/>
+    <replacer from="восстановления" to="sp_rate"/>
+    <replacer from="Бонус исцеления" to="heal_rate"/>
+    <replacer from="Бонус ветр. урона" to="wind_dmg"/>
+    <replacer from="Бонус физ. урона" to="physical_dmg"/>
+    <replacer from="Бонус огн. урона" to="fire_dmg"/>
+    <replacer from="Бонус лед. урона" to="ice_dmg"/>
+    <replacer from="Бонус элек. урона" to="lightning_dmg"/>
+    <replacer from="Бонус квант. урона" to="quantum_dmg"/>
+    <replacer from="Бонус мним. урона" to="imaginary_dmg"/>
+    <replacer from="поро" to="sp_rate"/>
+    <replacer from="ро ен" to="sp_rate"/>
+    <valFix from="_" to="."/>
+    <valFix from="[." to="4"/>
+    <valFix from="‚" to=","/>
+</replacers>

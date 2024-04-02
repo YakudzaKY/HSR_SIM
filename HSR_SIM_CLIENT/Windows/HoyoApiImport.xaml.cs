@@ -13,7 +13,7 @@ public partial class HoyoApiImport : INotifyPropertyChanged
 {
     private string btnImportCaption = ImportWait;
     public bool ApiFullSave { get; set; } = true;
-    public string ApiMyUid { get; set; } = IniF.IniReadValue("WarGear", "UID");
+    public string? ApiMyUid { get; set; } = IniF.IniReadValue("WarGear", "UID");
     private const string ImportWait = "Import";
     private const string ImportProgress = "Please wait";
 

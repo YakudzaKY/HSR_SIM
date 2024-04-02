@@ -1,4 +1,4 @@
-﻿namespace HSR_SIM_CLIENT;
+﻿namespace HSR_SIM_CLIENT.Utils;
 
 internal static class StatData
 {
