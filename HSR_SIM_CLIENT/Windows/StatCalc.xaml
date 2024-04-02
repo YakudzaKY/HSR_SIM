@@ -5,6 +5,7 @@
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                  xmlns:converters="clr-namespace:HSR_SIM_CLIENT.Converters"
+                 xmlns:views="clr-namespace:HSR_SIM_CLIENT.Views"
                  mc:Ignorable="d"
                  Title="Stat Calc" Height="Auto" Width="Auto"
                  SizeToContent="Width"
@@ -92,8 +93,8 @@
 
                 </StackPanel>
             </ScrollViewer>
-            <mah:MetroTabControl Grid.Column="4" Name="tbCalcType">
-                <mah:MetroTabItem x:Name="tbiStatImpact" Header="Stat impact calc">
+            <mah:MetroTabControl Grid.Column="4" >
+                <mah:MetroTabItem IsSelected="{Binding StatImpactTabSelected, Mode=TwoWay}" Header="Stat impact calc">
                     <mah:MetroTabItem.Content>
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -153,16 +154,28 @@
                     </mah:MetroTabItem.Content>
 
                 </mah:MetroTabItem>
-                <mah:MetroTabItem Name="tbiGearRepalce">
+                <mah:MetroTabItem IsSelected="{Binding GearReplaceTabSelected, Mode=TwoWay}" >
                     <mah:MetroTabItem.Header>
                         GearReplaceCalc
                     </mah:MetroTabItem.Header>
                     <mah:MetroTabItem.Content>
-                        <StackPanel>
-                            <RadioButton IsChecked="True">123</RadioButton>
-                            <RadioButton>123</RadioButton>
-                            <RadioButton>123</RadioButton>
-                        </StackPanel>
+                       <Grid>
+                         <Grid.ColumnDefinitions>
+                             <ColumnDefinition></ColumnDefinition>
+                             <ColumnDefinition></ColumnDefinition>
+                             <ColumnDefinition></ColumnDefinition>
+                         </Grid.ColumnDefinitions>  
+                           <StackPanel Grid.Column="0" Orientation="Vertical">
+                               <Label >Character:</Label>
+                               <ComboBox ItemsSource="{Binding AvailableCharacters}"
+                                         SelectedItem="{Binding SelectedCharacterToCalc,Mode=TwoWay}" 
+                                        />
+                               <Button Click="BtnImportScreen_OnClick" Content="Import from screen" Name="BtnImportScreen" ></Button>
+                               <Button Click="BtnResetScanArea_OnClick" Content="Reset scan area" Name="BtnResetScanArea" ></Button>
+                           </StackPanel>
+                           <views:ItemStatsView Grid.Column="1" ItemStatsModel="{Binding ItemStatsUnequipped, Mode=OneWay}"  GroupCaption="Stats unequipped"/>
+                           <views:ItemStatsView Grid.Column="2" ItemStatsModel="{Binding ItemStatsEquipped, Mode=OneWay}" GroupCaption="Stats equipped"/>
+                       </Grid>
                     </mah:MetroTabItem.Content>
                 </mah:MetroTabItem>
             </mah:MetroTabControl>
@@ -171,7 +184,7 @@
         
         <StackPanel Orientation="Vertical" Grid.Row="1">
             <Label  Content="{Binding WorkProgressText ,Mode=OneWay}"/>
-            <ProgressBar Maximum="{Binding SimOperationsMax, Mode=OneWay}" Value="{Binding SimOperationsCurrent,Mode=OneWay}"/>
+            <mah:MetroProgressBar Maximum="{Binding SimOperationsMax, Mode=OneWay}" Value="{Binding SimOperationsCurrent,Mode=OneWay}" />
         </StackPanel>
         
         <ScrollViewer Grid.Row="2">

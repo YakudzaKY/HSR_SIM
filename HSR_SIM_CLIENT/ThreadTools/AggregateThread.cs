@@ -12,14 +12,14 @@ internal class AggregateThread
 {
     private const int QueueSlotMultiplier = 100;
     private readonly int childThreadCount;
-    private readonly ThreadJob job;
+    private readonly ThreadJob? job;
     private readonly Thread mainThread;
     private readonly List<TaskProgress> taskProgress = new();
     private readonly ConcurrentQueue<SimTask> taskQueue = new();
     private readonly ConcurrentQueue<KeyValuePair<SimTask, Worker.RCombatResult>> taskResultQueue = new();
     private readonly List<SimThread> threads = new();
 
-    public AggregateThread(ThreadJob pJob, int pChildThreadCount)
+    public AggregateThread(ThreadJob? pJob, int pChildThreadCount)
     {
         job = pJob;
         childThreadCount = pChildThreadCount;

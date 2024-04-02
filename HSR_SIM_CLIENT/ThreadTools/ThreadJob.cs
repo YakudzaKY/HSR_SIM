@@ -10,7 +10,7 @@ namespace HSR_SIM_CLIENT.ThreadTools;
 /// </summary>
 /// <param name="pTaskList"></param>
 /// <param name="pIterations"></param>
-internal class ThreadJob(List<SimTask> pTaskList, int pIterations)
+internal class ThreadJob(List<SimTask>? pTaskList, int pIterations)
 {
     private readonly Type[] typeArray =
     {
@@ -22,7 +22,7 @@ internal class ThreadJob(List<SimTask> pTaskList, int pIterations)
     /// <summary>
     ///     List of task for sim
     /// </summary>
-    public List<SimTask> TaskList { get; } = pTaskList;
+    public List<SimTask>? TaskList { get; } = pTaskList;
 
     public Dictionary<SimTask, RAggregatedData> CombatData { get; } = new();
 

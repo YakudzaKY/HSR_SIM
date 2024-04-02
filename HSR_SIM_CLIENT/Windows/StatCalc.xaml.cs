@@ -6,13 +6,15 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Forms.Integration;
 using System.Windows.Input;
+using System.Windows.Interop;
 using HSR_SIM_CLIENT.ChartTools;
+using HSR_SIM_CLIENT.Models;
 using HSR_SIM_CLIENT.ThreadTools;
 using HSR_SIM_CLIENT.Utils;
 using HSR_SIM_LIB;
 using HSR_SIM_LIB.Utils;
 using static HSR_SIM_CLIENT.Utils.GuiUtils;
-using static HSR_SIM_CLIENT.StatData;
+using static HSR_SIM_CLIENT.Utils.StatData;
 
 
 namespace HSR_SIM_CLIENT.Windows;
@@ -28,10 +30,15 @@ public partial class StatCalc : INotifyPropertyChanged
     /// </summary>
     private const string Delimiter = "\\";
 
+    /// <summary>
+    ///     force new OCR rectangles
+    /// </summary>
+    private bool forceNewRect;
+
     private bool interruptFlag;
-    private ThreadJob threadJob;
-    private AggregateThread aggThread;
-    private List<SimTask> myTaskList;
+    private ThreadJob? threadJob;
+    private AggregateThread? aggThread;
+    private List<SimTask>? myTaskList;
     private ObservableCollection<SelectedItem> profiles = [];
 
 
@@ -40,18 +47,64 @@ public partial class StatCalc : INotifyPropertyChanged
     private Dictionary<string, string>? statValTable;
 
     private int thrCnt;
-
+    public ItemStatsModel ItemStatsUnequipped { get; } = new ItemStatsModel();
+    public ItemStatsModel ItemStatsEquipped { get; } = new ItemStatsModel();
 
     public StatCalc()
     {
-        InitializeComponent();
         //refresh combo box data
-        RefreshCb();
+        LoadFromIni();
+        InitializeComponent();
+
         ThrCnt = Math.Max(Environment.ProcessorCount / 2 - 1, 1);
     }
 
     public ObservableCollection<string> AvailableCharacters { get; } = [];
-    public string SelectedCharacterToCalc { get; set; }
+
+    public string? SelectedCharacterToCalc
+    {
+        get => selectedCharacterToCalc;
+        set
+        {
+            if (Equals(value, selectedCharacterToCalc)) return;
+            selectedCharacterToCalc = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// Tab selection stat calc
+    /// </summary>
+    /// <returns></returns>
+    private bool statImpactTabSelected = true;
+
+    public bool StatImpactTabSelected
+    {
+        get => statImpactTabSelected;
+        set
+        {
+            if (Equals(value, statImpactTabSelected)) return;
+            statImpactTabSelected = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// Tab selection stat calc
+    /// </summary>
+    /// <returns></returns>
+    private bool gearReplaceTabSelected = true;
+
+    public bool GearReplaceTabSelected
+    {
+        get => gearReplaceTabSelected;
+        set
+        {
+            if (Equals(value, gearReplaceTabSelected)) return;
+            gearReplaceTabSelected = value;
+            OnPropertyChanged();
+        }
+    }
 
     /// <summary>
     ///     chosen stat will be replaced from checked stats in table
@@ -127,14 +180,14 @@ public partial class StatCalc : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
-    
+
 
     /// <summary>
     ///     calculating in progress flag
     /// </summary>
-    private string workProgressText;
+    private string? workProgressText;
 
-    public string WorkProgressText
+    public string? WorkProgressText
     {
         get => workProgressText;
         private set
@@ -161,6 +214,7 @@ public partial class StatCalc : INotifyPropertyChanged
     }
 
     private int simOperationsCurrent;
+    private string? selectedCharacterToCalc;
 
     public int SimOperationsCurrent
     {
@@ -246,14 +300,28 @@ public partial class StatCalc : INotifyPropertyChanged
             Scenarios.Where(x => x.IsSelected).Aggregate("", (current, item) => current + item.Name + Delimiter));
         IniF.IniWriteValue(GetType().Name, nameof(Profiles),
             Profiles.Where(x => x.IsSelected).Aggregate("", (current, item) => current + item.Name + Delimiter));
-       
+
+        IniF.IniWriteValue(GetType().Name, nameof(ItemStatsEquipped) + "Sub",
+            ItemStatsEquipped.SecondStats.Aggregate("",
+                (current, statVal) => current + statVal.Stat + "=" + statVal.Val + Delimiter));
+        IniF.IniWriteValue(GetType().Name, nameof(ItemStatsEquipped) + "Main", ItemStatsEquipped.MainStat);
+
+        IniF.IniWriteValue(GetType().Name, nameof(ItemStatsUnequipped) + "Sub",
+            ItemStatsUnequipped.SecondStats.Aggregate("",
+                (current, statVal) => current + statVal.Stat + "=" + statVal.Val + Delimiter));
+        IniF.IniWriteValue(GetType().Name, nameof(ItemStatsUnequipped) + "Main", ItemStatsUnequipped.MainStat);
+
+        IniF.IniWriteValue(GetType().Name, nameof(SelectedCharacterToCalc), SelectedCharacterToCalc);
+
+        IniF.IniWriteValue(GetType().Name, nameof(StatImpactTabSelected), StatImpactTabSelected.ToString().ToLower());
+        IniF.IniWriteValue(GetType().Name, nameof(GearReplaceTabSelected), GearReplaceTabSelected.ToString().ToLower());
     }
 
 
     /// <summary>
     ///     Refresh combo box
     /// </summary>
-    private void RefreshCb()
+    private void LoadFromIni()
     {
         //find scenarios
         var files = Directory.GetFiles(GetScenarioPath(), "*.xml");
@@ -289,6 +357,39 @@ public partial class StatCalc : INotifyPropertyChanged
 
         NotifyPropertyChanged(nameof(Profiles));
 
+        //load  item stats
+        var i = 0;
+        ItemStatsEquipped.MainStat = IniF.IniReadValue(GetType().Name, nameof(ItemStatsEquipped) + "Main");
+        foreach (var item in IniF.IniReadValue(GetType().Name, nameof(ItemStatsEquipped) + "Sub").Split(Delimiter)
+                     .Where(x => !string.IsNullOrEmpty(x)))
+        {
+            string[] keyVal = item.Split('=');
+            ItemStatsEquipped.SecondStats[i].Stat = keyVal[0];
+            ItemStatsEquipped.SecondStats[i].Val = keyVal[1];
+            i++;
+        }
+
+        i = 0;
+        ItemStatsUnequipped.MainStat = IniF.IniReadValue(GetType().Name, nameof(ItemStatsUnequipped) + "Main");
+        foreach (var item in IniF.IniReadValue(GetType().Name, nameof(ItemStatsUnequipped) + "Sub").Split(Delimiter)
+                     .Where(x => !string.IsNullOrEmpty(x)))
+        {
+            string[] keyVal = item.Split('=');
+            ItemStatsUnequipped.SecondStats[i].Stat = keyVal[0];
+            ItemStatsUnequipped.SecondStats[i].Val = keyVal[1];
+            i++;
+        }
+
+        NotifyPropertyChanged(nameof(ItemStatsUnequipped));
+        NotifyPropertyChanged(nameof(ItemStatsEquipped));
+
+        SelectedCharacterToCalc = IniF.IniReadValue(GetType().Name, nameof(SelectedCharacterToCalc));
+        bool.TryParse(IniF.IniReadValue(GetType().Name, nameof(StatImpactTabSelected)), out statImpactTabSelected);
+        bool.TryParse(IniF.IniReadValue(GetType().Name, nameof(GearReplaceTabSelected)), out gearReplaceTabSelected);
+
+        NotifyPropertyChanged(nameof(StatImpactTabSelected));
+        NotifyPropertyChanged(nameof(GearReplaceTabSelected));
+
         ReloadProfileCharacters();
     }
 
@@ -310,6 +411,7 @@ public partial class StatCalc : INotifyPropertyChanged
 
     private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
     {
+        SaveIni();
         //also save ini before run sim(if got freeze or app crash cause out of memory) 
         //generate task list
         myTaskList = new List<SimTask>();
@@ -329,26 +431,24 @@ public partial class StatCalc : INotifyPropertyChanged
         }
 
         DoSomeJob();
-        SaveIni();
+      
     }
 
     private async Task DoSomeJob()
     {
-   
-        foreach (var item in  StackCharts.Children)
+        foreach (var item in StackCharts.Children)
         {
             ((WindowsFormsHost)item).Child.Dispose();
-            
         }
+
         StackCharts.Children.Clear();
         await Task.Run(DoJob);
-        
+
         foreach (var task in threadJob.CombatData.Where(x => x.Key.Parent is null))
         {
             var newChart = ChartUtils.GetChart(task, threadJob.CombatData.Where(x => x.Key.Parent == task.Key));
             StackCharts.Children.Add(new WindowsFormsHost() { Child = newChart });
         }
-
     }
 
     private void DoJob()
@@ -397,15 +497,14 @@ public partial class StatCalc : INotifyPropertyChanged
             var etaM = (int)Math.Floor((double)avgEta / 60);
             var etaFormated = $"{etaM}m {avgEta - etaM * 60}s";
             WorkProgressText = $"{SimOperationsCurrent}\\{SimOperationsMax}  {performance:f}\\sec    ETA:{etaFormated}";
-            
         } while (aggThread.IsAlive);
-        
+
 
         WorkInProgress = false;
     }
 
     //get Stat mods by checked item(one mod atm)
-    private List<Worker.RStatMod> GetStatMods(string character, string item, int step, string minusItem = null)
+    private List<Worker.RStatMod> GetStatMods(string? character, string item, int step, string minusItem = null)
     {
         var res = new List<Worker.RStatMod>();
         res.Add(new Worker.RStatMod
@@ -427,11 +526,19 @@ public partial class StatCalc : INotifyPropertyChanged
         return double.Parse(statValTable[item]);
     }
 
+    //parse stat value 
+    private static double ExctractDoubleVal(string inputStr)
+    {
+        inputStr = inputStr.Replace('.', ',');
+        return inputStr.EndsWith('%')
+            ? double.Parse(inputStr.Substring(0, inputStr.Length - 1)) / 100
+            : double.Parse(inputStr);
+    }
 
     private List<SimTask> GetStatsSubTasks(string scenario, string profile, SimTask simTask)
     {
         var res = new List<SimTask>();
-        if (tbiStatImpact.IsSelected)
+        if (StatImpactTabSelected)
         {
             if (!string.IsNullOrEmpty(SelectedCharacterToCalc))
                 foreach (var selectedStat in SelectedStats.Where(x => x.IsSelected))
@@ -446,38 +553,63 @@ public partial class StatCalc : INotifyPropertyChanged
                                 i * UpgradesPerIterations, SelectedStatToReplace?.Name ?? string.Empty)
                         });
         }
-        /*else if (rbGearReplace.Checked)
+        else if (GearReplaceTabSelected)
         {
-            if (!string.IsNullOrEmpty(cbCharacterGrp.Text))
+            if (!string.IsNullOrEmpty(SelectedCharacterToCalc))
             {
-                var statModList = new List<RStatMod>();
-                foreach (var str in (RectModeEnm[])Enum.GetValues(typeof(RectModeEnm)))
-                    for (var i = 0; i < 5; i++)
+                var statModList = new List<Worker.RStatMod>();
+                
+                //unequipped
+                if (!string.IsNullOrEmpty(ItemStatsUnequipped.MainStat))
+                {
+                    double val = SearchStatBaseByNameInMainStats(ItemStatsUnequipped.MainStat) +
+                                 15 * SearchStatDeltaByNameInMainStats(ItemStatsUnequipped.MainStat);
+                    statModList.Add(new Worker.RStatMod
                     {
-                        var statName = Controls.Find($"cb{str}Stat{i}", true).First().Text;
-                        if (!string.IsNullOrEmpty(statName))
+                        Character = SelectedCharacterToCalc,
+                        Stat = ItemStatsUnequipped.MainStat,
+                        Val = -1 * val
+                    });
+                }
+                foreach (var itemStat in ItemStatsUnequipped.SecondStats)
+                {
+                    if (!string.IsNullOrEmpty(itemStat.Stat) && !string.IsNullOrEmpty(itemStat.Val))
+                        statModList.Add(new Worker.RStatMod
                         {
-                            var statVal = i > 0
-                                ? Controls.Find($"txt{str}Stat{i}", true).First().Text
-                                : (SearchStatBaseByNameInMainStats(statName) +
-                                   15 * SearchStatDeltaByNameInMainStats(statName)).ToString();
-                            if (!string.IsNullOrEmpty(statName) && !string.IsNullOrEmpty(statVal))
-                                statModList.Add(new RStatMod
-                                {
-                                    Character = cbCharacterGrp.Text,
-                                    Stat = statName,
-                                    Val = (str == RectModeEnm.Minus ? -1 : 1) * ExctractDoubleVal(statVal)
-                                });
-                        }
-                    }
-
-
+                            Character = SelectedCharacterToCalc,
+                            Stat = itemStat.Stat,
+                            Val = -1 * ExctractDoubleVal(itemStat.Val)
+                        });
+                }
+                //equipped
+                if (!string.IsNullOrEmpty(ItemStatsEquipped.MainStat))
+                {
+                    double val = SearchStatBaseByNameInMainStats(ItemStatsEquipped.MainStat) +
+                                 15 * SearchStatDeltaByNameInMainStats(ItemStatsEquipped.MainStat);
+                    statModList.Add(new Worker.RStatMod
+                    {
+                        Character = SelectedCharacterToCalc,
+                        Stat = ItemStatsEquipped.MainStat,
+                        Val = val
+                    });
+                }
+                foreach (var itemStat in ItemStatsEquipped.SecondStats)
+                {
+                    if (!string.IsNullOrEmpty(itemStat.Stat) && !string.IsNullOrEmpty(itemStat.Val))
+                        statModList.Add(new Worker.RStatMod
+                        {
+                            Character = SelectedCharacterToCalc,
+                            Stat = itemStat.Stat,
+                            Val =  ExctractDoubleVal(itemStat.Val)
+                        });
+                }
+                
                 if (statModList.Count > 0)
                 {
-                    statModList.Insert(0, new RStatMod { Stat = "NEW GEAR" });
+                    statModList.Insert(0, new Worker.RStatMod { Stat = "NEW GEAR" });
                     res.Add(new SimTask
                     {
-                        SimScenario = XmlLoader.LoadCombatFromXml(GetScenarioPath() + cbScenario.Text,
+                        SimScenario = XmlLoader.LoadCombatFromXml(GetScenarioPath() + scenario,
                             GetProfilePath() + profile),
                         StatMods = statModList,
                         UpgradesCount = 1,
@@ -485,9 +617,19 @@ public partial class StatCalc : INotifyPropertyChanged
                     });
                 }
             }
-        }*/
+        }
 
         return res;
+    }
+
+    private static double SearchStatDeltaByNameInMainStats(string item)
+    {
+        return ExctractDoubleVal(MainStatsUpgrades.First(x => x.Key.Equals(item)).Value);
+    }
+
+    private static double SearchStatBaseByNameInMainStats(string item)
+    {
+        return ExctractDoubleVal(MainStatsBase.First(x => x.Key.Equals(item)).Value);
     }
 
     private void BtnSubStats_OnClick(object sender, RoutedEventArgs e)
@@ -535,6 +677,43 @@ public partial class StatCalc : INotifyPropertyChanged
 
     private void BtnCancel_OnClick(object sender, RoutedEventArgs e)
     {
+        //in case of crash app we have saved values
+
         interruptFlag = true;
+    }
+
+    private void BtnImportScreen_OnClick(object sender, RoutedEventArgs e)
+    {
+        var keyVal =
+            new OcrUtils().GetComparisonItemStat(new WindowInteropHelper(this).Handle.ToInt64(), ref forceNewRect);
+        /*   foreach (Control ctrl in gbPlus.Controls)
+               if (ctrl is not Label)
+                   ctrl.Text = string.Empty;
+           foreach (Control ctrl in gbMinus.Controls)
+               if (ctrl is not Label)
+                   ctrl.Text = string.Empty;
+
+           var i = 0;
+           foreach (var item in keyVal.Where(x => x.Value.StatMode == RectModeEnm.Minus))
+           {
+               gbMinus.Controls.Find($"cbMinusStat{i}", false).First().Text = item.Value.Key;
+               if (i > 0)
+                   gbMinus.Controls.Find($"txtMinusStat{i}", false).First().Text = item.Value.Value;
+               i++;
+           }
+
+           i = 0;
+           foreach (var item in keyVal.Where(x => x.Value.StatMode == RectModeEnm.Plus))
+           {
+               gbPlus.Controls.Find($"cbPlusStat{i}", false).First().Text = item.Value.Key;
+               if (i > 0)
+                   gbPlus.Controls.Find($"txtPlusStat{i}", false).First().Text = item.Value.Value;
+               i++;
+           }*/
+    }
+
+    private void BtnResetScanArea_OnClick(object sender, RoutedEventArgs e)
+    {
+        forceNewRect = true;
     }
 }

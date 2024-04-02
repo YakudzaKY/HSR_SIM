@@ -20,10 +20,15 @@
         <Content Include="Data\**">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
+        <Content Include="tessdata\**">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="MahApps.Metro" Version="3.0.0-alpha0476"/>
+        <PackageReference Include="Tesseract" Version="5.2.0" />
+        <PackageReference Include="Tesseract.Drawing" Version="5.2.0" />
         <PackageReference Include="WinForms.DataVisualization" Version="1.9.2" />
     </ItemGroup>
 

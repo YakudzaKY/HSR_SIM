@@ -1,0 +1,41 @@
+﻿<UserControl x:Class="HSR_SIM_CLIENT.Views.ItemStatsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:HSR_SIM_CLIENT.Views"
+             xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             mc:Ignorable="d"
+   
+             Name="Parent">
+
+    <Border BorderThickness="1" BorderBrush="Chocolate">
+    <Grid DataContext="{Binding ElementName=Parent}" >
+        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+ 
+        <mah:MetroHeader Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Header="{Binding GroupCaption , Mode=OneWay }"></mah:MetroHeader>
+        <ComboBox Grid.Column="0" Grid.Row="1"  SelectedItem="{Binding ItemStatsVm.MainStatName ,Mode=TwoWay}" ItemsSource="{Binding MainStatsNames}"></ComboBox>
+        <Label Grid.Column="1" Grid.Row="1" Content="MAX."></Label>
+        <ComboBox Grid.Column="0" Grid.Row="2" SelectedItem="{Binding ItemStatsVm.SubStatName1 ,Mode=TwoWay}" ItemsSource="{Binding SubStatsNames}"></ComboBox>
+        <ComboBox Grid.Column="0" Grid.Row="3" SelectedItem="{Binding ItemStatsVm.SubStatName2 ,Mode=TwoWay}" ItemsSource="{Binding SubStatsNames}"></ComboBox>
+        <ComboBox Grid.Column="0" Grid.Row="4" SelectedItem="{Binding ItemStatsVm.SubStatName3 ,Mode=TwoWay}" ItemsSource="{Binding SubStatsNames}"></ComboBox>
+        <ComboBox Grid.Column="0" Grid.Row="5" SelectedItem="{Binding ItemStatsVm.SubStatName4 ,Mode=TwoWay}" ItemsSource="{Binding SubStatsNames}"></ComboBox>
+        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ItemStatsVm.SubStatVal1 ,Mode=TwoWay}"></TextBox>
+        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding ItemStatsVm.SubStatVal2 ,Mode=TwoWay}"></TextBox>
+        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding ItemStatsVm.SubStatVal3 ,Mode=TwoWay}"></TextBox>
+        <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding ItemStatsVm.SubStatVal4 ,Mode=TwoWay}"></TextBox>
+    </Grid>
+    </Border>
+</UserControl>

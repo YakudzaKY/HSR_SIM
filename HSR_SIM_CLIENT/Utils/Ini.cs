@@ -21,7 +21,7 @@ public class IniFile
 
     [DllImport("kernel32")]
     private static extern long WritePrivateProfileString(string section,
-        string key, string val, string filePath);
+        string key, string? val, string filePath);
 
     [DllImport("kernel32")]
     private static extern int GetPrivateProfileString(string section,
@@ -37,7 +37,7 @@ public class IniFile
     /// Key Name
     /// <PARAM name="Value"></PARAM>
     /// Value Name
-    public void IniWriteValue(string section, string key, string value)
+    public void IniWriteValue(string section, string key, string? value)
     {
         WritePrivateProfileString(section, key, value, Path);
     }
@@ -49,7 +49,7 @@ public class IniFile
     /// <PARAM name="Key"></PARAM>
     /// <PARAM name="Path"></PARAM>
     /// <returns></returns>
-    public string IniReadValue(string section, string key)
+    public string? IniReadValue(string section, string key)
     {
         var temp = new StringBuilder(255);
         GetPrivateProfileString(section, key, "", temp,
