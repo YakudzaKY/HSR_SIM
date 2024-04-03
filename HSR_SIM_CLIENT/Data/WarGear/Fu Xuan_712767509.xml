@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Unit name="Fu Xuan" level="80" rank="2" element="Quantum">
+<Unit name="Fu Xuan" level="80" rank="2">
   <Stats hp="2744.784" atk="889.056" def="1135.575" spd="100" crit_rate="0.05" crit_dmg="0.5" crit_rate_prc="0.3652000013999999" hp_prc="2.1892800138000004" effect_res_prc="0.17776000460000002" sp_rate_prc="0.12" hp_fix="904.5864849999998" atk_prc="0.42768002530000004" def_prc="0.37260000000000004" break_dmg_prc="0.39528000199999996" atk_fix="352.79999999999995" def_fix="55.038811" spd_fix="25.032" effect_hit_prc="0.0734400043" spd_prc="0.06" />
   <LightCone rank="1" level="80" name="She Already Shut Her Eyes" />
   <Skill name="Novaburst" level="6" max_level="9" />

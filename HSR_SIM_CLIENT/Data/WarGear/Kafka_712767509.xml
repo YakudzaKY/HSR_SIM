@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Unit name="Kafka" level="80" rank="2">
+  <Stats hp="2145.0240000000003" atk="1261.26" def="948.15" spd="100" crit_rate="0.05" crit_dmg="0.5" atk_prc="1.6355200222000001" effect_hit_prc="0.3787200118" hp_prc="0.25984000949999997" all_dmg_prc="0.24" hp_fix="786.0413449999999" def_prc="0.14579999999999999" spd_fix="36.232" crit_rate_prc="0.23328000159999998" atk_fix="488.28014899999994" def_fix="52.921934" effect_res_prc="0.0820800049" lightning_dmg_prc="0.488803015" crit_dmg_prc="0.11664000079999999" />
+  <LightCone rank="1" level="80" name="Patience Is All You Need" />
+  <Skill name="Midnight Tumult" level="6" max_level="9" />
+  <Skill name="Caressing Moonlight" level="10" max_level="15" />
+  <Skill name="Twilight Trill" level="10" max_level="15" />
+  <Skill name="Gentle but Cruel" level="10" max_level="15" />
+  <Skill name="100506" level="0" max_level="1" />
+  <Skill name="Mercy Is Not Forgiveness" level="1" max_level="1" />
+  <RelicSet name="Band of Sizzling Thunder" num="4" />
+  <RelicSet name="Space Sealing Station" num="2" />
+</Unit>

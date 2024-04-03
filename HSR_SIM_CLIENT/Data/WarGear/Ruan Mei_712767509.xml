@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Unit name="Ruan Mei" level="80" rank="2" element="Ice">
+<Unit name="Ruan Mei" level="80" rank="2">
   <Stats hp="2145.0240000000003" atk="1188.9360000000001" def="1014.3000000000001" spd="104" crit_rate="0.05" crit_dmg="0.5" break_dmg_prc="1.8458000056" def_prc="0.4302" spd_fix="34.632" hp_fix="781.8075899999999" hp_prc="1.0574400043" atk_fix="528.500818" def_fix="156.64892200000003" atk_prc="0.07776000459999999" effect_res_prc="0.1468800086" crit_dmg_prc="0.05184" effect_hit_prc="0.0734400043" sp_rate_prc="0.19439401499999998" spd_prc="0.06" />
   <LightCone rank="1" level="80" name="Past Self in Mirror" />
   <Skill name="Threading Fragrance" level="6" max_level="9" />
   <Skill name="String Sings Slow Swirls" level="9" max_level="15" />
   <Skill name="Petals to Stream, Repose in Dream" level="9" max_level="15" />
-  <Skill name="Somatotypical Helix" level="9" max_level="15" />
+  <Skill name="Somatotypical Helix" level="10" max_level="15" />
   <Skill name="130306" level="0" max_level="1" />
   <Skill name="Silken Serenade" level="1" max_level="1" />
   <RelicSet name="Thief of Shooting Meteor" num="2" />
