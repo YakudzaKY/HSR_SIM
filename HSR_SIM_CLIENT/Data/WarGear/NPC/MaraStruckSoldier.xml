@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 
-<Unit name="MaraStruckSoldier" element="Wind">
+<Unit name="MaraStruckSoldier">
 	<Weakness value="Fire"/>
 	<Weakness value="Ice"/>
 	<Weakness value="Quantum"/>

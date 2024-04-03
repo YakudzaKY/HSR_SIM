@@ -15,7 +15,7 @@ internal class PlanetaryRendezvous : DefaultLightCone
         if (Path == Parent.Path)
             Parent.Parent.PassiveBuffs.Add(new PassiveBuff(Parent.Parent, this)
             {
-                Effects = [new EffElementalBoost { Element = parent.Parent.AttackElement, Value = modifiers[rank] }],
+                Effects = [new EffElementalBoost { Element = parent.Element, Value = modifiers[rank] }],
 
                 Target = Parent.Parent.ParentTeam
             });

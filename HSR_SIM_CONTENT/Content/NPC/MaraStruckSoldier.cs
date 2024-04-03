@@ -100,7 +100,8 @@ public class MaraStruckSoldier : DefaultNPCFighter
     }
 
 
- 
+    public override Ability.ElementEnm Element { get; } = Ability.ElementEnm.Wind;
+
     protected override void DefaultFighter_HandleEvent(Event ent)
     {
         if (ent is UnitEnteringBattle && ent.TargetUnit == Parent)

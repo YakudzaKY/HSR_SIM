@@ -39,6 +39,8 @@ public class ForgottenHall : DefaultNPCFighter
         Abilities.Add(IncreaseCycle);
     }
 
+    public override ElementEnm Element { get; } = ElementEnm.None;
+
     protected override void DefaultFighter_HandleEvent(Event ent)
     {
         // wipe party if 1000+cycles

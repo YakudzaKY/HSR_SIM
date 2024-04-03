@@ -9,9 +9,10 @@ public class Yanqing : DefaultFighter
 {
     public Yanqing(Unit parent) : base(parent)
     {
-  
+
     }
 
-    public override double MaxEnergy { get; set; }
+    public override double MaxEnergy { get; } = 0;
+    public override Ability.ElementEnm Element { get;  } = Ability.ElementEnm.Ice;
     public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Hunt;
 }

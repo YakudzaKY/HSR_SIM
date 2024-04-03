@@ -177,11 +177,6 @@ public partial class HoyoApiImport : INotifyPropertyChanged
         public List<Attribute> properties;
     }
 
-    public class ElementCls
-    {
-        public string Name;
-    }
-
 
     public class Character
     {
@@ -197,7 +192,6 @@ public partial class HoyoApiImport : INotifyPropertyChanged
         public string Name { get; set; }
         public int Level { get; set; }
         public int Rank { get; set; }
-        public ElementCls Element { get; set; }
 
         public int Promotion { get; set; }
     }
@@ -219,7 +213,6 @@ public partial class HoyoApiImport : INotifyPropertyChanged
         unit.SetAttributeValue("name", character?.Name);
         unit.SetAttributeValue("level", character.Level.ToString());
         unit.SetAttributeValue("rank", character.Rank.ToString());
-        unit.SetAttributeValue("element", character.Element.Name);
         XElement stat = new("Stats");
         foreach (var attr in character.attributes) stat.SetAttributeValue(attr.field, attr.value);
         unit.Add(stat);

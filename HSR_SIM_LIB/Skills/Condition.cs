@@ -97,7 +97,7 @@ public class Condition
                                              CheckExpression(untToCheck.HpPrc(ent:ent, excludeCondition:excludeCondition).Result),
                 ConditionCheckParam.Resource => ResourceValue!=null && CheckExpression(untToCheck.GetRes((Resource.ResourceType)ResourceValue).ResVal),
                 ConditionCheckParam.Weakness => untToCheck.GetWeaknesses(ent, excludeCondition)
-                                                    .Any(x => x == (ElemValue ?? ent?.SourceUnit.AttackElement))
+                                                    .Any(x => x == (ElemValue ?? ent?.SourceUnit.Fighter.Element))
                                                 == (ConditionExpression ==
                                                     ConditionCheckExpression.Exists),
                 ConditionCheckParam.Buff => untToCheck.AppliedBuffs.Any(x =>

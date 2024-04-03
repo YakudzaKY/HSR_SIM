@@ -228,7 +228,8 @@ public class SilverWolf : DefaultFighter
             });
     }
 
-    public sealed override double MaxEnergy { get; set; } = 110;
+    public sealed override double MaxEnergy { get;  } = 110;
+    public override ElementEnm Element { get; } = ElementEnm.Quantum;
     public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Nihility;
 
 
@@ -298,12 +299,12 @@ public class SilverWolf : DefaultFighter
             {
                 //first find elements not in native weakness
                 var reduceResists = true;
-                var elemListToApply = GetAliveFriends().Select(x => x.AttackElement)
+                var elemListToApply = GetAliveFriends().Select(x => x.Fighter.Element)
                     .Where(x => !ent.TargetUnit.NativeWeaknesses.Contains(x)).Distinct();
                 if (!elemListToApply.Any())
                 {
                     elemListToApply =
-                        GetAliveFriends().Select(x => x.AttackElement).Distinct(); //else pick all elements
+                        GetAliveFriends().Select(x => x.Fighter.Element).Distinct(); //else pick all elements
                     reduceResists = false;
                 }
 

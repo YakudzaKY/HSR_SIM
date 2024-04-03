@@ -58,4 +58,6 @@ public class AutomatonBeetle : DefaultNPCFighter
             ent.ParentStep.Events.Add(newEvent);
         }
     }
+
+    public override Ability.ElementEnm Element { get; } = Ability.ElementEnm.Physical;
 }
