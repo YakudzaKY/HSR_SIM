@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 
-<Unit name="Vagrant" element="Physical">
+<Unit name="Vagrant">
 	<Weakness value="Fire"/>
 	<Weakness value="Ice"/>
 	<Weakness value="Imaginary"/>

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 
-<Unit name="AutomatonGrizzlyComplete" element="Physical">
+<Unit name="AutomatonGrizzlyComplete">
 	<Weakness value="Fire"/>
 	<Weakness value="Lightning"/>
 	<Weakness value="Ice"/>

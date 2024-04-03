@@ -258,11 +258,6 @@ public static class XmlLoader
             unit.Level = SafeToInt(newLevel);
         if (!string.IsNullOrEmpty(newRank))
             unit.Rank = SafeToInt(newRank);
-        //attack element
-        XmlNode unitElement = xmlElement.Attributes.GetNamedItem("element");
-        if (unitElement is { Value: not null })
-            unit.AttackElement = (Ability.ElementEnm)Enum.Parse(typeof(Ability.ElementEnm),
-                unitElement.Value.Trim(), true);
         //stats
         unit.Stats = ExtractStats(xmlElement, unit.Level, unit);
         //weakness

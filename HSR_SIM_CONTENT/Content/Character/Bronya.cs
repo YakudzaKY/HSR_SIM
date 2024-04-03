@@ -160,7 +160,8 @@ public class Bronya : DefaultFighter
             });
     }
 
-    public sealed override double MaxEnergy { get; set; } = 120;
+    public sealed override double MaxEnergy { get;  } = 120;
+    public override Ability.ElementEnm Element { get;  } = Ability.ElementEnm.Wind;
     public override PathType? Path { get; } = PathType.Harmony;
 
 

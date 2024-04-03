@@ -285,7 +285,8 @@ public class Luocha : DefaultFighter
             });
     }
 
-    public sealed override double MaxEnergy { get; set; } = 100;
+    public sealed override double MaxEnergy { get; } = 100;
+    public override ElementEnm Element { get; } = ElementEnm.Imaginary;
     public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Abundance;
 
 

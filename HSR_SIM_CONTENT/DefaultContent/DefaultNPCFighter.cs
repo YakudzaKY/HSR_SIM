@@ -12,7 +12,7 @@ namespace HSR_SIM_CONTENT.DefaultContent;
 /// <summary>
 ///     default npc fighter logics
 /// </summary>
-public class DefaultNPCFighter :  IFighter
+public abstract class DefaultNPCFighter :  IFighter
 {
     private UnitRole? role;
 
@@ -69,6 +69,7 @@ public class DefaultNPCFighter :  IFighter
     }
 
     public double MaxEnergy { get; set; } = 0;
+    public abstract Ability.ElementEnm Element { get;  }
     public AppliedBuff WeaknessBreakDebuff { get; set; } = new(null,null,typeof(DefaultNPCFighter)) { Effects = [] };
     public PathType? Path { get; set; } = null;
 

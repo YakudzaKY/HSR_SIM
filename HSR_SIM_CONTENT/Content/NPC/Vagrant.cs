@@ -51,4 +51,6 @@ public class Vagrant : DefaultNPCFighter
         myAttackAbility.Events.Add(new EnergyGain(null, this, Parent) { Value = 10 });
         Abilities.Add(myAttackAbility);
     }
+
+    public override Ability.ElementEnm Element { get; } = Ability.ElementEnm.Physical;
 }

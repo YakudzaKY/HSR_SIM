@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 
-<Unit name="Automaton Beetle" element="Physical">
+<Unit name="Automaton Beetle">
 	<Weakness value="Wind"/>
 	<Weakness value="Lightning"/>
 	<Weakness value="Imaginary"/>

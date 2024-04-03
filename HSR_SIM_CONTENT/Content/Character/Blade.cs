@@ -426,7 +426,8 @@ public class Blade : DefaultFighter
         };
     }
 
-    public sealed override double MaxEnergy { get; set; } = 130;
+    public sealed override double MaxEnergy { get;  } = 130;
+    public override ElementEnm Element { get;  } = ElementEnm.Wind;
     public override PathType? Path => PathType.Destruction;
 
     /// <summary>
