@@ -118,7 +118,7 @@ public partial class HoyoApiImport : INotifyPropertyChanged
         XElement party = new("Party");
         profile.Add(party);
 
-        foreach (var character in data.characters)
+        foreach (var character in data.characters.Take(4))
         {
             XElement unit = new("Unit");
             unit.SetAttributeValue("template", "Character\\" + character.Name);
