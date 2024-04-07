@@ -540,7 +540,7 @@ public static class UnitFormulas
             EventRef = ent,
             ConditionSkipList = excludeCondition,
             Expression =
-                $" 1 - ( {unitToCheck}#{nameof(Unit.NativeResists)}" +
+                $" 1 - ( {unitToCheck}#{nameof(Resists)}" +
                 $" - {OppositeTarget(unitToCheck)}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffElementalPenetration).FullName}#{elem.ToString()} " +
                 $") "
         };

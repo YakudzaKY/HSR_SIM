@@ -11,6 +11,7 @@ using HSR_SIM_CLIENT.ChartTools;
 using HSR_SIM_CLIENT.Models;
 using HSR_SIM_CLIENT.ThreadTools;
 using HSR_SIM_CLIENT.Utils;
+using HSR_SIM_CLIENT.Views;
 using HSR_SIM_LIB;
 using HSR_SIM_LIB.Utils;
 using static HSR_SIM_CLIENT.Utils.GuiUtils;
@@ -456,10 +457,13 @@ public partial class StatCalc : INotifyPropertyChanged
             myTaskList.AddRange(GetStatsSubTasks(scenario.Name, profile.Name, prnt));
         }
 
-        DoSomeJob();
+        DoCalculations();
     }
 
-    private async Task DoSomeJob()
+    /// <summary>
+    /// clear charts->do calc->render charts
+    /// </summary>
+    private async Task DoCalculations()
     {
         foreach (var item in StackCharts.Children)
         {
@@ -471,11 +475,14 @@ public partial class StatCalc : INotifyPropertyChanged
 
         foreach (var task in threadJob.CombatData.Where(x => x.Key.Parent is null))
         {
-            var newChart = ChartUtils.GetChart(task, threadJob.CombatData.Where(x => x.Key.Parent == task.Key));
-            StackCharts.Children.Add(new WindowsFormsHost() { Child = newChart });
+            //var newChart = ChartUtils.GetChart(task, threadJob.CombatData.Where(x => x.Key.Parent == task.Key));
+            //new WindowsFormsHost() { Child = newChart }
+            StackCharts.Children.Add( new CalcResultView(task) );
         }
     }
-
+    /// <summary>
+    ///  start and wait threads calculations
+    /// </summary>
     private void DoJob()
     {
         WorkInProgress = true;

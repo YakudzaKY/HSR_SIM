@@ -6,7 +6,7 @@ namespace HSR_SIM_CLIENT.Utils;
 /// <summary>
 ///     Task for simulator.
 /// </summary>
-internal class SimTask
+public class SimTask
 {
     //loaded scenario. will be cloned into every sim iteration
     public SimCls SimScenario { get; init; }

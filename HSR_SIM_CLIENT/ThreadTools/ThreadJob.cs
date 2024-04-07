@@ -10,7 +10,7 @@ namespace HSR_SIM_CLIENT.ThreadTools;
 /// </summary>
 /// <param name="pTaskList"></param>
 /// <param name="pIterations"></param>
-internal class ThreadJob(List<SimTask>? pTaskList, int pIterations)
+public class ThreadJob(List<SimTask>? pTaskList, int pIterations)
 {
     private readonly Type[] typeArray =
     {
