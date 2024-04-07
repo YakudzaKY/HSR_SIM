@@ -11,6 +11,7 @@ namespace HSR_SIM_CLIENT.ViewModels;
 public class UnitViewModel(Unit unit)
 {
     public string Name => unit.Name;
+    public string Rank => unit.Rank.ToString();
 
     public List<BuffViewModel> AppliedBuffs =>unit.AppliedBuffs.Select(buff => new BuffViewModel(buff)).ToList();
   

@@ -465,11 +465,13 @@ public partial class StatCalc : INotifyPropertyChanged
     /// </summary>
     private async Task DoCalculations()
     {
+
         foreach (var item in StackCharts.Children)
         {
-            ((WindowsFormsHost)item).Child.Dispose();
+            //chart dispose
+            ((CalcResultView)item).WinHst.Child.Dispose();
+                
         }
-
         StackCharts.Children.Clear();
         await Task.Run(DoJob);
 
@@ -477,7 +479,7 @@ public partial class StatCalc : INotifyPropertyChanged
         {
             //var newChart = ChartUtils.GetChart(task, threadJob.CombatData.Where(x => x.Key.Parent == task.Key));
             //new WindowsFormsHost() { Child = newChart }
-            StackCharts.Children.Add( new CalcResultView(task) );
+            StackCharts.Children.Add( new CalcResultView(task,threadJob.CombatData.Where(x => x.Key.Parent == task.Key)) );
         }
     }
     /// <summary>

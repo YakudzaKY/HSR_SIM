@@ -217,7 +217,19 @@ public class Unit : CloneClass
         var oldPassives = newClone.PassiveBuffs;
         newClone.PassiveBuffs = [];
         foreach (var res in oldPassives) newClone.PassiveBuffs.Add((PassiveBuff)res.Clone());
-
+        //clone Debuff Resists
+        var oldNativeDebuffResists= newClone.NativeDebuffResists;
+        newClone.NativeDebuffResists = [];
+        foreach (var res in oldNativeDebuffResists) newClone.NativeDebuffResists.Add(res);
+        //clone  Resists
+        var oldNativeResists= newClone.NativeResists;
+        newClone.NativeResists = [];
+        foreach (var res in oldNativeResists) newClone.NativeResists.Add(res);
+        //clone  Weakness
+        var oldNativeWeakness= newClone.NativeWeaknesses;
+        newClone.NativeWeaknesses = [];
+        foreach (var res in oldNativeWeakness) newClone.NativeWeaknesses.Add(res);
+        
         //clone Skills
         var oldSkills = newClone.Skills;
         newClone.Skills = new List<Skill>();
