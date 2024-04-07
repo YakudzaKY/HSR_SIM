@@ -30,10 +30,6 @@ Its Ui for SIM all functionality starts from here
 > [!TIP]
 > free developers are needed here
 content for the simulator. Characters, cones, opponents, equipment. Horizontal development takes place here
-* HSR_SIM_GUI
-  
-> [!WARNING]
-> Legacy. HSR_SIM_GUI(windows forms) will be replaced by HSR_SIM_CLIENT(wpf)
 
 * HSR_SIM_LIB
   
