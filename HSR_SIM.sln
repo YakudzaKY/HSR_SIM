@@ -2,11 +2,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HSR_SIM_GUI", "HSR_SIM_GUI\HSR_SIM_GUI.csproj", "{38D76C59-75EE-4E01-A69B-F3175CDF9900}"
-	ProjectSection(ProjectDependencies) = postProject
-		{609ACA43-DFBA-4CDD-A668-D9C4C28D44AC} = {609ACA43-DFBA-4CDD-A668-D9C4C28D44AC}
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HSR_SIM_LIB", "HSR_SIM_LIB\HSR_SIM_LIB.csproj", "{E00A8B28-2FD6-4A6C-B761-630F8ED66421}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E2546477-046A-4A37-9DFF-9704ECA334E7}"
@@ -21,10 +16,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{38D76C59-75EE-4E01-A69B-F3175CDF9900}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{38D76C59-75EE-4E01-A69B-F3175CDF9900}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{38D76C59-75EE-4E01-A69B-F3175CDF9900}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{38D76C59-75EE-4E01-A69B-F3175CDF9900}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E00A8B28-2FD6-4A6C-B761-630F8ED66421}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E00A8B28-2FD6-4A6C-B761-630F8ED66421}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E00A8B28-2FD6-4A6C-B761-630F8ED66421}.Release|Any CPU.ActiveCfg = Release|Any CPU

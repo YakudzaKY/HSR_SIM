@@ -11,6 +11,7 @@ using HSR_SIM_CLIENT.ChartTools;
 using HSR_SIM_CLIENT.Models;
 using HSR_SIM_CLIENT.ThreadTools;
 using HSR_SIM_CLIENT.Utils;
+using HSR_SIM_CLIENT.Views;
 using HSR_SIM_LIB;
 using HSR_SIM_LIB.Utils;
 using static HSR_SIM_CLIENT.Utils.GuiUtils;
@@ -46,7 +47,7 @@ public partial class StatCalc : INotifyPropertyChanged
     private ObservableCollection<SelectedItem> selectedStats = [];
     private Dictionary<string, string>? statValTable;
 
-    private int thrCnt;
+
     public ItemStatsModel ItemStatsUnequipped { get; } = new ItemStatsModel();
     public ItemStatsModel ItemStatsEquipped { get; } = new ItemStatsModel();
 
@@ -55,8 +56,8 @@ public partial class StatCalc : INotifyPropertyChanged
         //refresh combo box data
         LoadFromIni();
         InitializeComponent();
-
-        ThrCnt = Math.Max(Environment.ProcessorCount / 2 - 1, 1);
+        if (ThrCnt == 0)
+            ThrCnt = Math.Max(Environment.ProcessorCount / 2 - 1, 1);
     }
 
     public ObservableCollection<string> AvailableCharacters { get; } = [];
@@ -232,11 +233,24 @@ public partial class StatCalc : INotifyPropertyChanged
     /// <summary>
     ///     Iterations per every job
     /// </summary>
-    public int IterationsCnt { get; set; } = 1000;
+    private int iterationsCnt = 1000;
+
+    public int IterationsCnt
+    {
+        get => iterationsCnt;
+        set
+        {
+            if (Equals(value, iterationsCnt)) return;
+            iterationsCnt = value;
+            OnPropertyChanged();
+        }
+    }
 
     /// <summary>
     ///     Simulation threads count
     /// </summary>
+    private int thrCnt;
+
     public int ThrCnt
     {
         get => thrCnt;
@@ -315,6 +329,8 @@ public partial class StatCalc : INotifyPropertyChanged
 
         IniF.IniWriteValue(GetType().Name, nameof(StatImpactTabSelected), StatImpactTabSelected.ToString().ToLower());
         IniF.IniWriteValue(GetType().Name, nameof(GearReplaceTabSelected), GearReplaceTabSelected.ToString().ToLower());
+        IniF.IniWriteValue(GetType().Name, nameof(ThrCnt), ThrCnt.ToString());
+        IniF.IniWriteValue(GetType().Name, nameof(IterationsCnt), IterationsCnt.ToString());
     }
 
 
@@ -386,9 +402,20 @@ public partial class StatCalc : INotifyPropertyChanged
         SelectedCharacterToCalc = IniF.IniReadValue(GetType().Name, nameof(SelectedCharacterToCalc));
         bool.TryParse(IniF.IniReadValue(GetType().Name, nameof(StatImpactTabSelected)), out statImpactTabSelected);
         bool.TryParse(IniF.IniReadValue(GetType().Name, nameof(GearReplaceTabSelected)), out gearReplaceTabSelected);
-
         NotifyPropertyChanged(nameof(StatImpactTabSelected));
         NotifyPropertyChanged(nameof(GearReplaceTabSelected));
+        
+        if (int.TryParse(IniF.IniReadValue(GetType().Name, nameof(ThrCnt)), out var parsedThrCnt))
+        {
+            ThrCnt = parsedThrCnt;
+        };
+        if (int.TryParse(IniF.IniReadValue(GetType().Name, nameof(IterationsCnt)), out var parsedIterationsCnt))
+        {
+            IterationsCnt = parsedIterationsCnt;
+        };
+
+
+
 
         ReloadProfileCharacters();
     }
@@ -430,27 +457,34 @@ public partial class StatCalc : INotifyPropertyChanged
             myTaskList.AddRange(GetStatsSubTasks(scenario.Name, profile.Name, prnt));
         }
 
-        DoSomeJob();
-      
+        DoCalculations();
     }
 
-    private async Task DoSomeJob()
+    /// <summary>
+    /// clear charts->do calc->render charts
+    /// </summary>
+    private async Task DoCalculations()
     {
+
         foreach (var item in StackCharts.Children)
         {
-            ((WindowsFormsHost)item).Child.Dispose();
+            //chart dispose
+            ((CalcResultView)item).WinHst.Child.Dispose();
+                
         }
-
         StackCharts.Children.Clear();
         await Task.Run(DoJob);
 
         foreach (var task in threadJob.CombatData.Where(x => x.Key.Parent is null))
         {
-            var newChart = ChartUtils.GetChart(task, threadJob.CombatData.Where(x => x.Key.Parent == task.Key));
-            StackCharts.Children.Add(new WindowsFormsHost() { Child = newChart });
+            //var newChart = ChartUtils.GetChart(task, threadJob.CombatData.Where(x => x.Key.Parent == task.Key));
+            //new WindowsFormsHost() { Child = newChart }
+            StackCharts.Children.Add( new CalcResultView(task,threadJob.CombatData.Where(x => x.Key.Parent == task.Key)) );
         }
     }
-
+    /// <summary>
+    ///  start and wait threads calculations
+    /// </summary>
     private void DoJob()
     {
         WorkInProgress = true;
@@ -558,7 +592,7 @@ public partial class StatCalc : INotifyPropertyChanged
             if (!string.IsNullOrEmpty(SelectedCharacterToCalc))
             {
                 var statModList = new List<Worker.RStatMod>();
-                
+
                 //unequipped
                 if (!string.IsNullOrEmpty(ItemStatsUnequipped.MainStat))
                 {
@@ -571,6 +605,7 @@ public partial class StatCalc : INotifyPropertyChanged
                         Val = -1 * val
                     });
                 }
+
                 foreach (var itemStat in ItemStatsUnequipped.SecondStats)
                 {
                     if (!string.IsNullOrEmpty(itemStat.Stat) && !string.IsNullOrEmpty(itemStat.Val))
@@ -581,6 +616,7 @@ public partial class StatCalc : INotifyPropertyChanged
                             Val = -1 * ExctractDoubleVal(itemStat.Val)
                         });
                 }
+
                 //equipped
                 if (!string.IsNullOrEmpty(ItemStatsEquipped.MainStat))
                 {
@@ -593,6 +629,7 @@ public partial class StatCalc : INotifyPropertyChanged
                         Val = val
                     });
                 }
+
                 foreach (var itemStat in ItemStatsEquipped.SecondStats)
                 {
                     if (!string.IsNullOrEmpty(itemStat.Stat) && !string.IsNullOrEmpty(itemStat.Val))
@@ -600,10 +637,10 @@ public partial class StatCalc : INotifyPropertyChanged
                         {
                             Character = SelectedCharacterToCalc,
                             Stat = itemStat.Stat,
-                            Val =  ExctractDoubleVal(itemStat.Val)
+                            Val = ExctractDoubleVal(itemStat.Val)
                         });
                 }
-                
+
                 if (statModList.Count > 0)
                 {
                     statModList.Insert(0, new Worker.RStatMod { Stat = "NEW GEAR" });

@@ -25,7 +25,8 @@ public partial class SingleSimWindow : INotifyPropertyChanged
     private ObservableCollection<Team> teams;
 
 
-    public SingleSimWindow(SimCls simCls, string? devModePath = null, bool chkDevMode = false)
+    public SingleSimWindow(SimCls simCls, string? devModePath = null, bool chkDevMode = false,
+        List<Worker.RStatMod>? statMods = null)
     {
         InitializeComponent();
         wrk = new Worker();
@@ -33,6 +34,8 @@ public partial class SingleSimWindow : INotifyPropertyChanged
         wrk.CbGetDecision = WorkerCallBackGetDecision;
         wrk.DevMode = chkDevMode;
         wrk.LoadScenarioFromSim(simCls, devModePath);
+        if (statMods != null)
+            wrk.ApplyModes(statMods);
         teams = new ObservableCollection<Team>();
         events = new ObservableCollection<EventViewModel>();
     }
@@ -164,7 +167,6 @@ public partial class SingleSimWindow : INotifyPropertyChanged
         //render selected unit
 
         NotifyPropertyChanged(nameof(Events));
-      
     }
 
     private void BtnPrev_OnClick(object sender, RoutedEventArgs e)

@@ -8,7 +8,7 @@ namespace HSR_SIM_CLIENT.ThreadTools;
 ///     Main thread class for sim job
 ///     It is System.Threading wrapper
 /// </summary>
-internal class AggregateThread
+public class AggregateThread
 {
     private const int QueueSlotMultiplier = 100;
     private readonly int childThreadCount;
@@ -119,7 +119,7 @@ internal class AggregateThread
         return taskProgress.Sum(x => x.EndCount);
     }
 
-    internal record TaskProgress
+    public record TaskProgress
     {
         public SimTask STask { get; init; }
         public int StartCount { get; set; }

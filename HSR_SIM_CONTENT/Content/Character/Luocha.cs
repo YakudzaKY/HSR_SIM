@@ -192,7 +192,7 @@ public class Luocha : DefaultFighter
                 AppliedBuffToApply = new AppliedBuff(Parent, null, this)
                 {
                     CustomIconName = "Ability_Death_Wish", BaseDuration = 2, Type = Buff.BuffType.Debuff,
-                    Effects = [new EffAllDamageResist { Value = 0.2 }]
+                    Effects = [new EffAllDamageResist { Value = -0.2 }]
                 },
                 CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent
             });

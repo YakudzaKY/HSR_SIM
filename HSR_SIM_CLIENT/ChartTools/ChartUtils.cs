@@ -17,7 +17,7 @@ internal static class ChartUtils
     /// <param name="childTasks">array of child results</param>
     /// <returns></returns>
     public static Chart GetChart(KeyValuePair<SimTask, ThreadJob.RAggregatedData> task,
-        IEnumerable<KeyValuePair<SimTask, ThreadJob.RAggregatedData>> childTasks)
+        IEnumerable<KeyValuePair<SimTask, ThreadJob.RAggregatedData>>? childTasks)
     {
         var i = 0;
         var newChart = new Chart();

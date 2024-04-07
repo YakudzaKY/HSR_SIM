@@ -11,6 +11,7 @@ namespace HSR_SIM_CLIENT.ViewModels;
 public class UnitViewModel(Unit unit)
 {
     public string Name => unit.Name;
+    public string Rank => unit.Rank.ToString();
 
     public List<BuffViewModel> AppliedBuffs =>unit.AppliedBuffs.Select(buff => new BuffViewModel(buff)).ToList();
   
@@ -86,7 +87,7 @@ public class UnitViewModel(Unit unit)
             foreach (Ability.ElementEnm elem in ((Ability.ElementEnm[]) Enum.GetValues(typeof(Ability.ElementEnm))).Where(x=>x!=Ability.ElementEnm.None) )
             {
                 var resVal = unit.Resists(ent:null,elem:elem);
-                if (resVal.Result != 0)
+                if (resVal.Result != 0||resVal.TraceBuffs().Any())
                 {
                     res.Add(new UnitStatRec(elem.ToString(),resVal));
                 }
