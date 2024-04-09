@@ -7,7 +7,7 @@ using static HSR_SIM_CLIENT.Utils.GuiUtils;
 
 namespace HSR_SIM_CLIENT.Utils;
 
-internal class OcrUtils
+public class OcrUtils
 {
     /// <summary>
     ///     Utilities for text recognition
@@ -93,9 +93,7 @@ internal class OcrUtils
         var loc = "rus"; //todo: into settings ?
         //init engines LSTM for text, Legacy for numbers
         var engine = new TesseractEngine(AppDomain.CurrentDomain.BaseDirectory + "tessdata", loc, EngineMode.LstmOnly);
-        var engineNumbers = new TesseractEngine(AppDomain.CurrentDomain.BaseDirectory + "tessdata", loc, EngineMode.TesseractOnly);
         engine.DefaultPageSegMode = PageSegMode.SingleBlock;
-        engineNumbers.DefaultPageSegMode = PageSegMode.SingleBlock;
 
         //need 2 picture rectangles. One is unequipped item, second is equipped item
         foreach (var itemRectMode in (RectModeEnm[])Enum.GetValues(typeof(RectModeEnm)))
@@ -132,18 +130,14 @@ internal class OcrUtils
                 using (var img = PixConverter.ToPix(miniHsrScreen))
                 {
                     var page = engine.Process(img);
-                    var pageNumbers = engineNumbers.Process(img);
+                
                     var text = page.GetText();
-                    var textNumbers = pageNumbers.GetText();
+
 
                     text = text.Replace("\n\n", "\n");
-                    textNumbers = textNumbers.Replace("\n\n", "\n");
                     if (text.EndsWith("\n"))
                         text = text[..^1];
-                    if (textNumbers.EndsWith("\n"))
-                        textNumbers = textNumbers[..^1];
                     var strings = text.Split('\n').ToList();
-                    var stringsNumbers = textNumbers.Split('\n').ToList();
                     //replace some shit into stat words
                     var xDoc = new XmlDocument();
                     xDoc.Load($"{AppDomain.CurrentDomain.BaseDirectory}\\tessdata\\{loc}.xml");
@@ -174,13 +168,13 @@ internal class OcrUtils
                                 {
                                     var rx = new Regex("[0-9]");
                                     var val = "";
-                                    var ndx = rx.Matches(stringsNumbers[i])
+                                    var ndx = rx.Matches(strings[i])
                                         .FirstOrDefault(x => x.Index > wordNdx)?.Index ?? 0;
                                     if (ndx > 0)
-                                        val = stringsNumbers[i].Substring(ndx).Replace(" ", string.Empty);
+                                        val = strings[i].Substring(ndx).Replace(" ", string.Empty);
                                     else
                                         val = strings[i]
-                                            .Substring(rx.Matches(strings[i]).First(x => x.Index > wordNdx).Index)
+                                            .Substring(rx.Matches(strings[i]).FirstOrDefault(x => x.Index > wordNdx)?.Index??strings[i].Length)
                                             .Replace(" ", string.Empty);
                                     foreach (var vlFix in valFixers) val = val.Replace(vlFix.Key, vlFix.Value);
                                     var key = wordTo + (val.EndsWith("%") ? "_prc" : "_fix");
@@ -197,18 +191,16 @@ internal class OcrUtils
                             if (!replacerFound)
                                 res.Add(res.Count,
                                     new RStatWordRec
-                                        { Key = strings[i], Value = stringsNumbers[i], StatMode = itemRectMode });
+                                        { Key = strings[i], Value = strings[i], StatMode = itemRectMode });
                         }
 
                     page.Dispose();
-                    pageNumbers.Dispose();
                 }
             }
         }
 
         forceNewRect = false;
         engine.Dispose();
-        engineNumbers.Dispose();
         return res;
     }
 

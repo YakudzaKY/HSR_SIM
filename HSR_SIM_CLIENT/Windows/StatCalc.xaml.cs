@@ -396,25 +396,25 @@ public partial class StatCalc : INotifyPropertyChanged
             i++;
         }
 
-        NotifyPropertyChanged(nameof(ItemStatsUnequipped));
-        NotifyPropertyChanged(nameof(ItemStatsEquipped));
 
         SelectedCharacterToCalc = IniF.IniReadValue(GetType().Name, nameof(SelectedCharacterToCalc));
         bool.TryParse(IniF.IniReadValue(GetType().Name, nameof(StatImpactTabSelected)), out statImpactTabSelected);
         bool.TryParse(IniF.IniReadValue(GetType().Name, nameof(GearReplaceTabSelected)), out gearReplaceTabSelected);
         NotifyPropertyChanged(nameof(StatImpactTabSelected));
         NotifyPropertyChanged(nameof(GearReplaceTabSelected));
-        
+
         if (int.TryParse(IniF.IniReadValue(GetType().Name, nameof(ThrCnt)), out var parsedThrCnt))
         {
             ThrCnt = parsedThrCnt;
-        };
+        }
+
+        ;
         if (int.TryParse(IniF.IniReadValue(GetType().Name, nameof(IterationsCnt)), out var parsedIterationsCnt))
         {
             IterationsCnt = parsedIterationsCnt;
-        };
+        }
 
-
+        ;
 
 
         ReloadProfileCharacters();
@@ -465,13 +465,12 @@ public partial class StatCalc : INotifyPropertyChanged
     /// </summary>
     private async Task DoCalculations()
     {
-
         foreach (var item in StackCharts.Children)
         {
             //chart dispose
             ((CalcResultView)item).WinHst.Child.Dispose();
-                
         }
+
         StackCharts.Children.Clear();
         await Task.Run(DoJob);
 
@@ -479,9 +478,11 @@ public partial class StatCalc : INotifyPropertyChanged
         {
             //var newChart = ChartUtils.GetChart(task, threadJob.CombatData.Where(x => x.Key.Parent == task.Key));
             //new WindowsFormsHost() { Child = newChart }
-            StackCharts.Children.Add( new CalcResultView(task,threadJob.CombatData.Where(x => x.Key.Parent == task.Key)) );
+            StackCharts.Children.Add(
+                new CalcResultView(task, threadJob.CombatData.Where(x => x.Key.Parent == task.Key)));
         }
     }
+
     /// <summary>
     ///  start and wait threads calculations
     /// </summary>
@@ -723,30 +724,10 @@ public partial class StatCalc : INotifyPropertyChanged
     {
         var keyVal =
             new OcrUtils().GetComparisonItemStat(new WindowInteropHelper(this).Handle.ToInt64(), ref forceNewRect);
-        /*   foreach (Control ctrl in gbPlus.Controls)
-               if (ctrl is not Label)
-                   ctrl.Text = string.Empty;
-           foreach (Control ctrl in gbMinus.Controls)
-               if (ctrl is not Label)
-                   ctrl.Text = string.Empty;
-
-           var i = 0;
-           foreach (var item in keyVal.Where(x => x.Value.StatMode == RectModeEnm.Minus))
-           {
-               gbMinus.Controls.Find($"cbMinusStat{i}", false).First().Text = item.Value.Key;
-               if (i > 0)
-                   gbMinus.Controls.Find($"txtMinusStat{i}", false).First().Text = item.Value.Value;
-               i++;
-           }
-
-           i = 0;
-           foreach (var item in keyVal.Where(x => x.Value.StatMode == RectModeEnm.Plus))
-           {
-               gbPlus.Controls.Find($"cbPlusStat{i}", false).First().Text = item.Value.Key;
-               if (i > 0)
-                   gbPlus.Controls.Find($"txtPlusStat{i}", false).First().Text = item.Value.Value;
-               i++;
-           }*/
+        ItemStatsUnequipped.FillStats(keyVal.Where(x => x.Value.StatMode == OcrUtils.RectModeEnm.Minus));
+        ItemStatsEquipped.FillStats(keyVal.Where(x => x.Value.StatMode == OcrUtils.RectModeEnm.Plus));
+        VvItemStatsEquipped.RefreshData();
+        VvItemStatsUnequipped.RefreshData();
     }
 
     private void BtnResetScanArea_OnClick(object sender, RoutedEventArgs e)

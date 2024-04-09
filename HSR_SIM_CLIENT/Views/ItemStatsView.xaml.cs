@@ -50,7 +50,7 @@ public partial class ItemStatsView : INotifyPropertyChanged
     /// <summary>
     /// 
     /// </summary>
-    private void RefreshData()
+    public void RefreshData()
     {
         ItemStatsVm = new ItemStatsViewModel(ItemStatsModel);
 
