@@ -61,7 +61,19 @@ public partial class StatCalc : INotifyPropertyChanged
     }
 
     public ObservableCollection<string> AvailableCharacters { get; } = [];
-
+    public ObservableCollection<string> AvailableLocalizations { get; } = [];
+    
+    public string? SelectedLocalization
+    {
+        get => selectedLocalization;
+        set
+        {
+            if (Equals(value, selectedLocalization)) return;
+            selectedLocalization = value;
+            OnPropertyChanged();
+        }
+    }
+    
     public string? SelectedCharacterToCalc
     {
         get => selectedCharacterToCalc;
@@ -216,6 +228,7 @@ public partial class StatCalc : INotifyPropertyChanged
 
     private int simOperationsCurrent;
     private string? selectedCharacterToCalc;
+    private string? selectedLocalization;
 
     public int SimOperationsCurrent
     {
@@ -326,6 +339,7 @@ public partial class StatCalc : INotifyPropertyChanged
         IniF.IniWriteValue(GetType().Name, nameof(ItemStatsUnequipped) + "Main", ItemStatsUnequipped.MainStat);
 
         IniF.IniWriteValue(GetType().Name, nameof(SelectedCharacterToCalc), SelectedCharacterToCalc);
+        IniF.IniWriteValue(GetType().Name, nameof(SelectedLocalization), SelectedLocalization);
 
         IniF.IniWriteValue(GetType().Name, nameof(StatImpactTabSelected), StatImpactTabSelected.ToString().ToLower());
         IniF.IniWriteValue(GetType().Name, nameof(GearReplaceTabSelected), GearReplaceTabSelected.ToString().ToLower());
@@ -373,6 +387,12 @@ public partial class StatCalc : INotifyPropertyChanged
 
         NotifyPropertyChanged(nameof(Profiles));
 
+        //localizations
+        AvailableLocalizations.Clear();
+        files = Directory.GetFiles(OcrUtils.GetTessDataFolder(), "*.traineddata");
+        foreach (var t in files) AvailableLocalizations.Add((Path.GetFileNameWithoutExtension(t)));
+        NotifyPropertyChanged(nameof(AvailableLocalizations));
+        
         //load  item stats
         var i = 0;
         ItemStatsEquipped.MainStat = IniF.IniReadValue(GetType().Name, nameof(ItemStatsEquipped) + "Main");
@@ -398,6 +418,8 @@ public partial class StatCalc : INotifyPropertyChanged
 
 
         SelectedCharacterToCalc = IniF.IniReadValue(GetType().Name, nameof(SelectedCharacterToCalc));
+        SelectedLocalization = IniF.IniReadValue(GetType().Name, nameof(SelectedLocalization));
+        
         bool.TryParse(IniF.IniReadValue(GetType().Name, nameof(StatImpactTabSelected)), out statImpactTabSelected);
         bool.TryParse(IniF.IniReadValue(GetType().Name, nameof(GearReplaceTabSelected)), out gearReplaceTabSelected);
         NotifyPropertyChanged(nameof(StatImpactTabSelected));
@@ -723,7 +745,7 @@ public partial class StatCalc : INotifyPropertyChanged
     private void BtnImportScreen_OnClick(object sender, RoutedEventArgs e)
     {
         var keyVal =
-            new OcrUtils().GetComparisonItemStat(new WindowInteropHelper(this).Handle.ToInt64(), ref forceNewRect);
+            new OcrUtils().GetComparisonItemStat(new WindowInteropHelper(this).Handle.ToInt64(), ref forceNewRect,SelectedLocalization);
         ItemStatsUnequipped.FillStats(keyVal.Where(x => x.Value.StatMode == OcrUtils.RectModeEnm.Minus));
         ItemStatsEquipped.FillStats(keyVal.Where(x => x.Value.StatMode == OcrUtils.RectModeEnm.Plus));
         VvItemStatsEquipped.RefreshData();

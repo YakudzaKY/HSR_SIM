@@ -94,23 +94,27 @@ public class OcrUtils
         }
     }
 
-
+    public static string GetTessDataFolder()
+    {
+        return AppDomain.CurrentDomain.BaseDirectory + "tessdata";
+    }
+    
     /// <summary>
     ///     Get comparison items stats from  screen
     /// </summary>
     /// <param name="hwnd"></param>
     /// <param name="forceNewRect">ask for select new screen zones(false for use INI file saves) </param>
+    /// <param name="loc">localization</param>
     /// <returns></returns>
-    public Dictionary<int, RStatWordRec> GetComparisonItemStat(long hwnd,  ref bool forceNewRect)
+    public Dictionary<int, RStatWordRec> GetComparisonItemStat(long hwnd,  ref bool forceNewRect, string loc)
     {
         var res = new Dictionary<int, RStatWordRec>();
         var hsrWindow = FindWindow(null, "Honkai: Star Rail");
         SetForegroundWindow(hsrWindow);
         WaitForActiveWindow(hsrWindow, 5);
         var hsrScreen = CaptureScreen(false);
-        var loc = "rus"; //todo: into settings ?
         //init engines LSTM for text, Legacy for numbers
-        var engine = new TesseractEngine(AppDomain.CurrentDomain.BaseDirectory + "tessdata", loc, EngineMode.LstmOnly);
+        var engine = new TesseractEngine(GetTessDataFolder(), loc, EngineMode.LstmOnly);
         engine.DefaultPageSegMode = PageSegMode.SingleBlock;
         
         //need 2 picture rectangles. One is unequipped item, second is equipped item

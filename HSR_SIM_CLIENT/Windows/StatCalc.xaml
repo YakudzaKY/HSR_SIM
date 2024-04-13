@@ -170,6 +170,10 @@
                                <ComboBox ItemsSource="{Binding AvailableCharacters}"
                                          SelectedItem="{Binding SelectedCharacterToCalc,Mode=TwoWay}" 
                                         />
+                               <Label >Game localization:</Label>
+                               <ComboBox ItemsSource="{Binding AvailableLocalizations}"
+                                         SelectedItem="{Binding SelectedLocalization,Mode=TwoWay}" 
+                               />
                                <Button Click="BtnImportScreen_OnClick" Content="Import from screen" Name="BtnImportScreen" ></Button>
                                <Button Click="BtnResetScanArea_OnClick" Content="Reset scan area" Name="BtnResetScanArea" ></Button>
                            </StackPanel>
