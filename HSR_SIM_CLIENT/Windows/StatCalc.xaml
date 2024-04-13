@@ -170,11 +170,15 @@
                                <ComboBox ItemsSource="{Binding AvailableCharacters}"
                                          SelectedItem="{Binding SelectedCharacterToCalc,Mode=TwoWay}" 
                                         />
+                               <Label >Game localization:</Label>
+                               <ComboBox ItemsSource="{Binding AvailableLocalizations}"
+                                         SelectedItem="{Binding SelectedLocalization,Mode=TwoWay}" 
+                               />
                                <Button Click="BtnImportScreen_OnClick" Content="Import from screen" Name="BtnImportScreen" ></Button>
                                <Button Click="BtnResetScanArea_OnClick" Content="Reset scan area" Name="BtnResetScanArea" ></Button>
                            </StackPanel>
-                           <views:ItemStatsView Grid.Column="1" ItemStatsModel="{Binding ItemStatsUnequipped, Mode=OneWay}"  GroupCaption="Stats unequipped"/>
-                           <views:ItemStatsView Grid.Column="2" ItemStatsModel="{Binding ItemStatsEquipped, Mode=OneWay}" GroupCaption="Stats equipped"/>
+                           <views:ItemStatsView Grid.Column="1" x:Name="VvItemStatsUnequipped" ItemStatsModel="{Binding ItemStatsUnequipped, Mode=OneWay}"  GroupCaption="Stats unequipped"/>
+                           <views:ItemStatsView Grid.Column="2" x:Name="VvItemStatsEquipped"  ItemStatsModel="{Binding ItemStatsEquipped, Mode=OneWay}" GroupCaption="Stats equipped"/>
                        </Grid>
                     </mah:MetroTabItem.Content>
                 </mah:MetroTabItem>

@@ -61,7 +61,19 @@ public partial class StatCalc : INotifyPropertyChanged
     }
 
     public ObservableCollection<string> AvailableCharacters { get; } = [];
-
+    public ObservableCollection<string> AvailableLocalizations { get; } = [];
+    
+    public string? SelectedLocalization
+    {
+        get => selectedLocalization;
+        set
+        {
+            if (Equals(value, selectedLocalization)) return;
+            selectedLocalization = value;
+            OnPropertyChanged();
+        }
+    }
+    
     public string? SelectedCharacterToCalc
     {
         get => selectedCharacterToCalc;
@@ -216,6 +228,7 @@ public partial class StatCalc : INotifyPropertyChanged
 
     private int simOperationsCurrent;
     private string? selectedCharacterToCalc;
+    private string? selectedLocalization;
 
     public int SimOperationsCurrent
     {
@@ -326,6 +339,7 @@ public partial class StatCalc : INotifyPropertyChanged
         IniF.IniWriteValue(GetType().Name, nameof(ItemStatsUnequipped) + "Main", ItemStatsUnequipped.MainStat);
 
         IniF.IniWriteValue(GetType().Name, nameof(SelectedCharacterToCalc), SelectedCharacterToCalc);
+        IniF.IniWriteValue(GetType().Name, nameof(SelectedLocalization), SelectedLocalization);
 
         IniF.IniWriteValue(GetType().Name, nameof(StatImpactTabSelected), StatImpactTabSelected.ToString().ToLower());
         IniF.IniWriteValue(GetType().Name, nameof(GearReplaceTabSelected), GearReplaceTabSelected.ToString().ToLower());
@@ -373,6 +387,12 @@ public partial class StatCalc : INotifyPropertyChanged
 
         NotifyPropertyChanged(nameof(Profiles));
 
+        //localizations
+        AvailableLocalizations.Clear();
+        files = Directory.GetFiles(OcrUtils.GetTessDataFolder(), "*.traineddata");
+        foreach (var t in files) AvailableLocalizations.Add((Path.GetFileNameWithoutExtension(t)));
+        NotifyPropertyChanged(nameof(AvailableLocalizations));
+        
         //load  item stats
         var i = 0;
         ItemStatsEquipped.MainStat = IniF.IniReadValue(GetType().Name, nameof(ItemStatsEquipped) + "Main");
@@ -396,25 +416,27 @@ public partial class StatCalc : INotifyPropertyChanged
             i++;
         }
 
-        NotifyPropertyChanged(nameof(ItemStatsUnequipped));
-        NotifyPropertyChanged(nameof(ItemStatsEquipped));
 
         SelectedCharacterToCalc = IniF.IniReadValue(GetType().Name, nameof(SelectedCharacterToCalc));
+        SelectedLocalization = IniF.IniReadValue(GetType().Name, nameof(SelectedLocalization));
+        
         bool.TryParse(IniF.IniReadValue(GetType().Name, nameof(StatImpactTabSelected)), out statImpactTabSelected);
         bool.TryParse(IniF.IniReadValue(GetType().Name, nameof(GearReplaceTabSelected)), out gearReplaceTabSelected);
         NotifyPropertyChanged(nameof(StatImpactTabSelected));
         NotifyPropertyChanged(nameof(GearReplaceTabSelected));
-        
+
         if (int.TryParse(IniF.IniReadValue(GetType().Name, nameof(ThrCnt)), out var parsedThrCnt))
         {
             ThrCnt = parsedThrCnt;
-        };
+        }
+
+        ;
         if (int.TryParse(IniF.IniReadValue(GetType().Name, nameof(IterationsCnt)), out var parsedIterationsCnt))
         {
             IterationsCnt = parsedIterationsCnt;
-        };
+        }
 
-
+        ;
 
 
         ReloadProfileCharacters();
@@ -465,13 +487,12 @@ public partial class StatCalc : INotifyPropertyChanged
     /// </summary>
     private async Task DoCalculations()
     {
-
         foreach (var item in StackCharts.Children)
         {
             //chart dispose
             ((CalcResultView)item).WinHst.Child.Dispose();
-                
         }
+
         StackCharts.Children.Clear();
         await Task.Run(DoJob);
 
@@ -479,9 +500,11 @@ public partial class StatCalc : INotifyPropertyChanged
         {
             //var newChart = ChartUtils.GetChart(task, threadJob.CombatData.Where(x => x.Key.Parent == task.Key));
             //new WindowsFormsHost() { Child = newChart }
-            StackCharts.Children.Add( new CalcResultView(task,threadJob.CombatData.Where(x => x.Key.Parent == task.Key)) );
+            StackCharts.Children.Add(
+                new CalcResultView(task, threadJob.CombatData.Where(x => x.Key.Parent == task.Key)));
         }
     }
+
     /// <summary>
     ///  start and wait threads calculations
     /// </summary>
@@ -722,31 +745,11 @@ public partial class StatCalc : INotifyPropertyChanged
     private void BtnImportScreen_OnClick(object sender, RoutedEventArgs e)
     {
         var keyVal =
-            new OcrUtils().GetComparisonItemStat(new WindowInteropHelper(this).Handle.ToInt64(), ref forceNewRect);
-        /*   foreach (Control ctrl in gbPlus.Controls)
-               if (ctrl is not Label)
-                   ctrl.Text = string.Empty;
-           foreach (Control ctrl in gbMinus.Controls)
-               if (ctrl is not Label)
-                   ctrl.Text = string.Empty;
-
-           var i = 0;
-           foreach (var item in keyVal.Where(x => x.Value.StatMode == RectModeEnm.Minus))
-           {
-               gbMinus.Controls.Find($"cbMinusStat{i}", false).First().Text = item.Value.Key;
-               if (i > 0)
-                   gbMinus.Controls.Find($"txtMinusStat{i}", false).First().Text = item.Value.Value;
-               i++;
-           }
-
-           i = 0;
-           foreach (var item in keyVal.Where(x => x.Value.StatMode == RectModeEnm.Plus))
-           {
-               gbPlus.Controls.Find($"cbPlusStat{i}", false).First().Text = item.Value.Key;
-               if (i > 0)
-                   gbPlus.Controls.Find($"txtPlusStat{i}", false).First().Text = item.Value.Value;
-               i++;
-           }*/
+            new OcrUtils().GetComparisonItemStat(new WindowInteropHelper(this).Handle.ToInt64(), ref forceNewRect,SelectedLocalization);
+        ItemStatsUnequipped.FillStats(keyVal.Where(x => x.Value.StatMode == OcrUtils.RectModeEnm.Minus));
+        ItemStatsEquipped.FillStats(keyVal.Where(x => x.Value.StatMode == OcrUtils.RectModeEnm.Plus));
+        VvItemStatsEquipped.RefreshData();
+        VvItemStatsUnequipped.RefreshData();
     }
 
     private void BtnResetScanArea_OnClick(object sender, RoutedEventArgs e)

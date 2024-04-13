@@ -17,9 +17,4 @@
     <replacer from="Бонус элек. урона" to="lightning_dmg"/>
     <replacer from="Бонус квант. урона" to="quantum_dmg"/>
     <replacer from="Бонус мним. урона" to="imaginary_dmg"/>
-    <replacer from="поро" to="sp_rate"/>
-    <replacer from="ро ен" to="sp_rate"/>
-    <valFix from="_" to="."/>
-    <valFix from="[." to="4"/>
-    <valFix from="‚" to=","/>
 </replacers>

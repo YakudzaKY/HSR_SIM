@@ -7,7 +7,7 @@ using static HSR_SIM_CLIENT.Utils.GuiUtils;
 
 namespace HSR_SIM_CLIENT.Utils;
 
-internal class OcrUtils
+public class OcrUtils
 {
     /// <summary>
     ///     Utilities for text recognition
@@ -60,6 +60,24 @@ internal class OcrUtils
         IniF.IniWriteValue("OcrUtils", rectMode + "initialY", initialY.ToString());
     }
 
+    private static void Negate(Bitmap image)
+    {
+
+        int x, y;
+
+        // Loop through the images pixels to reset color.
+        for(x=0; x<image.Width; x++)
+        {
+            for(y=0; y<image.Height; y++)
+            {
+                Color pixelColor = image.GetPixel(x, y);
+                Color newColor = Color.FromArgb(0xff - pixelColor.R
+                    , 0xff - pixelColor.G, 0xff - pixelColor.B);
+                image.SetPixel(x, y, newColor);
+            }
+        }
+    }
+    
     private void PictureBox_MouseMove(object sender, MouseEventArgs e)
     {
         if (isDown)
@@ -76,27 +94,29 @@ internal class OcrUtils
         }
     }
 
-
+    public static string GetTessDataFolder()
+    {
+        return AppDomain.CurrentDomain.BaseDirectory + "tessdata";
+    }
+    
     /// <summary>
     ///     Get comparison items stats from  screen
     /// </summary>
     /// <param name="hwnd"></param>
     /// <param name="forceNewRect">ask for select new screen zones(false for use INI file saves) </param>
+    /// <param name="loc">localization</param>
     /// <returns></returns>
-    public Dictionary<int, RStatWordRec> GetComparisonItemStat(long hwnd,  ref bool forceNewRect)
+    public Dictionary<int, RStatWordRec> GetComparisonItemStat(long hwnd,  ref bool forceNewRect, string loc)
     {
         var res = new Dictionary<int, RStatWordRec>();
         var hsrWindow = FindWindow(null, "Honkai: Star Rail");
         SetForegroundWindow(hsrWindow);
         WaitForActiveWindow(hsrWindow, 5);
-        var hsrScreen = GraphicsCls.ConvertBlackAndWhite(CaptureScreen(false));
-        var loc = "rus"; //todo: into settings ?
+        var hsrScreen = CaptureScreen(false);
         //init engines LSTM for text, Legacy for numbers
-        var engine = new TesseractEngine(AppDomain.CurrentDomain.BaseDirectory + "tessdata", loc, EngineMode.LstmOnly);
-        var engineNumbers = new TesseractEngine(AppDomain.CurrentDomain.BaseDirectory + "tessdata", loc, EngineMode.TesseractOnly);
+        var engine = new TesseractEngine(GetTessDataFolder(), loc, EngineMode.LstmOnly);
         engine.DefaultPageSegMode = PageSegMode.SingleBlock;
-        engineNumbers.DefaultPageSegMode = PageSegMode.SingleBlock;
-
+        
         //need 2 picture rectangles. One is unequipped item, second is equipped item
         foreach (var itemRectMode in (RectModeEnm[])Enum.GetValues(typeof(RectModeEnm)))
         {
@@ -126,37 +146,40 @@ internal class OcrUtils
                 }
 
 
-                var miniHsrScreen = hsrScreen.Clone(selectRect, hsrScreen.PixelFormat);
+                //copy part of screenshot
+                var miniHsrScreen =   hsrScreen.Clone(selectRect, hsrScreen.PixelFormat);
+                //remove green upgrade step count
+                RemoveGreen(miniHsrScreen);
+                //Orange to white
+                RedToWhite(miniHsrScreen);
+                // do it black and white
+                miniHsrScreen = GraphicsCls.ConvertBlackAndWhite(miniHsrScreen);
+                //negate it to make text black and background white
+                Negate(miniHsrScreen);
+                //GrayToWhite
+                GreyToWhite(miniHsrScreen);
+                    
                 SetForegroundWindow((IntPtr)hwnd);
-
+                //miniHsrScreen.Save($"test{itemRectMode}.bmp");// uncoment to debug image processing
                 using (var img = PixConverter.ToPix(miniHsrScreen))
                 {
                     var page = engine.Process(img);
-                    var pageNumbers = engineNumbers.Process(img);
                     var text = page.GetText();
-                    var textNumbers = pageNumbers.GetText();
 
                     text = text.Replace("\n\n", "\n");
-                    textNumbers = textNumbers.Replace("\n\n", "\n");
                     if (text.EndsWith("\n"))
                         text = text[..^1];
-                    if (textNumbers.EndsWith("\n"))
-                        textNumbers = textNumbers[..^1];
                     var strings = text.Split('\n').ToList();
-                    var stringsNumbers = textNumbers.Split('\n').ToList();
                     //replace some shit into stat words
                     var xDoc = new XmlDocument();
                     xDoc.Load($"{AppDomain.CurrentDomain.BaseDirectory}\\tessdata\\{loc}.xml");
                     var xRoot = xDoc.DocumentElement;
 
                     var replacers = new Dictionary<string, string>();
-                    var valFixers = new Dictionary<string, string>();
+
                     //parse replacers
                     foreach (XmlElement xnode in xRoot.SelectNodes("replacer"))
                         replacers.Add(xnode.Attributes.GetNamedItem("from").Value.Trim(),
-                            xnode.Attributes.GetNamedItem("to")?.Value.Trim());
-                    foreach (XmlElement xnode in xRoot.SelectNodes("valFix"))
-                        valFixers.Add(xnode.Attributes.GetNamedItem("from").Value.Trim(),
                             xnode.Attributes.GetNamedItem("to")?.Value.Trim());
 
                     if (xRoot != null)
@@ -174,15 +197,14 @@ internal class OcrUtils
                                 {
                                     var rx = new Regex("[0-9]");
                                     var val = "";
-                                    var ndx = rx.Matches(stringsNumbers[i])
+                                    var ndx = rx.Matches(strings[i])
                                         .FirstOrDefault(x => x.Index > wordNdx)?.Index ?? 0;
                                     if (ndx > 0)
-                                        val = stringsNumbers[i].Substring(ndx).Replace(" ", string.Empty);
+                                        val = strings[i].Substring(ndx).Replace(" ", string.Empty);
                                     else
                                         val = strings[i]
-                                            .Substring(rx.Matches(strings[i]).First(x => x.Index > wordNdx).Index)
+                                            .Substring(rx.Matches(strings[i]).FirstOrDefault(x => x.Index > wordNdx)?.Index??strings[i].Length)
                                             .Replace(" ", string.Empty);
-                                    foreach (var vlFix in valFixers) val = val.Replace(vlFix.Key, vlFix.Value);
                                     var key = wordTo + (val.EndsWith("%") ? "_prc" : "_fix");
 
                                     replacerFound = true;
@@ -197,21 +219,85 @@ internal class OcrUtils
                             if (!replacerFound)
                                 res.Add(res.Count,
                                     new RStatWordRec
-                                        { Key = strings[i], Value = stringsNumbers[i], StatMode = itemRectMode });
+                                        { Key = strings[i], Value = strings[i], StatMode = itemRectMode });
                         }
 
                     page.Dispose();
-                    pageNumbers.Dispose();
                 }
             }
         }
 
         forceNewRect = false;
         engine.Dispose();
-        engineNumbers.Dispose();
         return res;
     }
 
+    /// <summary>
+    /// Remove green circles with upgrade steps
+    /// </summary>
+    /// <param name="image">Bitmap to process</param>
+    /// <param name="threshold">green value over other colors to replace by black</param>
+    private void RemoveGreen(Bitmap image,int threshold=10)
+    {
+        int x, y;
+        for(x=0; x<image.Width; x++)
+        {
+            for(y=0; y<image.Height; y++)
+            {
+                Color pixelColor = image.GetPixel(x, y);
+                if (pixelColor.G -threshold > pixelColor.B&&pixelColor.G -threshold > pixelColor.R)
+                {
+                    Color newColor = Color.FromArgb(0,0,0);
+                    image.SetPixel(x, y, newColor);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Make orange text white(like other text)
+    /// </summary>
+    /// <param name="image">Bitmap to process</param>
+    /// <param name="threshold">green value over other colors to replace by black</param>
+    private void RedToWhite(Bitmap image,int threshold=50)
+    {
+        int x, y;
+        for(x=0; x<image.Width; x++)
+        {
+            for(y=0; y<image.Height; y++)
+            {
+                Color pixelColor = image.GetPixel(x, y);
+                if (pixelColor.R -threshold > pixelColor.G&&pixelColor.R -threshold > pixelColor.B)
+                {
+                    Color newColor = Color.FromArgb(255,255,255);
+                    image.SetPixel(x, y, newColor);
+                }
+            }
+        }
+    }
+    
+    
+    /// <summary>
+    /// Make grey text white(like background)
+    /// </summary>
+    /// <param name="image">Bitmap to process</param>
+    /// <param name="threshold">green value over other colors to replace by black</param>
+    private void GreyToWhite(Bitmap image,int threshold=530)
+    {
+        int x, y;
+        for(x=0; x<image.Width; x++)
+        {
+            for(y=0; y<image.Height; y++)
+            {
+                Color pixelColor = image.GetPixel(x, y);
+                if (pixelColor.R+ pixelColor.G+ pixelColor.B >=threshold)
+                {
+                    Color newColor = Color.FromArgb(255,255,255);
+                    image.SetPixel(x, y, newColor);
+                }
+            }
+        }
+    }
 
     public record RStatWordRec
     {
