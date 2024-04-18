@@ -68,7 +68,7 @@ public class ThreadJob(List<SimTask>? pTaskList, int pIterations)
             var teamDpav =
                 rCombatResult.Combatants.Sum(z => z.Damages.Sum(x => x.Value) / rCombatResult.TotalAv);
             Data.avgDPAV = AggAvg(Data.avgDPAV, teamDpav, Data.WinCount);
-            Data.minDPAV = Math.Min(Data.minDPAV, teamDpav);
+            Data.minDPAV = Data.minDPAV.HasValue ? Math.Min((double)Data.minDPAV, teamDpav) : teamDpav;
             Data.maxDPAV = Math.Max(Data.maxDPAV, teamDpav);
             //calc personal stats
             foreach (var unit in rCombatResult.Combatants)
@@ -87,7 +87,8 @@ public class ThreadJob(List<SimTask>? pTaskList, int pIterations)
                 }
 
                 foundUnit.avgDPAV = AggAvg(foundUnit.avgDPAV, unit.Damages.Sum(x => x.Value) / rCombatResult.TotalAv);
-                foundUnit.minDPAV = Math.Min(foundUnit.minDPAV, unit.Damages.Sum(x => x.Value) / rCombatResult.TotalAv);
+                var fndUnitDpav = unit.Damages.Sum(x => x.Value) / rCombatResult.TotalAv;
+                foundUnit.minDPAV =  foundUnit.minDPAV.HasValue ? Math.Min((double)foundUnit.minDPAV,fndUnitDpav ):fndUnitDpav;
                 foundUnit.maxDPAV = Math.Max(foundUnit.maxDPAV, unit.Damages.Sum(x => x.Value) / rCombatResult.TotalAv);
 
                 foreach (var typ in typeArray)
@@ -107,14 +108,14 @@ public class ThreadJob(List<SimTask>? pTaskList, int pIterations)
         public ConcurrentDictionary<Type, double> avgByTypeDPAV = new();
         public double avgDPAV;
         public double maxDPAV;
-        public double minDPAV;
+        public double? minDPAV;
     }
 
     public record RAggregatedData
     {
         public double avgDPAV;
         public double maxDPAV;
-        public double minDPAV;
+        public double? minDPAV;
 
 
         public ConcurrentDictionary<string, PartyUnit> PartyUnits = new();

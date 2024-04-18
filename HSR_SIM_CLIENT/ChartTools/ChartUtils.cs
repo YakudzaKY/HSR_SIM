@@ -1,103 +1,151 @@
-﻿using System.Drawing;
-using System.Runtime.InteropServices;
-using System.Windows.Forms.DataVisualization.Charting;
+﻿using System.Globalization;
 using HSR_SIM_CLIENT.ThreadTools;
 using HSR_SIM_CLIENT.Utils;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
-using HSR_SIM_LIB.Utils;
+using ScottPlot;
+using ScottPlot.WPF;
+
 
 namespace HSR_SIM_CLIENT.ChartTools;
 
 internal static class ChartUtils
 {
-    /// <summary>
-    ///     Generate Chart for one completed sim job
-    /// </summary>
-    /// <param name="task">KeyPair SimTask-Results</param>
-    /// <param name="childTasks">array of child results</param>
-    /// <returns></returns>
-    public static Chart GetChart(KeyValuePair<SimTask, ThreadJob.RAggregatedData> task,
+    public static WpfPlot CreateChart(KeyValuePair<SimTask, ThreadJob.RAggregatedData> task,
         IEnumerable<KeyValuePair<SimTask, ThreadJob.RAggregatedData>>? childTasks)
     {
-        var i = 0;
-        var newChart = new Chart();
-        newChart.Size = new Size(380, 380);
-        newChart.Palette = ChartColorPalette.Chocolate;
-        newChart.Titles.Add(new Title($"{task.Key.SimScenario.CurrentScenario.Name} wr:{task.Value.WinRate:f}%"));
-        newChart.Titles.Add(new Title($"Win stats: cycles:{task.Value.Cycles:f}     totalAV:{task.Value.TotalAV:f}"));
+        var retChart = new WpfPlot();
+        string title =
+            $"{task.Key.SimScenario.CurrentScenario.Name} wr:{task.Value.WinRate:f}%";
+        string ann = $"Win stats: cycles:{task.Value.Cycles:f} totalAV:{task.Value.TotalAV:f}";
         if (task.Value.WinRate < 100)
-            newChart.Titles.Add(new Title($"Defeat stats: cycles:{task.Value.DefeatCycles:f}"));
-        //CharArea
-        var dpsArea = new ChartArea("primaryArea");
+            ann += ($" Defeat stats: cycles:{task.Value.DefeatCycles:f}");
+        var plot = retChart.Plot;
+        plot.Title(title);
+        ScottPlot.Palettes.Dark palette = new();
+        plot.Axes.Margins(left: 0);
+        //arrays for error bar
+        double[] errorsX = [];
+        double[] errorsY = [];
+        double[] errorsXNegative = [];
+        double[] errorsXPositive = [];
+        
+        Bar?[] damageBars = [];
+        var units = task.Value.PartyUnits.OrderBy(x => x.Value.avgDPAV).ToArray();
+        //unit names for axis 
+        Tick[] partyList = [];
+        Array.Resize(ref partyList, units.Length + 1);
+        //damage Types dictionary
+        Type[] dmgTypes = new[]
+            { typeof(DirectDamage), typeof(DoTDamage), typeof(ToughnessBreak), typeof(ToughnessBreakDoTDamage) };
 
-        //Axis
-        dpsArea.AxisY.IntervalType = DateTimeIntervalType.Number;
-        dpsArea.AxisY.Minimum = 0;
-        dpsArea.AxisY.Maximum = task.Value.maxDPAV;
-        dpsArea.AxisY.Interval = 100;
-        dpsArea.AxisX.CustomLabels.Add(new CustomLabel(i, i + 0.001, "Party", 0, LabelMarkStyle.None));
-        dpsArea.AxisX.IsLabelAutoFit = false;
-        dpsArea.AxisX.IsReversed = true;
-
-
-        //Legend
-        var dpsPartyCharting = "Total DPAV";
-        var directDpav = nameof(DirectDamage);
-        var dotDpav = nameof(DoTDamage);
-        var toughnessBreak = nameof(ToughnessBreak);
-        var toughnessBreakDoTDamage = nameof(ToughnessBreakDoTDamage);
-
-        //Bars
-        newChart.Series.Add(dpsPartyCharting);
-        newChart.Series[dpsPartyCharting].ChartType = SeriesChartType.Bar;
-        newChart.Series[dpsPartyCharting].Color = Color.DarkRed;
-
-        newChart.Series.Add(directDpav);
-        newChart.Series[directDpav].ChartType = SeriesChartType.Bar;
-        newChart.Series[directDpav].Color = Color.Chocolate;
-
-        newChart.Series.Add(dotDpav);
-        newChart.Series[dotDpav].ChartType = SeriesChartType.Bar;
-        newChart.Series[dotDpav].Color = Color.BlueViolet;
-
-        newChart.Series.Add(toughnessBreak);
-        newChart.Series[toughnessBreak].ChartType = SeriesChartType.Bar;
-        newChart.Series[toughnessBreak].Color = Color.DarkGray;
-
-        newChart.Series.Add(toughnessBreakDoTDamage);
-        newChart.Series[toughnessBreakDoTDamage].ChartType = SeriesChartType.Bar;
-        newChart.Series[toughnessBreakDoTDamage].Color = Color.DarkCyan;
-
-
-        //Fill party bar
-        newChart.Series[dpsPartyCharting].Points.AddXY(i, task.Value.avgDPAV);
-        newChart.Series[dpsPartyCharting].Points[i].Label = $"{task.Value.avgDPAV:f}";
-
-
-        //Unit bar
-        foreach (var unit in task.Value.PartyUnits.OrderByDescending(x => x.Value.avgDPAV))
+        var i = 0;
+        //per Unit bar
+        foreach (var unit in units)
         {
-            i++;
-            var unitLabel = new CustomLabel(i, i + 0.001, unit.Key, 0, LabelMarkStyle.None);
-            dpsArea.AxisX.CustomLabels.Add(unitLabel);
-            newChart.Series[dpsPartyCharting].Points.AddXY(i, unit.Value.avgDPAV);
-            newChart.Series[dpsPartyCharting].Points[i].Label = $"{unit.Value.avgDPAV:f}";
-
-            foreach (var kindDmg in unit.Value.avgByTypeDPAV.Where(x => x.Value > 0))
+            partyList[i] = new Tick(i, unit.Key);
+            double prevVal = 0;
+            Bar? unitBar = null;
+            foreach (var kindDmg in unit.Value.avgByTypeDPAV.Where(x => x.Value > 0)
+                         .OrderBy(x => Array.IndexOf(dmgTypes, x.Key)))
             {
-                var ndx = newChart.Series[kindDmg.Key.Name].Points.AddXY(i, kindDmg.Value);
-                newChart.Series[kindDmg.Key.Name].Points[ndx].Label = $"{kindDmg.Value:f}";
+                unitBar = new()
+                {
+                    Position = i, ValueBase = prevVal, Value = prevVal + kindDmg.Value,
+                    FillColor = palette.Colors[Array.IndexOf(dmgTypes, kindDmg.Key)]
+                };
+                prevVal += kindDmg.Value;
+                Array.Resize<Bar>(ref damageBars, damageBars.Length + 1);
+                damageBars[^1] = unitBar;
             }
+
+            if (unitBar != null)
+                unitBar.Label = unit.Value.avgDPAV.ToString(CultureInfo.InvariantCulture);
+
+            //errror bar
+            Array.Resize(ref errorsY, errorsY.Length + 1);
+            errorsY[^1] = i;
+            Array.Resize(ref errorsX, errorsX.Length + 1);
+            errorsX[^1] = prevVal;
+            Array.Resize(ref errorsXNegative, errorsXNegative.Length + 1);
+            errorsXNegative[^1] = unit.Value.avgDPAV-unit.Value.minDPAV??0;
+            Array.Resize(ref errorsXPositive, errorsXPositive.Length + 1);
+            errorsXPositive[^1] = unit.Value.maxDPAV-unit.Value.avgDPAV;
+         
+        
+            
+            i++;
         }
 
-        newChart.ChartAreas.Add(dpsArea);
-        var partyDpsLegend = new Legend("partyDps");
-        partyDpsLegend.DockedToChartArea = dpsArea.Name;
-        partyDpsLegend.IsDockedInsideChartArea = false;
-        newChart.Legends.Add(partyDpsLegend);
-        //newChart.Dock = DockStyle.Top;
+        //party overall bars
+        Bar? partyBar = new()
+            { Position = i, ValueBase = 0, Value = task.Value.avgDPAV, FillColor = palette.Colors[6] };
+      
+        //errror bar
+        Array.Resize(ref errorsY, errorsY.Length + 1);
+        errorsY[^1] = i;
+        Array.Resize(ref errorsX, errorsX.Length + 1);
+        errorsX[^1] = task.Value.avgDPAV;
+        Array.Resize(ref errorsXNegative, errorsXNegative.Length + 1);
+        errorsXNegative[^1] = task.Value.avgDPAV-task.Value.minDPAV??0;
+        Array.Resize(ref errorsXPositive, errorsXPositive.Length + 1);
+        errorsXPositive[^1] = task.Value.maxDPAV-task.Value.avgDPAV;
+        
+        partyBar.Label = task.Value.avgDPAV.ToString(CultureInfo.InvariantCulture);
+        Array.Resize<Bar>(ref damageBars, damageBars.Length + 1);
+        damageBars[^1] = partyBar;
+        partyList[i] = new Tick(i, "OVERALL");
 
-        //If we have child task-> do additional chart compare with parent results
+
+        var plotDmgBars = plot.Add.Bars(damageBars);
+        plotDmgBars.Horizontal = true;
+        plot.Axes.Left.TickGenerator = new ScottPlot.TickGenerators.NumericManual(partyList);
+        plot.Axes.Left.MajorTickStyle.Length = 0;
+
+
+
+        plotDmgBars.ValueLabelStyle.Bold = true;
+        plotDmgBars.ValueLabelStyle.FontSize = 18;
+        plotDmgBars.ValueLabelStyle.LineSpacing = 0;
+        plotDmgBars.ValueLabelStyle.ForeColor = palette.Colors[7];
+        plotDmgBars.Horizontal = true;
+
+        //errors output
+        var scatter = plot.Add.Scatter(errorsX, errorsY);
+        scatter.Color = palette.Colors[5];
+        scatter.LineStyle.Width = 0;
+
+        ScottPlot.Plottables.ErrorBar eb = new(
+            xs: errorsX,
+            ys: errorsY,
+            xErrorsNegative: errorsXNegative,
+            xErrorsPositive: errorsXPositive,
+            yErrorsNegative: null,
+            yErrorsPositive: null);
+        eb.Color = scatter.Color;
+        plot.Add.Plottable(eb);
+        
+        //style
+        plot.Legend.IsVisible = true;
+        plot.Legend.Location = Alignment.LowerRight;
+        foreach (var dmgType in dmgTypes)
+        {
+            plot.Legend.ManualItems.Add(new()
+                { Label = dmgType.Name, FillColor = palette.Colors[Array.IndexOf(dmgTypes, dmgType)] });
+        }
+
+        plot.Legend.ManualItems.Add(new() { Label = "Other", FillColor = palette.Colors[5] });
+        //additional info
+        plot.Add.Annotation(ann, Alignment.UpperRight);
+        plot.Add.Palette = palette;
+        plot.Style.DarkMode();
+        retChart.Height = 380;
+        retChart.Refresh();
+        
+        
+        return retChart;
+    }
+    /*
+     *   todo:      //If we have child task-> do additional chart compare with parent results
         var childTasksArr = childTasks as KeyValuePair<SimTask, ThreadJob.RAggregatedData>[] ?? childTasks.ToArray();
         if (childTasksArr.Any())
         {
@@ -139,38 +187,6 @@ internal static class ChartUtils
                 //newChart.Series[statMod.Stat].Points.Last().Label = $"wr:{subtask.Data.WinRate:f}% wcl:{subtask.Data.Cycles:f} dcl:{subtask.Data.DefeatCycles:f}";// extended stats
             }
         }
+     */
 
-        ApplyDarkTheme(newChart);
-        return newChart;
-    }
-
-    /// <summary>
-    ///     apply dark theme to chart
-    /// </summary>
-    /// <param name="chart"></param>
-    public static void ApplyDarkTheme(Chart chart)
-    {
-        chart.BackColor = Zcolor(45, 45, 48);
-        foreach (var chartArea in chart.ChartAreas)
-        {
-            chartArea.BackColor = Zcolor(104, 104, 104);
-            chartArea.BorderColor = Constant.clrDefault;
-            chartArea.AxisX.LabelStyle.ForeColor = Constant.clrDefault;
-            chartArea.AxisY.LabelStyle.ForeColor = Constant.clrDefault;
-            chartArea.AxisX.TitleForeColor = Constant.clrDefault;
-            chartArea.AxisY.TitleForeColor = Constant.clrDefault;
-            foreach (var axis in chartArea.Axes) axis.LineColor = Constant.clrDefault;
-        }
-
-        foreach (var legend in chart.Legends) legend.BackColor = Zcolor(104, 104, 104);
-
-        foreach (var series in chart.Series) series.LabelForeColor = Constant.clrDefault;
-
-        foreach (var title in chart.Titles) title.ForeColor = Constant.clrDefault;
-    }
-
-    public static Color Zcolor(int r, int g, int b)
-    {
-        return Color.FromArgb(r, g, b);
-    }
 }

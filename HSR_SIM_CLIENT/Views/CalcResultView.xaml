@@ -44,8 +44,8 @@
             <DataGrid AutoGenerateColumns="True" IsReadOnly="True" ItemsSource="{Binding StatMods}">
             </DataGrid>
         </StackPanel>
-        <WindowsFormsHost Name="WinHst" Width="1000" Grid.Column="2">
-            
-        </WindowsFormsHost>
+        <StackPanel  Name="WinHst" Width="1000" Grid.Column="2">
+        </StackPanel>   
+      
     </Grid>
 </UserControl>

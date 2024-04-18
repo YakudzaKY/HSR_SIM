@@ -22,10 +22,10 @@ public sealed partial class CalcResultView ():UserControl,INotifyPropertyChanged
     private CalcResultViewModel? selectedTask;
     public CalcResultViewModel ViewModel { get; } = null!;
 
-    public CalcResultViewModel? SelectedTask
+    private CalcResultViewModel? SelectedTask
     {
         get => selectedTask;
-        private set
+        set
         {
             if (Equals(value, selectedTask)) return;
             selectedTask = value;
@@ -43,10 +43,8 @@ public sealed partial class CalcResultView ():UserControl,INotifyPropertyChanged
       
         ViewModel = new CalcResultViewModel(task,child);
         InitializeComponent();
-        
-        var newChart = ChartUtils.GetChart(task, child);
-        WinHst.Child = newChart;
-
+        var newChart = ChartUtils.CreateChart(task, child);
+        WinHst.Children.Add(newChart)  ;
       
     }
 
@@ -59,9 +57,9 @@ public sealed partial class CalcResultView ():UserControl,INotifyPropertyChanged
             if (SelectedTask != fm)
             {
                 SelectedTask = fm;
-                WinHst.Child.Dispose();
-                var newChart = ChartUtils.GetChart(SelectedTask.Task, Array.Empty<KeyValuePair<SimTask, ThreadJob.RAggregatedData>>() );
-                WinHst.Child = newChart;
+                WinHst.Children.Clear();
+                var newChart =  ChartUtils.CreateChart(SelectedTask.Task, Array.Empty<KeyValuePair<SimTask, ThreadJob.RAggregatedData>>() );
+                WinHst.Children.Add(newChart)  ;
             }
         }
         //on parent click
@@ -70,9 +68,9 @@ public sealed partial class CalcResultView ():UserControl,INotifyPropertyChanged
             if (SelectedTask != (CalcResultViewModel)itm.Header)
             {
                 SelectedTask = (CalcResultViewModel)itm.Header;
-                WinHst.Child.Dispose();
-                var newChart = ChartUtils.GetChart(SelectedTask.Task, SelectedTask.Child);
-                WinHst.Child = newChart;
+                WinHst.Children.Clear();
+                var newChart = ChartUtils.CreateChart(SelectedTask.Task, SelectedTask.Child);
+                WinHst.Children.Add(newChart)  ;
             }
         }
         else

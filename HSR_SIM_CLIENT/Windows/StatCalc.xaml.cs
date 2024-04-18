@@ -487,11 +487,6 @@ public partial class StatCalc : INotifyPropertyChanged
     /// </summary>
     private async Task DoCalculations()
     {
-        foreach (var item in StackCharts.Children)
-        {
-            //chart dispose
-            ((CalcResultView)item).WinHst.Child.Dispose();
-        }
 
         StackCharts.Children.Clear();
         await Task.Run(DoJob);
