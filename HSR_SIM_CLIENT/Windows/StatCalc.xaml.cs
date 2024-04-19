@@ -44,7 +44,7 @@ public partial class StatCalc : INotifyPropertyChanged
 
 
     private ObservableCollection<SelectedItem> scenarios = [];
-    private ObservableCollection<SelectedItem> selectedStats = [];
+    private ObservableCollection<SelectedItem?> selectedStats = [];
     private Dictionary<string, string>? statValTable;
 
 
@@ -141,7 +141,7 @@ public partial class StatCalc : INotifyPropertyChanged
     /// <summary>
     ///     selected stats from table to run in sim
     /// </summary>
-    public ObservableCollection<SelectedItem> SelectedStats
+    public ObservableCollection<SelectedItem?> SelectedStats
     {
         get => selectedStats;
         private set
@@ -280,6 +280,7 @@ public partial class StatCalc : INotifyPropertyChanged
     private void ReloadProfileCharacters()
     {
         AvailableCharacters.Clear();
+        AvailableCharacters.Add(string.Empty);
         foreach (var item in Profiles.Where(x => x.IsSelected))
         {
             var units =
@@ -300,7 +301,6 @@ public partial class StatCalc : INotifyPropertyChanged
         SelectedStats.Clear();
         //save selected table reference(will take values from it before sim run)
         statValTable = table;
-
         foreach (var item in table) SelectedStats.Add(new SelectedItem(item.Key));
 
         OnPropertyChanged(nameof(SelectedStats));
