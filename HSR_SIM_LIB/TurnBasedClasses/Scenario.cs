@@ -10,6 +10,7 @@ namespace HSR_SIM_LIB.TurnBasedClasses;
 public class Scenario : ICloneable
 {
     public string Name { get; internal set; }
+    public string ShortName { get; internal set; }
     internal List<Fight> Fights { get; set; }
 
     internal List<Unit> Party { get; set; }

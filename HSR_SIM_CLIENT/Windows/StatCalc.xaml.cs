@@ -35,7 +35,10 @@ public partial class StatCalc : INotifyPropertyChanged
     ///     force new OCR rectangles
     /// </summary>
     private bool forceNewRect;
-
+    /// <summary>
+    /// render overall damage compare chart
+    /// </summary>
+    private bool renderOverallCompareRes = false;
     private bool interruptFlag;
     private ThreadJob? threadJob;
     private AggregateThread? aggThread;
@@ -464,6 +467,8 @@ public partial class StatCalc : INotifyPropertyChanged
         //also save ini before run sim(if got freeze or app crash cause out of memory) 
         //generate task list
         myTaskList = new List<SimTask>();
+        //render overall chart if gear replace calc and character not null
+        renderOverallCompareRes = (GearReplaceTabSelected&&SelectedCharacterToCalc!=null);
 
         foreach (var scenario in Scenarios.Where(x => x.IsSelected))
         foreach (var profile in Profiles.Where(x => x.IsSelected))
@@ -490,11 +495,14 @@ public partial class StatCalc : INotifyPropertyChanged
 
         StackCharts.Children.Clear();
         await Task.Run(DoJob);
-
-        foreach (var task in threadJob.CombatData.Where(x => x.Key.Parent is null))
+        var parentData = threadJob!.CombatData.Where(x => x.Key.Parent is null).ToArray();
+        if (renderOverallCompareRes)
         {
-            //var newChart = ChartUtils.GetChart(task, threadJob.CombatData.Where(x => x.Key.Parent == task.Key));
-            //new WindowsFormsHost() { Child = newChart }
+            StackCharts.Children.Add(
+                new ChangeGearOverallCompare(parentData, threadJob.CombatData)); 
+        }
+        foreach (var task in parentData)
+        {
             StackCharts.Children.Add(
                 new CalcResultView(task, threadJob.CombatData.Where(x => x.Key.Parent == task.Key)));
         }
