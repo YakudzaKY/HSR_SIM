@@ -21,9 +21,8 @@ public partial class EventView : INotifyPropertyChanged
 
 
     public EventView()
-    {        InitializeComponent();
-
-       
+    {
+        InitializeComponent();
     }
 
 
@@ -58,7 +57,6 @@ public partial class EventView : INotifyPropertyChanged
 
     private void RefreshData()
     {
-        
         SelectedFormula = null;
         NotifyPropertyChanged(nameof(ExplainVisible));
     }
@@ -73,7 +71,6 @@ public partial class EventView : INotifyPropertyChanged
     {
         if (PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(name));
     }
-
 
 
     private void TreeView_OnSelectedFormulaChanged(object sender, RoutedPropertyChangedEventArgs<object> e)

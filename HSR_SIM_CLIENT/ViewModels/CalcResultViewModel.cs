@@ -26,7 +26,7 @@ public class CalcResultViewModel(
         }
     }
 
-    public   IEnumerable<KeyValuePair<SimTask, ThreadJob.RAggregatedData>> Child => child;
+    public   IEnumerable<KeyValuePair<SimTask, ThreadJob.RAggregatedData>>? Child => child;
 
 
 

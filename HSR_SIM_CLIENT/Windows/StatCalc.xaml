@@ -124,7 +124,7 @@
                                 <TextBox Grid.Row="3" Grid.Column="0" PreviewTextInput="NumberValidationTextBox"
                                          Text="{Binding UpgradesPerIterations ,Mode=TwoWay}" />
                                 <Label Grid.Row="2" Grid.Column="1">Stat to replace:</Label>
-                                <ComboBox Grid.Row="3" Grid.Column="1" DisplayMemberPath="Name"
+                                <ComboBox Grid.Row="3" Grid.Column="1" DisplayMemberPath="Name" 
                                           ItemsSource="{Binding SelectedStats}"
                                           SelectedItem="{Binding SelectedStatToReplace,Mode=TwoWay}" />
                                 <Label Grid.Row="4" Grid.Column="0">Upgrades iterations:</Label>

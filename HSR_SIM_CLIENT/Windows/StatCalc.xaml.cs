@@ -35,7 +35,10 @@ public partial class StatCalc : INotifyPropertyChanged
     ///     force new OCR rectangles
     /// </summary>
     private bool forceNewRect;
-
+    /// <summary>
+    /// render overall damage compare chart
+    /// </summary>
+    private bool renderOverallCompareRes = false;
     private bool interruptFlag;
     private ThreadJob? threadJob;
     private AggregateThread? aggThread;
@@ -44,7 +47,7 @@ public partial class StatCalc : INotifyPropertyChanged
 
 
     private ObservableCollection<SelectedItem> scenarios = [];
-    private ObservableCollection<SelectedItem> selectedStats = [];
+    private ObservableCollection<SelectedItem?> selectedStats = [];
     private Dictionary<string, string>? statValTable;
 
 
@@ -141,7 +144,7 @@ public partial class StatCalc : INotifyPropertyChanged
     /// <summary>
     ///     selected stats from table to run in sim
     /// </summary>
-    public ObservableCollection<SelectedItem> SelectedStats
+    public ObservableCollection<SelectedItem?> SelectedStats
     {
         get => selectedStats;
         private set
@@ -280,6 +283,7 @@ public partial class StatCalc : INotifyPropertyChanged
     private void ReloadProfileCharacters()
     {
         AvailableCharacters.Clear();
+        AvailableCharacters.Add(string.Empty);
         foreach (var item in Profiles.Where(x => x.IsSelected))
         {
             var units =
@@ -300,7 +304,6 @@ public partial class StatCalc : INotifyPropertyChanged
         SelectedStats.Clear();
         //save selected table reference(will take values from it before sim run)
         statValTable = table;
-
         foreach (var item in table) SelectedStats.Add(new SelectedItem(item.Key));
 
         OnPropertyChanged(nameof(SelectedStats));
@@ -464,6 +467,8 @@ public partial class StatCalc : INotifyPropertyChanged
         //also save ini before run sim(if got freeze or app crash cause out of memory) 
         //generate task list
         myTaskList = new List<SimTask>();
+        //render overall chart if gear replace calc and character not null
+        renderOverallCompareRes = (GearReplaceTabSelected&&SelectedCharacterToCalc!=null);
 
         foreach (var scenario in Scenarios.Where(x => x.IsSelected))
         foreach (var profile in Profiles.Where(x => x.IsSelected))
@@ -487,19 +492,17 @@ public partial class StatCalc : INotifyPropertyChanged
     /// </summary>
     private async Task DoCalculations()
     {
-        foreach (var item in StackCharts.Children)
-        {
-            //chart dispose
-            ((CalcResultView)item).WinHst.Child.Dispose();
-        }
 
         StackCharts.Children.Clear();
         await Task.Run(DoJob);
-
-        foreach (var task in threadJob.CombatData.Where(x => x.Key.Parent is null))
+        var parentData = threadJob!.CombatData.Where(x => x.Key.Parent is null).ToArray();
+        if (renderOverallCompareRes)
         {
-            //var newChart = ChartUtils.GetChart(task, threadJob.CombatData.Where(x => x.Key.Parent == task.Key));
-            //new WindowsFormsHost() { Child = newChart }
+            StackCharts.Children.Add(
+                new ChangeGearOverallCompare(parentData, threadJob.CombatData)); 
+        }
+        foreach (var task in parentData)
+        {
             StackCharts.Children.Add(
                 new CalcResultView(task, threadJob.CombatData.Where(x => x.Key.Parent == task.Key)));
         }

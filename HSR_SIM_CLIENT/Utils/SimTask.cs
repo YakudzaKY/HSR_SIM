@@ -21,7 +21,7 @@ public class SimTask
     public int UpgradesCount { get; set; } = 0;
 
     // Parent need for group results
-    public SimTask Parent { get; init; }
+    public SimTask? Parent { get; init; }
 
     /// <summary>
     ///     modifiers to profile

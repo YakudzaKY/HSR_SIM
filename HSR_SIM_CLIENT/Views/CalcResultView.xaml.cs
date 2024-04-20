@@ -16,38 +16,31 @@ using UserControl = System.Windows.Controls.UserControl;
 
 namespace HSR_SIM_CLIENT.Views;
 
-
-public sealed partial class CalcResultView ():UserControl,INotifyPropertyChanged
+public sealed partial class CalcResultView() : UserControl, INotifyPropertyChanged
 {
     private CalcResultViewModel? selectedTask;
     public CalcResultViewModel ViewModel { get; } = null!;
 
-    public CalcResultViewModel? SelectedTask
+    private CalcResultViewModel? SelectedTask
     {
         get => selectedTask;
-        private set
+        set
         {
             if (Equals(value, selectedTask)) return;
             selectedTask = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(StatMods));
-   
         }
     }
 
     public List<Worker.RStatMod> StatMods => (SelectedTask is null) ? [] : SelectedTask.TaskKey.StatMods;
-    
+
     public CalcResultView(KeyValuePair<SimTask, ThreadJob.RAggregatedData> task,
         IEnumerable<KeyValuePair<SimTask, ThreadJob.RAggregatedData>>? child) : this()
     {
-      
-        ViewModel = new CalcResultViewModel(task,child);
+        ViewModel = new CalcResultViewModel(task, child);
         InitializeComponent();
-        
-        var newChart = ChartUtils.GetChart(task, child);
-        WinHst.Child = newChart;
-
-      
+        RedrawChart(task, child);
     }
 
     private void TreeView_OnSelectedTaskChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -59,9 +52,7 @@ public sealed partial class CalcResultView ():UserControl,INotifyPropertyChanged
             if (SelectedTask != fm)
             {
                 SelectedTask = fm;
-                WinHst.Child.Dispose();
-                var newChart = ChartUtils.GetChart(SelectedTask.Task, Array.Empty<KeyValuePair<SimTask, ThreadJob.RAggregatedData>>() );
-                WinHst.Child = newChart;
+                RedrawChart(SelectedTask.Task, null);
             }
         }
         //on parent click
@@ -70,13 +61,34 @@ public sealed partial class CalcResultView ():UserControl,INotifyPropertyChanged
             if (SelectedTask != (CalcResultViewModel)itm.Header)
             {
                 SelectedTask = (CalcResultViewModel)itm.Header;
-                WinHst.Child.Dispose();
-                var newChart = ChartUtils.GetChart(SelectedTask.Task, SelectedTask.Child);
-                WinHst.Child = newChart;
+                RedrawChart(SelectedTask.Task, SelectedTask.Child);
             }
         }
         else
             SelectedTask = null;
+    }
+
+    /// <summary>
+    /// redraw chart by Task data
+    /// </summary>
+    /// <param name="task"></param>
+    /// <param name="taskChild"></param>
+    private void RedrawChart(KeyValuePair<SimTask, ThreadJob.RAggregatedData> task,
+        IEnumerable<KeyValuePair<SimTask, ThreadJob.RAggregatedData>>? taskChild)
+    {
+        var keyValuePairs = taskChild as KeyValuePair<SimTask, ThreadJob.RAggregatedData>[] ?? taskChild?.ToArray();
+        WinHst.Children.Clear();
+
+        WinHst.Children.Add(keyValuePairs?.Count() == 1
+            ? new DamageChart(task, keyValuePairs.First())
+            : new DamageChart(task, null));
+
+        if (keyValuePairs?.Count() > 1)
+        {
+            WinHst.Children.Add(new SubTaskDamageChart(task, keyValuePairs));
+        }
+       
+           
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -98,8 +110,9 @@ public sealed partial class CalcResultView ():UserControl,INotifyPropertyChanged
     {
         if (SelectedTask != null)
         {
-            var singleSimWindow = new SingleSimWindow(SelectedTask.TaskKey.SimScenario, chkDevMode: false, statMods:SelectedTask.TaskKey.StatMods);
-            
+            var singleSimWindow = new SingleSimWindow(SelectedTask.TaskKey.SimScenario, chkDevMode: false,
+                statMods: SelectedTask.TaskKey.StatMods);
+
             singleSimWindow.Show();
         }
     }

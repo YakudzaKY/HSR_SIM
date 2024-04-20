@@ -33,6 +33,8 @@ public static class XmlLoader
         {
             combat.CurrentScenario.Name =
                 $"{xRoot.Attributes.GetNamedItem("name")?.Value} scenario: {Path.GetFileNameWithoutExtension(scenarioPath)} profile: {Path.GetFileNameWithoutExtension(profilePath)}";
+            combat.CurrentScenario.ShortName =
+                $"{Path.GetFileNameWithoutExtension(scenarioPath)}/{Path.GetFileNameWithoutExtension(profilePath)}";
 
             //parse all items
             foreach (XmlElement node in xRoot)
