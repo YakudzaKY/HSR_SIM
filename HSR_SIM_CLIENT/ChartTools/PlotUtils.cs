@@ -6,7 +6,7 @@ public static class PlotUtils
 {
     public static PlotActions NoWheelZoom()
     {
-        return new PlotActions()
+        return new PlotActions
         {
             ZoomIn = delegate { },
             ZoomOut = delegate { },
@@ -21,8 +21,7 @@ public static class PlotUtils
             ZoomRectangleApply = StandardActions.ZoomRectangleApply,
             ToggleBenchmark = StandardActions.ToggleBenchmark,
             AutoScale = StandardActions.AutoScale,
-            ShowContextMenu = StandardActions.ShowContextMenu,
+            ShowContextMenu = StandardActions.ShowContextMenu
         };
     }
-
 }

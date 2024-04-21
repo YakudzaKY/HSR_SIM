@@ -25,7 +25,7 @@ internal class EchoesoftheCoffin : DefaultLightCone
                 ApplyBuff eventBuff = new(null, this, Parent.Parent)
                 {
                     CalculateTargets = ((DefaultFighter)Parent).GetAliveFriends,
-                    AppliedBuffToApply = new AppliedBuff(Parent.Parent,null,this)
+                    AppliedBuffToApply = new AppliedBuff(Parent.Parent, null, this)
                     {
                         Type = Buff.BuffType.Buff,
                         Effects = new List<Effect> { new EffSpeed { Value = modifiersSpd[Rank - 1] } },
@@ -56,6 +56,6 @@ internal class EchoesoftheCoffin : DefaultLightCone
 
     private Formula CalcEnergyRgn(Event ent)
     {
-        return new Formula() { Expression = $"{modifiersEnrg[Rank - 1]} * ({ent.ParentStep.TargetsHit.Count()} min 3)" };
+        return new Formula { Expression = $"{modifiersEnrg[Rank - 1]} * ({ent.ParentStep.TargetsHit.Count()} min 3)" };
     }
 }

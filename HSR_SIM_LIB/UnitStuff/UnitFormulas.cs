@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
@@ -22,26 +20,28 @@ public partial class Unit : CloneClass
             UnitRef = this,
             ConditionSkipList = excludeCondition,
             Expression =
-                $"{unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.BaseAttack)} * (1 + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAtkPrc).FullName} +  {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.AttackPrc)}) " +
-                $"+ {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAtk).FullName} + {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.AttackFix)}"
+                $"{unitToCheck}#{nameof(Stats)}#{nameof(UnitStats.BaseAttack)} * (1 + {unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffAtkPrc).FullName} +  {unitToCheck}#{nameof(Stats)}#{nameof(UnitStats.AttackPrc)}) " +
+                $"+ {unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffAtk).FullName} + {unitToCheck}#{nameof(Stats)}#{nameof(UnitStats.AttackFix)}"
         };
     }
 
-    public  Formula EnergyRegenPrc(  Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker,Event ent=null, List<Condition> excludeCondition = null)
+    public Formula EnergyRegenPrc(Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker,
+        Event ent = null, List<Condition> excludeCondition = null)
     {
-
         return new Formula
         {
             EventRef = ent,
             UnitRef = this,
             ConditionSkipList = excludeCondition,
-            Expression =  $"1 + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffEnergyRatePrc).FullName} + {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.BaseEnergyResPrc)} " +
-                          $" + {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.BaseEnergyRes)} "
+            Expression =
+                $"1 + {unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffEnergyRatePrc).FullName} + {unitToCheck}#{nameof(Stats)}#{nameof(UnitStats.BaseEnergyResPrc)} " +
+                $" + {unitToCheck}#{nameof(Stats)}#{nameof(UnitStats.BaseEnergyRes)} "
         };
     }
 
-    
-    public  Formula Aggro( Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker,Event ent=null, List<Condition> excludeCondition = null)
+
+    public Formula Aggro(Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+        List<Condition> excludeCondition = null)
     {
         if (IsAlive)
             return new Formula
@@ -49,20 +49,20 @@ public partial class Unit : CloneClass
                 EventRef = ent,
                 UnitRef = this,
                 ConditionSkipList = excludeCondition,
-                Expression =  $"{unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.BaseAggro)} * (1 + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffBaseAggroPrc).FullName} ) " +
-                              $"* (1 +  {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAggroPrc).FullName})"
+                Expression =
+                    $"{unitToCheck}#{nameof(Stats)}#{nameof(UnitStats.BaseAggro)} * (1 + {unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffBaseAggroPrc).FullName} ) " +
+                    $"* (1 +  {unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffAggroPrc).FullName})"
             };
         return new Formula
         {
             EventRef = ent,
             UnitRef = this,
             ConditionSkipList = excludeCondition,
-            Expression = $"0"
+            Expression = "0"
         };
     }
 
 
-    
     public Formula MaxHp(
         Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
         List<Condition> excludeCondition = null)
@@ -72,9 +72,9 @@ public partial class Unit : CloneClass
             EventRef = ent,
             UnitRef = this,
             ConditionSkipList = excludeCondition,
-            Expression = $"{unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.BaseMaxHp)} " +
-                         $" * (1 + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffMaxHpPrc).FullName} + {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.MaxHpPrc)} )" +
-                         $" + {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.MaxHpFix)} + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffMaxHp).FullName}  "
+            Expression = $"{unitToCheck}#{nameof(Stats)}#{nameof(UnitStats.BaseMaxHp)} " +
+                         $" * (1 + {unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffMaxHpPrc).FullName} + {unitToCheck}#{nameof(Stats)}#{nameof(UnitStats.MaxHpPrc)} )" +
+                         $" + {unitToCheck}#{nameof(Stats)}#{nameof(UnitStats.MaxHpFix)} + {unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffMaxHp).FullName}  "
         };
     }
 
@@ -87,15 +87,15 @@ public partial class Unit : CloneClass
             EventRef = ent,
             UnitRef = this,
             ConditionSkipList = excludeCondition,
-            Expression = $"{unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.BaseSpeed)} " +
-                         $" * (1 + {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.SpeedPrc)} " +
-                         $" + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffSpeedPrc).FullName}) " +
-                         $" + {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.SpeedFix)} " +
-                         $" + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffSpeed).FullName}"
+            Expression = $"{unitToCheck}#{nameof(Stats)}#{nameof(UnitStats.BaseSpeed)} " +
+                         $" * (1 + {unitToCheck}#{nameof(Stats)}#{nameof(UnitStats.SpeedPrc)} " +
+                         $" + {unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffSpeedPrc).FullName}) " +
+                         $" + {unitToCheck}#{nameof(Stats)}#{nameof(UnitStats.SpeedFix)} " +
+                         $" + {unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffSpeed).FullName}"
         };
     }
 
-    public  Formula InitialBaseActionValue(
+    public Formula InitialBaseActionValue(
         Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
         List<Condition> excludeCondition = null)
     {
@@ -104,7 +104,7 @@ public partial class Unit : CloneClass
             EventRef = ent,
             UnitRef = this,
             ConditionSkipList = excludeCondition,
-            Expression = $"{unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.LoadedBaseActionValue)} ifzero (10000" +
+            Expression = $"{unitToCheck}#{nameof(Stats)}#{nameof(UnitStats.LoadedBaseActionValue)} ifzero (10000" +
                          $" / {unitToCheck}#{nameof(Speed)}) "
         };
     }
@@ -119,11 +119,12 @@ public partial class Unit : CloneClass
             UnitRef = this,
             ConditionSkipList = excludeCondition,
             Expression = $"{unitToCheck}#{nameof(InitialBaseActionValue)}" +
-                         $" - {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffReduceBav).FullName} "
+                         $" - {unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffReduceBav).FullName} "
         };
     }
 
-    public Formula ActionValue(Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+    public Formula ActionValue(Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker,
+        Event ent = null,
         List<Condition> excludeCondition = null)
     {
         return new Formula
@@ -132,12 +133,13 @@ public partial class Unit : CloneClass
             UnitRef = this,
             ConditionSkipList = excludeCondition,
             Expression = $"{unitToCheck}#{nameof(BaseActionValue)}" +
-                         $" * (1 - {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAdvance).FullName} " +
-                         $" + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffDelay).FullName}) "
+                         $" * (1 - {unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffAdvance).FullName} " +
+                         $" + {unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffDelay).FullName}) "
         };
     }
 
-    public Formula CurrentActionValue(Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+    public Formula CurrentActionValue(Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker,
+        Event ent = null,
         List<Condition> excludeCondition = null)
     {
         return new Formula
@@ -145,13 +147,17 @@ public partial class Unit : CloneClass
             EventRef = ent,
             UnitRef = this,
             ConditionSkipList = excludeCondition,
-            FoundedDependency = [new FormulaBuffer.DependencyRec(){Relation= unitToCheck,Stat=Condition.ConditionCheckParam.PerformedActionValue}],
+            FoundedDependency =
+            [
+                new FormulaBuffer.DependencyRec
+                    { Relation = unitToCheck, Stat = Condition.ConditionCheckParam.PerformedActionValue }
+            ],
             Expression = $"{unitToCheck}#{nameof(ActionValue)}" +
-                         $" -  {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.PerformedActionValue)} "
+                         $" -  {unitToCheck}#{nameof(Stats)}#{nameof(UnitStats.PerformedActionValue)} "
         };
     }
 
-    public  Formula HpPrc(Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+    public Formula HpPrc(Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
         List<Condition> excludeCondition = null)
     {
         return new Formula
@@ -159,12 +165,13 @@ public partial class Unit : CloneClass
             EventRef = ent,
             UnitRef = this,
             ConditionSkipList = excludeCondition,
-            Expression = $"{unitToCheck}#{nameof(Unit.GetResVal)}#{Resource.ResourceType.HP} " +
+            Expression = $"{unitToCheck}#{nameof(GetResVal)}#{Resource.ResourceType.HP} " +
                          $" / {unitToCheck}#{nameof(MaxHp)} "
         };
     }
 
-    public Formula CritDamage(Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+    public Formula CritDamage(Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker,
+        Event ent = null,
         List<Condition> excludeCondition = null)
     {
         return new Formula
@@ -172,8 +179,8 @@ public partial class Unit : CloneClass
             EventRef = ent,
             UnitRef = this,
             ConditionSkipList = excludeCondition,
-            Expression = $"{unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.CritDmg)} " +
-                         $"  + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffCritDmg).FullName}  "
+            Expression = $"{unitToCheck}#{nameof(Stats)}#{nameof(UnitStats.CritDmg)} " +
+                         $"  + {unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffCritDmg).FullName}  "
         };
     }
 
@@ -186,12 +193,13 @@ public partial class Unit : CloneClass
             EventRef = ent,
             UnitRef = this,
             ConditionSkipList = excludeCondition,
-            Expression = $"{unitToCheck}#{nameof(Unit.GetBaseElemBoostVal)}#{elem.ToString()}  " +
-                         $"  + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffElementalBoost).FullName}#{elem.ToString()}   "
+            Expression = $"{unitToCheck}#{nameof(GetBaseElemBoostVal)}#{elem.ToString()}  " +
+                         $"  + {unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffElementalBoost).FullName}#{elem.ToString()}   "
         };
     }
 
-    public  Formula OutgoingHealMultiplier(Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+    public Formula OutgoingHealMultiplier(Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker,
+        Event ent = null,
         List<Condition> excludeCondition = null)
     {
         return new Formula
@@ -199,12 +207,13 @@ public partial class Unit : CloneClass
             EventRef = ent,
             UnitRef = this,
             ConditionSkipList = excludeCondition,
-            Expression = $"1 + {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.HealRate)}" +
-                         $"  + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffOutgoingHealingPrc).FullName}  "
+            Expression = $"1 + {unitToCheck}#{nameof(Stats)}#{nameof(UnitStats.HealRate)}" +
+                         $"  + {unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffOutgoingHealingPrc).FullName}  "
         };
     }
 
-    public Formula IncomingHealMultiplier(Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+    public Formula IncomingHealMultiplier(Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker,
+        Event ent = null,
         List<Condition> excludeCondition = null)
     {
         return new Formula
@@ -212,7 +221,7 @@ public partial class Unit : CloneClass
             EventRef = ent,
             UnitRef = this,
             ConditionSkipList = excludeCondition,
-            Expression = $"1 + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffIncomeHealingPrc).FullName}  "
+            Expression = $"1 + {unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffIncomeHealingPrc).FullName}  "
         };
     }
 
@@ -224,8 +233,8 @@ public partial class Unit : CloneClass
             EventRef = ent,
             UnitRef = this,
             ConditionSkipList = excludeCondition,
-            Expression = $"1 + {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.BreakDmgPrc)}" +
-                         $"  + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffBreakDmgPrc).FullName}  "
+            Expression = $"1 + {unitToCheck}#{nameof(Stats)}#{nameof(UnitStats.BreakDmgPrc)}" +
+                         $"  + {unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffBreakDmgPrc).FullName}  "
         };
     }
 
@@ -248,7 +257,7 @@ public partial class Unit : CloneClass
                 EventRef = ent,
                 UnitRef = this,
                 ConditionSkipList = excludeCondition,
-                Expression = $" 0 "
+                Expression = " 0 "
             };
 
         return new Formula
@@ -257,7 +266,7 @@ public partial class Unit : CloneClass
             UnitRef = this,
             ConditionSkipList = excludeCondition,
             Expression =
-                $"{unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAbilityTypeBoost).FullName}#{abilityType.ToString()}  "
+                $"{unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffAbilityTypeBoost).FullName}#{abilityType.ToString()}  "
         };
     }
 
@@ -270,31 +279,31 @@ public partial class Unit : CloneClass
             UnitRef = this,
             ConditionSkipList = excludeCondition,
             Expression =
-                $"{unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffEffectHitPrc).FullName} + {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.EffectHitPrc)} "
+                $"{unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffEffectHitPrc).FullName} + {unitToCheck}#{nameof(Stats)}#{nameof(UnitStats.EffectHitPrc)} "
         };
     }
 
-    public Formula DebuffResists(Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null, Effect effect=null,
+    public Formula DebuffResists(Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker,
+        Event ent = null, Effect effect = null,
         List<Condition> excludeCondition = null)
     {
-      
         var resExpr = "";
         if (effect != null)
-            resExpr = $" + {unitToCheck}#{nameof(Unit.GetNativeDebuffResists)}#{effect.GetType().FullName}";
+            resExpr = $" + {unitToCheck}#{nameof(GetNativeDebuffResists)}#{effect.GetType().FullName}";
         return new Formula
         {
             EventRef = ent,
             UnitRef = this,
             ConditionSkipList = excludeCondition,
             Expression =
-                $"{unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffDebuffResist).FullName} {resExpr} "
+                $"{unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffDebuffResist).FullName} {resExpr} "
         };
     }
 
     public Formula CcResists(Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
         List<Condition> excludeCondition = null)
     {
-        bool isCc = (((ApplyBuff)ent)!).AppliedBuffToApply.CrowdControl;
+        var isCc = ((ApplyBuff)ent)!.AppliedBuffToApply.CrowdControl;
         if (isCc)
             return new Formula
             {
@@ -302,7 +311,7 @@ public partial class Unit : CloneClass
                 UnitRef = this,
                 ConditionSkipList = excludeCondition,
                 Expression =
-                    $"{unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffCrowdControl).FullName} + {unitToCheck}#{nameof(Unit.GetNativeDebuffResists)}#{typeof(EffCrowdControl).FullName}"
+                    $"{unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffCrowdControl).FullName} + {unitToCheck}#{nameof(GetNativeDebuffResists)}#{typeof(EffCrowdControl).FullName}"
             };
 
         return new Formula
@@ -310,11 +319,11 @@ public partial class Unit : CloneClass
             EventRef = ent,
             UnitRef = this,
             ConditionSkipList = excludeCondition,
-            Expression = $" 0 "
+            Expression = " 0 "
         };
     }
 
-    public  Formula EffectRes(Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+    public Formula EffectRes(Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
         List<Condition> excludeCondition = null)
     {
         return new Formula
@@ -323,7 +332,7 @@ public partial class Unit : CloneClass
             UnitRef = this,
             ConditionSkipList = excludeCondition,
             Expression =
-                $"{unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffEffectResPrc).FullName} + {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.EffectResPrc)} "
+                $"{unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffEffectResPrc).FullName} + {unitToCheck}#{nameof(Stats)}#{nameof(UnitStats.EffectResPrc)} "
         };
     }
 
@@ -336,7 +345,7 @@ public partial class Unit : CloneClass
                 EventRef = ent,
                 UnitRef = this,
                 ConditionSkipList = excludeCondition,
-                Expression = $" 0 "
+                Expression = " 0 "
             };
 
         return new Formula
@@ -345,11 +354,12 @@ public partial class Unit : CloneClass
             UnitRef = this,
             ConditionSkipList = excludeCondition,
             Expression =
-                $"{unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffDoTBoost).FullName}  "
+                $"{unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffDoTBoost).FullName}  "
         };
     }
 
-    public Formula DotVulnerability(Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+    public Formula DotVulnerability(Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker,
+        Event ent = null,
         List<Condition> excludeCondition = null)
     {
         if (ent is not DoTDamage)
@@ -358,7 +368,7 @@ public partial class Unit : CloneClass
                 EventRef = ent,
                 UnitRef = this,
                 ConditionSkipList = excludeCondition,
-                Expression = $"0"
+                Expression = "0"
             };
 
         return new Formula
@@ -367,11 +377,12 @@ public partial class Unit : CloneClass
             UnitRef = this,
             ConditionSkipList = excludeCondition,
             Expression =
-                $"{unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffDoTVulnerability).FullName}  "
+                $"{unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffDoTVulnerability).FullName}  "
         };
     }
 
-    public Formula WeaknessMaxToughnessMultiplier(Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+    public Formula WeaknessMaxToughnessMultiplier(
+        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
         List<Condition> excludeCondition = null)
     {
         return new Formula
@@ -379,13 +390,12 @@ public partial class Unit : CloneClass
             EventRef = ent,
             UnitRef = this,
             ConditionSkipList = excludeCondition,
-            Expression = $"{unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.MaxToughness)} / 120 + 0.5"
+            Expression = $"{unitToCheck}#{nameof(Stats)}#{nameof(UnitStats.MaxToughness)} / 120 + 0.5"
         };
     }
 
-    
 
-    public Formula CritHit( Event ent, List<Condition> excludeCondition = null)
+    public Formula CritHit(Event ent, List<Condition> excludeCondition = null)
     {
         double critMod = ent is DirectDamage dd ? dd.IsCrit ? 1 : 0 : 0;
         return new Formula
@@ -394,13 +404,19 @@ public partial class Unit : CloneClass
             UnitRef = this,
             ConditionSkipList = excludeCondition,
             Expression = $"{critMod}",
-            FoundedDependency = [new FormulaBuffer.DependencyRec(){Relation= Formula.DynamicTargetEnm.Attacker,Stat=Condition.ConditionCheckParam.DoNotSaveDependency}]
+            FoundedDependency =
+            [
+                new FormulaBuffer.DependencyRec
+                {
+                    Relation = Formula.DynamicTargetEnm.Attacker,
+                    Stat = Condition.ConditionCheckParam.DoNotSaveDependency
+                }
+            ]
         };
     }
 
 
-
-    public  Formula Def(
+    public Formula Def(
         Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
         List<Condition> excludeCondition = null)
     {
@@ -410,34 +426,17 @@ public partial class Unit : CloneClass
             UnitRef = this,
             ConditionSkipList = excludeCondition,
             Expression =
-                $" {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.BaseDef)} * ( 1 + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffDefPrc).FullName} " +
+                $" {unitToCheck}#{nameof(Stats)}#{nameof(UnitStats.BaseDef)} * ( 1 + {unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffDefPrc).FullName} " +
                 //def ignore
                 (ent != null
-                    ? $" - {OppositeTarget(unitToCheck)}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffDefIgnore).FullName} "
+                    ? $" - {OppositeTarget(unitToCheck)}#{nameof(GetBuffSumByType)}#{typeof(EffDefIgnore).FullName} "
                     : string.Empty) +
-                $" +  {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.DefPrc)} ) + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffDef).FullName} "
+                $" +  {unitToCheck}#{nameof(Stats)}#{nameof(UnitStats.DefPrc)} ) + {unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffDef).FullName} "
         };
     }
 
 
-
-    public  Formula Resists(Ability.ElementEnm elem,Formula.DynamicTargetEnm unitToCheck= Formula.DynamicTargetEnm.Attacker, Event ent = null,
-        List<Condition> excludeCondition = null)
-    {
-        return new Formula
-        {
-            EventRef = ent,
-            UnitRef = this,
-            ConditionSkipList = excludeCondition,
-            Expression =
-                $" {unitToCheck}#{nameof(Unit.GetNativeResists)}#{elem.ToString()} +  {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffElementalResist).FullName}#{elem.ToString()}  " +
-                $" +  {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAllDamageResist).FullName} "
-        };
-    }
-
-
-
-    public  Formula VulnerabilityMulti(Ability.ElementEnm elem,
+    public Formula Resists(Ability.ElementEnm elem,
         Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
         List<Condition> excludeCondition = null)
     {
@@ -447,13 +446,29 @@ public partial class Unit : CloneClass
             UnitRef = this,
             ConditionSkipList = excludeCondition,
             Expression =
-                $"1 - {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffElementalVulnerability).FullName}#{elem.ToString()}  " +
-                $"+ {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAllDamageVulnerability).FullName} " +
+                $" {unitToCheck}#{nameof(GetNativeResists)}#{elem.ToString()} +  {unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffElementalResist).FullName}#{elem.ToString()}  " +
+                $" +  {unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffAllDamageResist).FullName} "
+        };
+    }
+
+
+    public Formula VulnerabilityMulti(Ability.ElementEnm elem,
+        Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
+        List<Condition> excludeCondition = null)
+    {
+        return new Formula
+        {
+            EventRef = ent,
+            UnitRef = this,
+            ConditionSkipList = excludeCondition,
+            Expression =
+                $"1 - {unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffElementalVulnerability).FullName}#{elem.ToString()}  " +
+                $"+ {unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffAllDamageVulnerability).FullName} " +
                 $"+ {unitToCheck}#{nameof(DotVulnerability)} "
         };
     }
 
-    public  Formula CritChance(
+    public Formula CritChance(
         Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
         List<Condition> excludeCondition = null)
     {
@@ -462,8 +477,8 @@ public partial class Unit : CloneClass
             EventRef = ent,
             UnitRef = this,
             ConditionSkipList = excludeCondition,
-            Expression = $" {unitToCheck}#{nameof(Unit.Stats)}#{nameof(UnitStats.CritChance)} " +
-                         $"  + {unitToCheck}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffCritPrc).FullName}  "
+            Expression = $" {unitToCheck}#{nameof(Stats)}#{nameof(UnitStats.CritChance)} " +
+                         $"  + {unitToCheck}#{nameof(GetBuffSumByType)}#{typeof(EffCritPrc).FullName}  "
         };
     }
 
@@ -475,9 +490,9 @@ public partial class Unit : CloneClass
     /// <param name="ent"></param>
     /// <param name="excludeCondition"></param>
     /// <returns></returns>
-    public  Formula GenerateCrit(
+    public Formula GenerateCrit(
         Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
-        List<Condition> excludeCondition = null )
+        List<Condition> excludeCondition = null)
     {
         var res = CritChance(unitToCheck, ent, excludeCondition);
         if (ent is DirectDamage dd)
@@ -486,7 +501,9 @@ public partial class Unit : CloneClass
             dd.IsCrit = ent.ParentStep.Parent.Parent.DevMode
                 ? DevModeUtils.IsCrit(ent)
                 : new MersenneTwister().NextDouble() <= res.Result;
-            FormulaBuffer.MergeDependency(res.FoundedDependency, new FormulaBuffer.DependencyRec(){Stat = Condition.ConditionCheckParam.DoNotSaveDependency,Relation =unitToCheck });
+            FormulaBuffer.MergeDependency(res.FoundedDependency,
+                new FormulaBuffer.DependencyRec
+                    { Stat = Condition.ConditionCheckParam.DoNotSaveDependency, Relation = unitToCheck });
         }
 
         return res;

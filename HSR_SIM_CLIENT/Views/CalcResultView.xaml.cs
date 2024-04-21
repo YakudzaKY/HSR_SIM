@@ -2,15 +2,12 @@
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Xml;
 using HSR_SIM_CLIENT.ChartTools;
 using HSR_SIM_CLIENT.ThreadTools;
 using HSR_SIM_CLIENT.Utils;
 using HSR_SIM_CLIENT.ViewModels;
 using HSR_SIM_CLIENT.Windows;
 using HSR_SIM_LIB;
-using HSR_SIM_LIB.UnitStuff;
-using HSR_SIM_LIB.Utils;
 using TreeView = System.Windows.Controls.TreeView;
 using UserControl = System.Windows.Controls.UserControl;
 
@@ -19,6 +16,15 @@ namespace HSR_SIM_CLIENT.Views;
 public sealed partial class CalcResultView() : UserControl, INotifyPropertyChanged
 {
     private CalcResultViewModel? selectedTask;
+
+    public CalcResultView(KeyValuePair<SimTask, ThreadJob.RAggregatedData> task,
+        IEnumerable<KeyValuePair<SimTask, ThreadJob.RAggregatedData>>? child) : this()
+    {
+        ViewModel = new CalcResultViewModel(task, child);
+        InitializeComponent();
+        RedrawChart(task, child);
+    }
+
     public CalcResultViewModel ViewModel { get; } = null!;
 
     private CalcResultViewModel? SelectedTask
@@ -33,15 +39,9 @@ public sealed partial class CalcResultView() : UserControl, INotifyPropertyChang
         }
     }
 
-    public List<Worker.RStatMod> StatMods => (SelectedTask is null) ? [] : SelectedTask.TaskKey.StatMods;
+    public List<Worker.RStatMod> StatMods => SelectedTask is null ? [] : SelectedTask.TaskKey.StatMods;
 
-    public CalcResultView(KeyValuePair<SimTask, ThreadJob.RAggregatedData> task,
-        IEnumerable<KeyValuePair<SimTask, ThreadJob.RAggregatedData>>? child) : this()
-    {
-        ViewModel = new CalcResultViewModel(task, child);
-        InitializeComponent();
-        RedrawChart(task, child);
-    }
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     private void TreeView_OnSelectedTaskChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
@@ -65,11 +65,13 @@ public sealed partial class CalcResultView() : UserControl, INotifyPropertyChang
             }
         }
         else
+        {
             SelectedTask = null;
+        }
     }
 
     /// <summary>
-    /// redraw chart by Task data
+    ///     redraw chart by Task data
     /// </summary>
     /// <param name="task"></param>
     /// <param name="taskChild"></param>
@@ -83,15 +85,8 @@ public sealed partial class CalcResultView() : UserControl, INotifyPropertyChang
             ? new DamageChart(task, keyValuePairs.First())
             : new DamageChart(task, null));
 
-        if (keyValuePairs?.Count() > 1)
-        {
-            WinHst.Children.Add(new SubTaskDamageChart(task, keyValuePairs));
-        }
-       
-           
+        if (keyValuePairs?.Count() > 1) WinHst.Children.Add(new SubTaskDamageChart(task, keyValuePairs));
     }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {

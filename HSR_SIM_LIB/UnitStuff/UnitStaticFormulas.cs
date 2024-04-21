@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.Utils;
-using HSR_SIM_LIB.Utils.Utils;
+
 namespace HSR_SIM_LIB.UnitStuff;
 
 public static class UnitStaticFormulas
@@ -17,44 +16,32 @@ public static class UnitStaticFormulas
             return Formula.DynamicTargetEnm.Defender;
         return Formula.DynamicTargetEnm.Attacker;
     }
-    
+
     public static Formula WeaknessBreakBaseDamage(Formula.DynamicTargetEnm unitToCheck, Event ent,
         Ability.ElementEnm elem, List<Condition> excludeCondition = null)
     {
         //if DoT proceed
         if (ent is ToughnessBreakDoTDamage modEnt)
         {
-            string baseDmgExpr =
+            var baseDmgExpr =
                 $"{unitToCheck}#{nameof(Unit.UnitLvlMultiplier)} * {OppositeTarget(unitToCheck)}#{nameof(Unit.WeaknessMaxToughnessMultiplier)}";
             if (modEnt.BuffThatDamage.Effects.Any(x => x is EffBleed))
-            {
                 baseDmgExpr =
                     $"({OppositeTarget(unitToCheck)}#{nameof(Unit.BleedEliteMultiplier)} * {OppositeTarget(unitToCheck)}#{nameof(Unit.MaxHp)}) min (2 * {baseDmgExpr}))";
-            }
             else if (modEnt.BuffThatDamage.Effects.Any(x =>
                          x is EffBurn or EffFreeze))
-            {
                 baseDmgExpr = "1 * " + baseDmgExpr;
-            }
             else if (modEnt.BuffThatDamage.Effects.Any(x =>
                          x is EffShock))
-            {
                 baseDmgExpr = "2 * " + baseDmgExpr;
-            }
             else if (modEnt.BuffThatDamage.Effects.Any(x =>
                          x is EffWindShear))
-            {
                 baseDmgExpr = $"1 * {modEnt.BuffThatDamage.Stack} * " + baseDmgExpr;
-            }
             else if (modEnt.BuffThatDamage.Effects.Any(x =>
                          x is EffEntanglement))
-            {
                 baseDmgExpr = $"0.6 * {modEnt.BuffThatDamage.Stack} * " + baseDmgExpr;
-            }
             else
-            {
                 throw new Exception($"{nameof(ToughnessBreakDoTDamage)} contains unknown effect");
-            }
 
             return new Formula
             {
@@ -75,7 +62,7 @@ public static class UnitStaticFormulas
             Ability.ElementEnm.Wind => 1.5,
             Ability.ElementEnm.Quantum => 0.5,
             Ability.ElementEnm.Imaginary => 0.5,
-            _ => throw new Exception("Weakness break unknown element "+elem)
+            _ => throw new Exception("Weakness break unknown element " + elem)
         };
         return new Formula
         {
@@ -98,8 +85,8 @@ public static class UnitStaticFormulas
                 $" + 200 + (10 * {OppositeTarget(unitToCheck)}#{nameof(Unit.Level)})) ) "
         };
     }
-    
-    public static Formula ResPen(Formula.DynamicTargetEnm unitToCheck,Ability.ElementEnm elem, Event ent = null,
+
+    public static Formula ResPen(Formula.DynamicTargetEnm unitToCheck, Ability.ElementEnm elem, Event ent = null,
         List<Condition> excludeCondition = null)
     {
         return new Formula

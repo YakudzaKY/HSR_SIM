@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.TurnBasedClasses;
-using HSR_SIM_LIB.Fighters;
 using static HSR_SIM_LIB.UnitStuff.Resource;
 
 namespace HSR_SIM_LIB.UnitStuff;
@@ -27,7 +24,7 @@ public class Team(SimCls parent) : CloneClass
 
     public double TeamAggro
     {
-        get { return Units.Where(x => x.IsAlive).Sum(unit => unit.Aggro(ent:null).Result); }
+        get { return Units.Where(x => x.IsAlive).Sum(unit => unit.Aggro(ent: null).Result); }
     }
 
     public List<Resource> Resources
@@ -65,11 +62,12 @@ public class Team(SimCls parent) : CloneClass
                 newUnit.ParentTeam = newClone;
             newClone.Units.Add(newUnit);
         }
+
         var oldRes = newClone.Resources;
         newClone.Resources = [];
         foreach (var res in oldRes)
         {
-            Resource newRes =(Resource)res.Clone();
+            var newRes = (Resource)res.Clone();
             newRes.Parent = newClone;
             newClone.Resources.Add(newRes);
         }
@@ -104,8 +102,6 @@ public class Team(SimCls parent) : CloneClass
     {
         unit.ParentTeam = this;
         Units.Insert(ndx, unit);
-
-
     }
 
     /// <summary>

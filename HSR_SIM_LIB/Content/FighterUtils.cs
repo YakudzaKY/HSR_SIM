@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using HSR_SIM_LIB.Fighters;
-using HSR_SIM_LIB.Skills;
+﻿using System.Collections.Generic;
 using HSR_SIM_LIB.Skills.EffectList;
-using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using HSR_SIM_LIB.Utils;
-using HSR_SIM_LIB.Utils.Utils;
-using static HSR_SIM_LIB.UnitStuff.Unit;
 
 namespace HSR_SIM_LIB.Content;
 
@@ -36,12 +29,12 @@ public static class FighterUtils
         Support,
         Healer
     }
+
     /// <summary>
     ///     get from table in https://honkai-star-rail.fandom.com/wiki/Toughness#Weakness_Break
     ///     if someone know formula plz rewrite
     /// </summary>
-
-    public static readonly Dictionary<int, double> LvlMultiplier= new()
+    public static readonly Dictionary<int, double> LvlMultiplier = new()
     {
         { 1, 54.0000 }, { 2, 58.0000 }, { 3, 62.0000 }, { 4, 67.5264 }, { 5, 70.5094 }, { 6, 73.5228 },
         { 7, 76.5660 }, { 8, 79.6385 }, { 9, 82.7395 }, { 10, 85.8684 }, { 11, 91.4944 }, { 12, 97.0680 },
@@ -61,37 +54,33 @@ public static class FighterUtils
     };
 
 
-    
-    
     /// <summary>
     ///     Calc dmg when shield broken
     ///     https://honkai-star-rail.fandom.com/wiki/Toughness#Weakness_Break
     /// </summary>
     /// <param name="ent"></param>
     /// <returns></returns>
-
     public static Formula WeaknessBreakFormula()
     {
-    
         var expression =
-                        //base damage
-                         $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitStaticFormulas)}#{nameof(UnitStaticFormulas.WeaknessBreakBaseDamage)} " +
-                         //breakEffect
-                         $" * (1 + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffBreakDmgPrc).FullName} + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Stats)}#{nameof(UnitStats.BreakDmgPrc)} ) " +
-                         //def
-                         $" * ({Formula.DynamicTargetEnm.Defender}#{nameof(UnitStaticFormulas)}#{nameof(UnitStaticFormulas.DefMultiplier)}) "  +
-                         //resist and  penetration
-                         $" *  {Formula.DynamicTargetEnm.Defender}#{nameof(UnitStaticFormulas)}#{nameof(UnitStaticFormulas.ResPen)}  " +
-                         //vulnerability 
-                         $" *  {Formula.DynamicTargetEnm.Defender}#{nameof(Unit.VulnerabilityMulti)} " +
-                         //broken multiplier
-                         $" *  {Formula.DynamicTargetEnm.Defender}#{nameof(Unit.GetBrokenMultiplier)}";
-                       
-        var newFormula = new Formula { Expression = expression};
+            //base damage
+            $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitStaticFormulas)}#{nameof(UnitStaticFormulas.WeaknessBreakBaseDamage)} " +
+            //breakEffect
+            $" * (1 + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffBreakDmgPrc).FullName} + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Stats)}#{nameof(UnitStats.BreakDmgPrc)} ) " +
+            //def
+            $" * ({Formula.DynamicTargetEnm.Defender}#{nameof(UnitStaticFormulas)}#{nameof(UnitStaticFormulas.DefMultiplier)}) " +
+            //resist and  penetration
+            $" *  {Formula.DynamicTargetEnm.Defender}#{nameof(UnitStaticFormulas)}#{nameof(UnitStaticFormulas.ResPen)}  " +
+            //vulnerability 
+            $" *  {Formula.DynamicTargetEnm.Defender}#{nameof(Unit.VulnerabilityMulti)} " +
+            //broken multiplier
+            $" *  {Formula.DynamicTargetEnm.Defender}#{nameof(Unit.GetBrokenMultiplier)}";
+
+        var newFormula = new Formula { Expression = expression };
 
         return newFormula;
     }
-    
+
     /// <summary>
     ///     Generate damage output formula
     /// </summary>
@@ -109,7 +98,7 @@ public static class FighterUtils
                          $" + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAllDamageBoost).FullName} " +
                          $" + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.DotBoost)}  ) " +
                          //def
-                         $" * ({Formula.DynamicTargetEnm.Defender}#{nameof(UnitStaticFormulas)}#{nameof(UnitStaticFormulas.DefMultiplier)}) "  +
+                         $" * ({Formula.DynamicTargetEnm.Defender}#{nameof(UnitStaticFormulas)}#{nameof(UnitStaticFormulas.DefMultiplier)}) " +
                          //resist and  penetration
                          $" *  {Formula.DynamicTargetEnm.Defender}#{nameof(UnitStaticFormulas)}#{nameof(UnitStaticFormulas.ResPen)}  " +
                          //vulnerability 
@@ -118,7 +107,11 @@ public static class FighterUtils
                          $" * {Formula.DynamicTargetEnm.Defender}#{nameof(Unit.GetBuffMultiplyByType)}#{typeof(EffDamageReduction).FullName} " +
                          //broken multiplier
                          $" *  {Formula.DynamicTargetEnm.Defender}#{nameof(Unit.GetBrokenMultiplier)}";
-        var newFormula = new Formula { Expression = expression, Variables = abilityFormula.Variables ,FoundedDependency = abilityFormula.FoundedDependency};
+        var newFormula = new Formula
+        {
+            Expression = expression, Variables = abilityFormula.Variables,
+            FoundedDependency = abilityFormula.FoundedDependency
+        };
 
         return newFormula;
     }
@@ -139,9 +132,8 @@ public static class FighterUtils
                          $" * (1 - {Formula.DynamicTargetEnm.Defender}#{nameof(Unit.DebuffResists)}) " +
                          //cc res
                          $" * (1 - {Formula.DynamicTargetEnm.Defender}#{nameof(Unit.CcResists)}) ";
-        
-                         
-                     
+
+
         var newFormula = new Formula { Expression = expression };
         return newFormula;
     }
@@ -155,26 +147,31 @@ public static class FighterUtils
     public static Formula ShieldFormula(Formula abilityFormula)
     {
         var expression =
-
             $"({abilityFormula.Expression} + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffAdditiveShieldBonus).FullName}) " +
             $" * (1 + {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GetBuffSumByType)}#{typeof(EffPrcShieldBonus).FullName})";
-                     
-        var newFormula = new Formula { Expression = expression ,Variables = abilityFormula.Variables ,FoundedDependency = abilityFormula.FoundedDependency};
+
+        var newFormula = new Formula
+        {
+            Expression = expression, Variables = abilityFormula.Variables,
+            FoundedDependency = abilityFormula.FoundedDependency
+        };
         return newFormula;
     }
-    
+
     public static Formula HealFormula(Formula abilityFormula)
     {
         var expression =
-
             $"{abilityFormula.Expression} * {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.OutgoingHealMultiplier)}" +
             $" * {Formula.DynamicTargetEnm.Defender}#{nameof(Unit.IncomingHealMultiplier)}";
-                     
-        var newFormula = new Formula { Expression = expression ,Variables = abilityFormula.Variables ,FoundedDependency = abilityFormula.FoundedDependency};
+
+        var newFormula = new Formula
+        {
+            Expression = expression, Variables = abilityFormula.Variables,
+            FoundedDependency = abilityFormula.FoundedDependency
+        };
         return newFormula;
     }
 
-    
 
     /// <summary>
     ///     Get Skill Modifier By min, max and level

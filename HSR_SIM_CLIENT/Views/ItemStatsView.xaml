@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:HSR_SIM_CLIENT.Views"
              xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              mc:Ignorable="d"
 
@@ -13,11 +12,11 @@
         <Grid DataContext="{Binding ElementName=Parent}">
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition></RowDefinition>
+                <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
@@ -26,28 +25,22 @@
             </Grid.RowDefinitions>
 
             <mah:MetroHeader Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
-                             Header="{Binding GroupCaption , Mode=OneWay }">
-            </mah:MetroHeader>
+                             Header="{Binding GroupCaption , Mode=OneWay }" />
             <ComboBox Grid.Column="0" Grid.Row="1" IsEditable="True"
-                      Text="{Binding ItemStatsVm.MainStatName ,Mode=TwoWay}" ItemsSource="{Binding MainStatsNames}">
-            </ComboBox>
-            <Label Grid.Column="1" Grid.Row="1" Content="MAX."></Label>
+                      Text="{Binding ItemStatsVm.MainStatName ,Mode=TwoWay}" ItemsSource="{Binding MainStatsNames}" />
+            <Label Grid.Column="1" Grid.Row="1" Content="MAX." />
             <ComboBox Grid.Column="0" Grid.Row="2" IsEditable="True"
-                      Text="{Binding ItemStatsVm.SubStatName1 ,Mode=TwoWay}" ItemsSource="{Binding SubStatsNames}">
-            </ComboBox>
+                      Text="{Binding ItemStatsVm.SubStatName1 ,Mode=TwoWay}" ItemsSource="{Binding SubStatsNames}" />
             <ComboBox Grid.Column="0" Grid.Row="3" IsEditable="True"
-                      Text="{Binding ItemStatsVm.SubStatName2 ,Mode=TwoWay}" ItemsSource="{Binding SubStatsNames}">
-            </ComboBox>
+                      Text="{Binding ItemStatsVm.SubStatName2 ,Mode=TwoWay}" ItemsSource="{Binding SubStatsNames}" />
             <ComboBox Grid.Column="0" Grid.Row="4" IsEditable="True"
-                      Text="{Binding ItemStatsVm.SubStatName3 ,Mode=TwoWay}" ItemsSource="{Binding SubStatsNames}">
-            </ComboBox>
+                      Text="{Binding ItemStatsVm.SubStatName3 ,Mode=TwoWay}" ItemsSource="{Binding SubStatsNames}" />
             <ComboBox Grid.Column="0" Grid.Row="5" IsEditable="True"
-                      Text="{Binding ItemStatsVm.SubStatName4 ,Mode=TwoWay}" ItemsSource="{Binding SubStatsNames}">
-            </ComboBox>
-            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ItemStatsVm.SubStatVal1 ,Mode=TwoWay}"></TextBox>
-            <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding ItemStatsVm.SubStatVal2 ,Mode=TwoWay}"></TextBox>
-            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding ItemStatsVm.SubStatVal3 ,Mode=TwoWay}"></TextBox>
-            <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding ItemStatsVm.SubStatVal4 ,Mode=TwoWay}"></TextBox>
+                      Text="{Binding ItemStatsVm.SubStatName4 ,Mode=TwoWay}" ItemsSource="{Binding SubStatsNames}" />
+            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ItemStatsVm.SubStatVal1 ,Mode=TwoWay}" />
+            <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding ItemStatsVm.SubStatVal2 ,Mode=TwoWay}" />
+            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding ItemStatsVm.SubStatVal3 ,Mode=TwoWay}" />
+            <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding ItemStatsVm.SubStatVal4 ,Mode=TwoWay}" />
         </Grid>
     </Border>
 </UserControl>

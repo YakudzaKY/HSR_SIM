@@ -39,21 +39,22 @@
             <DataTemplate DataType="{x:Type singleSim:EffectViewModel }">
                 <views:EffectView EffectToView="{Binding ., Mode=OneWay}" />
             </DataTemplate>
-           
-            
+
+
             <DataTemplate DataType="{x:Type singleSim:BuffViewModel }">
-                <views:BuffView BuffToView="{Binding ., Mode=OneWay}"  />
+                <views:BuffView BuffToView="{Binding ., Mode=OneWay}" />
             </DataTemplate>
-            
+
             <converters:CountVisibilityConverter x:Key="CountVisibilityConverter" />
             <HierarchicalDataTemplate DataType="{x:Type utils:Formula}"
                                       ItemsSource="{Binding Path=ChildFormulas}">
                 <StackPanel Orientation="Horizontal">
-                <Label>IsBuff?</Label><CheckBox IsChecked="{Binding LoadedFromBuffer, Mode=OneWay}"></CheckBox><TextBlock Text="{Binding Path=Expression}" />
+                    <Label>IsBuff?</Label><CheckBox IsChecked="{Binding LoadedFromBuffer, Mode=OneWay}" />
+                    <TextBlock Text="{Binding Path=Expression}" />
                 </StackPanel>
             </HierarchicalDataTemplate>
         </Grid.Resources>
-        
+
         <Label Grid.Row="0" Grid.Column="0">Name</Label>
         <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding EventToView.Name, Mode=OneWay}" />
         <Label Grid.Row="1" Grid.Column="0">Source</Label>
@@ -68,25 +69,37 @@
         <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding EventToView.RealValue, Mode=OneWay}" />
         <Label Grid.Row="6" Grid.Column="0">Description</Label>
         <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding EventToView.Description, Mode=OneWay}" />
-        <Label Grid.Row="7" Visibility="{Binding Path=EventToView.Buffs,Mode=OneWay , Converter={StaticResource CountVisibilityConverter}}" Grid.Column="0">Affecting buffs</Label>
-        <mah:HamburgerMenuListBox  Visibility="{Binding Path=EventToView.Buffs,Mode=OneWay , Converter={StaticResource CountVisibilityConverter}}"  Grid.Row="8" Grid.Column="0"  Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
-                                   VerticalAlignment="Stretch" 
-                                   ItemsSource="{Binding Path=EventToView.Buffs,Mode=OneWay}">
-        </mah:HamburgerMenuListBox>
-        
-        <Label Grid.Row="7" Visibility="{Binding Path=EventToView.Effects,Mode=OneWay , Converter={StaticResource CountVisibilityConverter}}" Grid.Column="0">Affecting effects</Label>
-        <mah:HamburgerMenuListBox  Visibility="{Binding Path=EventToView.Effects,Mode=OneWay , Converter={StaticResource CountVisibilityConverter}}"  Grid.Row="8" Grid.Column="0"  Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
-                                   VerticalAlignment="Stretch" 
-                                   ItemsSource="{Binding Path=EventToView.Effects,Mode=OneWay}">
-        </mah:HamburgerMenuListBox>
-      
-        
+        <Label Grid.Row="7"
+               Visibility="{Binding Path=EventToView.Buffs,Mode=OneWay , Converter={StaticResource CountVisibilityConverter}}"
+               Grid.Column="0">
+            Affecting buffs
+        </Label>
+        <mah:HamburgerMenuListBox
+            Visibility="{Binding Path=EventToView.Buffs,Mode=OneWay , Converter={StaticResource CountVisibilityConverter}}"
+            Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            ItemsSource="{Binding Path=EventToView.Buffs,Mode=OneWay}" />
+
+        <Label Grid.Row="7"
+               Visibility="{Binding Path=EventToView.Effects,Mode=OneWay , Converter={StaticResource CountVisibilityConverter}}"
+               Grid.Column="0">
+            Affecting effects
+        </Label>
+        <mah:HamburgerMenuListBox
+            Visibility="{Binding Path=EventToView.Effects,Mode=OneWay , Converter={StaticResource CountVisibilityConverter}}"
+            Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            ItemsSource="{Binding Path=EventToView.Effects,Mode=OneWay}" />
+
+
         <Label Grid.Row="9" Grid.Column="0" Visibility="{Binding ExplainVisible, Mode=OneWay}">Formula</Label>
-        <TextBox Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding ExplainVisible, Mode=OneWay}" Text="{Binding SelectedFormula.Expression, Mode=OneWay}" />
-        <TextBox Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding ExplainVisible, Mode=OneWay}" Text="{Binding SelectedFormula.Result, Mode=OneWay}" />
+        <TextBox Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding ExplainVisible, Mode=OneWay}"
+                 Text="{Binding SelectedFormula.Expression, Mode=OneWay}" />
+        <TextBox Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding ExplainVisible, Mode=OneWay}"
+                 Text="{Binding SelectedFormula.Result, Mode=OneWay}" />
         <TreeView Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding ExplainVisible, Mode=OneWay}"
                   ScrollViewer.VerticalScrollBarVisibility="Auto"
-                  SelectedItemChanged="TreeView_OnSelectedFormulaChanged" >
+                  SelectedItemChanged="TreeView_OnSelectedFormulaChanged">
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
                     <Setter Property="IsExpanded" Value="False" />
@@ -102,7 +115,7 @@
             </TreeViewItem>
 
         </TreeView>
-        
+
         <Label Grid.Row="13" Grid.Column="0" Visibility="{Binding ExplainVisible, Mode=OneWay}">Explain</Label>
         <TextBox Width="Auto" Grid.Row="14" Grid.Column="0" Visibility="{Binding ExplainVisible, Mode=OneWay}"
                  Grid.ColumnSpan="2" TextWrapping="WrapWithOverflow" Text="{Binding EventToView.Explain, Mode=OneWay}" />

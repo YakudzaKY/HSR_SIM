@@ -3,6 +3,6 @@
 /// <summary>
 ///     all type damage boosting
 /// </summary>
-public class EffAllDamageBoost() : Effect()
+public class EffAllDamageBoost : Effect
 {
 }

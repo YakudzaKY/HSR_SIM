@@ -77,8 +77,7 @@
             <Border BorderThickness="1" BorderBrush="Gray" Grid.Row="0" Grid.Column="0">
 
                 <TreeView SelectedItemChanged="TreeView_OnSelectedUnitChanged"
-                          ScrollViewer.VerticalScrollBarVisibility="Auto"
-                       >
+                          ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <TreeView.ItemContainerStyle>
                         <Style TargetType="{x:Type TreeViewItem}">
                             <Setter Property="IsExpanded" Value="True" />
@@ -100,7 +99,7 @@
             <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="Gray">
                 <ScrollViewer>
                     <ScrollViewer.HorizontalScrollBarVisibility>Disabled</ScrollViewer.HorizontalScrollBarVisibility>
-                    <views:UnitView UnitToView="{Binding SelectedUnit,Mode=OneWay}"></views:UnitView>
+                    <views:UnitView UnitToView="{Binding SelectedUnit,Mode=OneWay}" />
                 </ScrollViewer>
             </Border>
 

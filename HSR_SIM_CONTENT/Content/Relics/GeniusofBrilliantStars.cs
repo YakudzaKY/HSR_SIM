@@ -2,7 +2,6 @@
 using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
-using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_CONTENT.Content.Relics;
 
@@ -23,12 +22,15 @@ internal class GeniusofBrilliantStars : DefaultRelicSet
                 Effects = new List<Effect> { new EffDefIgnore { Value = 0.10 } },
                 IsTargetCheck = true,
                 Target = Parent.Parent,
-                ApplyConditions = [new Condition
-                {
-                    ConditionParam = Condition.ConditionCheckParam.Weakness,
-                    ConditionExpression = Condition.ConditionCheckExpression.Exists,
-                    ElemValue = Ability.ElementEnm.Quantum
-                }]
+                ApplyConditions =
+                [
+                    new Condition
+                    {
+                        ConditionParam = Condition.ConditionCheckParam.Weakness,
+                        ConditionExpression = Condition.ConditionCheckExpression.Exists,
+                        ElemValue = Ability.ElementEnm.Quantum
+                    }
+                ]
             });
     }
 }

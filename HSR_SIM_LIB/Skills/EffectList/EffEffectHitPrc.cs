@@ -3,6 +3,6 @@
 /// <summary>
 ///     effect hit buff by x%
 /// </summary>
-public class EffEffectHitPrc() : Effect()
+public class EffEffectHitPrc : Effect
 {
 }

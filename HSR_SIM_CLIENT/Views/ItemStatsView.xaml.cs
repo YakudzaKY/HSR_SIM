@@ -4,7 +4,6 @@ using System.Windows;
 using HSR_SIM_CLIENT.Models;
 using HSR_SIM_CLIENT.Utils;
 using HSR_SIM_CLIENT.ViewModels;
-using UserControl = System.Windows.Controls.UserControl;
 
 namespace HSR_SIM_CLIENT.Views;
 
@@ -12,15 +11,8 @@ public partial class ItemStatsView : INotifyPropertyChanged
 {
     public static readonly DependencyProperty GroupCaptionProperty;
     public static readonly DependencyProperty ItemStatsModelProperty;
-    public IEnumerable<string> MainStatsNames { get; } = new []{string.Empty}.Concat( StatData.MainStatsUpgrades.Select(x => x.Key));
-    public IEnumerable<string> SubStatsNames { get; } = new []{string.Empty}.Concat(StatData.SubStatsUpgrades.Select(x => x.Key));
 
-    public ItemStatsView()
-    {
-        ItemStatsModel = new ItemStatsModel();
-        ItemStatsVm = new ItemStatsViewModel(ItemStatsModel);
-        InitializeComponent();
-    }
+    private ItemStatsViewModel itemStatsVm;
 
     static ItemStatsView()
     {
@@ -30,16 +22,18 @@ public partial class ItemStatsView : INotifyPropertyChanged
             typeof(ItemStatsView), new FrameworkPropertyMetadata(ItemChangedCb));
     }
 
-    /// <summary>
-    /// callback handler
-    /// </summary>
-    /// <param name="d"></param>
-    /// <param name="e"></param>
-    private static void ItemChangedCb(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    public ItemStatsView()
     {
-        if (d is ItemStatsView isv)
-            isv.RefreshData();
+        ItemStatsModel = new ItemStatsModel();
+        ItemStatsVm = new ItemStatsViewModel(ItemStatsModel);
+        InitializeComponent();
     }
+
+    public IEnumerable<string> MainStatsNames { get; } =
+        new[] { string.Empty }.Concat(StatData.MainStatsUpgrades.Select(x => x.Key));
+
+    public IEnumerable<string> SubStatsNames { get; } =
+        new[] { string.Empty }.Concat(StatData.SubStatsUpgrades.Select(x => x.Key));
 
     public string GroupCaption
     {
@@ -47,22 +41,11 @@ public partial class ItemStatsView : INotifyPropertyChanged
         set => SetValue(GroupCaptionProperty, value);
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public void RefreshData()
-    {
-        ItemStatsVm = new ItemStatsViewModel(ItemStatsModel);
-
-    }
-
     public ItemStatsModel ItemStatsModel
     {
         get => (ItemStatsModel)GetValue(ItemStatsModelProperty);
         set => SetValue(ItemStatsModelProperty, value);
     }
-
-    private ItemStatsViewModel itemStatsVm;
 
     public ItemStatsViewModel ItemStatsVm
     {
@@ -79,6 +62,24 @@ public partial class ItemStatsView : INotifyPropertyChanged
 
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>
+    ///     callback handler
+    /// </summary>
+    /// <param name="d"></param>
+    /// <param name="e"></param>
+    private static void ItemChangedCb(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is ItemStatsView isv)
+            isv.RefreshData();
+    }
+
+    /// <summary>
+    /// </summary>
+    public void RefreshData()
+    {
+        ItemStatsVm = new ItemStatsViewModel(ItemStatsModel);
+    }
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {

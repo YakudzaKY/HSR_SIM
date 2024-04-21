@@ -3,6 +3,6 @@
 /// <summary>
 ///     all damage type reusts
 /// </summary>
-public class EffAllDamageResist() : Effect()
+public class EffAllDamageResist : Effect
 {
 }

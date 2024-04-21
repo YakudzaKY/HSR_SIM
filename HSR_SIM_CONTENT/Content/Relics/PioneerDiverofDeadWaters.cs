@@ -16,7 +16,7 @@ internal class PioneerDiverofDeadWaters : DefaultRelicSet
 
     public PioneerDiverofDeadWaters(IFighter parent, int num) : base(parent, num)
     {
-        onDebuffHitAppliedBuff = new AppliedBuff(Parent.Parent,null,this)
+        onDebuffHitAppliedBuff = new AppliedBuff(Parent.Parent, null, this)
             { BaseDuration = 1, Dispellable = false, CustomIconName = "Sword", Effects = [] };
         if (num >= 2)
             Parent.Parent.PassiveBuffs.Add(new PassiveBuff(parent.Parent, this)
@@ -24,11 +24,14 @@ internal class PioneerDiverofDeadWaters : DefaultRelicSet
                 Effects = new List<Effect> { new EffAllDamageBoost { Value = 0.12 } },
                 IsTargetCheck = true,
                 Target = Parent.Parent,
-                ApplyConditions = [new Condition
-                {
-                    ConditionParam = Condition.ConditionCheckParam.AnyDebuff,
-                    ConditionExpression = Condition.ConditionCheckExpression.Exists
-                }]
+                ApplyConditions =
+                [
+                    new Condition
+                    {
+                        ConditionParam = Condition.ConditionCheckParam.AnyDebuff,
+                        ConditionExpression = Condition.ConditionCheckExpression.Exists
+                    }
+                ]
             });
 
         if (num >= 4)
@@ -37,11 +40,14 @@ internal class PioneerDiverofDeadWaters : DefaultRelicSet
                 Effects = new List<Effect> { new EffCritDmg { CalculateValue = Calc4Pieces } },
                 IsTargetCheck = true,
                 Target = Parent.Parent,
-                ApplyConditions = [new Condition
-                {
-                    ConditionParam = Condition.ConditionCheckParam.AnyDebuff,
-                    ConditionExpression = Condition.ConditionCheckExpression.Exists
-                }]
+                ApplyConditions =
+                [
+                    new Condition
+                    {
+                        ConditionParam = Condition.ConditionCheckParam.AnyDebuff,
+                        ConditionExpression = Condition.ConditionCheckExpression.Exists
+                    }
+                ]
             });
     }
 
@@ -76,9 +82,9 @@ internal class PioneerDiverofDeadWaters : DefaultRelicSet
         var mod = ent.SourceUnit.AppliedBuffs.Any(x => x.Reference == onDebuffHitAppliedBuff) ? 2 : 1;
         return debuffs switch
         {
-            >= 3 => new Formula() {Expression = $"0.12 * {mod}"},
-            2 => new Formula() {Expression = $"0.08 * {mod}"},
-            _ => new Formula() {Expression = $"0"},
+            >= 3 => new Formula { Expression = $"0.12 * {mod}" },
+            2 => new Formula { Expression = $"0.08 * {mod}" },
+            _ => new Formula { Expression = "0" }
         };
     }
 }

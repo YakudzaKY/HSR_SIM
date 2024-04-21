@@ -1,16 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 
 <Unit name="AutomatonGrizzlyComplete">
-	<Weakness value="Fire"/>
-	<Weakness value="Lightning"/>
-	<Weakness value="Ice"/>
-	<Resist value="Physical" byValue="0.20" />
-	<Resist value="Wind" byValue="0.20" />
-	<Resist value="Quantum" byValue="0.20" />
-	<Resist value="Imaginary" byValue="0.20" />
-	<DebuffResist value="EffFreeze" byValue="0.5" />
-	<DebuffResist value="EffImprisonment" byValue="0.5" />
-	<DebuffResist value="EffEntanglement" byValue="0.5" />
+    <Weakness value="Fire"/>
+    <Weakness value="Lightning"/>
+    <Weakness value="Ice"/>
+    <Resist value="Physical" byValue="0.20"/>
+    <Resist value="Wind" byValue="0.20"/>
+    <Resist value="Quantum" byValue="0.20"/>
+    <Resist value="Imaginary" byValue="0.20"/>
+    <DebuffResist value="EffFreeze" byValue="0.5"/>
+    <DebuffResist value="EffImprisonment" byValue="0.5"/>
+    <DebuffResist value="EffEntanglement" byValue="0.5"/>
     <Stats level="1" hp="818" atk="12" spd="144" def="210" effect_hit="0.0" effect_res="0.20" tgh="480"/>
     <Stats level="2" hp="1074" atk="14" spd="144" def="220" effect_hit="0.0" effect_res="0.20" tgh="480"/>
     <Stats level="3" hp="1125" atk="15" spd="144" def="230" effect_hit="0.0" effect_res="0.20" tgh="480"/>

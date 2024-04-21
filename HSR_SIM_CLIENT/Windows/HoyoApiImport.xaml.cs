@@ -4,18 +4,24 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Xml.Linq;
 using HSR_SIM_LIB.Utils;
-using static HSR_SIM_CLIENT.Utils.GuiUtils;
 using Newtonsoft.Json;
+using static HSR_SIM_CLIENT.Utils.GuiUtils;
 
 namespace HSR_SIM_CLIENT.Windows;
 
 public partial class HoyoApiImport : INotifyPropertyChanged
 {
-    private string btnImportCaption = ImportWait;
-    public bool ApiFullSave { get; set; } = true;
-    public string? ApiMyUid { get; set; } = IniF.IniReadValue("WarGear", "UID");
     private const string ImportWait = "Import";
     private const string ImportProgress = "Please wait";
+    private string btnImportCaption = ImportWait;
+
+    public HoyoApiImport()
+    {
+        InitializeComponent();
+    }
+
+    public bool ApiFullSave { get; set; } = true;
+    public string? ApiMyUid { get; set; } = IniF.IniReadValue("WarGear", "UID");
 
     public string BtnImportCaption
     {
@@ -41,13 +47,8 @@ public partial class HoyoApiImport : INotifyPropertyChanged
         if (PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(name));
     }
 
-    public HoyoApiImport()
-    {
-        InitializeComponent();
-    }
-
     /// <summary>
-    /// rename stats by values(percent or not)
+    ///     rename stats by values(percent or not)
     /// </summary>
     /// <param name="lst_out"></param>
     /// <param name="lst_in"></param>
@@ -131,6 +132,69 @@ public partial class HoyoApiImport : INotifyPropertyChanged
         BtnImportCaption = ImportWait;
     }
 
+    /// <summary>
+    ///     save character gear and stats into XML
+    /// </summary>
+    /// <param name="character"></param>
+    /// <param name="savePath"></param>
+    private static void XmlSave(Character character, string savePath)
+    {
+        XElement unit = new("Unit");
+        unit.SetAttributeValue("name", character?.Name);
+        unit.SetAttributeValue("level", character.Level.ToString());
+        unit.SetAttributeValue("rank", character.Rank.ToString());
+        XElement stat = new("Stats");
+        foreach (var attr in character.attributes) stat.SetAttributeValue(attr.field, attr.value);
+        unit.Add(stat);
+
+        if (character.light_cone != null)
+        {
+            XElement xLc = new("LightCone");
+            xLc.SetAttributeValue("rank", character.light_cone.rank.ToString());
+            xLc.SetAttributeValue("level", character.light_cone.level.ToString());
+            xLc.SetAttributeValue("name", character.light_cone.name);
+            unit.Add(xLc);
+        }
+
+        foreach (var skl in character.skills)
+        {
+            XElement skill = new("Skill");
+            skill.SetAttributeValue("name", skl.name);
+            skill.SetAttributeValue("level", skl.level.ToString());
+            skill.SetAttributeValue("max_level", skl.max_level.ToString());
+            unit.Add(skill);
+        }
+
+
+        foreach (var gearSet in character.relic_sets)
+        {
+            XElement set = new("RelicSet");
+            set.SetAttributeValue("name", gearSet.name);
+            set.SetAttributeValue("num", gearSet.num.ToString());
+            unit.Add(set);
+        }
+
+
+        unit.Save(savePath);
+    }
+
+    private static string GetWarGearPath()
+    {
+        return Utl.DataFolder + "\\WarGear\\";
+    }
+
+    private static string GetProfilePath()
+    {
+        return Utl.DataFolder + "\\Profile\\";
+    }
+
+    private static string GetDefaultFileName(Character character, bool withExt = true)
+    {
+        var ext = withExt ? ".xml" : "";
+        return string.Format("{0:s}_{1:s}" + ext, character?.Name,
+            IniF.IniReadValue("WarGear", "UID"));
+    }
+
 
     public class Player
     {
@@ -200,68 +264,5 @@ public partial class HoyoApiImport : INotifyPropertyChanged
     {
         public List<Character> characters;
         public Player player;
-    }
-
-    /// <summary>
-    ///     save character gear and stats into XML
-    /// </summary>
-    /// <param name="character"></param>
-    /// <param name="savePath"></param>
-    private static void XmlSave(Character character, string savePath)
-    {
-        XElement unit = new("Unit");
-        unit.SetAttributeValue("name", character?.Name);
-        unit.SetAttributeValue("level", character.Level.ToString());
-        unit.SetAttributeValue("rank", character.Rank.ToString());
-        XElement stat = new("Stats");
-        foreach (var attr in character.attributes) stat.SetAttributeValue(attr.field, attr.value);
-        unit.Add(stat);
-
-        if (character.light_cone != null)
-        {
-            XElement xLc = new("LightCone");
-            xLc.SetAttributeValue("rank", character.light_cone.rank.ToString());
-            xLc.SetAttributeValue("level", character.light_cone.level.ToString());
-            xLc.SetAttributeValue("name", character.light_cone.name);
-            unit.Add(xLc);
-        }
-
-        foreach (var skl in character.skills)
-        {
-            XElement skill = new("Skill");
-            skill.SetAttributeValue("name", skl.name);
-            skill.SetAttributeValue("level", skl.level.ToString());
-            skill.SetAttributeValue("max_level", skl.max_level.ToString());
-            unit.Add(skill);
-        }
-
-
-        foreach (var gearSet in character.relic_sets)
-        {
-            XElement set = new("RelicSet");
-            set.SetAttributeValue("name", gearSet.name);
-            set.SetAttributeValue("num", gearSet.num.ToString());
-            unit.Add(set);
-        }
-
-
-        unit.Save(savePath);
-    }
-
-    private static string GetWarGearPath()
-    {
-        return Utl.DataFolder + "\\WarGear\\";
-    }
-
-    private static string GetProfilePath()
-    {
-        return Utl.DataFolder + "\\Profile\\";
-    }
-
-    private static string GetDefaultFileName(Character character, bool withExt = true)
-    {
-        var ext = withExt ? ".xml" : "";
-        return string.Format("{0:s}_{1:s}" + ext, character?.Name,
-            IniF.IniReadValue("WarGear", "UID"));
     }
 }

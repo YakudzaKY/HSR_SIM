@@ -16,7 +16,7 @@ internal class LongevousDisciple : DefaultRelicSet
 
     public LongevousDisciple(IFighter parent, int num) : base(parent, num)
     {
-        uniqueAppliedBuff = new AppliedBuff(Parent.Parent,null,this)
+        uniqueAppliedBuff = new AppliedBuff(Parent.Parent, null, this)
         {
             Type = Buff.BuffType.Buff,
             BaseDuration = 2,

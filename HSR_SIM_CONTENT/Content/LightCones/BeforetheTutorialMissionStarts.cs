@@ -39,7 +39,7 @@ internal class BeforetheTutorialMissionStarts : DefaultLightCone
                 where p is DirectDamage &&
                       (p.TargetUnit.GetBuffSumByType(ent, typeof(EffDef), buffType: Buff.BuffType.Debuff) < 0
                        || p.TargetUnit.GetBuffSumByType(ent, typeof(EffDefPrc), buffType: Buff.BuffType.Debuff) < 0
-                       || p.SourceUnit.GetBuffSumByType(ent, typeof(EffDefIgnore))> 0)
+                       || p.SourceUnit.GetBuffSumByType(ent, typeof(EffDefIgnore)) > 0)
                 select p.TargetUnit)
             .Distinct();
         var emmTargets = targetHits as Unit[] ?? targetHits.ToArray();

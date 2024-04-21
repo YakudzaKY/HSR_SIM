@@ -49,10 +49,13 @@
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <Button Grid.Column="0" Click="ButtonBase_OnClick"
-                            IsEnabled="{Binding Path=WorkInProgress,Mode=OneWay ,Converter={StaticResource ReverseBoolConverter}}" >
+                            IsEnabled="{Binding Path=WorkInProgress,Mode=OneWay ,Converter={StaticResource ReverseBoolConverter}}">
                         Go
                     </Button>
-                    <Button Grid.Column="1" IsEnabled="{Binding Path=WorkInProgress,Mode=OneWay}" Name="BtnCancel" Click="BtnCancel_OnClick">Cancel</Button>
+                    <Button Grid.Column="1" IsEnabled="{Binding Path=WorkInProgress,Mode=OneWay}" Name="BtnCancel"
+                            Click="BtnCancel_OnClick">
+                        Cancel
+                    </Button>
 
                 </Grid>
             </StackPanel>
@@ -93,7 +96,7 @@
 
                 </StackPanel>
             </ScrollViewer>
-            <mah:MetroTabControl Grid.Column="4" >
+            <mah:MetroTabControl Grid.Column="4">
                 <mah:MetroTabItem IsSelected="{Binding StatImpactTabSelected, Mode=TwoWay}" Header="Stat impact calc">
                     <mah:MetroTabItem.Content>
                         <Grid>
@@ -124,7 +127,7 @@
                                 <TextBox Grid.Row="3" Grid.Column="0" PreviewTextInput="NumberValidationTextBox"
                                          Text="{Binding UpgradesPerIterations ,Mode=TwoWay}" />
                                 <Label Grid.Row="2" Grid.Column="1">Stat to replace:</Label>
-                                <ComboBox Grid.Row="3" Grid.Column="1" DisplayMemberPath="Name" 
+                                <ComboBox Grid.Row="3" Grid.Column="1" DisplayMemberPath="Name"
                                           ItemsSource="{Binding SelectedStats}"
                                           SelectedItem="{Binding SelectedStatToReplace,Mode=TwoWay}" />
                                 <Label Grid.Row="4" Grid.Column="0">Upgrades iterations:</Label>
@@ -154,50 +157,53 @@
                     </mah:MetroTabItem.Content>
 
                 </mah:MetroTabItem>
-                <mah:MetroTabItem IsSelected="{Binding GearReplaceTabSelected, Mode=TwoWay}" >
+                <mah:MetroTabItem IsSelected="{Binding GearReplaceTabSelected, Mode=TwoWay}">
                     <mah:MetroTabItem.Header>
                         GearReplaceCalc
                     </mah:MetroTabItem.Header>
                     <mah:MetroTabItem.Content>
-                       <Grid>
-                         <Grid.ColumnDefinitions>
-                             <ColumnDefinition></ColumnDefinition>
-                             <ColumnDefinition></ColumnDefinition>
-                             <ColumnDefinition></ColumnDefinition>
-                         </Grid.ColumnDefinitions>  
-                           <StackPanel Grid.Column="0" Orientation="Vertical">
-                               <Label >Character:</Label>
-                               <ComboBox ItemsSource="{Binding AvailableCharacters}"
-                                         SelectedItem="{Binding SelectedCharacterToCalc,Mode=TwoWay}" 
-                                        />
-                               <Label >Game localization:</Label>
-                               <ComboBox ItemsSource="{Binding AvailableLocalizations}"
-                                         SelectedItem="{Binding SelectedLocalization,Mode=TwoWay}" 
-                               />
-                               <Button Click="BtnImportScreen_OnClick" Content="Import from screen" Name="BtnImportScreen" ></Button>
-                               <Button Click="BtnResetScanArea_OnClick" Content="Reset scan area" Name="BtnResetScanArea" ></Button>
-                           </StackPanel>
-                           <views:ItemStatsView Grid.Column="1" x:Name="VvItemStatsUnequipped" ItemStatsModel="{Binding ItemStatsUnequipped, Mode=OneWay}"  GroupCaption="Stats unequipped"/>
-                           <views:ItemStatsView Grid.Column="2" x:Name="VvItemStatsEquipped"  ItemStatsModel="{Binding ItemStatsEquipped, Mode=OneWay}" GroupCaption="Stats equipped"/>
-                       </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Orientation="Vertical">
+                                <Label>Character:</Label>
+                                <ComboBox ItemsSource="{Binding AvailableCharacters}"
+                                          SelectedItem="{Binding SelectedCharacterToCalc,Mode=TwoWay}" />
+                                <Label>Game localization:</Label>
+                                <ComboBox ItemsSource="{Binding AvailableLocalizations}"
+                                          SelectedItem="{Binding SelectedLocalization,Mode=TwoWay}" />
+                                <Button Click="BtnImportScreen_OnClick" Content="Import from screen"
+                                        Name="BtnImportScreen" />
+                                <Button Click="BtnResetScanArea_OnClick" Content="Reset scan area"
+                                        Name="BtnResetScanArea" />
+                            </StackPanel>
+                            <views:ItemStatsView Grid.Column="1" x:Name="VvItemStatsUnequipped"
+                                                 ItemStatsModel="{Binding ItemStatsUnequipped, Mode=OneWay}"
+                                                 GroupCaption="Stats unequipped" />
+                            <views:ItemStatsView Grid.Column="2" x:Name="VvItemStatsEquipped"
+                                                 ItemStatsModel="{Binding ItemStatsEquipped, Mode=OneWay}"
+                                                 GroupCaption="Stats equipped" />
+                        </Grid>
                     </mah:MetroTabItem.Content>
                 </mah:MetroTabItem>
             </mah:MetroTabControl>
 
         </Grid>
-        
+
         <StackPanel Orientation="Vertical" Grid.Row="1">
-            <Label  Content="{Binding WorkProgressText ,Mode=OneWay}"/>
-            <mah:MetroProgressBar Maximum="{Binding SimOperationsMax, Mode=OneWay}" Value="{Binding SimOperationsCurrent,Mode=OneWay}" />
+            <Label Content="{Binding WorkProgressText ,Mode=OneWay}" />
+            <mah:MetroProgressBar Maximum="{Binding SimOperationsMax, Mode=OneWay}"
+                                  Value="{Binding SimOperationsCurrent,Mode=OneWay}" />
         </StackPanel>
-        
+
         <ScrollViewer Grid.Row="2">
             <ScrollViewer.VerticalScrollBarVisibility>Visible</ScrollViewer.VerticalScrollBarVisibility>
-           
-        <StackPanel Name="StackCharts" Orientation="Vertical" >
-   
-        </StackPanel>
-            </ScrollViewer>
-      
+
+            <StackPanel Name="StackCharts" Orientation="Vertical" />
+        </ScrollViewer>
+
     </Grid>
 </mah:MetroWindow>

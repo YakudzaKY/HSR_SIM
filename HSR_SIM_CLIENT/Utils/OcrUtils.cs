@@ -2,7 +2,6 @@
 using System.Xml;
 using HSR_SIM_LIB.Utils;
 using Tesseract;
-
 using static HSR_SIM_CLIENT.Utils.GuiUtils;
 
 namespace HSR_SIM_CLIENT.Utils;
@@ -62,22 +61,19 @@ public class OcrUtils
 
     private static void Negate(Bitmap image)
     {
-
         int x, y;
 
         // Loop through the images pixels to reset color.
-        for(x=0; x<image.Width; x++)
+        for (x = 0; x < image.Width; x++)
+        for (y = 0; y < image.Height; y++)
         {
-            for(y=0; y<image.Height; y++)
-            {
-                Color pixelColor = image.GetPixel(x, y);
-                Color newColor = Color.FromArgb(0xff - pixelColor.R
-                    , 0xff - pixelColor.G, 0xff - pixelColor.B);
-                image.SetPixel(x, y, newColor);
-            }
+            var pixelColor = image.GetPixel(x, y);
+            var newColor = Color.FromArgb(0xff - pixelColor.R
+                , 0xff - pixelColor.G, 0xff - pixelColor.B);
+            image.SetPixel(x, y, newColor);
         }
     }
-    
+
     private void PictureBox_MouseMove(object sender, MouseEventArgs e)
     {
         if (isDown)
@@ -98,7 +94,7 @@ public class OcrUtils
     {
         return AppDomain.CurrentDomain.BaseDirectory + "tessdata";
     }
-    
+
     /// <summary>
     ///     Get comparison items stats from  screen
     /// </summary>
@@ -106,7 +102,7 @@ public class OcrUtils
     /// <param name="forceNewRect">ask for select new screen zones(false for use INI file saves) </param>
     /// <param name="loc">localization</param>
     /// <returns></returns>
-    public Dictionary<int, RStatWordRec> GetComparisonItemStat(long hwnd,  ref bool forceNewRect, string loc)
+    public Dictionary<int, RStatWordRec> GetComparisonItemStat(long hwnd, ref bool forceNewRect, string loc)
     {
         var res = new Dictionary<int, RStatWordRec>();
         var hsrWindow = FindWindow(null, "Honkai: Star Rail");
@@ -116,7 +112,7 @@ public class OcrUtils
         //init engines LSTM for text, Legacy for numbers
         var engine = new TesseractEngine(GetTessDataFolder(), loc, EngineMode.LstmOnly);
         engine.DefaultPageSegMode = PageSegMode.SingleBlock;
-        
+
         //need 2 picture rectangles. One is unequipped item, second is equipped item
         foreach (var itemRectMode in (RectModeEnm[])Enum.GetValues(typeof(RectModeEnm)))
         {
@@ -147,7 +143,7 @@ public class OcrUtils
 
 
                 //copy part of screenshot
-                var miniHsrScreen =   hsrScreen.Clone(selectRect, hsrScreen.PixelFormat);
+                var miniHsrScreen = hsrScreen.Clone(selectRect, hsrScreen.PixelFormat);
                 //remove green upgrade step count
                 RemoveGreen(miniHsrScreen);
                 //Orange to white
@@ -158,9 +154,9 @@ public class OcrUtils
                 Negate(miniHsrScreen);
                 //GrayToWhite
                 GreyToWhite(miniHsrScreen);
-                    
+
                 SetForegroundWindow((IntPtr)hwnd);
-                miniHsrScreen.Save($"test{itemRectMode}.bmp");// uncoment to debug image processing
+                miniHsrScreen.Save($"test{itemRectMode}.bmp"); // uncoment to debug image processing
                 using (var img = PixConverter.ToPix(miniHsrScreen))
                 {
                     var page = engine.Process(img);
@@ -203,7 +199,8 @@ public class OcrUtils
                                         val = strings[i].Substring(ndx).Replace(" ", string.Empty);
                                     else
                                         val = strings[i]
-                                            .Substring(rx.Matches(strings[i]).FirstOrDefault(x => x.Index > wordNdx)?.Index??strings[i].Length)
+                                            .Substring(rx.Matches(strings[i]).FirstOrDefault(x => x.Index > wordNdx)
+                                                ?.Index ?? strings[i].Length)
                                             .Replace(" ", string.Empty);
                                     var key = wordTo + (val.EndsWith("%") ? "_prc" : "_fix");
 
@@ -233,69 +230,64 @@ public class OcrUtils
     }
 
     /// <summary>
-    /// Remove green circles with upgrade steps
+    ///     Remove green circles with upgrade steps
     /// </summary>
     /// <param name="image">Bitmap to process</param>
     /// <param name="threshold">green value over other colors to replace by black</param>
-    private void RemoveGreen(Bitmap image,int threshold=10)
+    private void RemoveGreen(Bitmap image, int threshold = 10)
     {
         int x, y;
-        for(x=0; x<image.Width; x++)
+        for (x = 0; x < image.Width; x++)
+        for (y = 0; y < image.Height; y++)
         {
-            for(y=0; y<image.Height; y++)
+            var pixelColor = image.GetPixel(x, y);
+            if (pixelColor.G - threshold > pixelColor.B && pixelColor.G - threshold > pixelColor.R)
             {
-                Color pixelColor = image.GetPixel(x, y);
-                if (pixelColor.G -threshold > pixelColor.B&&pixelColor.G -threshold > pixelColor.R)
-                {
-                    Color newColor = Color.FromArgb(0,0,0);
-                    image.SetPixel(x, y, newColor);
-                }
+                var newColor = Color.FromArgb(0, 0, 0);
+                image.SetPixel(x, y, newColor);
             }
         }
     }
 
     /// <summary>
-    /// Make orange text white(like other text)
+    ///     Make orange text white(like other text)
     /// </summary>
     /// <param name="image">Bitmap to process</param>
     /// <param name="threshold">green value over other colors to replace by black</param>
-    private void RedToWhite(Bitmap image,int threshold=50)
+    private void RedToWhite(Bitmap image, int threshold = 50)
     {
         int x, y;
-        for(x=0; x<image.Width; x++)
+        for (x = 0; x < image.Width; x++)
+        for (y = 0; y < image.Height; y++)
         {
-            for(y=0; y<image.Height; y++)
+            var pixelColor = image.GetPixel(x, y);
+            if (pixelColor.R - threshold > pixelColor.G && pixelColor.R - threshold > pixelColor.B)
             {
-                Color pixelColor = image.GetPixel(x, y);
-                if (pixelColor.R -threshold > pixelColor.G&&pixelColor.R -threshold > pixelColor.B)
-                {
-                    Color newColor = Color.FromArgb(255,255,255);
-                    image.SetPixel(x, y, newColor);
-                }
+                var newColor = Color.FromArgb(255, 255, 255);
+                image.SetPixel(x, y, newColor);
             }
         }
     }
 
 
     /// <summary>
-    /// Make grey text white(like background)
+    ///     Make grey text white(like background)
     /// </summary>
     /// <param name="image">Bitmap to process</param>
     /// <param name="threshold">green value over other colors to replace by black</param>
     /// <param name="thresholdTop">green value over other colors to replace by black(at top part of image)</param>
-    private void GreyToWhite(Bitmap image,int threshold=530, int thresholdTop=440)
+    private void GreyToWhite(Bitmap image, int threshold = 530, int thresholdTop = 440)
     {
         int x, y;
-        for(x=0; x<image.Width; x++)
+        for (x = 0; x < image.Width; x++)
+        for (y = 0; y < image.Height; y++)
         {
-            for(y=0; y<image.Height; y++)
+            var pixelColor = image.GetPixel(x, y);
+            if (pixelColor.R + pixelColor.G + pixelColor.B >= threshold ||
+                (pixelColor.R + pixelColor.G + pixelColor.B >= thresholdTop && y <= image.Height / 4))
             {
-                Color pixelColor = image.GetPixel(x, y);
-                if (pixelColor.R+ pixelColor.G+ pixelColor.B >=threshold||(pixelColor.R+ pixelColor.G+ pixelColor.B >=thresholdTop&&y<=image.Height/4))
-                {
-                    Color newColor = Color.FromArgb(255,255,255);
-                    image.SetPixel(x, y, newColor);
-                }
+                var newColor = Color.FromArgb(255, 255, 255);
+                image.SetPixel(x, y, newColor);
             }
         }
     }

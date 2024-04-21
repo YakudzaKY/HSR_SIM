@@ -1,13 +1,7 @@
 ﻿using System.ComponentModel;
-using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Media.Media3D;
 using HSR_SIM_CLIENT.ViewModels;
-using HSR_SIM_LIB.Skills;
-using HSR_SIM_LIB.Utils;
 using TreeView = System.Windows.Controls.TreeView;
 
 
@@ -16,24 +10,20 @@ namespace HSR_SIM_CLIENT.Views;
 public partial class BuffView : INotifyPropertyChanged
 {
     public static readonly DependencyProperty BuffToViewProperty;
-    
+
+    private ConditionViewModel? selectedCondition;
+
 
     static BuffView()
     {
         BuffToViewProperty = DependencyProperty.Register(nameof(BuffToView), typeof(BuffViewModel),
             typeof(BuffView), new FrameworkPropertyMetadata(PropChangedCb));
-        
     }
 
-    private static void PropChangedCb(DependencyObject d, DependencyPropertyChangedEventArgs e)
+
+    public BuffView()
     {
-        if (d is BuffView bv)
-            bv.RefreshData();
-    }
-    private void RefreshData()
-    {
-        SelectedCondition = null;
-     
+        InitializeComponent();
     }
 
 
@@ -43,14 +33,6 @@ public partial class BuffView : INotifyPropertyChanged
         set => SetValue(BuffToViewProperty, value);
     }
 
-
-
-    public BuffView()
-    {
-        InitializeComponent();
-    }
-
-    private ConditionViewModel? selectedCondition;
     public ConditionViewModel? SelectedCondition
     {
         get => selectedCondition;
@@ -64,6 +46,17 @@ public partial class BuffView : INotifyPropertyChanged
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    private static void PropChangedCb(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is BuffView bv)
+            bv.RefreshData();
+    }
+
+    private void RefreshData()
+    {
+        SelectedCondition = null;
+    }
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {

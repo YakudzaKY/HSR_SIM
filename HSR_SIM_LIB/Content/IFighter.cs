@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.TurnBasedClasses;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -17,15 +16,16 @@ public interface IFighter : ICloneable
     public delegate void EventHandler(Event ent);
 
     public delegate void StepHandler(Step step);
-    public double MaxEnergy { get;  } 
-    
+
+    public double MaxEnergy { get; }
+
     public Ability.ElementEnm Element { get; }
 
     /// <summary>
     ///     A debuff that is applied when a vulnerability is broken.
     /// </summary>
     public AppliedBuff WeaknessBreakDebuff { get; set; }
-    
+
     public PathType? Path { get; }
 
     public EventHandler EventHandlerProc { get; set; }
@@ -56,9 +56,6 @@ public interface IFighter : ICloneable
     ///     Unique mechanics for this character
     /// </summary>
     public MechDictionary Mechanics { get; set; }
-
-
-
 
 
     /// <summary>

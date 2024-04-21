@@ -23,6 +23,8 @@ public abstract class Event : CloneClass
     private readonly int procRatio = 1;
     public List<Condition> ApplyConditions;
 
+    private object calculateValue;
+
     private int procRatioCounter = 1; //counter
     private double? value; //Theoretical value
 
@@ -36,17 +38,17 @@ public abstract class Event : CloneClass
         ParentStep = parentStep;
     }
 
-    public object CalculateValue {
+    public object CalculateValue
+    {
         get => calculateValue;
         set
         {
-            if (value!=null&&value is not Formula && value is not Func<Event, Formula>)
+            if (value != null && value is not Formula && value is not Func<Event, Formula>)
                 throw new Exception("CalculateValue should be Formula or Func<Event, Formula>");
             calculateValue = value;
         }
     }
 
-    private object calculateValue;
     public CalculateTargetPrc CalculateTargets { get; init; }
 
 
@@ -201,8 +203,8 @@ public abstract class Event : CloneClass
             CalculateValue = FighterUtils.DebuffAppliedFormula(baseChance),
             RealValue = new MersenneTwister().NextDouble()
         };
-        this.Value = applyBuff.Value;
-        this.RealValue = applyBuff.RealValue;
+        Value = applyBuff.Value;
+        RealValue = applyBuff.RealValue;
         if (applyBuff.Value >= applyBuff.RealValue)
         {
             ChildEvents.Add(applyBuff);

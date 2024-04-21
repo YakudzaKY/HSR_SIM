@@ -3,6 +3,6 @@
 /// <summary>
 ///     Outrage debuff by Deer vines?
 /// </summary>
-public class EffOutrage() : Effect()
+public class EffOutrage : Effect
 {
 }

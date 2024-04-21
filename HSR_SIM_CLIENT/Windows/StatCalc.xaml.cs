@@ -4,10 +4,8 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows;
-using System.Windows.Forms.Integration;
 using System.Windows.Input;
 using System.Windows.Interop;
-using HSR_SIM_CLIENT.ChartTools;
 using HSR_SIM_CLIENT.Models;
 using HSR_SIM_CLIENT.ThreadTools;
 using HSR_SIM_CLIENT.Utils;
@@ -31,28 +29,71 @@ public partial class StatCalc : INotifyPropertyChanged
     /// </summary>
     private const string Delimiter = "\\";
 
+    private AggregateThread? aggThread;
+
     /// <summary>
     ///     force new OCR rectangles
     /// </summary>
     private bool forceNewRect;
+
     /// <summary>
-    /// render overall damage compare chart
+    ///     Tab selection stat calc
     /// </summary>
-    private bool renderOverallCompareRes = false;
+    /// <returns></returns>
+    private bool gearReplaceTabSelected = true;
+
     private bool interruptFlag;
-    private ThreadJob? threadJob;
-    private AggregateThread? aggThread;
+
+
+    /// <summary>
+    ///     Iterations per every job
+    /// </summary>
+    private int iterationsCnt = 1000;
+
     private List<SimTask>? myTaskList;
     private ObservableCollection<SelectedItem> profiles = [];
 
+    /// <summary>
+    ///     render overall damage compare chart
+    /// </summary>
+    private bool renderOverallCompareRes;
+
 
     private ObservableCollection<SelectedItem> scenarios = [];
+    private string? selectedCharacterToCalc;
+    private string? selectedLocalization;
     private ObservableCollection<SelectedItem?> selectedStats = [];
+
+    private int simOperationsCurrent;
+
+    private int simOperationsMax;
+
+    /// <summary>
+    ///     Tab selection stat calc
+    /// </summary>
+    /// <returns></returns>
+    private bool statImpactTabSelected = true;
+
     private Dictionary<string, string>? statValTable;
 
+    /// <summary>
+    ///     Simulation threads count
+    /// </summary>
+    private int thrCnt;
 
-    public ItemStatsModel ItemStatsUnequipped { get; } = new ItemStatsModel();
-    public ItemStatsModel ItemStatsEquipped { get; } = new ItemStatsModel();
+    private ThreadJob? threadJob;
+
+
+    /// <summary>
+    ///     calculating in progress flag
+    /// </summary>
+    private bool workInProgress;
+
+
+    /// <summary>
+    ///     calculating in progress flag
+    /// </summary>
+    private string? workProgressText;
 
     public StatCalc()
     {
@@ -63,9 +104,13 @@ public partial class StatCalc : INotifyPropertyChanged
             ThrCnt = Math.Max(Environment.ProcessorCount / 2 - 1, 1);
     }
 
+
+    public ItemStatsModel ItemStatsUnequipped { get; } = new();
+    public ItemStatsModel ItemStatsEquipped { get; } = new();
+
     public ObservableCollection<string> AvailableCharacters { get; } = [];
     public ObservableCollection<string> AvailableLocalizations { get; } = [];
-    
+
     public string? SelectedLocalization
     {
         get => selectedLocalization;
@@ -76,7 +121,7 @@ public partial class StatCalc : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
-    
+
     public string? SelectedCharacterToCalc
     {
         get => selectedCharacterToCalc;
@@ -88,12 +133,6 @@ public partial class StatCalc : INotifyPropertyChanged
         }
     }
 
-    /// <summary>
-    /// Tab selection stat calc
-    /// </summary>
-    /// <returns></returns>
-    private bool statImpactTabSelected = true;
-
     public bool StatImpactTabSelected
     {
         get => statImpactTabSelected;
@@ -104,12 +143,6 @@ public partial class StatCalc : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
-
-    /// <summary>
-    /// Tab selection stat calc
-    /// </summary>
-    /// <returns></returns>
-    private bool gearReplaceTabSelected = true;
 
     public bool GearReplaceTabSelected
     {
@@ -179,12 +212,6 @@ public partial class StatCalc : INotifyPropertyChanged
     /// </summary>
     public int UpgradesIterations { get; set; }
 
-
-    /// <summary>
-    ///     calculating in progress flag
-    /// </summary>
-    private bool workInProgress;
-
     public bool WorkInProgress
     {
         get => workInProgress;
@@ -196,12 +223,6 @@ public partial class StatCalc : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
-
-
-    /// <summary>
-    ///     calculating in progress flag
-    /// </summary>
-    private string? workProgressText;
 
     public string? WorkProgressText
     {
@@ -215,8 +236,6 @@ public partial class StatCalc : INotifyPropertyChanged
         }
     }
 
-    private int simOperationsMax;
-
     public int SimOperationsMax
     {
         get => simOperationsMax;
@@ -228,10 +247,6 @@ public partial class StatCalc : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
-
-    private int simOperationsCurrent;
-    private string? selectedCharacterToCalc;
-    private string? selectedLocalization;
 
     public int SimOperationsCurrent
     {
@@ -245,12 +260,6 @@ public partial class StatCalc : INotifyPropertyChanged
         }
     }
 
-
-    /// <summary>
-    ///     Iterations per every job
-    /// </summary>
-    private int iterationsCnt = 1000;
-
     public int IterationsCnt
     {
         get => iterationsCnt;
@@ -261,11 +270,6 @@ public partial class StatCalc : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
-
-    /// <summary>
-    ///     Simulation threads count
-    /// </summary>
-    private int thrCnt;
 
     public int ThrCnt
     {
@@ -393,16 +397,16 @@ public partial class StatCalc : INotifyPropertyChanged
         //localizations
         AvailableLocalizations.Clear();
         files = Directory.GetFiles(OcrUtils.GetTessDataFolder(), "*.traineddata");
-        foreach (var t in files) AvailableLocalizations.Add((Path.GetFileNameWithoutExtension(t)));
+        foreach (var t in files) AvailableLocalizations.Add(Path.GetFileNameWithoutExtension(t));
         NotifyPropertyChanged(nameof(AvailableLocalizations));
-        
+
         //load  item stats
         var i = 0;
         ItemStatsEquipped.MainStat = IniF.IniReadValue(GetType().Name, nameof(ItemStatsEquipped) + "Main");
         foreach (var item in IniF.IniReadValue(GetType().Name, nameof(ItemStatsEquipped) + "Sub").Split(Delimiter)
                      .Where(x => !string.IsNullOrEmpty(x)))
         {
-            string[] keyVal = item.Split('=');
+            var keyVal = item.Split('=');
             ItemStatsEquipped.SecondStats[i].Stat = keyVal[0];
             ItemStatsEquipped.SecondStats[i].Val = keyVal[1];
             i++;
@@ -413,7 +417,7 @@ public partial class StatCalc : INotifyPropertyChanged
         foreach (var item in IniF.IniReadValue(GetType().Name, nameof(ItemStatsUnequipped) + "Sub").Split(Delimiter)
                      .Where(x => !string.IsNullOrEmpty(x)))
         {
-            string[] keyVal = item.Split('=');
+            var keyVal = item.Split('=');
             ItemStatsUnequipped.SecondStats[i].Stat = keyVal[0];
             ItemStatsUnequipped.SecondStats[i].Val = keyVal[1];
             i++;
@@ -422,22 +426,18 @@ public partial class StatCalc : INotifyPropertyChanged
 
         SelectedCharacterToCalc = IniF.IniReadValue(GetType().Name, nameof(SelectedCharacterToCalc));
         SelectedLocalization = IniF.IniReadValue(GetType().Name, nameof(SelectedLocalization));
-        
+
         bool.TryParse(IniF.IniReadValue(GetType().Name, nameof(StatImpactTabSelected)), out statImpactTabSelected);
         bool.TryParse(IniF.IniReadValue(GetType().Name, nameof(GearReplaceTabSelected)), out gearReplaceTabSelected);
         NotifyPropertyChanged(nameof(StatImpactTabSelected));
         NotifyPropertyChanged(nameof(GearReplaceTabSelected));
 
         if (int.TryParse(IniF.IniReadValue(GetType().Name, nameof(ThrCnt)), out var parsedThrCnt))
-        {
             ThrCnt = parsedThrCnt;
-        }
 
         ;
         if (int.TryParse(IniF.IniReadValue(GetType().Name, nameof(IterationsCnt)), out var parsedIterationsCnt))
-        {
             IterationsCnt = parsedIterationsCnt;
-        }
 
         ;
 
@@ -468,7 +468,7 @@ public partial class StatCalc : INotifyPropertyChanged
         //generate task list
         myTaskList = new List<SimTask>();
         //render overall chart if gear replace calc and character not null
-        renderOverallCompareRes = (GearReplaceTabSelected&&SelectedCharacterToCalc!=null);
+        renderOverallCompareRes = GearReplaceTabSelected && SelectedCharacterToCalc != null;
 
         foreach (var scenario in Scenarios.Where(x => x.IsSelected))
         foreach (var profile in Profiles.Where(x => x.IsSelected))
@@ -488,28 +488,23 @@ public partial class StatCalc : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// clear charts->do calc->render charts
+    ///     clear charts->do calc->render charts
     /// </summary>
     private async Task DoCalculations()
     {
-
         StackCharts.Children.Clear();
         await Task.Run(DoJob);
         var parentData = threadJob!.CombatData.Where(x => x.Key.Parent is null).ToArray();
         if (renderOverallCompareRes)
-        {
             StackCharts.Children.Add(
-                new ChangeGearOverallCompare(parentData, threadJob.CombatData)); 
-        }
+                new ChangeGearOverallCompare(parentData, threadJob.CombatData));
         foreach (var task in parentData)
-        {
             StackCharts.Children.Add(
                 new CalcResultView(task, threadJob.CombatData.Where(x => x.Key.Parent == task.Key)));
-        }
     }
 
     /// <summary>
-    ///  start and wait threads calculations
+    ///     start and wait threads calculations
     /// </summary>
     private void DoJob()
     {
@@ -532,7 +527,7 @@ public partial class StatCalc : INotifyPropertyChanged
 
         aggThread.Start();
 
-        int oldEta = 0;
+        var oldEta = 0;
         do
         {
             var stDate = DateTime.Now;
@@ -622,8 +617,8 @@ public partial class StatCalc : INotifyPropertyChanged
                 //unequipped
                 if (!string.IsNullOrEmpty(ItemStatsUnequipped.MainStat))
                 {
-                    double val = SearchStatBaseByNameInMainStats(ItemStatsUnequipped.MainStat) +
-                                 15 * SearchStatDeltaByNameInMainStats(ItemStatsUnequipped.MainStat);
+                    var val = SearchStatBaseByNameInMainStats(ItemStatsUnequipped.MainStat) +
+                              15 * SearchStatDeltaByNameInMainStats(ItemStatsUnequipped.MainStat);
                     statModList.Add(new Worker.RStatMod
                     {
                         Character = SelectedCharacterToCalc,
@@ -633,7 +628,6 @@ public partial class StatCalc : INotifyPropertyChanged
                 }
 
                 foreach (var itemStat in ItemStatsUnequipped.SecondStats)
-                {
                     if (!string.IsNullOrEmpty(itemStat.Stat) && !string.IsNullOrEmpty(itemStat.Val))
                         statModList.Add(new Worker.RStatMod
                         {
@@ -641,13 +635,12 @@ public partial class StatCalc : INotifyPropertyChanged
                             Stat = itemStat.Stat,
                             Val = -1 * ExctractDoubleVal(itemStat.Val)
                         });
-                }
 
                 //equipped
                 if (!string.IsNullOrEmpty(ItemStatsEquipped.MainStat))
                 {
-                    double val = SearchStatBaseByNameInMainStats(ItemStatsEquipped.MainStat) +
-                                 15 * SearchStatDeltaByNameInMainStats(ItemStatsEquipped.MainStat);
+                    var val = SearchStatBaseByNameInMainStats(ItemStatsEquipped.MainStat) +
+                              15 * SearchStatDeltaByNameInMainStats(ItemStatsEquipped.MainStat);
                     statModList.Add(new Worker.RStatMod
                     {
                         Character = SelectedCharacterToCalc,
@@ -657,7 +650,6 @@ public partial class StatCalc : INotifyPropertyChanged
                 }
 
                 foreach (var itemStat in ItemStatsEquipped.SecondStats)
-                {
                     if (!string.IsNullOrEmpty(itemStat.Stat) && !string.IsNullOrEmpty(itemStat.Val))
                         statModList.Add(new Worker.RStatMod
                         {
@@ -665,7 +657,6 @@ public partial class StatCalc : INotifyPropertyChanged
                             Stat = itemStat.Stat,
                             Val = ExctractDoubleVal(itemStat.Val)
                         });
-                }
 
                 if (statModList.Count > 0)
                 {
@@ -729,15 +720,6 @@ public partial class StatCalc : INotifyPropertyChanged
         ReloadProfileCharacters();
     }
 
-    /// <summary>
-    ///     item with check box
-    /// </summary>
-    /// <param name="Name"></param>
-    public record SelectedItem(string Name)
-    {
-        public bool IsSelected { get; set; }
-    }
-
     private void BtnCancel_OnClick(object sender, RoutedEventArgs e)
     {
         //in case of crash app we have saved values
@@ -748,7 +730,8 @@ public partial class StatCalc : INotifyPropertyChanged
     private void BtnImportScreen_OnClick(object sender, RoutedEventArgs e)
     {
         var keyVal =
-            new OcrUtils().GetComparisonItemStat(new WindowInteropHelper(this).Handle.ToInt64(), ref forceNewRect,SelectedLocalization);
+            new OcrUtils().GetComparisonItemStat(new WindowInteropHelper(this).Handle.ToInt64(), ref forceNewRect,
+                SelectedLocalization);
         ItemStatsUnequipped.FillStats(keyVal.Where(x => x.Value.StatMode == OcrUtils.RectModeEnm.Minus));
         ItemStatsEquipped.FillStats(keyVal.Where(x => x.Value.StatMode == OcrUtils.RectModeEnm.Plus));
         VvItemStatsEquipped.RefreshData();
@@ -758,5 +741,14 @@ public partial class StatCalc : INotifyPropertyChanged
     private void BtnResetScanArea_OnClick(object sender, RoutedEventArgs e)
     {
         forceNewRect = true;
+    }
+
+    /// <summary>
+    ///     item with check box
+    /// </summary>
+    /// <param name="Name"></param>
+    public record SelectedItem(string Name)
+    {
+        public bool IsSelected { get; set; }
     }
 }

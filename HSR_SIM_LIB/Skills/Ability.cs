@@ -5,7 +5,6 @@ using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using static HSR_SIM_LIB.UnitStuff.Resource;
-using static HSR_SIM_LIB.UnitStuff.Unit;
 
 namespace HSR_SIM_LIB.Skills;
 
@@ -23,12 +22,11 @@ public class Ability : CloneClass
     }
 
     /// <summary>
-    ///     Ability type. 
+    ///     Ability type.
     /// </summary>
     [Flags]
     public enum AbilityTypeEnm
     {
-      
         Basic = 1,
         Ability = 2,
         Ultimate = 4,
@@ -57,7 +55,7 @@ public class Ability : CloneClass
         Imaginary
     }
 
-    
+
     public enum PriorityEnm
     {
         DefeatHandler, //top 1

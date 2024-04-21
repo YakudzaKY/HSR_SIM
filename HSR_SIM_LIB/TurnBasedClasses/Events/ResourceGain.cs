@@ -36,6 +36,7 @@ public class ResourceGain : Event
                 TargetUnit.ResetCondition(Condition.ConditionCheckParam.Hp);
             TargetUnit.ResetCondition(Condition.ConditionCheckParam.Resource);
         }
+
         base.ProcEvent(revert);
     }
 }

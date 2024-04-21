@@ -90,7 +90,7 @@ public class UnitStats : ICloneable
         {
             if (!Equals(performedActionValue, value))
                 Parent.ResetCondition(Condition.ConditionCheckParam.PerformedActionValue);
-            
+
             performedActionValue = value;
         }
     }

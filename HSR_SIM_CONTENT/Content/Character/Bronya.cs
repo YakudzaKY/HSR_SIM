@@ -1,5 +1,4 @@
 ﻿using HSR_SIM_CONTENT.DefaultContent;
-using HSR_SIM_LIB.Content;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses;
@@ -20,7 +19,6 @@ public class Bronya : DefaultFighter
 
     public Bronya(Unit parent) : base(parent)
     {
-        
         wbSkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Windrider Bullet")!.Level;
         var abilitySkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "Combat Redeployment")!.Level;
         ultimateSkillLvl = Parent.Skills.FirstOrDefault(x => x.Name == "The Belobog March")!.Level;
@@ -72,7 +70,7 @@ public class Bronya : DefaultFighter
             { AbilityValue = windriderBullet, Value = 1 });
         windriderBullet.Events.Add(new DirectDamage(null, this, Parent)
         {
-            CalculateValue = DamageFormula(new Formula()
+            CalculateValue = DamageFormula(new Formula
             {
                 Expression =
                     $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)}  * (0.4 + {wbSkillLvl} * 0.1) "
@@ -160,14 +158,14 @@ public class Bronya : DefaultFighter
             });
     }
 
-    public sealed override double MaxEnergy { get;  } = 120;
-    public override Ability.ElementEnm Element { get;  } = Ability.ElementEnm.Wind;
+    public sealed override double MaxEnergy { get; } = 120;
+    public override Ability.ElementEnm Element { get; } = Ability.ElementEnm.Wind;
     public override PathType? Path { get; } = PathType.Harmony;
 
 
     private Formula CalcUltCritDmg(Event ent)
     {
-        return new Formula()
+        return new Formula
         {
             Expression =
                 $" {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.CritDamage)} * {GetAbilityScaling(0.12, 0.16, ultimateSkillLvl)} " +
@@ -178,7 +176,7 @@ public class Bronya : DefaultFighter
     //windrider bullet advance calc
     private Formula CalcTalentAv(Event ent)
     {
-        return new Formula()
+        return new Formula
         {
             Expression =
                 $" {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.ActionValue)} * {GetAbilityScaling(0.15, 0.30, talentSkillLvl)}"

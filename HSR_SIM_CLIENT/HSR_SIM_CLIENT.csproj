@@ -27,36 +27,36 @@
 
     <ItemGroup>
         <PackageReference Include="MahApps.Metro" Version="3.0.0-alpha0476"/>
-        <PackageReference Include="ScottPlot.WPF" Version="5.0.26" />
-        <PackageReference Include="Tesseract" Version="5.2.0" />
-        <PackageReference Include="Tesseract.Drawing" Version="5.2.0" />
+        <PackageReference Include="ScottPlot.WPF" Version="5.0.26"/>
+        <PackageReference Include="Tesseract" Version="5.2.0"/>
+        <PackageReference Include="Tesseract.Drawing" Version="5.2.0"/>
     </ItemGroup>
 
     <ItemGroup>
         <Page Update="Windows\GetDecision.xaml">
-          <Generator>MSBuild:Compile</Generator>
-          <XamlRuntime>Wpf</XamlRuntime>
-          <SubType>Designer</SubType>
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+            <SubType>Designer</SubType>
         </Page>
         <Page Update="Windows\MainWindow.xaml">
-          <Generator>MSBuild:Compile</Generator>
-          <XamlRuntime>Wpf</XamlRuntime>
-          <SubType>Designer</SubType>
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+            <SubType>Designer</SubType>
         </Page>
         <Page Update="Windows\SingleSimWindow.xaml">
-          <Generator>MSBuild:Compile</Generator>
-          <XamlRuntime>Wpf</XamlRuntime>
-          <SubType>Designer</SubType>
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+            <SubType>Designer</SubType>
         </Page>
         <Page Update="Windows\StatCalc.xaml">
-          <Generator>MSBuild:Compile</Generator>
-          <XamlRuntime>Wpf</XamlRuntime>
-          <SubType>Designer</SubType>
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+            <SubType>Designer</SubType>
         </Page>
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="Без имени-1.jpg" />
+        <None Remove="Без имени-1.jpg"/>
     </ItemGroup>
 
 
