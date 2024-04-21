@@ -160,7 +160,7 @@ public class OcrUtils
                 GreyToWhite(miniHsrScreen);
                     
                 SetForegroundWindow((IntPtr)hwnd);
-                //miniHsrScreen.Save($"test{itemRectMode}.bmp");// uncoment to debug image processing
+                miniHsrScreen.Save($"test{itemRectMode}.bmp");// uncoment to debug image processing
                 using (var img = PixConverter.ToPix(miniHsrScreen))
                 {
                     var page = engine.Process(img);
@@ -275,14 +275,15 @@ public class OcrUtils
             }
         }
     }
-    
-    
+
+
     /// <summary>
     /// Make grey text white(like background)
     /// </summary>
     /// <param name="image">Bitmap to process</param>
     /// <param name="threshold">green value over other colors to replace by black</param>
-    private void GreyToWhite(Bitmap image,int threshold=530)
+    /// <param name="thresholdTop">green value over other colors to replace by black(at top part of image)</param>
+    private void GreyToWhite(Bitmap image,int threshold=530, int thresholdTop=440)
     {
         int x, y;
         for(x=0; x<image.Width; x++)
@@ -290,7 +291,7 @@ public class OcrUtils
             for(y=0; y<image.Height; y++)
             {
                 Color pixelColor = image.GetPixel(x, y);
-                if (pixelColor.R+ pixelColor.G+ pixelColor.B >=threshold)
+                if (pixelColor.R+ pixelColor.G+ pixelColor.B >=threshold||(pixelColor.R+ pixelColor.G+ pixelColor.B >=thresholdTop&&y<=image.Height/4))
                 {
                     Color newColor = Color.FromArgb(255,255,255);
                     image.SetPixel(x, y, newColor);
