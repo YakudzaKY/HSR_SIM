@@ -54,9 +54,10 @@ public class FormulaBuffer
 
     public static string GenerateHash(string input)
     {
-        using var md5Hasher = MD5.Create();
-        var data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(input));
-        return BitConverter.ToString(data);
+       using var md5Hasher = MD5.Create();
+       var data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(input));
+       return BitConverter.ToString(data);
+
     }
 
     /// <summary>
@@ -104,9 +105,9 @@ public class FormulaBuffer
     public record BufferRec
     {
         public required Formula BuffFormula { get; init; }
-        public string Hash { get; init; }
+        public required string Hash { get; init; }
         public required Unit SourceUnit { get; init; }
-        public required Unit TargetUnit { get; init; }
+        public  Unit TargetUnit { get; init; }
         public required List<DependencyRec> DependencyRecs { get; init; }
     }
 }
