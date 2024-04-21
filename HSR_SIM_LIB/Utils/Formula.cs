@@ -213,16 +213,11 @@ public class Formula : ICloneable
             {
                 MethodInfo mInfo;
                 //proxy to unit formulas
-                if (nextMethod == nameof(UnitFormulas))
-                    mInfo = typeof(UnitFormulas).GetMethod(GetNextMethod(expr, methodNdx, out methodNdx));
+                if (nextMethod == nameof(UnitStaticFormulas))
+                    mInfo = typeof(UnitStaticFormulas).GetMethod(GetNextMethod(expr, methodNdx, out methodNdx));
                 else
                 {
                     mInfo = finalMeth.GetType().GetMethod(nextMethod);
-                    //try search in extensions
-                    if (mInfo == null)
-                    {
-                        mInfo = finalMeth.GetType().GetExtensionMethod(Assembly.GetExecutingAssembly(), nextMethod);
-                    }
                 }
 
 

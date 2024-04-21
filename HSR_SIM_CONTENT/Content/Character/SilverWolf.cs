@@ -119,7 +119,7 @@ public class SilverWolf : DefaultFighter
             CalculateValue = FighterUtils.DamageFormula(new Formula()
             {
                 Expression =
-                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.Attack)} * 0.8"
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)} * 0.8"
             })
         });
         ability.Events.Add(trgEnt);
@@ -150,7 +150,7 @@ public class SilverWolf : DefaultFighter
                 CalculateValue = FighterUtils.DamageFormula(new Formula()
                 {
                     Expression =
-                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.Attack)} * (0.4 + {swSkillLvl} * 0.1) * {proportion}"
+                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)} * (0.4 + {swSkillLvl} * 0.1) * {proportion}"
                 })
             });
             systemWarning.Events.Add(new ToughnessShred(null, this, Parent)
@@ -181,7 +181,7 @@ public class SilverWolf : DefaultFighter
             CalculateValue = FighterUtils.DamageFormula(new Formula()
             {
                 Expression =
-                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.Attack)} * {alwChgAtk}"
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)} * {alwChgAtk}"
             })
         });
 
@@ -208,7 +208,7 @@ public class SilverWolf : DefaultFighter
             CalculateValue = FighterUtils.DamageFormula(new Formula()
             {
                 Expression =
-                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.Attack)} * {ultDmg}"
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)} * {ultDmg}"
             })
         });
         userBanned.Events.Add(new ToughnessShred(null, this, Parent) { Value = 90 });
@@ -287,7 +287,7 @@ public class SilverWolf : DefaultFighter
                         TargetUnit = ent.ParentStep.Target, CalculateValue = FighterUtils.DamageFormula(new Formula()
                         {
                             Expression =
-                                $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.Attack)} * 0.2"
+                                $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)} * 0.2"
                         })
                     });
         }

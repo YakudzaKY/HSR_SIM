@@ -31,7 +31,7 @@ public class AutomatonBeetle : DefaultNPCFighter
             CalculateValue = FighterUtils.DamageFormula(new Formula()
             {
                 Expression =
-                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.Attack)} * 3 "
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)} * 3 "
             })
         });
         myAttackAbility.Events.Add(new EnergyGain(null, this, Parent) { Value = 15 });

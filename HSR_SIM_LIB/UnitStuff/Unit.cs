@@ -18,7 +18,7 @@ namespace HSR_SIM_LIB.UnitStuff;
 /// <summary>
 ///     Unit class. Stats skills etc
 /// </summary>
-public class Unit : CloneClass
+public partial class Unit : CloneClass
 {
     public enum LivingStatusEnm
     {

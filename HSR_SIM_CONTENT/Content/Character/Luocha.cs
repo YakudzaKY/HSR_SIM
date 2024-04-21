@@ -98,7 +98,7 @@ public class Luocha : DefaultFighter
             prayerOfAbyssFlower.Events.Add(new DispelBad(null, this, Parent));
 
         prayerOfAbyssFlower.Events.Add(new Healing(null, this, Parent)
-            { CalculateValue = FighterUtils.HealFormula(new Formula(){Expression =$"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.Attack)} * {poAfAtk} + {poAfFix}" }) });
+            { CalculateValue = FighterUtils.HealFormula(new Formula(){Expression =$"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)} * {poAfAtk} + {poAfFix}" }) });
         prayerOfAbyssFlower.Events.Add(new EnergyGain(null, this, Parent)
             { Value = 30, TargetUnit = Parent });
         Abilities.Add(prayerOfAbyssFlower);
@@ -118,7 +118,7 @@ public class Luocha : DefaultFighter
             prayerOfAbyssFlowerAuto.Events.Add(new DispelBad(null, this, Parent));
         prayerOfAbyssFlowerAuto.Events.Add(new Healing(null, this, Parent)
         {
-            CalculateValue = FighterUtils.HealFormula(new Formula(){Expression =$"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.Attack)} * {poAfAtk} + {poAfFix}" })
+            CalculateValue = FighterUtils.HealFormula(new Formula(){Expression =$"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)} * {poAfAtk} + {poAfFix}" })
         });
         prayerOfAbyssFlowerAuto.Events.Add(new EnergyGain(null, this, Parent)
             { Value = 30, TargetUnit = Parent });
@@ -138,7 +138,7 @@ public class Luocha : DefaultFighter
                     CalculateValue = FighterUtils.ShieldFormula(new Formula()
                     {
                         Expression =
-                            $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.Attack)} * 0.18 + 240"
+                            $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)} * 0.18 + 240"
                     })
                 }
             ]
@@ -160,7 +160,7 @@ public class Luocha : DefaultFighter
                 CalculateValue = FighterUtils.DamageFormula(new Formula()
                 {
                     Expression =
-                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.Attack)} * (0.4 + {totALvl} * 0.1) * {proportion} "
+                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)} * (0.4 + {totALvl} * 0.1) * {proportion} "
                 })
             });
 
@@ -203,7 +203,7 @@ public class Luocha : DefaultFighter
             CalculateValue = FighterUtils.DamageFormula(new Formula()
             {
                 Expression =
-                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.Attack)} * {deathWish} "
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)} * {deathWish} "
             }),
             CurrentTargetType = AbilityCurrentTargetEnm.AbilityAdjacent
         });
@@ -290,7 +290,7 @@ public class Luocha : DefaultFighter
     public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Abundance;
 
 
-    //default all abilities we wanna cast
+    //default all abilities we want to cast
     private bool WannaUseDw()
     {
         //if we have no CoL or enemy have buff
@@ -341,7 +341,7 @@ public class Luocha : DefaultFighter
                         Parent) //will put source unit coz Output healing calc will be calculated by target unit
                     {
                         TargetUnit = ent.SourceUnit,
-                        CalculateValue = FighterUtils.HealFormula(new Formula(){Expression =$"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.Attack)} * {coLfAtk} + {coLfFix}" })
+                        CalculateValue = FighterUtils.HealFormula(new Formula(){Expression =$"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)} * {coLfAtk} + {coLfFix}" })
                     });
 
             if (ATraces.HasFlag(ATracesEnm.A4))
@@ -352,7 +352,7 @@ public class Luocha : DefaultFighter
                                 Parent) //will put source unit coz Output healing calc will be calculated by target unit
                             {
                                 TargetUnit = unit,
-                                CalculateValue = FighterUtils.HealFormula(new Formula(){Expression =$"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.Attack)} * 0.07 + 93" })
+                                CalculateValue = FighterUtils.HealFormula(new Formula(){Expression =$"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)} * 0.07 + 93" })
                             });
         }
 

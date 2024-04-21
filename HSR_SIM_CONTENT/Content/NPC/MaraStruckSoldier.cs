@@ -39,7 +39,7 @@ public class MaraStruckSoldier : DefaultNPCFighter
                     DoTCalculateValue = FighterUtils.DamageFormula(new Formula()
                     {
                         Expression =
-                            $"0.5 * {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.Attack)}"
+                            $"0.5 * {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)}"
                     })
                 }
             }
@@ -64,7 +64,7 @@ public class MaraStruckSoldier : DefaultNPCFighter
             TargetType = Ability.TargetTypeEnm.Self
         };
         // Rejuvenate.Events.Add(new RemoveBuff(null,this,Parent) {TargetUnit = Parent,BuffToApply = uniqueBuff});
-        Rejuvenate.Events.Add(new Healing(null, this, Parent) { CalculateValue =   FighterUtils.HealFormula(new Formula(){Expression =$"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.MaxHp)} * 0.5" }) });
+        Rejuvenate.Events.Add(new Healing(null, this, Parent) { CalculateValue =   FighterUtils.HealFormula(new Formula(){Expression =$"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.MaxHp)} * 0.5" }) });
         Rejuvenate.Events.Add(new ResourceGain(null, this, Parent)
             { ResType = Resource.ResourceType.Toughness, Value = Parent.Stats.MaxToughness });
         Abilities.Add(Rejuvenate);
@@ -86,7 +86,7 @@ public class MaraStruckSoldier : DefaultNPCFighter
                 CalculateValue = FighterUtils.DamageFormula(new Formula()
                 {
                     Expression =
-                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.Attack)} * 2 * {proportion}"
+                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)} * 2 * {proportion}"
                 })
             });
             myAttackAbility.Events.Add(

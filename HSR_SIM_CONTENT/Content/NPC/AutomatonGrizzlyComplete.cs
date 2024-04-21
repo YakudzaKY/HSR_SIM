@@ -27,7 +27,7 @@ internal class AutomatonGrizzlyComplete : DefaultNpcBossFighter
             CalculateValue = FighterUtils.DamageFormula(new Formula()
             {
                 Expression =
-                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.Attack)} * 2.5 "
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)} * 2.5 "
             })
         });
         myAttackAbility.Events.Add(new EnergyGain(null, this, Parent) { Value = 10 });

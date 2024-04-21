@@ -75,7 +75,7 @@ public class Bronya : DefaultFighter
             CalculateValue = DamageFormula(new Formula()
             {
                 Expression =
-                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.Attack)}  * (0.4 + {wbSkillLvl} * 0.1) "
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)}  * (0.4 + {wbSkillLvl} * 0.1) "
             })
         });
 
@@ -170,7 +170,7 @@ public class Bronya : DefaultFighter
         return new Formula()
         {
             Expression =
-                $" {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.CritDamage)} * {GetAbilityScaling(0.12, 0.16, ultimateSkillLvl)} " +
+                $" {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.CritDamage)} * {GetAbilityScaling(0.12, 0.16, ultimateSkillLvl)} " +
                 $" +  {GetAbilityScaling(0.12, 0.20, ultimateSkillLvl)}"
         };
     }
@@ -181,7 +181,7 @@ public class Bronya : DefaultFighter
         return new Formula()
         {
             Expression =
-                $" {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.ActionValue)} * {GetAbilityScaling(0.15, 0.30, talentSkillLvl)}"
+                $" {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.ActionValue)} * {GetAbilityScaling(0.15, 0.30, talentSkillLvl)}"
         };
     }
 
