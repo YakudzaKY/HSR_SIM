@@ -83,7 +83,7 @@ public class Formula : ICloneable
         newClone.Variables = new Dictionary<string, VarVal>();
         foreach (var oldVar in oldVariables)
             newClone.Variables[oldVar.Key] = oldVar.Value with { TraceEffects = new List<EffectTraceRec>() };
-
+        newClone.result = null;;
         return newClone;
     }
 

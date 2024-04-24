@@ -415,11 +415,13 @@ public partial class Unit : CloneClass
 
                 else if (effect.CalculateValue is Func<Event, Formula> fnc)
                 {
-                    effect.CalculateValue = fnc.Invoke(ent);
-                    var newFrm = (Formula)effect.CalculateValue;
+                    var newFrm = fnc.Invoke(ent);
                     newFrm.EventRef = ent;
                     finalValue = newFrm.Result;
                 }
+                //do not save buffer if target calculation effects
+                FormulaBuffer.MergeDependency(dependencyRecs,
+                    new FormulaBuffer.DependencyRec { Relation = unitToCheck, Stat = Condition.ConditionCheckParam.DoNotSaveDependency });
             }
             else
             {
