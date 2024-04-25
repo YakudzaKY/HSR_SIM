@@ -419,12 +419,15 @@ public partial class Unit : CloneClass
                     newFrm.EventRef = ent;
                     finalValue = newFrm.Result;
                 }
-                //save last calculated value
-                effect.LastCalculatedValue = finalValue;
+        
                 //if no equals then reset dependency
-                if (Equals(finalValue, effect.LastCalculatedValue))
+                if (!Equals(finalValue, effect.LastCalculatedValue))
+                {          
+                    //save last calculated value
+                    effect.LastCalculatedValue = finalValue;
                     ResetCondition(effect.ResetDependency);
-                
+                }
+
                 //do not save buffer if target calculation effects
                 FormulaBuffer.MergeDependency(dependencyRecs,
                     new FormulaBuffer.DependencyRec
