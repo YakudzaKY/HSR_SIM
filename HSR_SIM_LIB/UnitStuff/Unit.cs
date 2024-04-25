@@ -419,9 +419,16 @@ public partial class Unit : CloneClass
                     newFrm.EventRef = ent;
                     finalValue = newFrm.Result;
                 }
+                //save last calculated value
+                effect.LastCalculatedValue = finalValue;
+                //if no equals then reset dependency
+                if (Equals(finalValue, effect.LastCalculatedValue))
+                    ResetCondition(effect.ResetDependency);
+                
                 //do not save buffer if target calculation effects
                 FormulaBuffer.MergeDependency(dependencyRecs,
-                    new FormulaBuffer.DependencyRec { Relation = unitToCheck, Stat = Condition.ConditionCheckParam.DoNotSaveDependency });
+                    new FormulaBuffer.DependencyRec
+                        { Relation = unitToCheck, Stat = Condition.ConditionCheckParam.DoNotSaveDependency });
             }
             else
             {
@@ -715,6 +722,18 @@ public partial class Unit : CloneClass
         return 1;
     }
 
+
+    public double CritHit(Event ent,
+        List<FormulaBuffer.DependencyRec> dependencyRecs = null,
+        DynamicTargetEnm unitToCheck = DynamicTargetEnm.Attacker)
+    {
+        if (dependencyRecs != null)
+            FormulaBuffer.MergeDependency(dependencyRecs,
+                new FormulaBuffer.DependencyRec
+                    { Relation = unitToCheck, Stat = Condition.ConditionCheckParam.DoNotSaveDependency });
+
+        return ent is DirectDamage dd ? dd.IsCrit ? 1 : 0 : 0;
+    }
 
     /// <summary>
     ///     Reset Conditions that depends on stat

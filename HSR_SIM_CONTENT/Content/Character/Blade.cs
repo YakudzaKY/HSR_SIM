@@ -247,7 +247,7 @@ public class Blade : DefaultFighter
                     (Parent.Rank >= 1
                         ? $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(GetDsMechanic)} min getDsMaxLostHp * 1.5 ) "
                         : ""),
-                Variables = new Dictionary<string, Formula.VarVal>
+                TransferVariables = new Dictionary<string, Formula.VarVal>
                 {
                     {
                         "getDsMaxLostHp",
@@ -274,7 +274,7 @@ public class Blade : DefaultFighter
                     $"({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)} * {dsAdjAtk}  ) " +
                     $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.MaxHp)} * {dsAdjHp}  ) " +
                     $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(GetDsMechanic)} min getDsMaxLostHp * {dsAdjHp}  ) ",
-                Variables = new Dictionary<string, Formula.VarVal>
+                TransferVariables = new Dictionary<string, Formula.VarVal>
                 {
                     {
                         "getDsMaxLostHp",
@@ -332,7 +332,7 @@ public class Blade : DefaultFighter
             CalculateValue = DamageFormula(new Formula
             {
                 Expression = " BladeMaxHp * 0.4 ",
-                Variables = new Dictionary<string, Formula.VarVal>
+                TransferVariables = new Dictionary<string, Formula.VarVal>
                 {
                     {
                         "BladeMaxHp",

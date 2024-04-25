@@ -30,6 +30,12 @@ public class Effect : CloneClass
         }
     }
 
+
+   //last calculated value
+    public double LastCalculatedValue{ get; set; }
+    
+       
+
     public object ResetDependency { get; }
 
     public double? Value { get; set; }
