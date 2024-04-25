@@ -21,7 +21,7 @@ public class MechanicValReset(Step parent, ICloneable source, Unit sourceUnit) :
             if (!TriggersHandled)
             {
                 if (!TriggersHandled)
-                    ParentStep.Parent.CalcBuffer.Reset(SourceUnit, Condition.ConditionCheckParam.Mechanics);
+                    ParentStep.Parent.CalcBuffer?.Reset(SourceUnit, Condition.ConditionCheckParam.Mechanics);
                 Value = SourceUnit.Fighter.Mechanics.Values[AbilityValue];
             }
 

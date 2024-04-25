@@ -745,7 +745,7 @@ public partial class Unit : CloneClass
             foreach (var cb in PassiveBuffs.Where(x => x.ApplyConditions != null)
                          .SelectMany(x => x.ApplyConditions.Where(y => y.ConditionParam == cprm)))
                 cb.NeedRecalculate = true;
-        ParentTeam?.ParentSim.CalcBuffer.Reset(this, chkPrm);
+        ParentTeam?.ParentSim.CalcBuffer?.Reset(this, chkPrm);
     }
 
 
