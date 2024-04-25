@@ -3,16 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:HSR_SIM_CLIENT.Views"
              mc:Ignorable="d"
              Name="Parent"
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid DataContext="{Binding ElementName=Parent}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <StackPanel  Grid.Row="0" Orientation="Horizontal">
-          
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+
             <Label Content="{Binding  EffectToView.Name}" />
             <Label Content="Value=" />
             <Label Content="{Binding  EffectToView.Value}" />

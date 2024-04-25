@@ -1,5 +1,4 @@
 ﻿using HSR_SIM_CONTENT.DefaultContent;
-using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -28,7 +27,7 @@ public class ForgottenHall : DefaultNPCFighter
 
         IncreaseCycle.Events.Add(new ApplyBuff(null, this, Parent)
         {
-            AppliedBuffToApply = new AppliedBuff(Parent,null,this)
+            AppliedBuffToApply = new AppliedBuff(Parent, null, this)
             {
                 Type = Buff.BuffType.Buff,
                 Effects = new List<Effect> { new EffReduceBav { Value = 50 } },

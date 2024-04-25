@@ -7,28 +7,31 @@ using HSR_SIM_LIB.Utils;
 
 namespace HSR_SIM_LIB.Skills;
 
-public class Buff(Unit sourceUnit, Buff reference,object sourceObject ) : CloneClass
+public class Buff(Unit sourceUnit, Buff reference, object sourceObject) : CloneClass
 {
     //calculated stacks will overwrite Stack value
     public delegate int CalculateIntVal(Event ent);
 
-    public object SourceObject { get; } = sourceObject;
     public enum BuffType
     {
         Buff,
         Debuff,
         Dot
     }
+
     private Bitmap iconImage;
+
+    public object SourceObject { get; } = sourceObject;
+
     public Bitmap IconImage
     {
         get
         {
-            return iconImage ??= new Bitmap(Utl.LoadBitmap(this.CustomIconName ?? this.Effects.First().GetType().Name),
+            return iconImage ??= new Bitmap(Utl.LoadBitmap(CustomIconName ?? Effects.First().GetType().Name),
                 Constant.ElemSizeMini);
-
         }
     }
+
     public string CustomIconName { get; init; }
     public List<Effect> Effects { get; set; } = [];
     public Unit CarrierUnit { get; set; }
@@ -63,7 +66,6 @@ public class Buff(Unit sourceUnit, Buff reference,object sourceObject ) : CloneC
         explainString += $" {nameof(passiveBuff.SourceObject)}={passiveBuff.SourceObject.GetType().Name}" +
                          $" {nameof(passiveBuff.Target)}={passiveBuff.Target.GetType().Name}";
         if (passiveBuff.ApplyConditions != null)
-        {
             foreach (var WorkCondition in passiveBuff.ApplyConditions)
             {
                 //additional info if condition
@@ -73,8 +75,6 @@ public class Buff(Unit sourceUnit, Buff reference,object sourceObject ) : CloneC
                                  $" {WorkCondition.ConditionExpression} {WorkCondition.Value}" +
                                  $" {WorkCondition.ElemValue} {WorkCondition.AppliedBuffValue})";
             }
-          
-        }
 
         return explainString;
     }

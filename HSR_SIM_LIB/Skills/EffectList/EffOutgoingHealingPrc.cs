@@ -3,6 +3,6 @@
 /// <summary>
 ///     increase outgoing healing by x%
 /// </summary>
-public class EffOutgoingHealingPrc() : Effect(null)
+public class EffOutgoingHealingPrc() : Effect()
 {
 }

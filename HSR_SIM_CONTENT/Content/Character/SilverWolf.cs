@@ -116,10 +116,10 @@ public class SilverWolf : DefaultFighter
         ability.Events.Add(new DirectDamage(null, this, Parent)
         {
             OnStepType = Step.StepTypeEnm.ExecuteAbilityFromQueue,
-            CalculateValue = FighterUtils.DamageFormula(new Formula()
+            CalculateValue = FighterUtils.DamageFormula(new Formula
             {
                 Expression =
-                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.Attack)} * 0.8"
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)} * 0.8"
             })
         });
         ability.Events.Add(trgEnt);
@@ -147,10 +147,10 @@ public class SilverWolf : DefaultFighter
         {
             systemWarning.Events.Add(new DirectDamage(null, this, Parent)
             {
-                CalculateValue = FighterUtils.DamageFormula(new Formula()
+                CalculateValue = FighterUtils.DamageFormula(new Formula
                 {
                     Expression =
-                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.Attack)} * (0.4 + {swSkillLvl} * 0.1) * {proportion}"
+                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)} * (0.4 + {swSkillLvl} * 0.1) * {proportion}"
                 })
             });
             systemWarning.Events.Add(new ToughnessShred(null, this, Parent)
@@ -178,10 +178,10 @@ public class SilverWolf : DefaultFighter
         //dmg events
         allowChanges.Events.Add(new DirectDamage(null, this, Parent)
         {
-            CalculateValue = FighterUtils.DamageFormula(new Formula()
+            CalculateValue = FighterUtils.DamageFormula(new Formula
             {
                 Expression =
-                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.Attack)} * {alwChgAtk}"
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)} * {alwChgAtk}"
             })
         });
 
@@ -198,17 +198,17 @@ public class SilverWolf : DefaultFighter
             Name = "User Banned",
             AdjacentTargets = AdjacentTargetsEnm.None,
             CostType = Resource.ResourceType.Energy,
-            Cost =MaxEnergy
+            Cost = MaxEnergy
         };
         userBanned.Events.Add(new AttemptEffect(null, this, Parent)
             { BaseChance = ultChance, AppliedBuffToApply = ultDefDebuff });
         //dmg events
         userBanned.Events.Add(new DirectDamage(null, this, Parent)
         {
-            CalculateValue = FighterUtils.DamageFormula(new Formula()
+            CalculateValue = FighterUtils.DamageFormula(new Formula
             {
                 Expression =
-                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.Attack)} * {ultDmg}"
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)} * {ultDmg}"
             })
         });
         userBanned.Events.Add(new ToughnessShred(null, this, Parent) { Value = 90 });
@@ -228,7 +228,7 @@ public class SilverWolf : DefaultFighter
             });
     }
 
-    public sealed override double MaxEnergy { get;  } = 110;
+    public sealed override double MaxEnergy { get; } = 110;
     public override ElementEnm Element { get; } = ElementEnm.Quantum;
     public override FighterUtils.PathType? Path { get; } = FighterUtils.PathType.Nihility;
 
@@ -244,7 +244,7 @@ public class SilverWolf : DefaultFighter
         if (debuffs >= 3) res += 0.03;
 
 
-        return new Formula() { Expression = $"- {res}"};
+        return new Formula { Expression = $"- {res}" };
     }
 
     protected override void DefaultFighter_HandleEvent(Event ent)
@@ -284,10 +284,10 @@ public class SilverWolf : DefaultFighter
                 for (var i = 0; i < debuffs; i++)
                     ent.ChildEvents.Add(new DirectDamage(ent.ParentStep, this, Parent)
                     {
-                        TargetUnit = ent.ParentStep.Target, CalculateValue = FighterUtils.DamageFormula(new Formula()
+                        TargetUnit = ent.ParentStep.Target, CalculateValue = FighterUtils.DamageFormula(new Formula
                         {
                             Expression =
-                                $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.Attack)} * 0.2"
+                                $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)} * 0.2"
                         })
                     });
         }
@@ -380,6 +380,6 @@ public class SilverWolf : DefaultFighter
         double debuffs = ent.TargetUnit.AppliedBuffs.Count(x =>
             x.Type == Buff.BuffType.Debuff || x.Type == Buff.BuffType.Dot);
         if (debuffs > maxDebuffs) debuffs = maxDebuffs;
-        return new Formula() { Expression = $"{debuffs} * 0.2"};
+        return new Formula { Expression = $"{debuffs} * 0.2" };
     }
 }

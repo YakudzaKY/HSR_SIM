@@ -102,14 +102,13 @@ public static class Utl
             ImageCache[filename] = new FileInfo(GetAvailableImageFile(filename)).NewBitmap();
         return ImageCache[filename];
     }
-    
-    public static int DoubleToIntRound(double d) {
-        if (d < 0) {
-            return (int)(d - 0.5);
-        }
+
+    public static int DoubleToIntRound(double d)
+    {
+        if (d < 0) return (int)(d - 0.5);
         return (int)(d + 0.5);
     }
-    
+
     /// <summary>
     ///     we can load png or webp frames
     /// </summary>

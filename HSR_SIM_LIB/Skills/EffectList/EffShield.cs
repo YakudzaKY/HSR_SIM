@@ -3,7 +3,7 @@
 /// <summary>
 ///     shield buff
 /// </summary>
-public class EffShield (): Effect(null)
+public class EffShield() : Effect()
 {
     /// <summary>
     ///     shield is always dynamic coz damage reduce the value

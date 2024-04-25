@@ -5,20 +5,16 @@ using HSR_SIM_CLIENT.Utils;
 namespace HSR_SIM_CLIENT.Models;
 
 /// <summary>
-/// class for ItemStats control
+///     class for ItemStats control
 /// </summary>
-public sealed class ItemStatsModel:INotifyPropertyChanged
+public sealed class ItemStatsModel : INotifyPropertyChanged
 {
-    public record StatValRec(string Val = "", string Stat = "")
-    {
-        public string Stat { get; set; } = Stat;
-        public string Val { get; set; } = Val;
-    }
-
     public string? MainStat { get; set; } = string.Empty;
 
-    public StatValRec[] SecondStats { get; } = new[]
+    public StatValRec[] SecondStats { get; } =
         { new StatValRec(), new StatValRec(), new StatValRec(), new StatValRec() };
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     //reset values
     private void Clear()
@@ -32,13 +28,13 @@ public sealed class ItemStatsModel:INotifyPropertyChanged
     }
 
     /// <summary>
-    /// fill stats from array
+    ///     fill stats from array
     /// </summary>
     /// <param name="items"></param>
     public void FillStats(IEnumerable<KeyValuePair<int, OcrUtils.RStatWordRec>> items)
     {
         Clear();
-        int i = 0;
+        var i = 0;
         foreach (var item in items)
         {
             //main stat
@@ -55,11 +51,11 @@ public sealed class ItemStatsModel:INotifyPropertyChanged
 
             i++;
         }
+
         NotifyPropertyChanged(nameof(SecondStats));
         NotifyPropertyChanged(nameof(MainStat));
     }
 
-    public event PropertyChangedEventHandler? PropertyChanged;
     private void NotifyPropertyChanged(string name)
     {
         if (PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(name));
@@ -77,5 +73,11 @@ public sealed class ItemStatsModel:INotifyPropertyChanged
         field = value;
         OnPropertyChanged(propertyName);
         return true;
+    }
+
+    public record StatValRec(string Val = "", string Stat = "")
+    {
+        public string Stat { get; set; } = Stat;
+        public string Val { get; set; } = Val;
     }
 }

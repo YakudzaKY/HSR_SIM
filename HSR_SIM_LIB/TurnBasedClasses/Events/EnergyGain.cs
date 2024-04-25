@@ -25,19 +25,21 @@ public class EnergyGain(Step parent, ICloneable source, Unit sourceUnit) : Event
         //switch value to formula
         if (Value != null && CalculateValue == null)
         {
-            CalculateValue = new Formula()
+            CalculateValue = new Formula
             {
-                EventRef = this, Expression = $"{Value}"+
+                EventRef = this, Expression = $"{Value}" +
                                               //if RawEnergy then value does not affected by regen rate
-                                              (IsRawEnergy?String.Empty : $" *  {Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas.EnergyRegenPrc)} ")
+                                              (IsRawEnergy
+                                                  ? string.Empty
+                                                  : $" *  {Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.EnergyRegenPrc)} ")
             };
             Value = null;
         }
 
         if (RealValue == null)
         {
-            RealValue = Value;//will trigger formula calculation
-            RealValue = Math.Min(Value??0, TargetUnit.Fighter.MaxEnergy - TargetUnit.CurrentEnergy);
+            RealValue = Value; //will trigger formula calculation
+            RealValue = Math.Min(Value ?? 0, TargetUnit.Fighter.MaxEnergy - TargetUnit.CurrentEnergy);
         }
 
         TargetUnit.CurrentEnergy += (double)(revert ? -RealValue : RealValue);

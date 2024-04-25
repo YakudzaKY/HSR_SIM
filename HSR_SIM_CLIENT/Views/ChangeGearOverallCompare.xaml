@@ -3,14 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:HSR_SIM_CLIENT.Views"
              xmlns:wpf="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
-             xmlns:scottPlot="clr-namespace:ScottPlot;assembly=ScottPlot"
              mc:Ignorable="d"
-             Name="Parent" 
-             d:DesignHeight="300" d:DesignWidth="300" >
-    <Grid  DataContext="{Binding ElementName=Parent}">
-        <wpf:WpfPlot Height="300"  Name="WpfPlot"/>
-            
+             Name="Parent"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid DataContext="{Binding ElementName=Parent}">
+        <wpf:WpfPlot Height="300" Name="WpfPlot" />
+
     </Grid>
 </UserControl>

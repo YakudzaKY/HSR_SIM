@@ -7,8 +7,15 @@ namespace HSR_SIM_LIB.Skills;
 
 public class Effect : CloneClass
 {
+    private object calculateValue;
+
+    protected Effect(Condition.ConditionCheckParam? resetDependency = null)
+    {
+        ResetDependency = resetDependency ?? (object)GetType();
+    }
+
     /// <summary>
-    /// can be Formula or ref to Formula func
+    ///     can be Formula or ref to Formula func
     ///     func ref that Calculate effect value on buff apply.
     ///     if RealTimeRecalculateValue== true then recalculate will be every time on buff parsing
     /// </summary>
@@ -24,12 +31,6 @@ public class Effect : CloneClass
     }
 
     public object ResetDependency { get; }
-    private object calculateValue;
-
-    protected Effect(Condition.ConditionCheckParam? resetDependency=null)
-    {
-        ResetDependency = resetDependency??(object)this.GetType();
-    }
 
     public double? Value { get; set; }
 
@@ -101,7 +102,7 @@ public class Effect : CloneClass
 
     public string Explain(double? calculatedValue = null)
     {
-        string val = (Value == null) ? "*" : Value.ToString();
+        var val = Value == null ? "*" : Value.ToString();
         if (Value is null && calculatedValue != null)
             val = "~" + calculatedValue;
         return $"{GetType().Name} ({val}) ";

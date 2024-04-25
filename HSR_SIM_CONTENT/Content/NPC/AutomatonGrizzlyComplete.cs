@@ -1,8 +1,6 @@
 ﻿using HSR_SIM_CONTENT.DefaultContent;
 using HSR_SIM_LIB.Content;
-using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
-using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.UnitStuff;
 using HSR_SIM_LIB.Utils;
@@ -19,15 +17,15 @@ internal class AutomatonGrizzlyComplete : DefaultNpcBossFighter
             new Ability(this)
             {
                 AbilityType = Ability.AbilityTypeEnm.Basic,
-                Name = "Shovel Attack",
+                Name = "Shovel Attack"
             };
         //dmg events
         myAttackAbility.Events.Add(new DirectDamage(null, this, Parent)
         {
-            CalculateValue = FighterUtils.DamageFormula(new Formula()
+            CalculateValue = FighterUtils.DamageFormula(new Formula
             {
                 Expression =
-                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.Attack)} * 2.5 "
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)} * 2.5 "
             })
         });
         myAttackAbility.Events.Add(new EnergyGain(null, this, Parent) { Value = 10 });

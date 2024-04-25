@@ -45,11 +45,11 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition></ColumnDefinition>
-            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition />
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <Label Grid.Row="0" Grid.Column="0">Rank</Label>
-        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding UnitToView.Rank, Mode=OneWay}"></TextBox>
+        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding UnitToView.Rank, Mode=OneWay}" />
         <!-- stats table -->
         <DataGrid Grid.Row="1" AutoGenerateColumns="False" Grid.ColumnSpan="2" Grid.Column="0"
                   GridLinesVisibility="All" IsReadOnly="True"
@@ -61,8 +61,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <mah:HamburgerMenuListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                                      ItemsSource="{Binding Path=Buffs,Mode=OneWay}">
-                            </mah:HamburgerMenuListBox>
+                                                      ItemsSource="{Binding Path=Buffs,Mode=OneWay}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -79,8 +78,7 @@
                                   Visibility="{Binding UnitToView.AppliedBuffs , Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
                                   Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
                                   VerticalAlignment="Stretch"
-                                  ItemsSource="{Binding Path=UnitToView.AppliedBuffs,Mode=OneWay}">
-        </mah:HamburgerMenuListBox>
+                                  ItemsSource="{Binding Path=UnitToView.AppliedBuffs,Mode=OneWay}" />
         <!--passive buffs-->
         <Label HorizontalAlignment="Center"
                Visibility="{Binding UnitToView.PassiveBuffs , Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
@@ -91,8 +89,7 @@
             Visibility="{Binding UnitToView.PassiveBuffs , Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
             Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
-            ItemsSource="{Binding Path=UnitToView.PassiveBuffs,Mode=OneWay}">
-        </mah:HamburgerMenuListBox>
+            ItemsSource="{Binding Path=UnitToView.PassiveBuffs,Mode=OneWay}" />
         <!--inactive passive buffs-->
         <Label HorizontalAlignment="Center"
                Visibility="{Binding UnitToView.InactivePassiveBuffs , Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
@@ -103,8 +100,7 @@
             Visibility="{Binding UnitToView.InactivePassiveBuffs , Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
             Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
-            ItemsSource="{Binding Path=UnitToView.InactivePassiveBuffs,Mode=OneWay}">
-        </mah:HamburgerMenuListBox>
+            ItemsSource="{Binding Path=UnitToView.InactivePassiveBuffs,Mode=OneWay}" />
         <!--TargetCheck buffs-->
         <Label HorizontalAlignment="Center"
                Visibility="{Binding UnitToView.TargetCheckBuffs, Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
@@ -115,8 +111,7 @@
             Visibility="{Binding UnitToView.TargetCheckBuffs, Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
             Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
-            ItemsSource="{Binding Path=UnitToView.TargetCheckBuffs,Mode=OneWay}">
-        </mah:HamburgerMenuListBox>
+            ItemsSource="{Binding Path=UnitToView.TargetCheckBuffs,Mode=OneWay}" />
 
         <!-- weakness table -->
         <Label HorizontalAlignment="Center"
@@ -134,14 +129,13 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <mah:HamburgerMenuListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                                      ItemsSource="{Binding Path=Buffs,Mode=OneWay}">
-                            </mah:HamburgerMenuListBox>
+                                                      ItemsSource="{Binding Path=Buffs,Mode=OneWay}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-        
+
         <!-- resists table -->
         <Label HorizontalAlignment="Center"
                Visibility="{Binding UnitToView.Resists, Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
@@ -159,14 +153,13 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <mah:HamburgerMenuListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                                      ItemsSource="{Binding Path=Buffs,Mode=OneWay}">
-                            </mah:HamburgerMenuListBox>
+                                                      ItemsSource="{Binding Path=Buffs,Mode=OneWay}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-        
+
         <!-- debuff resists table -->
         <Label HorizontalAlignment="Center"
                Visibility="{Binding UnitToView.DebuffResists, Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
@@ -184,14 +177,13 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <mah:HamburgerMenuListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                                      ItemsSource="{Binding Path=Buffs,Mode=OneWay}">
-                            </mah:HamburgerMenuListBox>
+                                                      ItemsSource="{Binding Path=Buffs,Mode=OneWay}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-        
+
         <!-- Ability type  table -->
         <Label HorizontalAlignment="Center"
                Visibility="{Binding UnitToView.AbilityTypeBoosters, Converter={StaticResource CountVisibilityConverter}  ,Mode=OneWay}"
@@ -209,12 +201,11 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <mah:HamburgerMenuListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                                      ItemsSource="{Binding Path=Buffs,Mode=OneWay}">
-                            </mah:HamburgerMenuListBox>
+                                                      ItemsSource="{Binding Path=Buffs,Mode=OneWay}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                
+
             </DataGrid.Columns>
         </DataGrid>
 

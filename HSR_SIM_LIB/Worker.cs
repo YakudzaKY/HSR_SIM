@@ -8,7 +8,6 @@ using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.Utils;
 using static HSR_SIM_LIB.Utils.CallBacks;
 using static HSR_SIM_LIB.TurnBasedClasses.Step;
-using static HSR_SIM_LIB.UnitStuff.Unit;
 
 namespace HSR_SIM_LIB;
 
@@ -263,7 +262,8 @@ public class Worker
                 else if (mod.Stat.EndsWith("_dmg_prc"))
                 {
                     var elem = mod.Stat.Split("_").First();
-                    targetUnit.GetBaseElemBoost((Ability.ElementEnm)Enum.Parse(typeof(Ability.ElementEnm), elem, true)).Value += mod.Val;
+                    targetUnit.GetBaseElemBoost((Ability.ElementEnm)Enum.Parse(typeof(Ability.ElementEnm), elem, true))
+                        .Value += mod.Val;
                 }
             }
         }

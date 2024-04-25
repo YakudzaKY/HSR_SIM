@@ -12,7 +12,7 @@ namespace HSR_SIM_CONTENT.DefaultContent;
 /// <summary>
 ///     default npc fighter logics
 /// </summary>
-public abstract class DefaultNPCFighter :  IFighter
+public abstract class DefaultNPCFighter : IFighter
 {
     private UnitRole? role;
 
@@ -25,7 +25,6 @@ public abstract class DefaultNPCFighter :  IFighter
         StepHandlerProc += DefaultFighter_HandleStep;
     }
 
-    
 
     public Unit? GetBestTarget(Ability ability)
     {
@@ -37,7 +36,9 @@ public abstract class DefaultNPCFighter :  IFighter
         if (ability.TargetType == Ability.TargetTypeEnm.Friend)
             //Pick friend in order that have no buff by ability then order by role
             return GetAliveFriends().OrderByDescending(x => x.AppliedBuffs.All(y =>
-                    ability.Events.Count(z => z is ApplyBuff ab &&  (ab.AppliedBuffToApply.Reference??ab.AppliedBuffToApply) == y.Reference) == 0))
+                    ability.Events.Count(z =>
+                        z is ApplyBuff ab &&
+                        (ab.AppliedBuffToApply.Reference ?? ab.AppliedBuffToApply) == y.Reference) == 0))
                 .ThenBy(x => x.Fighter.Role).First();
 
         var totalEnemyAggro = Parent.EnemyTeam.TeamAggro;
@@ -47,7 +48,7 @@ public abstract class DefaultNPCFighter :  IFighter
         {
             foreach (var unit in GetAliveEnemies())
             {
-                counter -= unit.Aggro(ent:null).Result / Parent.EnemyTeam.TeamAggro;
+                counter -= unit.Aggro(ent: null).Result / Parent.EnemyTeam.TeamAggro;
                 if (counter <= aggroRandomed)
                     return unit;
             }
@@ -69,8 +70,8 @@ public abstract class DefaultNPCFighter :  IFighter
     }
 
     public double MaxEnergy { get; set; } = 0;
-    public abstract Ability.ElementEnm Element { get;  }
-    public AppliedBuff WeaknessBreakDebuff { get; set; } = new(null,null,typeof(DefaultNPCFighter)) { Effects = [] };
+    public abstract Ability.ElementEnm Element { get; }
+    public AppliedBuff WeaknessBreakDebuff { get; set; } = new(null, null, typeof(DefaultNPCFighter)) { Effects = [] };
     public PathType? Path { get; set; } = null;
 
 
@@ -124,7 +125,7 @@ public abstract class DefaultNPCFighter :  IFighter
         return chosenAbility;
     }
 
-    public MechDictionary Mechanics { get; set; } = new MechDictionary();
+    public MechDictionary Mechanics { get; set; } = new();
 
 
     public IFighter.EventHandler EventHandlerProc { get; set; }

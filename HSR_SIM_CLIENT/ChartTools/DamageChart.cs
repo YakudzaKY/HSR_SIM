@@ -1,22 +1,24 @@
-﻿using System.Configuration;
-using System.Globalization;
+﻿using System.Globalization;
 using HSR_SIM_CLIENT.ThreadTools;
 using HSR_SIM_CLIENT.Utils;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using ScottPlot;
 using ScottPlot.Control;
+using ScottPlot.Palettes;
+using ScottPlot.Plottables;
+using ScottPlot.TickGenerators;
 using ScottPlot.WPF;
 using Color = ScottPlot.Color;
 
 namespace HSR_SIM_CLIENT.ChartTools;
 
 /// <summary>
-/// damage chart class (DPAV)
+///     damage chart class (DPAV)
 /// </summary>
 public class DamageChart : WpfPlot
 {
     /// <summary>
-    /// draw damage chart.
+    ///     draw damage chart.
     /// </summary>
     /// <param name="task">Primary task</param>
     /// <param name="offTask">Secondary task</param>
@@ -31,14 +33,14 @@ public class DamageChart : WpfPlot
         Bar?[] damageBars = [];
         //unit names for axis 
         Tick[] partyList = [];
-        
-        void AddPartyBar(int ndx, ThreadJob.RAggregatedData data,Color color,string label)
+
+        void AddPartyBar(int ndx, ThreadJob.RAggregatedData data, Color color, string label)
         {
-            Array.Resize(ref partyList, partyList.Length+1 );
+            Array.Resize(ref partyList, partyList.Length + 1);
             //party overall bars
             Bar? partyBar = new()
-                { Position = ndx, ValueBase = 0, Value = data.avgDPAV, FillColor =color};
-            
+                { Position = ndx, ValueBase = 0, Value = data.avgDPAV, FillColor = color };
+
             //errror bar
             Array.Resize(ref errorsY, errorsY.Length + 1);
             errorsY[^1] = ndx;
@@ -53,24 +55,24 @@ public class DamageChart : WpfPlot
             damageBars[^1] = partyBar;
             partyList[^1] = new Tick(ndx, label);
         }
-        string title =
+
+        var title =
             $"{task.Key.SimScenario.CurrentScenario.Name}";
-        string ann =
+        var ann =
             $"Win ratio:{task.Value.WinRate:f}% Win stats: cycles:{task.Value.Cycles:f} totalAV:{task.Value.TotalAV:f}";
         if (task.Value.WinRate < 100)
-            ann += ($" Defeat stats: cycles:{task.Value.DefeatCycles:f}");
+            ann += $" Defeat stats: cycles:{task.Value.DefeatCycles:f}";
         ((Interaction)Interaction).Actions = PlotUtils.NoWheelZoom();
         Plot.Title(title);
-        ScottPlot.Palettes.Dark palette = new();
+        Dark palette = new();
         Plot.Axes.Margins(left: 0);
 
 
-       
         var units = task.Value.PartyUnits.OrderBy(x => x.Value.avgDPAV).ToArray();
 
-        Array.Resize(ref partyList, units.Length );
+        Array.Resize(ref partyList, units.Length);
         //damage Types dictionary
-        Type[] dmgTypes = new[]
+        Type[] dmgTypes =
             { typeof(DirectDamage), typeof(DoTDamage), typeof(ToughnessBreak), typeof(ToughnessBreakDoTDamage) };
 
         var i = 0;
@@ -83,7 +85,7 @@ public class DamageChart : WpfPlot
             foreach (var kindDmg in unit.Value.avgByTypeDPAV.Where(x => x.Value > 0)
                          .OrderBy(x => Array.IndexOf(dmgTypes, x.Key)))
             {
-                unitBar = new()
+                unitBar = new Bar
                 {
                     Position = i, ValueBase = prevVal, Value = prevVal + kindDmg.Value,
                     FillColor = palette.Colors[Array.IndexOf(dmgTypes, kindDmg.Key)]
@@ -110,16 +112,13 @@ public class DamageChart : WpfPlot
             i++;
         }
 
-        AddPartyBar(i, task.Value,palette.Colors[6] ,"OVERALL");
-        if (offTask != null)
-        {
-              AddPartyBar(i+1, offTask.Value.Value,palette.Colors[7] ,"New Gear Overall");
-        }
+        AddPartyBar(i, task.Value, palette.Colors[6], "OVERALL");
+        if (offTask != null) AddPartyBar(i + 1, offTask.Value.Value, palette.Colors[7], "New Gear Overall");
 
 
         var plotDmgBars = Plot.Add.Bars(damageBars);
         plotDmgBars.Horizontal = true;
-        Plot.Axes.Left.TickGenerator = new ScottPlot.TickGenerators.NumericManual(partyList);
+        Plot.Axes.Left.TickGenerator = new NumericManual(partyList);
         Plot.Axes.Left.MajorTickStyle.Length = 0;
 
 
@@ -134,9 +133,9 @@ public class DamageChart : WpfPlot
         scatter.Color = palette.Colors[5];
         scatter.LineStyle.Width = 0;
 
-        ScottPlot.Plottables.ErrorBar eb = new(
-            xs: errorsX,
-            ys: errorsY,
+        ErrorBar eb = new(
+            errorsX,
+            errorsY,
             xErrorsNegative: errorsXNegative,
             xErrorsPositive: errorsXPositive,
             yErrorsNegative: null,
@@ -148,12 +147,10 @@ public class DamageChart : WpfPlot
         Plot.Legend.IsVisible = true;
         Plot.Legend.Location = Alignment.LowerRight;
         foreach (var dmgType in dmgTypes)
-        {
-            Plot.Legend.ManualItems.Add(new()
+            Plot.Legend.ManualItems.Add(new LegendItem
                 { Label = dmgType.Name, FillColor = palette.Colors[Array.IndexOf(dmgTypes, dmgType)] });
-        }
 
-        Plot.Legend.ManualItems.Add(new() { Label = "overall(party mixed)", FillColor = palette.Colors[5] });
+        Plot.Legend.ManualItems.Add(new LegendItem { Label = "overall(party mixed)", FillColor = palette.Colors[5] });
         //additional info
         Plot.Add.Annotation(ann, Alignment.UpperRight);
         Plot.Add.Palette = palette;

@@ -9,13 +9,12 @@ public class CountVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        
         if (value is IEnumerable ie && ie.Cast<object?>().Any())
 
             return Visibility.Visible;
 
 
-        return Visibility.Collapsed ;
+        return Visibility.Collapsed;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

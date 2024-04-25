@@ -1,6 +1,5 @@
 ﻿using HSR_SIM_CONTENT.DefaultContent;
 using HSR_SIM_LIB.Content;
-using HSR_SIM_LIB.Fighters;
 using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
@@ -28,10 +27,10 @@ public class AutomatonBeetle : DefaultNPCFighter
         //dmg events
         myAttackAbility.Events.Add(new DirectDamage(null, this, Parent)
         {
-            CalculateValue = FighterUtils.DamageFormula(new Formula()
+            CalculateValue = FighterUtils.DamageFormula(new Formula
             {
                 Expression =
-                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.Attack)} * 3 "
+                    $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)} * 3 "
             })
         });
         myAttackAbility.Events.Add(new EnergyGain(null, this, Parent) { Value = 15 });
@@ -41,6 +40,8 @@ public class AutomatonBeetle : DefaultNPCFighter
             { TargetUnit = Parent, AppliedBuffToApply = barierAppliedBuff });
         Abilities.Add(myAttackAbility);
     }
+
+    public override Ability.ElementEnm Element { get; } = Ability.ElementEnm.Physical;
 
 
     private void MyBarrierEventHandler(Event ent)
@@ -58,6 +59,4 @@ public class AutomatonBeetle : DefaultNPCFighter
             ent.ParentStep.Events.Add(newEvent);
         }
     }
-
-    public override Ability.ElementEnm Element { get; } = Ability.ElementEnm.Physical;
 }

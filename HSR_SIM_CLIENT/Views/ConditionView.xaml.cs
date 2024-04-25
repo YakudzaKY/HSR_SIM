@@ -3,23 +3,23 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using HSR_SIM_CLIENT.ViewModels;
 
-
 namespace HSR_SIM_CLIENT.Views;
 
 public partial class ConditionView : INotifyPropertyChanged
 {
     public static readonly DependencyProperty ConditionToViewProperty;
-    public ConditionView()
-    {
-        InitializeComponent();
-    }
+
     static ConditionView()
     {
         ConditionToViewProperty = DependencyProperty.Register(nameof(ConditionToView), typeof(ConditionViewModel),
             typeof(ConditionView), new FrameworkPropertyMetadata());
-        
     }
-  
+
+    public ConditionView()
+    {
+        InitializeComponent();
+    }
+
 
     public ConditionViewModel ConditionToView
     {
@@ -27,7 +27,7 @@ public partial class ConditionView : INotifyPropertyChanged
         set => SetValue(ConditionToViewProperty, value);
     }
 
-    
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)

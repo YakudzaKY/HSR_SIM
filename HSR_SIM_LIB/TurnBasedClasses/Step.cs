@@ -61,7 +61,7 @@ public class Step
     public List<Event> Events { get; set; } = new();
 
     public List<Event> ProceedEvents { get; set; } = new();
-    
+
 
     public bool TriggersHandled { get; set; } = false;
 

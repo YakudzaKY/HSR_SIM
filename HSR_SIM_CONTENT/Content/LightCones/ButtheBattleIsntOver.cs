@@ -35,7 +35,7 @@ internal class ButtheBattleIsntOver : DefaultLightCone
             {
                 ApplyBuff allDmg = new(null, this, Parent.Parent)
                 {
-                    AppliedBuffToApply = new AppliedBuff(Parent.Parent,null,this)
+                    AppliedBuffToApply = new AppliedBuff(Parent.Parent, null, this)
                     {
                         Type = Buff.BuffType.Buff,
                         Effects = new List<Effect> { new EffAllDamageBoost { Value = modifiersDmg[Rank - 1] } },

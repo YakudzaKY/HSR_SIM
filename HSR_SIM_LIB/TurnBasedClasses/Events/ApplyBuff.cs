@@ -35,7 +35,6 @@ public class ApplyBuff : BuffEventTemplate
 
             foreach (var modEffect in AppliedBuffToApply.Effects.Where(modEffect =>
                          modEffect.CalculateValue != null && modEffect.Value == null))
-            {
                 if (modEffect.CalculateValue is Formula fm)
                 {
                     modEffect.CalculateValue = (Formula)fm.Clone();
@@ -51,9 +50,6 @@ public class ApplyBuff : BuffEventTemplate
                     newFrm.EventRef = this;
                     modEffect.Value = newFrm.Result;
                 }
-               
-              
-            }
 
             if (!revert)
             {

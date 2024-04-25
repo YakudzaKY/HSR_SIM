@@ -13,7 +13,7 @@ public abstract class DefaultLightCone : ILightCone
         // ReSharper disable once VirtualMemberCallInConstructor
         if (Path != Parent.Path) //prevent from wrong Path lc
             return;
-        EventHandlerProc +=DefaultLightCone_HandleEvent;
+        EventHandlerProc += DefaultLightCone_HandleEvent;
         StepHandlerProc += DefaultLightCone_HandleStep;
     }
 
@@ -22,7 +22,7 @@ public abstract class DefaultLightCone : ILightCone
 
     public int Rank { get; set; }
     public abstract FighterUtils.PathType Path { get; }
-    public ILightCone.EventHandler? EventHandlerProc { get; set; } 
+    public ILightCone.EventHandler? EventHandlerProc { get; set; }
     public ILightCone.StepHandler? StepHandlerProc { get; set; }
 
     public void Reset()

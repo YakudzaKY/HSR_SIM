@@ -88,7 +88,9 @@ public class ThreadJob(List<SimTask>? pTaskList, int pIterations)
 
                 foundUnit.avgDPAV = AggAvg(foundUnit.avgDPAV, unit.Damages.Sum(x => x.Value) / rCombatResult.TotalAv);
                 var fndUnitDpav = unit.Damages.Sum(x => x.Value) / rCombatResult.TotalAv;
-                foundUnit.minDPAV =  foundUnit.minDPAV.HasValue ? Math.Min((double)foundUnit.minDPAV,fndUnitDpav ):fndUnitDpav;
+                foundUnit.minDPAV = foundUnit.minDPAV.HasValue
+                    ? Math.Min((double)foundUnit.minDPAV, fndUnitDpav)
+                    : fndUnitDpav;
                 foundUnit.maxDPAV = Math.Max(foundUnit.maxDPAV, unit.Damages.Sum(x => x.Value) / rCombatResult.TotalAv);
 
                 foreach (var typ in typeArray)

@@ -24,12 +24,15 @@ internal class InertSalsotto : DefaultRelicSet
             CustomIconName = "gear\\" + GetType().ToString().Split('.').Last(),
 
             Target = Parent.Parent,
-            ApplyConditions = [new Condition
-            {
-                ConditionParam = Condition.ConditionCheckParam.CritRate,
-                ConditionExpression = Condition.ConditionCheckExpression.EqualOrMore,
-                Value = 0.50
-            }]
+            ApplyConditions =
+            [
+                new Condition
+                {
+                    ConditionParam = Condition.ConditionCheckParam.CritRate,
+                    ConditionExpression = Condition.ConditionCheckExpression.EqualOrMore,
+                    Value = 0.50
+                }
+            ]
         };
     }
 }

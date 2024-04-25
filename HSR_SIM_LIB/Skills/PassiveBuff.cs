@@ -8,12 +8,14 @@ namespace HSR_SIM_LIB.Skills;
 
 public class PassiveBuff : Buff
 {
-    public PassiveBuff(Unit parent, object sourceObject) : base(parent,null,sourceObject)
+    public PassiveBuff(Unit parent, object sourceObject) : base(parent, null, sourceObject)
     {
         CarrierUnit = parent;
     }
 
     public object Target { get; set; } //in most cases target==parent, but when target is full team then not
+    public List<Condition> ApplyConditions { get; init; }
+    public bool IsTargetCheck { get; init; }
 
     /// <summary>
     ///     Conditions are OK
@@ -23,14 +25,12 @@ public class PassiveBuff : Buff
     /// <param name="excludeCondition"></param>
     /// <param name="ent"></param>
     /// <returns></returns>
-    public bool Truly(PassiveBuff parentBuff, Unit targetUnit , List<Condition> excludeCondition ,
-        Event ent )
+    public bool Truly(PassiveBuff parentBuff, Unit targetUnit, List<Condition> excludeCondition,
+        Event ent)
     {
         if (ApplyConditions is null || ApplyConditions.Count == 0) return true;
         return ApplyConditions.All(x => x.Truly(parentBuff, targetUnit, excludeCondition, ent));
     }
-    public List<Condition> ApplyConditions { get; init; }
-    public bool IsTargetCheck { get; init; }
 
 
     /// <summary>

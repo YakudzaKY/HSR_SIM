@@ -99,14 +99,12 @@ public static class XmlLoader
 
     private static List<Ability.ElementEnm> ExtractWeakness(XmlElement xmlItems)
     {
-        List<Ability.ElementEnm> res = new List<Ability.ElementEnm>();
+        var res = new List<Ability.ElementEnm>();
         //parse all items
 
         foreach (XmlElement node in xmlItems.SelectNodes("Weakness")!)
-        {
             res.Add((Ability.ElementEnm)Enum.Parse(typeof(Ability.ElementEnm),
                 node.Attributes.GetNamedItem("value")!.Value!.Trim(), true));
-        }
 
         return res;
     }
@@ -299,12 +297,12 @@ public static class XmlLoader
 
     private static List<Resist> ExtractResist(XmlElement xmlElement)
     {
-        List<Resist> res = new List<Resist>();
+        var res = new List<Resist>();
         //parse all items
 
         foreach (XmlElement node in xmlElement.SelectNodes("Resist")!)
         {
-            Resist newRes = new Resist()
+            var newRes = new Resist
             {
                 ResistType = (Ability.ElementEnm)Enum.Parse(typeof(Ability.ElementEnm),
                     node.Attributes.GetNamedItem("value")!.Value!.Trim(), true),
@@ -315,19 +313,20 @@ public static class XmlLoader
 
         return res;
     }
-    
+
     private static List<DebuffResist> ExtractDebuffResist(XmlElement xmlElement)
     {
-        List<DebuffResist> res = new List<DebuffResist>();
+        var res = new List<DebuffResist>();
         //parse all items
 
         foreach (XmlElement node in xmlElement.SelectNodes("DebuffResist")!)
         {
-            DebuffResist newRes = new DebuffResist()
+            var newRes = new DebuffResist
             {
                 //pick EffCrowdControl namespace
-                Debuff = Type.GetType( typeof(EffCrowdControl).Namespace  +"."+node.Attributes.GetNamedItem("value")!.Value!.Trim()),
-           
+                Debuff = Type.GetType(typeof(EffCrowdControl).Namespace + "." +
+                                      node.Attributes.GetNamedItem("value")!.Value!.Trim()),
+
                 ResistVal = SafeToDouble(node.Attributes.GetNamedItem("byValue")!.Value!.Trim())
             };
             res.Add(newRes);

@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.Drawing.Imaging;
+﻿using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -55,12 +54,17 @@ internal static class GuiUtils
     /// <returns></returns>
     public static Bitmap CaptureScreen(bool captureMouse)
     {
-       
-        var result = new Bitmap((int)  SystemParameters.PrimaryScreenWidth,(int) SystemParameters.PrimaryScreenHeight, PixelFormat.Format24bppRgb);
+        var result = new Bitmap((int)SystemParameters.PrimaryScreenWidth, (int)SystemParameters.PrimaryScreenHeight,
+            PixelFormat.Format24bppRgb);
 
 
         using var g = Graphics.FromImage(result);
-        g.CopyFromScreen(0, 0, 0, 0, new Size(){Width = (int) SystemParameters.FullPrimaryScreenWidth,Height = (int)SystemParameters.FullPrimaryScreenHeight}, CopyPixelOperation.SourceCopy);
+        g.CopyFromScreen(0, 0, 0, 0,
+            new Size
+            {
+                Width = (int)SystemParameters.FullPrimaryScreenWidth,
+                Height = (int)SystemParameters.FullPrimaryScreenHeight
+            }, CopyPixelOperation.SourceCopy);
 
         if (captureMouse)
         {

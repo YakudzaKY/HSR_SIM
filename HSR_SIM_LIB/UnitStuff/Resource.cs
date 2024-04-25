@@ -33,7 +33,6 @@ public class Resource(CloneClass parent) : CloneClass
                 if (ResType == ResourceType.HP) un.ResetCondition(Condition.ConditionCheckParam.Hp);
                 un.ResetCondition(Condition.ConditionCheckParam.Resource);
             }
-            
         }
     }
 }

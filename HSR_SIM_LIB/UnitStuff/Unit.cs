@@ -7,7 +7,6 @@ using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.Skills.EffectList;
 using HSR_SIM_LIB.TurnBasedClasses.Events;
 using HSR_SIM_LIB.Utils;
-using Microsoft.VisualBasic.CompilerServices;
 using static HSR_SIM_LIB.Utils.Constant;
 using static HSR_SIM_LIB.UnitStuff.Resource;
 using static HSR_SIM_LIB.Skills.Ability;
@@ -18,7 +17,7 @@ namespace HSR_SIM_LIB.UnitStuff;
 /// <summary>
 ///     Unit class. Stats skills etc
 /// </summary>
-public class Unit : CloneClass
+public partial class Unit : CloneClass
 {
     public enum LivingStatusEnm
     {
@@ -34,6 +33,13 @@ public class Unit : CloneClass
         Character
     }
 
+
+    private List<DamageBoostRec> baseDamageBoost; //Elemental damage boost list
+    private IFighter fighter;
+
+    private Bitmap portrait;
+    private UnitStats stats;
+
     /// <summary>
     ///     Is Elite flag. Need for some weakness break calculations
     /// </summary>
@@ -42,25 +48,18 @@ public class Unit : CloneClass
     /// <summary>
     ///     native weaknesses defined by profile
     /// </summary>
-    public List<ElementEnm> NativeWeaknesses { get; set; } 
+    public List<ElementEnm> NativeWeaknesses { get; set; }
 
 
     /// <summary>
     ///     native resists defined by profile
     /// </summary>
-    public List<Resist> NativeResists { get; set; } 
+    public List<Resist> NativeResists { get; set; }
 
     /// <summary>
     ///     native debuff resists defined by profile
     /// </summary>
-    public List<DebuffResist> NativeDebuffResists { get; set; } 
-
-
-    private List<DamageBoostRec> baseDamageBoost; //Elemental damage boost list
-
-    private Bitmap portrait;
-    private UnitStats stats;
-    private IFighter fighter;
+    public List<DebuffResist> NativeDebuffResists { get; set; }
 
     public bool IsAlive => LivingStatus != LivingStatusEnm.Defeated;
 
@@ -70,10 +69,7 @@ public class Unit : CloneClass
 
     public IFighter Fighter
     {
-        get
-        {
-            return fighter ??= (IFighter)Activator.CreateInstance(Type.GetType(FighterClassName, true)!, this);
-        }
+        get { return fighter ??= (IFighter)Activator.CreateInstance(Type.GetType(FighterClassName, true)!, this); }
         set => fighter = value;
     }
 
@@ -127,7 +123,7 @@ public class Unit : CloneClass
                 .FirstOrDefault(x => x != ParentTeam && x.TeamType != Team.TeamTypeEnm.Special);
         }
     }
-    
+
 
     /// <summary>
     ///     Enemies
@@ -198,13 +194,13 @@ public class Unit : CloneClass
     {
         var newClone = (Unit)MemberwiseClone();
         newClone.Fighter = null;
-        
+
         //clone resources
         var oldRes = newClone.Resources;
         newClone.Resources = [];
         foreach (var res in oldRes)
         {
-            Resource newRes =(Resource)res.Clone();
+            var newRes = (Resource)res.Clone();
             newRes.Parent = newClone;
             newClone.Resources.Add(newRes);
         }
@@ -218,18 +214,18 @@ public class Unit : CloneClass
         newClone.PassiveBuffs = [];
         foreach (var res in oldPassives) newClone.PassiveBuffs.Add((PassiveBuff)res.Clone());
         //clone Debuff Resists
-        var oldNativeDebuffResists= newClone.NativeDebuffResists;
+        var oldNativeDebuffResists = newClone.NativeDebuffResists;
         newClone.NativeDebuffResists = [];
         foreach (var res in oldNativeDebuffResists) newClone.NativeDebuffResists.Add(res);
         //clone  Resists
-        var oldNativeResists= newClone.NativeResists;
+        var oldNativeResists = newClone.NativeResists;
         newClone.NativeResists = [];
         foreach (var res in oldNativeResists) newClone.NativeResists.Add(res);
         //clone  Weakness
-        var oldNativeWeakness= newClone.NativeWeaknesses;
+        var oldNativeWeakness = newClone.NativeWeaknesses;
         newClone.NativeWeaknesses = [];
         foreach (var res in oldNativeWeakness) newClone.NativeWeaknesses.Add(res);
-        
+
         //clone Skills
         var oldSkills = newClone.Skills;
         newClone.Skills = new List<Skill>();
@@ -250,7 +246,6 @@ public class Unit : CloneClass
     }
 
 
-
     //call when unit enter battle
     public void OnEnteringBattle()
     {
@@ -268,7 +263,7 @@ public class Unit : CloneClass
     }
 
     /// <summary>
-    /// Set default value when resource got created
+    ///     Set default value when resource got created
     /// </summary>
     /// <param name="rt">resource type</param>
     /// <returns></returns>
@@ -277,12 +272,11 @@ public class Unit : CloneClass
         switch (rt)
         {
             case ResourceType.HP:
-                return this.MaxHp().Result;
+                return MaxHp().Result;
             case ResourceType.Toughness:
                 return Stats.MaxToughness;
             default:
                 return 0;
-            
         }
     }
 
@@ -291,7 +285,7 @@ public class Unit : CloneClass
     {
         if (dependencyRecs != null)
             FormulaBuffer.MergeDependency(dependencyRecs,
-                new FormulaBuffer.DependencyRec()
+                new FormulaBuffer.DependencyRec
                     { Relation = unitToCheck, Stat = Condition.ConditionCheckParam.Resource });
         return GetRes(rt).ResVal;
     }
@@ -299,7 +293,6 @@ public class Unit : CloneClass
 
     public double GetNativeResists(ElementEnm elem)
     {
-        
         double res = 0;
         if (NativeResists.Any(x => x.ResistType == elem))
             res += NativeResists.First(x => x.ResistType == elem).ResistVal;
@@ -391,16 +384,15 @@ public class Unit : CloneClass
         Type effTypeToSearch = null, List<EffectTraceRec> outputEffects = null, ElementEnm? elem = null,
         List<Condition> excludeCondition = null, Buff.BuffType? buffType = null,
         AbilityTypeEnm? abilityType = null, List<FormulaBuffer.DependencyRec> dependencyRecs = null,
-        Formula.DynamicTargetEnm unitToCheck = DynamicTargetEnm.Attacker)
+        DynamicTargetEnm unitToCheck = DynamicTargetEnm.Attacker)
     {
         //save dependency from formula
         if (dependencyRecs != null && effTypeToSearch != null)
         {
-            Effect instance = (Effect)Activator.CreateInstance(effTypeToSearch);
+            var instance = (Effect)Activator.CreateInstance(effTypeToSearch);
 
             FormulaBuffer.MergeDependency(dependencyRecs,
-                new FormulaBuffer.DependencyRec()
-                    { Relation = unitToCheck, Stat = instance!.ResetDependency });
+                new FormulaBuffer.DependencyRec { Relation = unitToCheck, Stat = instance!.ResetDependency });
         }
 
         double res = 0;
@@ -423,14 +415,18 @@ public class Unit : CloneClass
 
                 else if (effect.CalculateValue is Func<Event, Formula> fnc)
                 {
-                    effect.CalculateValue = fnc.Invoke(ent);
-                    var newFrm = (Formula)effect.CalculateValue;
+                    var newFrm = fnc.Invoke(ent);
                     newFrm.EventRef = ent;
                     finalValue = newFrm.Result;
                 }
+                //do not save buffer if target calculation effects
+                FormulaBuffer.MergeDependency(dependencyRecs,
+                    new FormulaBuffer.DependencyRec { Relation = unitToCheck, Stat = Condition.ConditionCheckParam.DoNotSaveDependency });
             }
             else
+            {
                 finalValue = (double)effect.Value;
+            }
             //multiply by stack
 
             if (kp.Key is AppliedBuff appliedBuff && effect.StackAffectValue)
@@ -446,7 +442,7 @@ public class Unit : CloneClass
 
     /// <summary>
     ///     the multiply of stats whose effects we found using the criteria
-    /// 1 * (1- X)*(1-Y)...*(1-N)
+    ///     1 * (1- X)*(1-Y)...*(1-N)
     /// </summary>
     /// <param name="ent">Event ref for calculation</param>
     /// <param name="effTypeToSearch">Effect to search</param>
@@ -462,7 +458,7 @@ public class Unit : CloneClass
         Type effTypeToSearch = null, List<EffectTraceRec> outputEffects = null, ElementEnm? elem = null,
         List<Condition> excludeCondition = null, Buff.BuffType? buffType = null,
         AbilityTypeEnm? abilityType = null, List<FormulaBuffer.DependencyRec> dependencyRecs = null,
-        Formula.DynamicTargetEnm unitToCheck = DynamicTargetEnm.Attacker)
+        DynamicTargetEnm unitToCheck = DynamicTargetEnm.Attacker)
     {
         double res = 1;
         var effList =
@@ -492,17 +488,19 @@ public class Unit : CloneClass
                 }
             }
             else
+            {
                 finalValue = (double)effect.Value;
+            }
             //multiply by stack
 
             if (kp.Key is AppliedBuff appliedBuff && effect.StackAffectValue)
                 finalValue *= appliedBuff.Stack;
-            res *= (1 - finalValue);
+            res *= 1 - finalValue;
             if (outputEffects != null && outputEffects.All(x => x.TraceEffect != effect))
                 outputEffects.Add(new EffectTraceRec(kp.Key, effect, finalValue));
             if (dependencyRecs != null && effect.ResetDependency != null)
                 FormulaBuffer.MergeDependency(dependencyRecs,
-                    new FormulaBuffer.DependencyRec()
+                    new FormulaBuffer.DependencyRec
                         { Relation = unitToCheck, Stat = (Condition.ConditionCheckParam)effect.ResetDependency });
         }
 
@@ -532,7 +530,7 @@ public class Unit : CloneClass
                             && (excludeCondition == null || z.ApplyConditions is null ||
                                 z.ApplyConditions.Any(cd => !excludeCondition.Contains(cd))))
             where passiveBuff.UnitIsAffected(this) &&
-                  (passiveBuff.Truly(passiveBuff, targetForBuff, excludeCondition, ent))
+                  passiveBuff.Truly(passiveBuff, targetForBuff, excludeCondition, ent)
             select passiveBuff;
         return res;
     }
@@ -587,8 +585,8 @@ public class Unit : CloneClass
     {
         int res;
         var foundBuff = AppliedBuffs.FirstOrDefault(x =>
-            ((x.Reference == (appliedBuff.Reference ?? appliedBuff)
-              || (!string.IsNullOrEmpty(appliedBuff.UniqueStr) && string.Equals(x.UniqueStr, appliedBuff.UniqueStr)))));
+            x.Reference == (appliedBuff.Reference ?? appliedBuff)
+            || (!string.IsNullOrEmpty(appliedBuff.UniqueStr) && string.Equals(x.UniqueStr, appliedBuff.UniqueStr)));
 
 
         foreach (var effect in appliedBuff.Effects) effect.BeforeApply(ent, appliedBuff);
@@ -709,7 +707,7 @@ public class Unit : CloneClass
     {
         if (dependencyRecs != null)
             FormulaBuffer.MergeDependency(dependencyRecs,
-                new FormulaBuffer.DependencyRec()
+                new FormulaBuffer.DependencyRec
                     { Relation = unitToCheck, Stat = Condition.ConditionCheckParam.Resource });
 
         if (GetRes(ResourceType.Toughness).ResVal > 0)
@@ -719,7 +717,7 @@ public class Unit : CloneClass
 
 
     /// <summary>
-    /// Reset Conditions that depends on stat
+    ///     Reset Conditions that depends on stat
     /// </summary>
     /// <param name="chkPrm"></param>
     public void ResetCondition(object chkPrm)
@@ -738,7 +736,7 @@ public class Unit : CloneClass
     {
         if (dependencyRecs != null)
             FormulaBuffer.MergeDependency(dependencyRecs,
-                new FormulaBuffer.DependencyRec()
+                new FormulaBuffer.DependencyRec
                     { Relation = unitToCheck, Stat = Condition.ConditionCheckParam.Weakness });
         List<ElementEnm> res = new();
         //add native weakness to result
@@ -755,5 +753,4 @@ public class Unit : CloneClass
         public ElementEnm ElemType;
         public double Value;
     }
-
 }

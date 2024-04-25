@@ -3,6 +3,6 @@
 /// <summary>
 ///     buff that defend from direct damage
 /// </summary>
-public class EffBarrier() : Effect()
+public class EffBarrier : Effect
 {
 }

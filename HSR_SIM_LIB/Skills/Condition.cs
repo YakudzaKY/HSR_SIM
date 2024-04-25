@@ -45,13 +45,12 @@ public class Condition
         ShieldBonus,
         Mechanics,
         PerformedActionValue,
-        DoNotSaveDependency//this param should be recalculated every time(crit proceed etc)
-        
+        DoNotSaveDependency //this param should be recalculated every time(crit proceed etc)
     }
 
     private bool truly;
     public bool NeedRecalculate { get; set; } = true;
-    
+
     public ConditionCheckExpression ConditionExpression { get; init; }
     public ConditionCheckParam ConditionParam { get; init; }
     public Ability.ElementEnm? ElemValue { get; init; }
@@ -90,12 +89,16 @@ public class Condition
         {
             res = ConditionParam switch
             {
-                ConditionCheckParam.Spd => CheckExpression(untToCheck.Speed(ent:ent, excludeCondition:excludeCondition).Result),
+                ConditionCheckParam.Spd => CheckExpression(untToCheck
+                    .Speed(ent: ent, excludeCondition: excludeCondition).Result),
                 ConditionCheckParam.CritRate => CheckExpression(
-                    untToCheck.CritChance(ent:ent, excludeCondition:excludeCondition).Result),
-                ConditionCheckParam.Hp => untToCheck.MaxHp(ent:ent, excludeCondition:excludeCondition).Result != 0 &&
-                                             CheckExpression(untToCheck.HpPrc(ent:ent, excludeCondition:excludeCondition).Result),
-                ConditionCheckParam.Resource => ResourceValue!=null && CheckExpression(untToCheck.GetRes((Resource.ResourceType)ResourceValue).ResVal),
+                    untToCheck.CritChance(ent: ent, excludeCondition: excludeCondition).Result),
+                ConditionCheckParam.Hp => untToCheck.MaxHp(ent: ent, excludeCondition: excludeCondition).Result != 0 &&
+                                          CheckExpression(untToCheck.HpPrc(ent: ent, excludeCondition: excludeCondition)
+                                              .Result),
+                ConditionCheckParam.Resource => ResourceValue != null &&
+                                                CheckExpression(untToCheck.GetRes((Resource.ResourceType)ResourceValue)
+                                                    .ResVal),
                 ConditionCheckParam.Weakness => untToCheck.GetWeaknesses(ent, excludeCondition)
                                                     .Any(x => x == (ElemValue ?? ent?.SourceUnit.Fighter.Element))
                                                 == (ConditionExpression ==

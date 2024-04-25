@@ -3,22 +3,22 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:HSR_SIM_CLIENT.Windows"
         mc:Ignorable="d"
         Title="HoyoApiImport" Height="250" Width="300"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition></RowDefinition>
+            <RowDefinition />
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*"></ColumnDefinition>
-            <ColumnDefinition Width="2*"></ColumnDefinition>
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
-        <TextBox Grid.Row="0" Grid.Column="0" Text="{Binding Path=ApiMyUid, Mode=TwoWay}"/>
+        <TextBox Grid.Row="0" Grid.Column="0" Text="{Binding Path=ApiMyUid, Mode=TwoWay}" />
         <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding Path=ApiFullSave, Mode=TwoWay}">Auto save full data</CheckBox>
-        <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Content="{Binding Path=BtnImportCaption, Mode=TwoWay}" Click="ButtonImport_OnClick"/>
+        <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Content="{Binding Path=BtnImportCaption, Mode=TwoWay}"
+                Click="ButtonImport_OnClick" />
     </Grid>
 </Window>

@@ -1,5 +1,4 @@
-﻿using HSR_SIM_LIB.Fighters;
-using HSR_SIM_LIB.Skills;
+﻿using HSR_SIM_LIB.Skills;
 using HSR_SIM_LIB.UnitStuff;
 
 namespace HSR_SIM_CONTENT.DefaultContent;
@@ -12,7 +11,6 @@ internal abstract class DefaultNpcBossFighter : DefaultNPCFighter
         parent.IsEliteUnit = true;
     }
 
-    public abstract override Ability.ElementEnm Element { get;  }
-    public override double Cost => Parent.Attack(ent:null).Result * 1.5;
-
+    public abstract override Ability.ElementEnm Element { get; }
+    public override double Cost => Parent.Attack(ent: null).Result * 1.5;
 }

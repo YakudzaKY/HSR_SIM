@@ -12,7 +12,8 @@ namespace HSR_SIM_LIB.Skills.ReadyBuffs;
 /// </summary>
 public class AppliedBuffEntanglementWb : AppliedBuff
 {
-    public AppliedBuffEntanglementWb(Unit sourceUnit, AppliedBuff reference =null  ) : base(sourceUnit, reference,typeof(AppliedBuffEntanglementWb))
+    public AppliedBuffEntanglementWb(Unit sourceUnit, AppliedBuff reference = null) : base(sourceUnit, reference,
+        typeof(AppliedBuffEntanglementWb))
     {
         Type = BuffType.Debuff;
         BaseDuration = 1;
@@ -22,10 +23,10 @@ public class AppliedBuffEntanglementWb : AppliedBuff
             new EffEntanglement { DoTCalculateValue = FighterUtils.WeaknessBreakFormula() },
             new EffDelay
             {
-                CalculateValue = new Formula()
+                CalculateValue = new Formula
                 {
                     Expression =
-                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.BreakDmg)} * 0.20"
+                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.BreakDmg)} * 0.20"
                 },
                 StackAffectValue = false
             }
@@ -33,7 +34,7 @@ public class AppliedBuffEntanglementWb : AppliedBuff
         EventHandlerProc += EntanglementEventHandler;
     }
 
-  
+
     private bool UnitGotHitByAbility(List<Event> events)
     {
         foreach (var ent in events)

@@ -14,7 +14,7 @@ namespace HSR_SIM_CONTENT.DefaultContent;
 /// <summary>
 ///     abstract class for Playable characters
 /// </summary>
-public abstract class DefaultFighter :  IFighter
+public abstract class DefaultFighter : IFighter
 {
     private ILightCone? lightCone;
 
@@ -22,11 +22,7 @@ public abstract class DefaultFighter :  IFighter
 
     private UnitRole? role;
     private AppliedBuff? weaknessBreakDebuff;
-    public abstract double MaxEnergy { get; } 
 
-    //we need this debuff to track and correctly apply debuff stacks
-    public abstract Ability.ElementEnm Element { get;  }
-    
     //Blade constructor
     protected DefaultFighter(Unit parent)
     {
@@ -81,10 +77,13 @@ public abstract class DefaultFighter :  IFighter
         set => lightCone = value;
     }
 
-    public MechDictionary Mechanics { get; set; } // dictionary for save mechanics value in combat
-
     public bool IsNpcUnit => false;
+    public abstract double MaxEnergy { get; }
 
+    //we need this debuff to track and correctly apply debuff stacks
+    public abstract Ability.ElementEnm Element { get; }
+
+    public MechDictionary Mechanics { get; set; } // dictionary for save mechanics value in combat
 
 
     public AppliedBuff WeaknessBreakDebuff
@@ -111,7 +110,7 @@ public abstract class DefaultFighter :  IFighter
 
 
     public abstract PathType? Path { get; }
-    
+
     public Unit Parent { get; set; }
 
     /// <summary>
@@ -263,7 +262,7 @@ public abstract class DefaultFighter :  IFighter
 
     public virtual void Reset()
     {
-        Parent.ParentTeam.ParentSim.CalcBuffer.Reset(Parent,Condition.ConditionCheckParam.Mechanics);
+        Parent.ParentTeam.ParentSim.CalcBuffer.Reset(Parent, Condition.ConditionCheckParam.Mechanics);
         Mechanics.Reset();
         LightCone?.Reset();
         foreach (var relic in Relics) relic.Reset();

@@ -20,10 +20,10 @@ public class AppliedBuffImprisonmentWb : AppliedBuff
             new EffImprisonment(),
             new EffDelay
             {
-                CalculateValue = new Formula()
+                CalculateValue = new Formula
                 {
                     Expression =
-                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(UnitFormulas)}#{nameof(UnitFormulas.BreakDmg)} * 0.30"
+                        $"{Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.BreakDmg)} * 0.30"
                 }
             },
             new EffSpeedPrc { Value = -0.1 }

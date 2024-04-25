@@ -24,8 +24,9 @@ public sealed class SimCls : ICloneable
 
     public delegate void StepHandler(Step step);
 
+    public FormulaBuffer CalcBuffer = new();
+
     public List<PreLaunchOption> PreLaunch;
-    public FormulaBuffer CalcBuffer = new ();
 
 
     /// <summary>

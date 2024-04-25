@@ -3,6 +3,6 @@
 /// <summary>
 ///     reduce damage by x%
 /// </summary>
-public class EffDamageReduction() : Effect()
+public class EffDamageReduction : Effect
 {
 }

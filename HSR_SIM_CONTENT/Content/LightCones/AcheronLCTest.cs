@@ -16,7 +16,7 @@ internal class AcheronLcTst : DefaultLightCone
     public AcheronLcTst(IFighter parent, int rank) : base(parent, rank)
     {
         if (Path != Parent.Path) return;
-        aetherCodeDebuff = new AppliedBuff(Parent.Parent,null,this)
+        aetherCodeDebuff = new AppliedBuff(Parent.Parent, null, this)
         {
             CustomIconName = "defeat",
             Type = Buff.BuffType.Debuff,
@@ -35,12 +35,15 @@ internal class AcheronLcTst : DefaultLightCone
             ],
 
             Target = Parent.Parent,
-            ApplyConditions = [new Condition
-            {
-                AppliedBuffValue = aetherCodeDebuff,
-                ConditionExpression = Condition.ConditionCheckExpression.Exists,
-                ConditionParam = Condition.ConditionCheckParam.Buff
-            }],
+            ApplyConditions =
+            [
+                new Condition
+                {
+                    AppliedBuffValue = aetherCodeDebuff,
+                    ConditionExpression = Condition.ConditionCheckExpression.Exists,
+                    ConditionParam = Condition.ConditionCheckParam.Buff
+                }
+            ],
             IsTargetCheck = true
         });
     }
