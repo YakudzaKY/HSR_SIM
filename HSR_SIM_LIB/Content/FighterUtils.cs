@@ -81,6 +81,7 @@ public static class FighterUtils
         return newFormula;
     }
 
+    
     /// <summary>
     ///     Generate damage output formula
     /// </summary>
@@ -88,6 +89,7 @@ public static class FighterUtils
     /// <returns></returns>
     public static Formula DamageFormula(Formula abilityFormula)
     {
+        
         var expression = $"{abilityFormula.Expression} * " +
                          //crit
                          $" ( ({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.GenerateCrit)} * 0) " +
