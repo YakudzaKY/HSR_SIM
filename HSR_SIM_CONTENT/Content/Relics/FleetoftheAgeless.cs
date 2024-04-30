@@ -13,7 +13,7 @@ internal class FleetoftheAgeless : DefaultRelicSet
             Parent.Parent.PassiveBuffs.Add(new PassiveBuff(parent.Parent, this)
             {
                 Effects = new List<Effect> { new EffAtkPrc { Value = 0.08 } },
-                CustomIconName = "gear\\" + GetType().ToString().Split('.').Last(),
+                CustomIconName =GearIcon(),
                 Target = parent.Parent.ParentTeam,
                 ApplyConditions =
                 [

@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
@@ -584,10 +585,10 @@ public partial class StatCalc : INotifyPropertyChanged
     //parse stat value 
     private static double ExctractDoubleVal(string inputStr)
     {
-        inputStr = inputStr.Replace('.', ',');
+        inputStr = inputStr.Replace(',', '.').Replace('‚','.');
         return inputStr.EndsWith('%')
-            ? double.Parse(inputStr.Substring(0, inputStr.Length - 1)) / 100
-            : double.Parse(inputStr);
+            ? double.Parse(inputStr.Substring(0, inputStr.Length - 1),NumberStyles.Any, CultureInfo.InvariantCulture) / 100
+            : double.Parse(inputStr,NumberStyles.Any, CultureInfo.InvariantCulture);
     }
 
     private List<SimTask> GetStatsSubTasks(string scenario, string profile, SimTask simTask)

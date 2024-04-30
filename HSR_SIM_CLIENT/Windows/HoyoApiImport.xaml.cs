@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Globalization;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -144,7 +145,7 @@ public partial class HoyoApiImport : INotifyPropertyChanged
         unit.SetAttributeValue("level", character.Level.ToString());
         unit.SetAttributeValue("rank", character.Rank.ToString());
         XElement stat = new("Stats");
-        foreach (var attr in character.attributes) stat.SetAttributeValue(attr.field, attr.value);
+        foreach (var attr in character.attributes) stat.SetAttributeValue(attr.field, attr.value.ToString(CultureInfo.InvariantCulture));
         unit.Add(stat);
 
         if (character.light_cone != null)
