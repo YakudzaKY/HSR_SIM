@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
+using System.Runtime;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -102,7 +103,9 @@ public partial class StatCalc : INotifyPropertyChanged
         LoadFromIni();
         InitializeComponent();
         if (ThrCnt == 0)
-            ThrCnt = Math.Max(Environment.ProcessorCount / 2 - 1, 1);
+            ThrCnt = Math.Max((int)Math.Ceiling(Environment.ProcessorCount *0.9*0.67), 1);
+     
+        
     }
 
 
@@ -493,7 +496,9 @@ public partial class StatCalc : INotifyPropertyChanged
     /// </summary>
     private async Task DoCalculations()
     {
+        //GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
         StackCharts.Children.Clear();
+        
         await Task.Run(DoJob);
         var parentData = threadJob!.CombatData.Where(x => x.Key.Parent is null).ToArray();
         if (renderOverallCompareRes)
@@ -502,6 +507,10 @@ public partial class StatCalc : INotifyPropertyChanged
         foreach (var task in parentData)
             StackCharts.Children.Add(
                 new CalcResultView(task, threadJob.CombatData.Where(x => x.Key.Parent == task.Key)));
+        //GCSettings.LatencyMode = GCLatencyMode.Interactive;
+      
+
+      
     }
 
     /// <summary>

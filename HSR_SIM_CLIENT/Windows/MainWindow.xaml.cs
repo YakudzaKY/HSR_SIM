@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.IO;
+using System.Runtime;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using HSR_SIM_LIB.Utils;
@@ -17,6 +18,15 @@ public sealed partial class MainWindow : INotifyPropertyChanged
 
     public MainWindow()
     {
+        // GC threads
+        int logicalProcessorCount = Math.Max((int)Math.Ceiling(Environment.ProcessorCount *0.9*0.33), 1);
+
+
+        Environment.SetEnvironmentVariable("COMPlus_GCHeapCount", logicalProcessorCount.ToString());
+
+
+        GCSettings.LatencyMode = GCLatencyMode.Batch;
+        
         InitializeComponent();
         RefreshCb();
     }

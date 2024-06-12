@@ -11,6 +11,17 @@
         <LangVersion>default</LangVersion>
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+        <Optimize>true</Optimize>
+        <DefineConstants></DefineConstants>
+        <DebugType>pdbonly</DebugType>
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+        <ServerGarbageCollection>true</ServerGarbageCollection>
+    </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\HSR_SIM_CONTENT\HSR_SIM_CONTENT.csproj"/>
         <ProjectReference Include="..\HSR_SIM_LIB\HSR_SIM_LIB.csproj"/>
