@@ -472,7 +472,7 @@ public partial class StatCalc : INotifyPropertyChanged
         //generate task list
         myTaskList = new List<SimTask>();
         //render overall chart if gear replace calc and character not null
-        renderOverallCompareRes = GearReplaceTabSelected && SelectedCharacterToCalc != null;
+        renderOverallCompareRes = GearReplaceTabSelected && !String.IsNullOrEmpty(SelectedCharacterToCalc);
 
         foreach (var scenario in Scenarios.Where(x => x.IsSelected))
         foreach (var profile in Profiles.Where(x => x.IsSelected))
