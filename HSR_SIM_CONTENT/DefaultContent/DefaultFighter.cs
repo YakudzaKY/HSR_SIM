@@ -30,8 +30,6 @@ public abstract class DefaultFighter : IFighter
         Parent = parent;
         EventHandlerProc += DefaultFighter_HandleEvent;
         StepHandlerProc += DefaultFighter_HandleStep;
-        //no way to get ascend traces from api :/
-        ATraces = ATracesEnm.A2 | ATracesEnm.A4 | ATracesEnm.A6;
 
         var defOpener =
             //Typical left click opener
@@ -61,7 +59,6 @@ public abstract class DefaultFighter : IFighter
     }
 
 
-    protected ATracesEnm ATraces { get; set; }
 
     public ILightCone? LightCone
     {
@@ -262,7 +259,7 @@ public abstract class DefaultFighter : IFighter
 
     public virtual void Reset()
     {
-        Parent.ParentTeam.ParentSim.CalcBuffer.Reset(Parent, Condition.ConditionCheckParam.Mechanics);
+        Parent.ParentTeam.ParentSim.CalcBuffer?.Reset(Parent, Condition.ConditionCheckParam.Mechanics);
         Mechanics.Reset();
         LightCone?.Reset();
         foreach (var relic in Relics) relic.Reset();
@@ -473,11 +470,4 @@ public abstract class DefaultFighter : IFighter
         foreach (var relic in Relics) relic.StepHandlerProc?.Invoke(step);
     }
 
-    [Flags]
-    protected enum ATracesEnm
-    {
-        A2 = 1,
-        A4 = 2,
-        A6 = 4
-    }
 }

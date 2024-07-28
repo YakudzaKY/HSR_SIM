@@ -150,7 +150,7 @@ public class Bronya : DefaultFighter
         //Ascended Traces
         //=====================
 
-        if (ATraces.HasFlag(ATracesEnm.A6))
+        if (parent.ATraces.HasFlag(Unit.ATracesEnm.A6))
             Parent.PassiveBuffs.Add(new PassiveBuff(Parent, this)
             {
                 Effects = [new EffAllDamageBoost { Value = 0.10 }],

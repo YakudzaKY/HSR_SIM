@@ -43,16 +43,21 @@ public class Formula : ICloneable
     public Unit Defender => EventRef?.TargetUnit;
 
     /// <summary>
-    ///     This simply stores a variable name and its value so when this key is found in a expression it gets the value
+    ///     This simply stores a local variable name and its value so when this key is found in a expression it gets the value
     ///     accordingly.
     /// </summary>
-    public Dictionary<string, VarVal> Variables { get; set; } = new();
+    private Dictionary<string, VarVal> LocalVariables { get; set; } = new();
+
+    /// <summary>
+    ///     same but global var. this var can go into child formulas
+    /// </summary>
+    public Dictionary<string, VarVal> TransferVariables { get; set; }
 
     public List<Condition> ConditionSkipList { get; set; }
 
     public IEnumerable<Formula> ChildFormulas
     {
-        get { return Variables.Select(x => x.Value.ResFormula).Where(z => z != null); }
+        get { return LocalVariables.Select(x => x.Value.ResFormula).Where(z => z != null); }
     }
 
     /// <summary>
@@ -79,11 +84,12 @@ public class Formula : ICloneable
     public object Clone()
     {
         var newClone = (Formula)MemberwiseClone();
-        var oldVariables = newClone.Variables;
-        newClone.Variables = new Dictionary<string, VarVal>();
+        var oldVariables = newClone.LocalVariables;
+        newClone.LocalVariables = new Dictionary<string, VarVal>();
         foreach (var oldVar in oldVariables)
-            newClone.Variables[oldVar.Key] = oldVar.Value with { TraceEffects = new List<EffectTraceRec>() };
-        newClone.result = null;;
+            newClone.LocalVariables[oldVar.Key] = oldVar.Value with { TraceEffects = new List<EffectTraceRec>() };
+        newClone.result = null;
+        ;
         return newClone;
     }
 
@@ -132,6 +138,210 @@ public class Formula : ICloneable
             return pstr.Substring(ndx, methodEndNdx - ndx);
         }
 
+        void ParseVariable(KeyValuePair<string, VarVal> variable)
+        {
+            foreach (var dynVar in (DynamicTargetEnm[])Enum.GetValues(typeof(DynamicTargetEnm)))
+            {
+                var expr = variable.Value.ReplaceExpression;
+                var ndx = expr?.IndexOf(dynVar.ToString(), StringComparison.Ordinal) ?? -1;
+                if (ndx < 0) continue;
+                var methodNdx = expr.IndexOf('#') + 1;
+
+                var myFieldInfo = GetType().GetProperty(dynVar.ToString());
+
+                var initUnit = (Unit)myFieldInfo!.GetValue(this);
+                object finalMeth = initUnit;
+                var prevObject = finalMeth;
+                var nextMethod = GetNextMethod(expr, methodNdx, out methodNdx);
+                //parsing all method and properties line
+                while (nextMethod != string.Empty)
+                {
+                    MethodInfo mInfo;
+                    //proxy to unit formulas
+                    if (nextMethod == nameof(UnitStaticFormulas))
+                        mInfo = typeof(UnitStaticFormulas).GetMethod(GetNextMethod(expr, methodNdx, out methodNdx));
+                    else
+                        mInfo = finalMeth.GetType().GetMethod(nextMethod);
+
+
+                    if (mInfo is not null)
+                    {
+                        prevObject = finalMeth;
+                        object[] objArr = [];
+
+
+                        foreach (var prm in mInfo.GetParameters())
+                        {
+                            Array.Resize(ref objArr, objArr.Length + 1);
+                            if (prm.ParameterType == typeof(Event))
+                            {
+                                objArr[^1] = EventRef;
+                            }
+                            else if (prm.ParameterType == typeof(DynamicTargetEnm))
+                            {
+                                objArr[^1] = dynVar;
+                            }
+                            else if (prm.ParameterType == typeof(Ability.ElementEnm) ||
+                                     prm.ParameterType == typeof(Ability.ElementEnm?))
+                            {
+                                //scan from next param
+                                var oldNdx = methodNdx;
+                                var nextPrm = GetNextMethod(expr, methodNdx, out methodNdx);
+                                if (!string.IsNullOrEmpty(nextPrm))
+                                    try
+                                    {
+                                        var element =
+                                            (Ability.ElementEnm)Enum.Parse(typeof(Ability.ElementEnm), nextPrm);
+                                        objArr[^1] = element;
+                                    }
+                                    catch
+                                    {
+                                        //revert index
+                                        methodNdx = oldNdx;
+                                    }
+                                else if (EventRef is DoTDamage dt)
+                                    objArr[^1] = dt.Element;
+                                else
+                                    objArr[^1] = EventRef?.ParentStep.ActorAbility?.Element;
+                            }
+                            else if (prm.ParameterType == typeof(Effect))
+                            {
+                                Effect effect = null;
+
+                                var nextPrm = GetNextMethod(expr, methodNdx, out methodNdx);
+                                if (!string.IsNullOrEmpty(nextPrm))
+                                    effect = (Effect)Activator.CreateInstance(Type.GetType(nextPrm));
+                                else if (EventRef is ApplyBuff applyBuff)
+                                    effect = applyBuff.AppliedBuffToApply.Effects.FirstOrDefault();
+
+
+                                objArr[^1] = effect;
+                            }
+                            else if (prm.ParameterType == typeof(Ability.AbilityTypeEnm) ||
+                                     prm.ParameterType == typeof(Ability.AbilityTypeEnm?))
+                            {
+                                Ability.AbilityTypeEnm? abilityTypeEnm;
+                                var oldNdx = methodNdx;
+                                var nextPrm = GetNextMethod(expr, methodNdx, out methodNdx);
+                                //first try parse ability type from formula
+                                if (!string.IsNullOrEmpty(nextPrm))
+                                    try
+                                    {
+                                        abilityTypeEnm =
+                                            (Ability.AbilityTypeEnm)Enum.Parse(typeof(Ability.AbilityTypeEnm), nextPrm);
+                                    }
+                                    catch
+                                    {
+                                        //revert index
+                                        methodNdx = oldNdx;
+                                        abilityTypeEnm = null;
+                                    }
+
+                                else
+                                    abilityTypeEnm =
+                                        EventRef?.ParentStep.ActorAbility?.AbilityType ?? null;
+
+                                //if Followup action and ability is not follow up type then add flag
+                                if (EventRef?.ParentStep.ActorAbility?.AbilityType !=
+                                    Ability.AbilityTypeEnm.FollowUpAction &&
+                                    EventRef?.ParentStep.StepType == Step.StepTypeEnm.UnitFollowUpAction)
+                                    abilityTypeEnm |= Ability.AbilityTypeEnm.FollowUpAction;
+                                objArr[^1] = abilityTypeEnm;
+                            }
+                            else if (prm.ParameterType == typeof(Ability))
+                            {
+                                objArr[^1] = EventRef.ParentStep.ActorAbility;
+                            }
+                            else if (prm.ParameterType == typeof(Unit))
+                            {
+                                objArr[^1] = UnitRef;
+                            }
+                            else if (prm.ParameterType == typeof(List<EffectTraceRec>))
+                            {
+                                objArr[^1] = variable.Value.TraceEffects;
+                            }
+                            else if (prm.ParameterType == typeof(List<FormulaBuffer.DependencyRec>))
+                            {
+                                objArr[^1] = FoundedDependency;
+                            }
+                            else if (prm.ParameterType == typeof(List<Condition>))
+                            {
+                                if (ConditionSkipList == null)
+                                    ConditionSkipList = new List<Condition>();
+                                objArr[^1] = ConditionSkipList;
+                            }
+                            else if (prm.ParameterType == typeof(Type))
+                            {
+                                var nextPrm = GetNextMethod(expr, methodNdx, out methodNdx);
+                                if (string.IsNullOrEmpty(nextPrm)) continue;
+                                //first search Type
+                                var searchType = Type.GetType(nextPrm);
+                                if (searchType != null)
+                                    objArr[^1] = searchType;
+                                else
+                                    objArr[^1] = null;
+                            }
+                            else if (prm.ParameterType == typeof(Resource.ResourceType))
+                            {
+                                var nextPrm = GetNextMethod(expr, methodNdx, out methodNdx);
+                                objArr[^1] =
+                                    (Resource.ResourceType)Enum.Parse(typeof(Resource.ResourceType), nextPrm, true);
+                            }
+                            else
+                            {
+                                switch (prm.ParameterType)
+                                {
+                                    case var value when value == typeof(int) || value == typeof(int?):
+                                        objArr[^1] = int.Parse(GetNextMethod(expr, methodNdx, out methodNdx));
+                                        break;
+                                    case var value when value == typeof(double) || value == typeof(double?):
+                                        objArr[^1] = double.Parse(GetNextMethod(expr, methodNdx, out methodNdx));
+                                        break;
+                                    case var value when value == typeof(string):
+                                        objArr[^1] = GetNextMethod(expr, methodNdx, out methodNdx);
+                                        break;
+                                }
+                            }
+                        }
+
+                        finalMeth = mInfo.Invoke(prevObject, objArr);
+                    }
+
+                    var pInfo = finalMeth.GetType().GetProperty(nextMethod);
+                    if (pInfo is not null)
+                    {
+                        prevObject = finalMeth;
+                        finalMeth = pInfo.GetValue(finalMeth);
+                    }
+
+
+                    nextMethod = GetNextMethod(expr, methodNdx, out methodNdx);
+                }
+
+                //get result by type
+
+                switch (finalMeth)
+                {
+                    case int nt:
+                        variable.Value.Result = (double)nt;
+                        break;
+                    case double ds:
+                        variable.Value.Result = ds;
+                        break;
+                    case Formula fs:
+                        variable.Value.Result = fs.Result;
+                        variable.Value.ResFormula = fs;
+                        FormulaBuffer.MergeDependencies(FoundedDependency, variable.Value.ResFormula.FoundedDependency);
+                        break;
+                    case PropertyInfo pf:
+                        variable.Value.Result = (double)pf.GetValue(prevObject)!;
+                        break;
+                }
+
+                break;
+            }
+        }
+
         //do replace on ( ) expressions
         var expNdx = GetNext("(", 0);
         while (expNdx >= 0)
@@ -157,12 +367,12 @@ public class Formula : ICloneable
             {
                 ResFormula = new Formula
                 {
-                    Expression = varExpr, Variables = Variables.ToDictionary(), EventRef = EventRef, UnitRef = UnitRef
+                    Expression = varExpr, TransferVariables = TransferVariables, EventRef = EventRef, UnitRef = UnitRef
                 }
             };
             newVal.Result = newVal.ResFormula.Result;
             FormulaBuffer.MergeDependencies(FoundedDependency, newVal.ResFormula.FoundedDependency);
-            Variables.Add(newExp, newVal);
+            LocalVariables.Add(newExp, newVal);
             expNdx = GetNext("(",
                 endNdx - (varExpr.Length + 2 /*"(" and ")" deleted from string then add 2 to length*/ - newExp.Length));
         }
@@ -184,7 +394,7 @@ public class Formula : ICloneable
                     if (endNdx < 0)
                         endNdx = Expression.Length;
                     var varExpr = Expression.Substring(ndx, endNdx - ndx);
-                    Variables.Add(varExpr, new VarVal { ReplaceExpression = varExpr });
+                    LocalVariables[varExpr] = new VarVal { ReplaceExpression = varExpr };
                 }
 
                 ndx = GetNext(dynVar.ToString(), ndx + 1);
@@ -192,206 +402,12 @@ public class Formula : ICloneable
         }
 
         //calculate variables
-        foreach (var variable in Variables.Where(x => x.Value.Result is null))
-        foreach (var dynVar in (DynamicTargetEnm[])Enum.GetValues(typeof(DynamicTargetEnm)))
-        {
-            var expr = variable.Value.ReplaceExpression;
-            var ndx = expr?.IndexOf(dynVar.ToString(), StringComparison.Ordinal) ?? -1;
-            if (ndx < 0) continue;
-            var methodNdx = expr.IndexOf('#') + 1;
-
-            var myFieldInfo = GetType().GetProperty(dynVar.ToString());
-
-            var initUnit = (Unit)myFieldInfo!.GetValue(this);
-            object finalMeth = initUnit;
-            var prevObject = finalMeth;
-            var nextMethod = GetNextMethod(expr, methodNdx, out methodNdx);
-            //parsing all method and properties line
-            while (nextMethod != string.Empty)
-            {
-                MethodInfo mInfo;
-                //proxy to unit formulas
-                if (nextMethod == nameof(UnitStaticFormulas))
-                    mInfo = typeof(UnitStaticFormulas).GetMethod(GetNextMethod(expr, methodNdx, out methodNdx));
-                else
-                    mInfo = finalMeth.GetType().GetMethod(nextMethod);
-
-
-                if (mInfo is not null)
-                {
-                    prevObject = finalMeth;
-                    object[] objArr = [];
-
-
-                    foreach (var prm in mInfo.GetParameters())
-                    {
-                        Array.Resize(ref objArr, objArr.Length + 1);
-                        if (prm.ParameterType == typeof(Event))
-                        {
-                            objArr[^1] = EventRef;
-                        }
-                        else if (prm.ParameterType == typeof(DynamicTargetEnm))
-                        {
-                            objArr[^1] = dynVar;
-                        }
-                        else if (prm.ParameterType == typeof(Ability.ElementEnm) ||
-                                 prm.ParameterType == typeof(Ability.ElementEnm?))
-                        {
-                            //scan from next param
-                            var oldNdx = methodNdx;
-                            var nextPrm = GetNextMethod(expr, methodNdx, out methodNdx);
-                            if (!string.IsNullOrEmpty(nextPrm))
-                                try
-                                {
-                                    var element = (Ability.ElementEnm)Enum.Parse(typeof(Ability.ElementEnm), nextPrm);
-                                    objArr[^1] = element;
-                                }
-                                catch
-                                {
-                                    //revert index
-                                    methodNdx = oldNdx;
-                                }
-                            else if (EventRef is DoTDamage dt)
-                                objArr[^1] = dt.Element;
-                            else
-                                objArr[^1] = EventRef?.ParentStep.ActorAbility?.Element;
-                        }
-                        else if (prm.ParameterType == typeof(Effect))
-                        {
-                            Effect effect = null;
-
-                            var nextPrm = GetNextMethod(expr, methodNdx, out methodNdx);
-                            if (!string.IsNullOrEmpty(nextPrm))
-                                effect = (Effect)Activator.CreateInstance(Type.GetType(nextPrm));
-                            else if (EventRef is ApplyBuff applyBuff)
-                                effect = applyBuff.AppliedBuffToApply.Effects.FirstOrDefault();
-
-
-                            objArr[^1] = effect;
-                        }
-                        else if (prm.ParameterType == typeof(Ability.AbilityTypeEnm) ||
-                                 prm.ParameterType == typeof(Ability.AbilityTypeEnm?))
-                        {
-                            Ability.AbilityTypeEnm? abilityTypeEnm;
-                            var oldNdx = methodNdx;
-                            var nextPrm = GetNextMethod(expr, methodNdx, out methodNdx);
-                            //first try parse ability type from formula
-                            if (!string.IsNullOrEmpty(nextPrm))
-                                try
-                                {
-                                    abilityTypeEnm =
-                                        (Ability.AbilityTypeEnm)Enum.Parse(typeof(Ability.AbilityTypeEnm), nextPrm);
-                                }
-                                catch
-                                {
-                                    //revert index
-                                    methodNdx = oldNdx;
-                                    abilityTypeEnm = null;
-                                }
-
-                            else
-                                abilityTypeEnm =
-                                    EventRef?.ParentStep.ActorAbility?.AbilityType ?? null;
-
-                            //if Followup action and ability is not follow up type then add flag
-                            if (EventRef?.ParentStep.ActorAbility?.AbilityType !=
-                                Ability.AbilityTypeEnm.FollowUpAction &&
-                                EventRef?.ParentStep.StepType == Step.StepTypeEnm.UnitFollowUpAction)
-                                abilityTypeEnm |= Ability.AbilityTypeEnm.FollowUpAction;
-                            objArr[^1] = abilityTypeEnm;
-                        }
-                        else if (prm.ParameterType == typeof(Ability))
-                        {
-                            objArr[^1] = EventRef.ParentStep.ActorAbility;
-                        }
-                        else if (prm.ParameterType == typeof(Unit))
-                        {
-                            objArr[^1] = UnitRef;
-                        }
-                        else if (prm.ParameterType == typeof(List<EffectTraceRec>))
-                        {
-                            objArr[^1] = variable.Value.TraceEffects;
-                        }
-                        else if (prm.ParameterType == typeof(List<FormulaBuffer.DependencyRec>))
-                        {
-                            objArr[^1] = FoundedDependency;
-                        }
-                        else if (prm.ParameterType == typeof(List<Condition>))
-                        {
-                            if (ConditionSkipList == null)
-                                ConditionSkipList = new List<Condition>();
-                            objArr[^1] = ConditionSkipList;
-                        }
-                        else if (prm.ParameterType == typeof(Type))
-                        {
-                            var nextPrm = GetNextMethod(expr, methodNdx, out methodNdx);
-                            if (string.IsNullOrEmpty(nextPrm)) continue;
-                            //first search Type
-                            var searchType = Type.GetType(nextPrm);
-                            if (searchType != null)
-                                objArr[^1] = searchType;
-                            else
-                                objArr[^1] = null;
-                        }
-                        else if (prm.ParameterType == typeof(Resource.ResourceType))
-                        {
-                            var nextPrm = GetNextMethod(expr, methodNdx, out methodNdx);
-                            objArr[^1] =
-                                (Resource.ResourceType)Enum.Parse(typeof(Resource.ResourceType), nextPrm, true);
-                        }
-                        else
-                        {
-                            switch (prm.ParameterType)
-                            {
-                                case var value when value == typeof(int) || value == typeof(int?):
-                                    objArr[^1] = int.Parse(GetNextMethod(expr, methodNdx, out methodNdx));
-                                    break;
-                                case var value when value == typeof(double) || value == typeof(double?):
-                                    objArr[^1] = double.Parse(GetNextMethod(expr, methodNdx, out methodNdx));
-                                    break;
-                                case var value when value == typeof(string):
-                                    objArr[^1] = GetNextMethod(expr, methodNdx, out methodNdx);
-                                    break;
-                            }
-                        }
-                    }
-
-                    finalMeth = mInfo.Invoke(prevObject, objArr);
-                }
-
-                var pInfo = finalMeth.GetType().GetProperty(nextMethod);
-                if (pInfo is not null)
-                {
-                    prevObject = finalMeth;
-                    finalMeth = pInfo.GetValue(finalMeth);
-                }
-
-
-                nextMethod = GetNextMethod(expr, methodNdx, out methodNdx);
-            }
-
-            //get result by type
-
-            switch (finalMeth)
-            {
-                case int nt:
-                    variable.Value.Result = (double)nt;
-                    break;
-                case double ds:
-                    variable.Value.Result = ds;
-                    break;
-                case Formula fs:
-                    variable.Value.Result = fs.Result;
-                    variable.Value.ResFormula = fs;
-                    FormulaBuffer.MergeDependencies(FoundedDependency, variable.Value.ResFormula.FoundedDependency);
-                    break;
-                case PropertyInfo pf:
-                    variable.Value.Result = (double)pf.GetValue(prevObject)!;
-                    break;
-            }
-
-            break;
-        }
+        foreach (var variable in LocalVariables.Where(x => x.Value.Result is null))
+            ParseVariable(variable);
+        //calculate transfer variables\
+        if (TransferVariables != null)
+            foreach (var variable in TransferVariables.Where(x => x.Value.Result is null))
+                ParseVariable(variable);
     }
 
 
@@ -405,7 +421,7 @@ public class Formula : ICloneable
             //load values from buffer
             Result = foundOld.Result;
             ConditionSkipList = foundOld.ConditionSkipList;
-            Variables = foundOld.Variables;
+            LocalVariables = foundOld.LocalVariables;
             FoundedDependency = foundOld.FoundedDependency;
             LoadedFromBuffer = true;
             Expression = foundOld.Expression;
@@ -431,7 +447,11 @@ public class Formula : ICloneable
             else //It is a number or a variable
             {
                 double value;
-                if (Variables.TryGetValue(lexeme, out var variable)) //If it is a variable, let's get the variable value
+                if (LocalVariables.TryGetValue(lexeme,
+                        out var variable)) //If it is a variable, let's get the variable value
+                    value = variable.Result ?? 0;
+                else if (TransferVariables != null &&
+                         TransferVariables.TryGetValue(lexeme, out variable)) //else take it from transfer variables
                     value = variable.Result ?? 0;
                 else //It is just a number, let's just parse
                     value = double.Parse(lexeme.Replace(",", "."), NumberStyles.Any, CultureInfo.InvariantCulture);
@@ -485,9 +505,9 @@ public class Formula : ICloneable
     //get all effects used in formula(including child calculations)
     public IEnumerable<EffectTraceRec> DescendantsAndSelfEffects()
     {
-        foreach (var eff in Variables.Values.SelectMany(x => x.TraceEffects))
+        foreach (var eff in LocalVariables.Values.SelectMany(x => x.TraceEffects))
             yield return eff;
-        foreach (var formula in Variables.Values.Where(x => x.ResFormula != null).Select(x => x.ResFormula))
+        foreach (var formula in LocalVariables.Values.Where(x => x.ResFormula != null).Select(x => x.ResFormula))
         foreach (var eff in formula.DescendantsAndSelfEffects())
             yield return eff;
     }
@@ -554,12 +574,12 @@ public class Formula : ICloneable
                 finalStr += "-============-" + Environment.NewLine;
         }
 
-        while (firstRun || IncompleteLevel(Variables))
+        while (firstRun || IncompleteLevel(LocalVariables))
         {
             firstRun = false;
             foreach (var lexeme in Expression.Split([" "],
                          StringSplitOptions.RemoveEmptyEntries))
-                if (Variables.TryGetValue(lexeme, out var val))
+                if (LocalVariables.TryGetValue(lexeme, out var val))
                 {
                     if (replacedVariables.ReplacedRaw.All(z => z.ReplaceExpression != val.ReplaceExpression))
                     {
@@ -596,7 +616,7 @@ public class Formula : ICloneable
                         /*
                          *
                          */
-                        if (!IncompleteLevel(val.ResFormula.Variables) || childItemsReplaced == 0)
+                        if (!IncompleteLevel(val.ResFormula.LocalVariables) || childItemsReplaced == 0)
                             if (newlyReplacedVariables.ReplacedFormulas.All(z =>
                                     z.ResFormula.Expression != val.ResFormula.Expression))
                             {

@@ -14,6 +14,11 @@ public class DefaultRelicSet : IRelicSet
         StepHandlerProc += DefaultRelicSet_HandleStep;
     }
 
+    // get default ger icon path
+    protected string GearIcon()
+    {
+        return "gear\\" + GetType().ToString().Split('.').Last();
+    }
     protected IFighter Parent { get; set; }
 
     public int Num { get; set; }

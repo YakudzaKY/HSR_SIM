@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Xml;
@@ -168,7 +169,7 @@ public static class XmlLoader
     private static double SafeToDouble(string pStr)
     {
         if (!string.IsNullOrEmpty(pStr))
-            return double.Parse(pStr.Replace(".", ","));
+            return double.Parse(pStr.Replace(',', '.'),NumberStyles.Any, CultureInfo.InvariantCulture);
         return 0;
     }
 
@@ -275,6 +276,17 @@ public static class XmlLoader
             };
             unit.Skills.Add(skill);
         }
+        
+        var majorTraces = xmlElement.SelectNodes("MajorTrace");
+        if (majorTraces != null)
+            foreach (XmlElement xmlTrace in majorTraces)
+            {
+
+                ATracesEnm flg = (ATracesEnm)Enum.Parse(typeof(ATracesEnm),
+                        xmlTrace.Attributes.GetNamedItem("Trace")?.Value?.Trim()!, true)
+                ;
+                unit.ATraces |= flg;
+            }
 
 
         foreach (XmlElement xmlLCone in xmlElement.SelectNodes("LightCone")!)
@@ -287,7 +299,7 @@ public static class XmlLoader
 
         foreach (XmlElement xmlRelic in xmlElement.SelectNodes("RelicSet")!)
         {
-            var assemblyName = xmlRelic.Attributes.GetNamedItem("assembly")?.Value?.Trim() ?? "HSR_SIM_CONTENT";
+            var assemblyName = xmlRelic.Attributes.GetNamedItem("assembly")?.Value?.Trim().Replace(":","") ?? "HSR_SIM_CONTENT";
             KeyValuePair<string, int> newRec = new(
                 $"{assemblyName}.Content.Relics.{EscapeReplaceString(xmlRelic.Attributes.GetNamedItem("name")?.Value)}, {assemblyName}",
                 int.Parse(xmlRelic.Attributes.GetNamedItem("num")?.Value?.Trim() ?? "0"));

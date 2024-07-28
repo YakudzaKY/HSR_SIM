@@ -21,7 +21,7 @@ internal class InertSalsotto : DefaultRelicSet
                 new EffAbilityTypeBoost { Value = 0.15, AbilityType = Ability.AbilityTypeEnm.Ultimate },
                 new EffAbilityTypeBoost { Value = 0.15, AbilityType = Ability.AbilityTypeEnm.FollowUpAction }
             ],
-            CustomIconName = "gear\\" + GetType().ToString().Split('.').Last(),
+            CustomIconName = GearIcon(),
 
             Target = Parent.Parent,
             ApplyConditions =

@@ -111,7 +111,7 @@ public static class FighterUtils
                          $" *  {Formula.DynamicTargetEnm.Defender}#{nameof(Unit.GetBrokenMultiplier)}";
         var newFormula = new Formula
         {
-            Expression = expression, Variables = abilityFormula.Variables,
+            Expression = expression, TransferVariables = abilityFormula.TransferVariables,
             FoundedDependency = abilityFormula.FoundedDependency
         };
 
@@ -154,7 +154,7 @@ public static class FighterUtils
 
         var newFormula = new Formula
         {
-            Expression = expression, Variables = abilityFormula.Variables,
+            Expression = expression, TransferVariables = abilityFormula.TransferVariables,
             FoundedDependency = abilityFormula.FoundedDependency
         };
         return newFormula;
@@ -168,7 +168,7 @@ public static class FighterUtils
 
         var newFormula = new Formula
         {
-            Expression = expression, Variables = abilityFormula.Variables,
+            Expression = expression, TransferVariables = abilityFormula.TransferVariables,
             FoundedDependency = abilityFormula.FoundedDependency
         };
         return newFormula;

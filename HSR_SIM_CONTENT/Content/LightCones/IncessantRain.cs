@@ -29,7 +29,15 @@ internal class IncessantRain : DefaultLightCone
         {
             Effects = [new EffCritPrc { CalculateValue = CalcCrit }],
             Target = Parent.Parent,
-            IsTargetCheck = true
+            IsTargetCheck = true,
+            ApplyConditions =
+            [
+                new Condition
+                {
+                    ConditionParam = Condition.ConditionCheckParam.AnyDebuff,
+                    ConditionExpression = Condition.ConditionCheckExpression.Exists
+                }
+            ]
         });
     }
 

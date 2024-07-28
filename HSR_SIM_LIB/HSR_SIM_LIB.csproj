@@ -11,6 +11,16 @@
         <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
         <LangVersion>default</LangVersion>
     </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+        <Optimize>true</Optimize>
+        <DefineConstants></DefineConstants>
+        <DebugType>pdbonly</DebugType>
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+    </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="13.3.0"/>
         <PackageReference Include="Magick.NET.Core" Version="13.3.0"/>

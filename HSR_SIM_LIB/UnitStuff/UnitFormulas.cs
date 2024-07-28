@@ -251,7 +251,7 @@ public partial class Unit : CloneClass
         Formula.DynamicTargetEnm unitToCheck = Formula.DynamicTargetEnm.Attacker, Event ent = null,
         List<Condition> excludeCondition = null)
     {
-        if (ent is DamageEventTemplate)
+        if (ent is not  DirectDamage)
             return new Formula
             {
                 EventRef = ent,
@@ -395,25 +395,7 @@ public partial class Unit : CloneClass
     }
 
 
-    public Formula CritHit(Event ent, List<Condition> excludeCondition = null)
-    {
-        double critMod = ent is DirectDamage dd ? dd.IsCrit ? 1 : 0 : 0;
-        return new Formula
-        {
-            EventRef = ent,
-            UnitRef = this,
-            ConditionSkipList = excludeCondition,
-            Expression = $"{critMod}",
-            FoundedDependency =
-            [
-                new FormulaBuffer.DependencyRec
-                {
-                    Relation = Formula.DynamicTargetEnm.Attacker,
-                    Stat = Condition.ConditionCheckParam.DoNotSaveDependency
-                }
-            ]
-        };
-    }
+
 
 
     public Formula Def(

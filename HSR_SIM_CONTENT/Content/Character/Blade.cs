@@ -247,7 +247,7 @@ public class Blade : DefaultFighter
                     (Parent.Rank >= 1
                         ? $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(GetDsMechanic)} min getDsMaxLostHp * 1.5 ) "
                         : ""),
-                Variables = new Dictionary<string, Formula.VarVal>
+                TransferVariables = new Dictionary<string, Formula.VarVal>
                 {
                     {
                         "getDsMaxLostHp",
@@ -274,7 +274,7 @@ public class Blade : DefaultFighter
                     $"({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Attack)} * {dsAdjAtk}  ) " +
                     $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.MaxHp)} * {dsAdjHp}  ) " +
                     $" + ({Formula.DynamicTargetEnm.Attacker}#{nameof(Unit.Fighter)}#{nameof(GetDsMechanic)} min getDsMaxLostHp * {dsAdjHp}  ) ",
-                Variables = new Dictionary<string, Formula.VarVal>
+                TransferVariables = new Dictionary<string, Formula.VarVal>
                 {
                     {
                         "getDsMaxLostHp",
@@ -332,7 +332,7 @@ public class Blade : DefaultFighter
             CalculateValue = DamageFormula(new Formula
             {
                 Expression = " BladeMaxHp * 0.4 ",
-                Variables = new Dictionary<string, Formula.VarVal>
+                TransferVariables = new Dictionary<string, Formula.VarVal>
                 {
                     {
                         "BladeMaxHp",
@@ -388,7 +388,7 @@ public class Blade : DefaultFighter
 //=====================
 //Ascended Traces
 //=====================
-        if (ATraces.HasFlag(ATracesEnm.A2))
+        if (parent.ATraces.HasFlag(Unit.ATracesEnm.A2))
             Parent.PassiveBuffs.Add(new PassiveBuff(Parent, this)
             {
                 Effects = [new EffIncomeHealingPrc { Value = 0.20 }],
@@ -405,7 +405,7 @@ public class Blade : DefaultFighter
                     }
                 ]
             });
-        if (ATraces.HasFlag(ATracesEnm.A6))
+        if (parent.ATraces.HasFlag(Unit.ATracesEnm.A6))
             Parent.PassiveBuffs.Add(new PassiveBuff(Parent, this)
             {
                 Effects = [new EffAbilityTypeBoost { Value = 0.20, AbilityType = AbilityTypeEnm.FollowUpAction }],
@@ -483,7 +483,7 @@ public class Blade : DefaultFighter
                     { TargetUnit = Parent, AppliedBuffToApply = E4AppliedBuff });
         }
 
-        if (ent.Reference == forestMainTargetHit && ATraces.HasFlag(ATracesEnm.A4) &&
+        if (ent.Reference == forestMainTargetHit && Parent.ATraces.HasFlag(Unit.ATracesEnm.A4) &&
             ent.TargetUnit.GetRes(Resource.ResourceType.Toughness).ResVal == 0)
             ent.ChildEvents.Add(new Healing(ent.ParentStep, this, Parent)
             {

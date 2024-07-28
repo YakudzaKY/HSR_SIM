@@ -115,6 +115,17 @@ public partial class Unit : CloneClass
     public TypeEnm UnitType { get; set; }
     public List<Skill> Skills { get; private set; } = [];
 
+    //Major Traces
+    [Flags]
+    public enum ATracesEnm
+    {
+        A2 = 1,
+        A4 = 2,
+        A6 = 4
+    }
+
+    public ATracesEnm ATraces { get; internal set; } 
+
     public Team EnemyTeam
     {
         get
@@ -419,9 +430,19 @@ public partial class Unit : CloneClass
                     newFrm.EventRef = ent;
                     finalValue = newFrm.Result;
                 }
+        
+                //if no equals then reset dependency
+                if (!Equals(finalValue, effect.LastCalculatedValue))
+                {          
+                    //save last calculated value
+                    effect.LastCalculatedValue = finalValue;
+                    ResetCondition(effect.ResetDependency);
+                }
+
                 //do not save buffer if target calculation effects
                 FormulaBuffer.MergeDependency(dependencyRecs,
-                    new FormulaBuffer.DependencyRec { Relation = unitToCheck, Stat = Condition.ConditionCheckParam.DoNotSaveDependency });
+                    new FormulaBuffer.DependencyRec
+                        { Relation = unitToCheck, Stat = Condition.ConditionCheckParam.DoNotSaveDependency });
             }
             else
             {
@@ -716,6 +737,18 @@ public partial class Unit : CloneClass
     }
 
 
+    public double CritHit(Event ent,
+        List<FormulaBuffer.DependencyRec> dependencyRecs = null,
+        DynamicTargetEnm unitToCheck = DynamicTargetEnm.Attacker)
+    {
+        if (dependencyRecs != null)
+            FormulaBuffer.MergeDependency(dependencyRecs,
+                new FormulaBuffer.DependencyRec
+                    { Relation = unitToCheck, Stat = Condition.ConditionCheckParam.DoNotSaveDependency });
+
+        return ent is DirectDamage dd ? dd.IsCrit ? 1 : 0 : 0;
+    }
+
     /// <summary>
     ///     Reset Conditions that depends on stat
     /// </summary>
@@ -726,7 +759,7 @@ public partial class Unit : CloneClass
             foreach (var cb in PassiveBuffs.Where(x => x.ApplyConditions != null)
                          .SelectMany(x => x.ApplyConditions.Where(y => y.ConditionParam == cprm)))
                 cb.NeedRecalculate = true;
-        ParentTeam?.ParentSim.CalcBuffer.Reset(this, chkPrm);
+        ParentTeam?.ParentSim.CalcBuffer?.Reset(this, chkPrm);
     }
 
 

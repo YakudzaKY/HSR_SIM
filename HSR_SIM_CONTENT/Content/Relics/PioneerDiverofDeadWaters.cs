@@ -17,12 +17,13 @@ internal class PioneerDiverofDeadWaters : DefaultRelicSet
     public PioneerDiverofDeadWaters(IFighter parent, int num) : base(parent, num)
     {
         onDebuffHitAppliedBuff = new AppliedBuff(Parent.Parent, null, this)
-            { BaseDuration = 1, Dispellable = false, CustomIconName = "Sword", Effects = [] };
+            { BaseDuration = 1, Dispellable = false, CustomIconName = GearIcon(), Effects = [] };
         if (num >= 2)
             Parent.Parent.PassiveBuffs.Add(new PassiveBuff(parent.Parent, this)
             {
                 Effects = new List<Effect> { new EffAllDamageBoost { Value = 0.12 } },
                 IsTargetCheck = true,
+                CustomIconName = GearIcon(),
                 Target = Parent.Parent,
                 ApplyConditions =
                 [
@@ -40,6 +41,7 @@ internal class PioneerDiverofDeadWaters : DefaultRelicSet
                 Effects = new List<Effect> { new EffCritDmg { CalculateValue = Calc4Pieces } },
                 IsTargetCheck = true,
                 Target = Parent.Parent,
+                CustomIconName = GearIcon(),
                 ApplyConditions =
                 [
                     new Condition

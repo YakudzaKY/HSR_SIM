@@ -94,7 +94,7 @@ public class Luocha : DefaultFighter
             CostType = Resource.ResourceType.SP,
             Cost = 1
         };
-        if (ATraces.HasFlag(ATracesEnm.A2))
+        if (parent.ATraces.HasFlag(Unit.ATracesEnm.A2))
             prayerOfAbyssFlower.Events.Add(new DispelBad(null, this, Parent));
 
         prayerOfAbyssFlower.Events.Add(new Healing(null, this, Parent)
@@ -117,7 +117,7 @@ public class Luocha : DefaultFighter
             TargetType = TargetTypeEnm.Friend,
             FollowUpTargets = trackedUnits
         };
-        if (ATraces.HasFlag(ATracesEnm.A2))
+        if (parent.ATraces.HasFlag(Unit.ATracesEnm.A2))
             prayerOfAbyssFlowerAuto.Events.Add(new DispelBad(null, this, Parent));
         prayerOfAbyssFlowerAuto.Events.Add(new Healing(null, this, Parent)
         {
@@ -256,7 +256,7 @@ public class Luocha : DefaultFighter
 
 
         //A6
-        if (ATraces.HasFlag(ATracesEnm.A6))
+        if (parent.ATraces.HasFlag(Unit.ATracesEnm.A6))
             Parent.NativeDebuffResists.Add(new DebuffResist { Debuff = typeof(EffCrowdControl), ResistVal = 0.7 });
         //E2
         if (Parent.Rank >= 2)
@@ -350,7 +350,7 @@ public class Luocha : DefaultFighter
                         })
                     });
 
-            if (ATraces.HasFlag(ATracesEnm.A4))
+            if (Parent.ATraces.HasFlag(Unit.ATracesEnm.A4))
                 //for all friends except attacker unit
                 foreach (var unit in ent.SourceUnit.Friends.Where(x => x.IsAlive && x != ent.SourceUnit))
                     ent.ChildEvents.Add(

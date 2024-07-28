@@ -16,58 +16,58 @@ namespace HSR_SIM_CLIENT.Windows;
 
 public partial class SingleSimWindow : INotifyPropertyChanged
 {
-    private readonly Worker wrk;
-    private ObservableCollection<EventViewModel> events;
-    private EventViewModel? selectedEvent;
-    private UnitViewModel? selectedUnit;
-    private ObservableCollection<Team> teams;
+    private readonly Worker _wrk;
+    private ObservableCollection<EventViewModel> _events;
+    private EventViewModel? _selectedEvent;
+    private UnitViewModel? _selectedUnit;
+    private ObservableCollection<Team> _teams;
 
 
     public SingleSimWindow(SimCls simCls, string? devModePath = null, bool chkDevMode = false,
         List<Worker.RStatMod>? statMods = null)
     {
         InitializeComponent();
-        wrk = new Worker();
-        wrk.CbRend += WorkerCallBackImages;
-        wrk.CbGetDecision = WorkerCallBackGetDecision;
-        wrk.DevMode = chkDevMode;
-        wrk.LoadScenarioFromSim(simCls, devModePath);
+        _wrk = new Worker();
+        _wrk.CbRend += WorkerCallBackImages;
+        _wrk.CbGetDecision = WorkerCallBackGetDecision;
+        _wrk.DevMode = chkDevMode;
+        _wrk.LoadScenarioFromSim(simCls, devModePath);
         if (statMods != null)
-            wrk.ApplyModes(statMods);
-        teams = new ObservableCollection<Team>();
-        events = new ObservableCollection<EventViewModel>();
+            _wrk.ApplyModes(statMods);
+        _teams = new ObservableCollection<Team>();
+        _events = new ObservableCollection<EventViewModel>();
     }
 
 
     public ObservableCollection<Team> Teams
     {
-        get => teams;
+        get => _teams;
         private set
         {
-            if (Equals(value, teams)) return;
-            teams = value;
+            if (Equals(value, _teams)) return;
+            _teams = value;
             OnPropertyChanged();
         }
     }
 
     public ObservableCollection<EventViewModel> Events
     {
-        get => events;
+        get => _events;
         private set
         {
-            if (Equals(value, events)) return;
-            events = value;
+            if (Equals(value, _events)) return;
+            _events = value;
             OnPropertyChanged();
         }
     }
 
     public UnitViewModel? SelectedUnit
     {
-        get => selectedUnit;
+        get => _selectedUnit;
         set
         {
-            if (Equals(value, selectedUnit)) return;
-            selectedUnit = value;
+            if (Equals(value, _selectedUnit)) return;
+            _selectedUnit = value;
 
             OnPropertyChanged();
         }
@@ -76,11 +76,11 @@ public partial class SingleSimWindow : INotifyPropertyChanged
 
     public EventViewModel? SelectedEvent
     {
-        get => selectedEvent;
+        get => _selectedEvent;
         set
         {
-            if (Equals(value, selectedEvent)) return;
-            selectedEvent = value;
+            if (Equals(value, _selectedEvent)) return;
+            _selectedEvent = value;
 
             OnPropertyChanged();
         }
@@ -139,7 +139,7 @@ public partial class SingleSimWindow : INotifyPropertyChanged
 
     private void BtnNext_OnClick(object sender, RoutedEventArgs e)
     {
-        wrk.MoveStep();
+        _wrk.MoveStep();
         GetTeamsAndEvents();
     }
 
@@ -150,7 +150,7 @@ public partial class SingleSimWindow : INotifyPropertyChanged
     {
         //save selected unit
         Teams.Clear();
-        foreach (var team in wrk.Sim.Teams)
+        foreach (var team in _wrk.Sim.Teams)
             Teams.Add(team);
 
         //render selected unit
@@ -159,8 +159,9 @@ public partial class SingleSimWindow : INotifyPropertyChanged
 
         //save selected unit
         Events.Clear();
-        foreach (var ent in wrk.Sim.CurrentStep.Events)
-            Events.Add(new EventViewModel(ent));
+        if (_wrk.Sim.CurrentStep != null)
+            foreach (var ent in _wrk.Sim.CurrentStep.Events)
+                Events.Add(new EventViewModel(ent));
 
         //render selected unit
 
@@ -169,7 +170,7 @@ public partial class SingleSimWindow : INotifyPropertyChanged
 
     private void BtnPrev_OnClick(object sender, RoutedEventArgs e)
     {
-        wrk.MoveStep(true);
+        _wrk.MoveStep(true);
         GetTeamsAndEvents();
     }
 
