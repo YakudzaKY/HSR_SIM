@@ -115,6 +115,17 @@ public partial class Unit : CloneClass
     public TypeEnm UnitType { get; set; }
     public List<Skill> Skills { get; private set; } = [];
 
+    //Major Traces
+    [Flags]
+    public enum ATracesEnm
+    {
+        A2 = 1,
+        A4 = 2,
+        A6 = 4
+    }
+
+    public ATracesEnm ATraces { get; internal set; } 
+
     public Team EnemyTeam
     {
         get

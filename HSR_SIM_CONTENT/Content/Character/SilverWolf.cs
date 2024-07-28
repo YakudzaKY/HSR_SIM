@@ -52,7 +52,7 @@ public class SilverWolf : DefaultFighter
         talentDebuffChance = FighterUtils.GetAbilityScaling(0.60, 0.72, talentLvl);
 
         //weakness duration depend on A4 traits
-        var weaknessDuration = ATraces.HasFlag(ATracesEnm.A4) ? 3 : 2;
+        var weaknessDuration = parent.ATraces.HasFlag(Unit.ATracesEnm.A4) ? 3 : 2;
 
         allowChangesDebuff = new AppliedBuff(Parent, null, this)
         {
@@ -77,7 +77,7 @@ public class SilverWolf : DefaultFighter
             Effects = [new EffDefPrc { Value = -ultDef }]
         };
 
-        bugDuration = ATraces.HasFlag(ATracesEnm.A2) ? 4 : 3;
+        bugDuration = parent.ATraces.HasFlag(Unit.ATracesEnm.A2) ? 4 : 3;
         var talentAtkDebuff = new AppliedBuff(Parent, null, this)
         {
             Type = Buff.BuffType.Debuff,
@@ -329,7 +329,7 @@ public class SilverWolf : DefaultFighter
             ImplantBug(ent.TargetUnit, ent, talentDebuffChance);
         }
         //a2. shield got broken by teammate
-        else if (ent is ToughnessBreak && ATraces.HasFlag(ATracesEnm.A2) &&
+        else if (ent is ToughnessBreak && Parent.ATraces.HasFlag(Unit.ATracesEnm.A2) &&
                  ent.SourceUnit.ParentTeam == Parent.ParentTeam)
         {
             ImplantBug(ent.TargetUnit, ent, 0.65); //fixed chance

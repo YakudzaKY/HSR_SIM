@@ -165,6 +165,32 @@ public partial class HoyoApiImport : INotifyPropertyChanged
             skill.SetAttributeValue("max_level", skl.max_level.ToString());
             unit.Add(skill);
         }
+        
+        foreach (var skt in character.skill_trees)
+        {
+            if (skt.icon.IndexOf("skilltree", StringComparison.Ordinal) > 0 & skt.level==1)
+            {
+                XElement majorTrace = new("MajorTrace");
+                if (skt.anchor.Equals("Point06"))
+                {
+                    majorTrace.SetAttributeValue("Trace","A2");
+                }
+                else if (skt.anchor.Equals("Point07"))
+                {
+                    majorTrace.SetAttributeValue("Trace","A4");
+                }
+                else if (skt.anchor.Equals("Point08"))
+                {
+                    majorTrace.SetAttributeValue("Trace","A6");
+                }
+                else
+                {
+                    throw new Exception("unknown anchor " + skt.anchor);
+                }
+                unit.Add(majorTrace);  
+            }
+        }
+
 
 
         foreach (var gearSet in character.relic_sets)
@@ -217,6 +243,15 @@ public partial class HoyoApiImport : INotifyPropertyChanged
         public int max_level;
         public string name;
     }
+    
+    public class SkillTree
+    {
+        public string anchor;
+        public string icon;
+        public int level;
+        public int max_level;
+    }
+
 
     public class Gear
     {
@@ -253,6 +288,7 @@ public partial class HoyoApiImport : INotifyPropertyChanged
         public List<Gear> relics;
 
         public List<Skill> skills;
+        public List<SkillTree> skill_trees;
         public int ID { get; set; }
         public string Name { get; set; }
         public int Level { get; set; }

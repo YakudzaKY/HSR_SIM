@@ -276,6 +276,17 @@ public static class XmlLoader
             };
             unit.Skills.Add(skill);
         }
+        
+        var majorTraces = xmlElement.SelectNodes("MajorTrace");
+        if (majorTraces != null)
+            foreach (XmlElement xmlTrace in majorTraces)
+            {
+
+                ATracesEnm flg = (ATracesEnm)Enum.Parse(typeof(ATracesEnm),
+                        xmlTrace.Attributes.GetNamedItem("Trace")?.Value?.Trim()!, true)
+                ;
+                unit.ATraces |= flg;
+            }
 
 
         foreach (XmlElement xmlLCone in xmlElement.SelectNodes("LightCone")!)

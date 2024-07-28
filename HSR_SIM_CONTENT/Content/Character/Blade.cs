@@ -388,7 +388,7 @@ public class Blade : DefaultFighter
 //=====================
 //Ascended Traces
 //=====================
-        if (ATraces.HasFlag(ATracesEnm.A2))
+        if (parent.ATraces.HasFlag(Unit.ATracesEnm.A2))
             Parent.PassiveBuffs.Add(new PassiveBuff(Parent, this)
             {
                 Effects = [new EffIncomeHealingPrc { Value = 0.20 }],
@@ -405,7 +405,7 @@ public class Blade : DefaultFighter
                     }
                 ]
             });
-        if (ATraces.HasFlag(ATracesEnm.A6))
+        if (parent.ATraces.HasFlag(Unit.ATracesEnm.A6))
             Parent.PassiveBuffs.Add(new PassiveBuff(Parent, this)
             {
                 Effects = [new EffAbilityTypeBoost { Value = 0.20, AbilityType = AbilityTypeEnm.FollowUpAction }],
@@ -483,7 +483,7 @@ public class Blade : DefaultFighter
                     { TargetUnit = Parent, AppliedBuffToApply = E4AppliedBuff });
         }
 
-        if (ent.Reference == forestMainTargetHit && ATraces.HasFlag(ATracesEnm.A4) &&
+        if (ent.Reference == forestMainTargetHit && Parent.ATraces.HasFlag(Unit.ATracesEnm.A4) &&
             ent.TargetUnit.GetRes(Resource.ResourceType.Toughness).ResVal == 0)
             ent.ChildEvents.Add(new Healing(ent.ParentStep, this, Parent)
             {
