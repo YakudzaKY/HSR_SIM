@@ -22,8 +22,8 @@
         <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.7.0" />
-        <PackageReference Include="Magick.NET.Core" Version="14.7.0" />
+        <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.8.1" />
+        <PackageReference Include="Magick.NET.Core" Version="14.8.1" />
         <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
         <PackageReference Include="Mono.DataConverter" Version="1.0.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
